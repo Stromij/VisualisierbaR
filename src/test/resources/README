@@ -1,0 +1,53 @@
+Time is either an integer, or a rational number N/M
+
+java -jar vis.jar /path/to/log/file
+
+
+
+NODE;<Name>;<X>;<Y>
+    - declares a node <Name> at (<X>,<Y>)
+
+EDGE;<Name>;<Start>;<End>;<Length>
+    - declares an edge <Name> with length <Length> between <Start> and <End>
+
+ELEM;<Name>;<Node>;<State>
+    - declares a track element <Name> on node <Node> and initial state <State>
+    - <State> is either NOSIG, STOP or FAHRT
+    - <Name> is a string that contains no ';'
+    - The type of the track element is encoded in the name; it will contain a substring with one of the following
+        - HauptSignalImpl
+        - VorSignalImpl
+        - SichtbarkeitsPunktImpl
+        - GefahrenPunktImpl
+        - MagnetImpl
+        - WeichenPunktImpl
+        - SwWechselImpl
+    - Three WeichenPunktImpl declare a switch
+
+ZUG;<Name>;<Name2>;<Length>
+    - declares a train <Name> with a human readable name <Name2> and length <Length>
+
+MV;INIT;<Train>;<Edge>
+    - sets <Train> on edge <Edge>. The back of the train is at distance 0 after the first node of <Edge>
+    - the first node of edge is the one declared first
+
+MV;SPEED;<Train>;<Short Time>;<Distance>;<SpeedAfter>
+    - updates the state of <Train> at time <Short Time>:
+    - the train moved <Distance> meter without passing a node and has speed <SpeedAfter> afterwards
+
+MV;REACHSTART;<Train>;<Time>;<Edge>;<Distance>
+    - updates the state of <Train> at time <Time>:
+    - the train moved <Distance> meter and its front is now at position 0 of <Edge>
+
+MV;LEAVES;<Train>;<Time>;<Edge>;<Distance>
+    - updates the state of <Train> at time <Time>:
+    - the train moved <Distance> meter and its back is now at position 0 of <Edge>
+
+MV;TERM;<Train>;<Time>;<Distance>
+    - deletes train <Train> at time <Time> after it moves <Distance> meters
+
+CH;<Element>;<New State>;<Time>
+    - updates the state of track element <Element> to <New State> at time <Time>
+
+DATA;<TrainName>;<Short Time> <Speed>;<Time>
+    - ignore this
