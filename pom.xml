@@ -25,8 +25,11 @@
         </developer>
         <developer>
             <name>Christian Schaarschmidt</name>
-            <!--TODO: change URL to actual GitHub profile-->
-            <url>https://github.com/Bachelorpraktikum</url>
+            <url>https://github.com/ChristianSchaar</url>
+        </developer>
+        <developer>
+            <name>Johannes Semsch</name>
+            <url>https://github.com/josemsch</url>
         </developer>
         <developer>
             <name>Torben Carstens</name>
