@@ -4,13 +4,14 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 public class DBVisualizer extends Application {
     static {
-        try {
-            LogManager.getLogManager().readConfiguration(DBVisualizer.class.getResourceAsStream("/logging.properties"));
+        try (InputStream in = DBVisualizer.class.getResourceAsStream("/logging.properties")) {
+            LogManager.getLogManager().readConfiguration(in);
         } catch (IOException e) {
             System.out.println("Can't initialize logging!");
             System.exit(100);
