@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -419,29 +420,55 @@ public class Train {
         private final Train train;
         private final int index;
         private final int time;
+        @Nonnull
+        private final List<String> events;
 
-        InterpolatableState(Train train, int index, int time) {
+        InterpolatableState(Train train, int index, int time, List<String> events) {
             this.train = train;
             this.index = index;
             this.time = time;
+            this.events = new ArrayList<>(events);
         }
 
         final InterpolatableState speed(int time, int index, int distance, int speed) {
-            return new NormalState(getTrain(), index, time, speed, getPosition().move(distance));
+            List<String> newEvents = new ArrayList<>(getEvents());
+            newEvents.add("Speed{"
+                    + "time=" + time
+                    + ", distance=" + distance
+                    + ", speed=" + speed
+                    + "}");
+            return new NormalState(getTrain(), index, time, speed, getPosition().move(distance), newEvents);
         }
 
         final InterpolatableState reach(int time, int index, Edge reached, int movedDistance) {
+            List<String> newEvents = new ArrayList<>(getEvents());
+            newEvents.add("Reach{"
+                    + "time=" + time
+                    + ", distance=" + movedDistance
+                    + ", reached=" + reached
+                    + "}");
             TrainPosition newPosition = getPosition().reachFront(reached, movedDistance);
-            return new NormalState(getTrain(), index, time, getSpeed(), newPosition);
+            return new NormalState(getTrain(), index, time, getSpeed(), newPosition, newEvents);
         }
 
         final InterpolatableState leave(int time, int index, Edge left, int movedDistance) {
+            List<String> newEvents = new ArrayList<>(getEvents());
+            newEvents.add("Terminate{"
+                    + "time=" + time
+                    + ", distance=" + movedDistance
+                    + ", left=" + left
+                    + "}");
             TrainPosition newPosition = getPosition().leaveBack(left, movedDistance);
-            return new NormalState(getTrain(), index, time, getSpeed(), newPosition);
+            return new NormalState(getTrain(), index, time, getSpeed(), newPosition, newEvents);
         }
 
         final InterpolatableState terminate(int time, int index, int distance) {
-            return new TerminatedState(getTrain(), index, getPosition().move(distance), time);
+            List<String> newEvents = new ArrayList<>(getEvents());
+            newEvents.add("Terminate{"
+                    + "time=" + time
+                    + ", distance=" + distance
+                    + "}");
+            return new TerminatedState(getTrain(), index, getPosition().move(distance), time, newEvents);
         }
 
         @Nonnull
@@ -471,7 +498,7 @@ public class Train {
                 interpolatedPosition = interpolatedPosition.interpolationMove(interpolationDistance, other.getPosition().getFrontEdge());
             }
 
-            return new NormalState(getTrain(), getIndex(), targetTime, interpolatedSpeed, interpolatedPosition);
+            return new NormalState(getTrain(), getIndex(), targetTime, interpolatedSpeed, interpolatedPosition, getEvents());
         }
 
         @Nonnull
@@ -491,6 +518,10 @@ public class Train {
 
         public int getIndex() {
             return index;
+        }
+
+        public List<String> getEvents() {
+            return events;
         }
 
         @Override
@@ -514,6 +545,11 @@ public class Train {
             result = 31 * result + getPosition().hashCode();
             return result;
         }
+
+        @Override
+        public String toString() {
+            return getEvents().toString();
+        }
     }
 
     @Immutable
@@ -521,8 +557,8 @@ public class Train {
     private static final class TerminatedState extends InterpolatableState {
         private final TrainPosition position;
 
-        TerminatedState(Train train, int index, TrainPosition position, int time) {
-            super(train, index, time);
+        TerminatedState(Train train, int index, TrainPosition position, int time, List<String> events) {
+            super(train, index, time, events);
             this.position = position;
         }
 
@@ -549,7 +585,7 @@ public class Train {
         private final TrainPosition position;
 
         InitState(Train train, TrainPosition position) {
-            super(train, 0, 0);
+            super(train, 0, 0, Collections.singletonList("Init{" + position + "}"));
             this.position = position;
         }
 
@@ -577,8 +613,8 @@ public class Train {
         @Nonnull
         private final TrainPosition position;
 
-        NormalState(Train train, int index, int time, int speed, TrainPosition position) {
-            super(train, index, time);
+        NormalState(Train train, int index, int time, int speed, TrainPosition position, List<String> events) {
+            super(train, index, time, events);
             this.speed = speed;
             this.position = position;
         }
