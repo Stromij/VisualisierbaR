@@ -53,6 +53,21 @@ public class TrainTest {
         Train.in(context).create(name, "trainz", 10);
     }
 
+    private Edge[] createEdges(Integer edgeLength, Integer... edgeLengths) {
+        Edge[] result = new Edge[edgeLengths.length + 1];
+        Node startNode = Node.in(context).create("startNode", new Coordinates(0, 0));
+        Node previousNode = Node.in(context).create("n0", new Coordinates(0, 1));
+        result[0] = Edge.in(context).create("e0", edgeLength, startNode, previousNode);
+
+        for (int i = 1; i <= edgeLengths.length; i++) {
+            Node node = Node.in(context).create("n" + i, new Coordinates(i, 1));
+            result[i] = Edge.in(context).create("e" + i, edgeLengths[i - 1], previousNode, node);
+            previousNode = node;
+        }
+
+        return result;
+    }
+
     @Test
     public void testName() {
         Train train = Train.in(context).create("t", "train", 100);
@@ -74,9 +89,7 @@ public class TrainTest {
     @Test
     public void testGetStateNegativeTime() {
         Train train = Train.in(context).create("t", "train", 20);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 30, node1, node2);
+        Edge edge = createEdges(30)[0];
         train.eventFactory().init(edge);
 
         expected.expect(IllegalArgumentException.class);
@@ -93,9 +106,7 @@ public class TrainTest {
     @Test
     public void testInitStart() {
         Train train = Train.in(context).create("t", "train", 20);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 30, node1, node2);
+        Edge edge = createEdges(30)[0];
         train.eventFactory().init(edge);
 
         Train.State state = train.getState(0);
@@ -108,16 +119,7 @@ public class TrainTest {
     @Test
     public void testInitMiddle() {
         Train train = Train.in(context).create("t", "train", 20);
-
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Node node3 = Node.in(context).create("n3", new Coordinates(2, 0));
-        Node node4 = Node.in(context).create("n4", new Coordinates(3, 0));
-
-        Edge edge1 = Edge.in(context).create("e1", 30, node1, node2);
-        Edge edge2 = Edge.in(context).create("e2", 40, node2, node3);
-        Edge edge3 = Edge.in(context).create("e3", 50, node3, node4);
-
+        Edge edge2 = createEdges(30, 40, 50)[1];
         train.eventFactory().init(edge2);
 
         Train.State state = train.getState(0);
@@ -129,9 +131,7 @@ public class TrainTest {
     @Test
     public void testSpeed() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
 
         Train.State initState = train.getState(0);
@@ -157,20 +157,16 @@ public class TrainTest {
     @Test
     public void testReach() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Node node3 = Node.in(context).create("n3", new Coordinates(2, 0));
-        Edge edge1 = Edge.in(context).create("e1", 20, node1, node2);
-        Edge edge2 = Edge.in(context).create("e2", 40, node2, node3);
-        train.eventFactory().init(edge1);
+        Edge[] edges = createEdges(20, 40);
+        train.eventFactory().init(edges[0]);
 
-        train.eventFactory().reach(10, edge2, 10);
+        train.eventFactory().reach(10, edges[1], 10);
         Train.State state = train.getState(10);
         assertEquals(10, state.getTime());
         assertEquals(0, state.getPosition().getFrontDistance());
-        assertEquals(edge2, state.getPosition().getFrontEdge());
+        assertEquals(edges[1], state.getPosition().getFrontEdge());
 
-        assertEquals(edge1, state.getPosition().getBackEdge());
+        assertEquals(edges[0], state.getPosition().getBackEdge());
         assertEquals(10, state.getPosition().getBackDistance());
         assertFalse(state.isTerminated());
     }
@@ -178,21 +174,17 @@ public class TrainTest {
     @Test
     public void testLeave() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Node node3 = Node.in(context).create("n3", new Coordinates(2, 0));
-        Edge edge1 = Edge.in(context).create("e1", 20, node1, node2);
-        Edge edge2 = Edge.in(context).create("e2", 40, node2, node3);
-        train.eventFactory().init(edge1);
+        Edge[] edges = createEdges(20, 40);
+        train.eventFactory().init(edges[0]);
 
-        train.eventFactory().reach(10, edge2, 10);
-        train.eventFactory().leave(20, edge1, 10);
+        train.eventFactory().reach(10, edges[1], 10);
+        train.eventFactory().leave(20, edges[0], 10);
         Train.State state = train.getState(20);
         assertEquals(20, state.getTime());
         assertEquals(0, state.getPosition().getBackDistance());
-        assertEquals(edge2, state.getPosition().getBackEdge());
+        assertEquals(edges[1], state.getPosition().getBackEdge());
 
-        assertEquals(edge2, state.getPosition().getFrontEdge());
+        assertEquals(edges[1], state.getPosition().getFrontEdge());
         assertEquals(10, state.getPosition().getFrontDistance());
         assertFalse(state.isTerminated());
     }
@@ -200,9 +192,7 @@ public class TrainTest {
     @Test
     public void testTerminate() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 20, node1, node2);
+        Edge edge = createEdges(20)[0];
         train.eventFactory().init(edge);
 
         train.eventFactory().speed(5, 2, 20);
@@ -218,9 +208,7 @@ public class TrainTest {
     @Test
     public void testSpeedInterpolation() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
 
         train.eventFactory().speed(10, 5, 10);
@@ -234,9 +222,7 @@ public class TrainTest {
     @Test
     public void testPositionInterpolation() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
 
         train.eventFactory().speed(10, 10, 5);
@@ -249,14 +235,10 @@ public class TrainTest {
     @Test
     public void testMergeEvents() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Node node3 = Node.in(context).create("n3", new Coordinates(2, 0));
-        Edge edge1 = Edge.in(context).create("e1", 20, node1, node2);
-        Edge edge2 = Edge.in(context).create("e2", 20, node2, node3);
-        train.eventFactory().init(edge1);
+        Edge[] edges = createEdges(20, 20);
+        train.eventFactory().init(edges[0]);
 
-        train.eventFactory().reach(10, edge2, 10);
+        train.eventFactory().reach(10, edges[1], 10);
         train.eventFactory().speed(10, 5, 10);
 
         Train.State state = train.getState(10);
@@ -267,14 +249,10 @@ public class TrainTest {
     @Test
     public void testInitAlreadyInitialized() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Node node3 = Node.in(context).create("n3", new Coordinates(2, 0));
-        Edge edge1 = Edge.in(context).create("e1", 20, node1, node2);
-        Edge edge2 = Edge.in(context).create("e2", 20, node2, node3);
-        train.eventFactory().init(edge1);
+        Edge[] edges = createEdges(20, 20);
+        train.eventFactory().init(edges[0]);
         expected.expect(IllegalStateException.class);
-        train.eventFactory().init(edge2);
+        train.eventFactory().init(edges[1]);
     }
 
     @Test
@@ -287,9 +265,7 @@ public class TrainTest {
     @Test
     public void testReachNotInitialized() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         expected.expect(IllegalStateException.class);
         train.eventFactory().reach(10, edge, 10);
     }
@@ -297,9 +273,7 @@ public class TrainTest {
     @Test
     public void testLeaveNotInitialized() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         expected.expect(IllegalStateException.class);
         train.eventFactory().leave(10, edge, 10);
     }
@@ -314,10 +288,7 @@ public class TrainTest {
     @Test
     public void testSpeedAlreadyTerminated() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
-
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
         train.eventFactory().terminate(5, 0);
         expected.expect(IllegalStateException.class);
@@ -327,9 +298,7 @@ public class TrainTest {
     @Test
     public void testReachAlreadyTerminated() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
         train.eventFactory().terminate(5, 0);
         expected.expect(IllegalStateException.class);
@@ -339,9 +308,7 @@ public class TrainTest {
     @Test
     public void testLeaveAlreadyTerminated() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
         train.eventFactory().terminate(5, 0);
         expected.expect(IllegalStateException.class);
@@ -351,9 +318,7 @@ public class TrainTest {
     @Test
     public void testTerminateAlreadyTerminated() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
         train.eventFactory().terminate(5, 0);
         expected.expect(IllegalStateException.class);
@@ -363,9 +328,7 @@ public class TrainTest {
     @Test
     public void testEventBeforeLast() {
         Train train = Train.in(context).create("t", "train", 10);
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Edge edge = Edge.in(context).create("e", 50, node1, node2);
+        Edge edge = createEdges(50)[0];
         train.eventFactory().init(edge);
         train.eventFactory().speed(10, 10, 20);
         expected.expect(IllegalStateException.class);
