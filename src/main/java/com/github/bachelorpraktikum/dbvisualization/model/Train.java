@@ -107,7 +107,7 @@ public class Train {
          *
          * @param name the train's name
          * @return the train instance for the given name
-         * @throws NullPointerException if name is null
+         * @throws NullPointerException     if name is null
          * @throws IllegalArgumentException if there is no train with the given name in this
          *                                  context
          */
@@ -414,31 +414,38 @@ public class Train {
 
     @Immutable
     @ParametersAreNonnullByDefault
-    private interface InterpolatableState extends Train.State {
+    private abstract static class InterpolatableState implements State {
         @Nonnull
-        @Override
-        TrainPosition getPosition();
+        private final Train train;
+        private final int index;
+        private final int time;
 
-        default InterpolatableState speed(int time, int index, int distance, int speed) {
+        InterpolatableState(Train train, int index, int time) {
+            this.train = train;
+            this.index = index;
+            this.time = time;
+        }
+
+        final InterpolatableState speed(int time, int index, int distance, int speed) {
             return new NormalState(getTrain(), index, time, speed, getPosition().move(distance));
         }
 
-        default InterpolatableState reach(int time, int index, Edge reached, int movedDistance) {
+        final InterpolatableState reach(int time, int index, Edge reached, int movedDistance) {
             TrainPosition newPosition = getPosition().reachFront(reached, movedDistance);
             return new NormalState(getTrain(), index, time, getSpeed(), newPosition);
         }
 
-        default InterpolatableState leave(int time, int index, Edge left, int movedDistance) {
+        final InterpolatableState leave(int time, int index, Edge left, int movedDistance) {
             TrainPosition newPosition = getPosition().leaveBack(left, movedDistance);
             return new NormalState(getTrain(), index, time, getSpeed(), newPosition);
         }
 
-        default InterpolatableState terminate(int time, int index, int distance) {
+        final InterpolatableState terminate(int time, int index, int distance) {
             return new TerminatedState(getTrain(), index, getPosition().move(distance), time);
         }
 
         @Nonnull
-        default InterpolatableState interpolate(int targetTime, InterpolatableState other) {
+        final InterpolatableState interpolate(int targetTime, InterpolatableState other) {
             if (compareTo(other) > 0) {
                 return other.interpolate(targetTime, this);
             }
@@ -467,35 +474,21 @@ public class Train {
             return new NormalState(getTrain(), getIndex(), targetTime, interpolatedSpeed, interpolatedPosition);
         }
 
-        int getIndex();
-    }
-
-    @Immutable
-    @ParametersAreNonnullByDefault
-    private abstract static class AbstractInterpolatableState implements InterpolatableState {
-        @Nonnull
-        private final Train train;
-        private final int index;
-        private final int time;
-
-        AbstractInterpolatableState(Train train, int index, int time) {
-            this.train = train;
-            this.index = index;
-            this.time = time;
-        }
-
         @Nonnull
         @Override
         public Train getTrain() {
             return train;
         }
 
+        @Nonnull
+        @Override
+        public abstract TrainPosition getPosition();
+
         @Override
         public int getTime() {
             return time;
         }
 
-        @Override
         public int getIndex() {
             return index;
         }
@@ -503,9 +496,9 @@ public class Train {
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
-            if (!(obj instanceof AbstractInterpolatableState)) return false;
+            if (!(obj instanceof InterpolatableState)) return false;
 
-            AbstractInterpolatableState that = (AbstractInterpolatableState) obj;
+            InterpolatableState that = (InterpolatableState) obj;
 
             if (time != that.time) return false;
             if (getSpeed() != that.getSpeed()) return false;
@@ -525,7 +518,7 @@ public class Train {
 
     @Immutable
     @ParametersAreNonnullByDefault
-    private static final class TerminatedState extends AbstractInterpolatableState {
+    private static final class TerminatedState extends InterpolatableState {
         private final TrainPosition position;
 
         TerminatedState(Train train, int index, TrainPosition position, int time) {
@@ -552,7 +545,7 @@ public class Train {
 
     @Immutable
     @ParametersAreNonnullByDefault
-    private static final class InitState extends AbstractInterpolatableState {
+    private static final class InitState extends InterpolatableState {
         private final TrainPosition position;
 
         InitState(Train train, TrainPosition position) {
@@ -579,7 +572,7 @@ public class Train {
 
     @Immutable
     @ParametersAreNonnullByDefault
-    private static final class NormalState extends AbstractInterpolatableState {
+    private static final class NormalState extends InterpolatableState {
         private final int speed;
         @Nonnull
         private final TrainPosition position;
