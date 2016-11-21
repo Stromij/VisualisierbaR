@@ -3,12 +3,23 @@ package com.github.bachelorpraktikum.dbvisualization.model;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
+/**
+ * Represents a position in a graph.<br>
+ * The coordinates are an abstract representation of the position, not an absolute location.
+ */
 @Immutable
 @ParametersAreNonnullByDefault
 public final class Coordinates {
     private final int x;
     private final int y;
 
+    /**
+     * Creates a new Coordinates instance.
+     *
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @throws IllegalArgumentException if a coordinate is negative
+     */
     public Coordinates(int x, int y) {
         if (x < 0 || y < 0) {
             throw new IllegalArgumentException("Coordinate can't be negative");
@@ -17,10 +28,20 @@ public final class Coordinates {
         this.y = y;
     }
 
+    /**
+     * Gets the x-coordinate.
+     *
+     * @return a positive int
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Gets the y-coordinate.
+     *
+     * @return a positive int
+     */
     public int getY() {
         return y;
     }
@@ -34,7 +55,6 @@ public final class Coordinates {
 
         if (x != that.x) return false;
         return y == that.y;
-
     }
 
     @Override
