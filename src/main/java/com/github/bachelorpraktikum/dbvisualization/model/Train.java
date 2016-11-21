@@ -196,16 +196,58 @@ public class Train {
      */
     @Nonnull
     public State getState(int time) {
+        return getState(time, 0);
+    }
+
+    /**
+     * Gets the state of this train at the given time, similar to {@link #getState(int)}.<br>In
+     * contrast to the aforementioned method, this method can use the given state as a starting
+     * point for searching the wanted state, which is potentially more efficient. If the time of the
+     * given starting state is after the wanted time, this method won't improve performance.
+     *
+     * @param time   the time in milliseconds since the start of the simulation
+     * @param before the state to use as a jumping off point
+     * @return the state of the train at the given point in time.
+     * @throws IllegalArgumentException if time is negative
+     * @throws IllegalArgumentException if before is a state of a different train
+     * @throws NullPointerException     if before is null
+     * @throws IllegalStateException    if this train has not been {@link EventFactory#init(Edge)
+     *                                  initialized}
+     */
+    @Nonnull
+    public State getState(int time, State before) {
+        if (before == null) {
+            throw new NullPointerException("before state is null");
+        }
+
+        if (!before.getTrain().equals(this)) {
+            throw new IllegalArgumentException("passed state of different train");
+        }
+
+        if (before.getTime() > time) {
+            return getState(time);
+        }
+
+        if (before instanceof InterpolatableState) {
+            return getState(time, ((InterpolatableState) before).getIndex());
+        }
+
+        return getState(time);
+    }
+
+    @Nonnull
+    private State getState(int time, int startingIndex) {
         if (time < 0) {
             throw new IllegalArgumentException("time is negative");
         }
 
-        Iterator<InterpolatableState> iterator = states.iterator();
-        if (!iterator.hasNext()) {
+        if (states.isEmpty()) {
             throw new IllegalStateException("not initialized");
         }
 
+        Iterator<InterpolatableState> iterator = states.listIterator(startingIndex);
         InterpolatableState result = iterator.next();
+
         while (iterator.hasNext()) {
             InterpolatableState state = iterator.next();
             if (state.getTime() > time) {

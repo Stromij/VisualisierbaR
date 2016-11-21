@@ -270,6 +270,60 @@ public class TrainTest {
     }
 
     @Test
+    public void testGetStateWithStart() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Edge[] edges = createEdges(20, 20);
+        train.eventFactory().init(edges[0]);
+
+        train.eventFactory().reach(10, edges[1], 10);
+        train.eventFactory().speed(20, 5, 10);
+
+        Train.State wanted = train.getState(20);
+
+        Train.State state = train.getState(15);
+        assertEquals(wanted, train.getState(20, state));
+    }
+
+    @Test
+    public void testGetStateWithStartAfterWanted() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Edge[] edges = createEdges(20, 20);
+        train.eventFactory().init(edges[0]);
+
+        train.eventFactory().reach(10, edges[1], 10);
+        train.eventFactory().speed(20, 5, 10);
+
+        Train.State wanted = train.getState(15);
+
+        Train.State state = train.getState(20);
+        assertEquals(wanted, train.getState(15, state));
+    }
+
+    @Test
+    public void testGetStateWithStartNull() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Edge[] edges = createEdges(20);
+        train.eventFactory().init(edges[0]);
+
+        expected.expect(NullPointerException.class);
+        train.getState(10, null);
+    }
+
+    @Test
+    public void testGetStateWithStartWrongTrain() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Train train2 = Train.in(context).create("t2", "train2", 20);
+        Edge[] edges = createEdges(20, 20);
+
+        train.eventFactory().init(edges[0]);
+        train2.eventFactory().init(edges[0]);
+
+        Train.State state = train2.getState(5);
+        expected.expect(IllegalArgumentException.class);
+        train.getState(10, state);
+    }
+
+    @Test
     public void testInitAlreadyInitialized() {
         Train train = Train.in(context).create("t", "train", 10);
         Edge[] edges = createEdges(20, 20);
