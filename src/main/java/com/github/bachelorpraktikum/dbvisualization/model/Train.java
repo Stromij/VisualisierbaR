@@ -355,6 +355,13 @@ public class Train {
         Position getPosition();
 
         /**
+         * Gets the total distance the train has travelled at this point.
+         *
+         * @return the distance in meters
+         */
+        int getTotalDistance();
+
+        /**
          * Compares states by the point of time they represent.
          */
         @Override
@@ -420,13 +427,15 @@ public class Train {
         private final Train train;
         private final int index;
         private final int time;
+        private final int distance;
         @Nonnull
         private final List<String> events;
 
-        InterpolatableState(Train train, int index, int time, List<String> events) {
+        InterpolatableState(Train train, int index, int time, int distance, List<String> events) {
             this.train = train;
             this.index = index;
             this.time = time;
+            this.distance = distance;
             this.events = new ArrayList<>(events);
         }
 
@@ -437,7 +446,9 @@ public class Train {
                     + ", distance=" + distance
                     + ", speed=" + speed
                     + "}");
-            return new NormalState(getTrain(), index, time, speed, getPosition().move(distance), newEvents);
+            int newDistance = getTotalDistance() + distance;
+            TrainPosition newPosition = getPosition().move(distance);
+            return new NormalState(getTrain(), index, time, newDistance, speed, newPosition, newEvents);
         }
 
         final InterpolatableState reach(int time, int index, Edge reached, int movedDistance) {
@@ -447,8 +458,9 @@ public class Train {
                     + ", distance=" + movedDistance
                     + ", reached=" + reached
                     + "}");
+            int newDistance = getTotalDistance() + movedDistance;
             TrainPosition newPosition = getPosition().reachFront(reached, movedDistance);
-            return new NormalState(getTrain(), index, time, getSpeed(), newPosition, newEvents);
+            return new NormalState(getTrain(), index, time, newDistance, getSpeed(), newPosition, newEvents);
         }
 
         final InterpolatableState leave(int time, int index, Edge left, int movedDistance) {
@@ -458,8 +470,9 @@ public class Train {
                     + ", distance=" + movedDistance
                     + ", left=" + left
                     + "}");
+            int newDistance = getTotalDistance() + movedDistance;
             TrainPosition newPosition = getPosition().leaveBack(left, movedDistance);
-            return new NormalState(getTrain(), index, time, getSpeed(), newPosition, newEvents);
+            return new NormalState(getTrain(), index, time, newDistance, getSpeed(), newPosition, newEvents);
         }
 
         final InterpolatableState terminate(int time, int index, int distance) {
@@ -468,7 +481,9 @@ public class Train {
                     + "time=" + time
                     + ", distance=" + distance
                     + "}");
-            return new TerminatedState(getTrain(), index, getPosition().move(distance), time, newEvents);
+            TrainPosition newPosition = getPosition().move(distance);
+            int newDistance = getTotalDistance() + distance;
+            return new TerminatedState(getTrain(), index, newPosition, time, newDistance, newEvents);
         }
 
         @Nonnull
@@ -491,14 +506,16 @@ public class Train {
                 interpolatedSpeed += (int) (((double) speedDiff) / relativeOtherTime * relativeTargetTime);
             }
 
+            int interpolatedDistance = getTotalDistance();
             TrainPosition interpolatedPosition = getPosition();
             if (!getPosition().equals(other.getPosition())) {
-                int distance = getPosition().getDistance(other.getPosition());
-                int interpolationDistance = (int) ((double) distance) / relativeOtherTime * relativeTargetTime;
+                int distanceDiff = other.getTotalDistance() - getTotalDistance();
+                int interpolationDistance = (int) (((double) distanceDiff) / relativeOtherTime * relativeTargetTime);
+                interpolatedDistance += interpolationDistance;
                 interpolatedPosition = interpolatedPosition.interpolationMove(interpolationDistance, other.getPosition().getFrontEdge());
             }
 
-            return new NormalState(getTrain(), getIndex(), targetTime, interpolatedSpeed, interpolatedPosition, getEvents());
+            return new NormalState(getTrain(), getIndex(), targetTime, interpolatedDistance, interpolatedSpeed, interpolatedPosition, getEvents());
         }
 
         @Nonnull
@@ -514,6 +531,11 @@ public class Train {
         @Override
         public int getTime() {
             return time;
+        }
+
+        @Override
+        public int getTotalDistance() {
+            return distance;
         }
 
         public int getIndex() {
@@ -557,8 +579,8 @@ public class Train {
     private static final class TerminatedState extends InterpolatableState {
         private final TrainPosition position;
 
-        TerminatedState(Train train, int index, TrainPosition position, int time, List<String> events) {
-            super(train, index, time, events);
+        TerminatedState(Train train, int index, TrainPosition position, int time, int distance, List<String> events) {
+            super(train, index, time, distance, events);
             this.position = position;
         }
 
@@ -585,7 +607,7 @@ public class Train {
         private final TrainPosition position;
 
         InitState(Train train, TrainPosition position) {
-            super(train, 0, 0, Collections.singletonList("Init{" + position + "}"));
+            super(train, 0, 0, 0, Collections.singletonList("Init{" + position + "}"));
             this.position = position;
         }
 
@@ -613,8 +635,8 @@ public class Train {
         @Nonnull
         private final TrainPosition position;
 
-        NormalState(Train train, int index, int time, int speed, TrainPosition position, List<String> events) {
-            super(train, index, time, events);
+        NormalState(Train train, int index, int time, int distance, int speed, TrainPosition position, List<String> events) {
+            super(train, index, time, distance, events);
             this.speed = speed;
             this.position = position;
         }
@@ -726,15 +748,6 @@ public class Train {
             LinkedList<Edge> edges = new LinkedList<>(getEdges());
             edges.addFirst(newStart);
             return new TrainPosition(getTrain(), edges, 0);
-        }
-
-        int getDistance(TrainPosition other) {
-            if (other.getFrontEdge().equals(getFrontEdge())) {
-                return other.getFrontDistance() - getFrontDistance();
-            }
-
-            int remainingDistance = getFrontEdge().getLength() - getFrontDistance();
-            return remainingDistance + other.getFrontDistance();
         }
 
         @Nonnull

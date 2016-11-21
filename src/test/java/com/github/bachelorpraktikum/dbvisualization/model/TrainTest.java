@@ -114,6 +114,7 @@ public class TrainTest {
         assertEquals(0, state.getPosition().getBackDistance());
         assertEquals(edge, state.getPosition().getFrontEdge());
         assertEquals(edge, state.getPosition().getBackEdge());
+        assertEquals(0, state.getTotalDistance());
     }
 
     @Test
@@ -126,6 +127,7 @@ public class TrainTest {
         assertEquals(train.getLength(), state.getPosition().getFrontDistance());
         assertEquals(edge2, state.getPosition().getFrontEdge());
         assertEquals(0, state.getPosition().getBackDistance());
+        assertEquals(0, state.getTotalDistance());
     }
 
     @Test
@@ -150,6 +152,7 @@ public class TrainTest {
         assertEquals(edge, state.getPosition().getFrontEdge());
         assertEquals(train.getLength() + distance, state.getPosition().getFrontDistance());
         assertEquals(speed, state.getSpeed());
+        assertEquals(distance, state.getTotalDistance());
 
         assertEquals(state, train.getState(20));
     }
@@ -165,6 +168,7 @@ public class TrainTest {
         assertEquals(10, state.getTime());
         assertEquals(0, state.getPosition().getFrontDistance());
         assertEquals(edges[1], state.getPosition().getFrontEdge());
+        assertEquals(10, state.getTotalDistance());
 
         assertEquals(edges[0], state.getPosition().getBackEdge());
         assertEquals(10, state.getPosition().getBackDistance());
@@ -186,6 +190,7 @@ public class TrainTest {
 
         assertEquals(edges[1], state.getPosition().getFrontEdge());
         assertEquals(10, state.getPosition().getFrontDistance());
+        assertEquals(20, state.getTotalDistance());
         assertFalse(state.isTerminated());
     }
 
@@ -201,6 +206,7 @@ public class TrainTest {
         assertEquals(10, state.getTime());
         assertTrue(state.isTerminated());
         assertEquals(14, state.getPosition().getFrontDistance());
+        assertEquals(4, state.getTotalDistance());
         expected.expect(IllegalStateException.class);
         state.getSpeed();
     }
@@ -233,6 +239,22 @@ public class TrainTest {
     }
 
     @Test
+    public void testDistanceInterpolation() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Edge edge = createEdges(50)[0];
+        train.eventFactory().init(edge);
+
+        train.eventFactory().speed(10, 10, 10);
+        train.eventFactory().speed(20, 10, 20);
+
+        assertEquals(10, train.getState(10).getTotalDistance());
+        assertEquals(20, train.getState(20).getTotalDistance());
+        assertEquals(12, train.getState(12).getTotalDistance());
+        assertEquals(15, train.getState(15).getTotalDistance());
+        assertEquals(18, train.getState(18).getTotalDistance());
+    }
+
+    @Test
     public void testMergeEvents() {
         Train train = Train.in(context).create("t", "train", 10);
         Edge[] edges = createEdges(20, 20);
@@ -244,6 +266,7 @@ public class TrainTest {
         Train.State state = train.getState(10);
         assertEquals(5, state.getPosition().getFrontDistance());
         assertEquals(10, state.getSpeed());
+        assertEquals(15, state.getTotalDistance());
     }
 
     @Test
