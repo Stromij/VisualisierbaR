@@ -59,14 +59,12 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <!-- TODO ask team about opinions on jsr305
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.1</version>
             <scope>compile</scope>
         </dependency>
-        -->
         <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
