@@ -5,7 +5,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.security.SecureRandom;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class EdgeTest {
     private Context context;
-    private SecureRandom random;
+    private Random random;
     private int nodeCounter;
 
     @Rule
@@ -26,11 +26,12 @@ public class EdgeTest {
     public void init() {
         context = new Context();
         nodeCounter = -1;
-        random = new SecureRandom();
+        random = new Random();
     }
 
     private Coordinates getCoordinate() {
-        return new Coordinates(random.nextInt(), random.nextInt());
+        return new Coordinates(random.nextInt(Integer.MAX_VALUE),
+                random.nextInt(Integer.MAX_VALUE));
     }
 
     private Node getNode() {
@@ -42,7 +43,8 @@ public class EdgeTest {
     public void testInstanceManager() {
         Edge edge = Edge.in(context).create("edge1", 30, getNode(), getNode());
         assertSame(edge, Edge.in(context).get(edge.getName()));
-        assertSame(edge, Edge.in(context).create(edge.getName(), edge.getLength(), edge.getNode1(), edge.getNode2()));
+        assertSame(edge, Edge.in(context).create(edge.getName(),
+                edge.getLength(), edge.getNode1(), edge.getNode2()));
         assertTrue(Edge.in(context).getAll().contains(edge));
     }
 

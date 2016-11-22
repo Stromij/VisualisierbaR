@@ -4,7 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.security.SecureRandom;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -65,15 +65,13 @@ public class CoordinatesTest {
 
     @Test
     public void testHashCode() {
-        Coordinates coordinate = new Coordinates(1, 2);
-        Coordinates coordinate2 = new Coordinates(2, -29);
+        Coordinates coordinate;
+        Coordinates coordinate2;
 
-        assertNotEquals(coordinate.hashCode(), coordinate2.hashCode());
-
-        SecureRandom sec = new SecureRandom();
+        Random sec = new Random();
         for (int counter = 0; counter < 20000; counter++) {
-            int x = sec.nextInt();
-            int y = sec.nextInt();
+            int x = sec.nextInt(Integer.MAX_VALUE);
+            int y = sec.nextInt(Integer.MAX_VALUE);
 
             if (x != y) {
                 coordinate = new Coordinates(x, y);
