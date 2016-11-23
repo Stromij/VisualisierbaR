@@ -1,0 +1,4 @@
+test:
+  post:
+    - mvn site -P site
+    - cp -r target/site $CIRCLE_ARTIFACTS/reports
