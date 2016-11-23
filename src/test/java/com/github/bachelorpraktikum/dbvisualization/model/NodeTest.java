@@ -125,4 +125,14 @@ public class NodeTest {
 
         assertTrue(otherEdges.isEmpty());
     }
+
+    @Test
+    public void testOtherEdgesNull() {
+        Node node1 = Node.in(context).create("node1", new Coordinates(0, 0));
+        Node node2 = Node.in(context).create("node2", new Coordinates(1, 0));
+        Edge edge = Edge.in(context).create("edge", 10, node1, node2);
+
+        expected.expect(NullPointerException.class);
+        node1.otherEdges(null);
+    }
 }

@@ -149,6 +149,7 @@ public final class Node {
      *
      * @param edge the edge to exclude from the set.
      * @return the set of edges
+     * @throws NullPointerException if edge is null
      */
     @Nonnull
     public Set<Edge> otherEdges(Edge edge) {
