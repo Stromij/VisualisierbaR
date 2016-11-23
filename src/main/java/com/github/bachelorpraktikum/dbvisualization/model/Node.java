@@ -125,6 +125,16 @@ public final class Node {
     }
 
     /**
+     * Gets the unique name of this node in its context.
+     *
+     * @return the name
+     */
+    @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Gets the coordinates of this node.
      *
      * @return the coordinates
