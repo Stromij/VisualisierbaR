@@ -51,19 +51,11 @@ public final class Element {
          * @param name the name
          * @return a state
          * @throws IllegalArgumentException if there is no state with that name
+         * @throws NullPointerException     if name is null
          */
         @Nonnull
         public static State fromName(String name) {
-            switch (name) {
-                case "NOSIG":
-                    return NOSIG;
-                case "STOP":
-                    return STOP;
-                case "FAHRT":
-                    return FAHRT;
-                default:
-                    throw new IllegalArgumentException("unknown state");
-            }
+            return valueOf(name.trim().toUpperCase());
         }
     }
 
@@ -342,7 +334,7 @@ public final class Element {
      * @throws IllegalArgumentException if time is negative
      */
     public void addEvent(State state, int time) {
-        getFactory().addEvent(this, state, time);
+        getFactory().addEvent(this, Objects.requireNonNull(state), time);
     }
 
     /**
