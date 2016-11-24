@@ -2,6 +2,7 @@ package com.github.bachelorpraktikum.dbvisualization.logparser;
 
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -21,7 +22,8 @@ public class GraphParserTest {
         assertNotNull(context);
     }
 
-    // TODO enable @Test
+    @Ignore
+    @Test
     public void testLog3() throws IOException {
         Context context = new GraphParser("src/test/resources/test3.zug.clean").parse();
         assertNotNull(context);
