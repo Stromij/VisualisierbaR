@@ -9,7 +9,7 @@
 <BorderPane fx:id="rootPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.bachelorpraktikum.dbvisualization.view.SourceController">
     <center>
         <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" tabClosingPolicy="UNAVAILABLE">
-            <Tab text="File">
+            <Tab text="%log_file">
                 <fx:include fx:id="fileChooserTab" source="FileChooserTab.fxml" />
             </Tab>
         </TabPane>
