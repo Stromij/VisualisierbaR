@@ -34,9 +34,13 @@ public final class Switch {
      * Gets a list containing the 3 {@link Element elements} this {@link Switch} consists of.
      *
      * @return the elements
+     * @throws IllegalStateException if this switch has not been completely initialized
      */
     @Nonnull
     public List<Element> getElements() {
+        if (elements.size() < 3) {
+            throw new IllegalStateException("Switch not completely initialized. Elements: " + elements);
+        }
         return Collections.unmodifiableList(elements);
     }
 
@@ -103,7 +107,7 @@ public final class Switch {
             Switch result = currentSwitch;
 
             result.addElement(element);
-            if (result.getElements().size() == 3) {
+            if (result.elements.size() == 3) {
                 currentSwitch = null;
             }
             return result;
