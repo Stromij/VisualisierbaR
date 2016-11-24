@@ -67,6 +67,11 @@ public class SourceController implements SourceChooser {
         closeWindowButton.setOnAction(event -> closeWindow());
     }
 
+    /**
+     * Adds an EventHandler to the button which fires the button on pressing enter
+     *
+     * @param button Button to add eventHandler to
+     */
     private void fireOnEnterPress(Button button) {
         button.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
