@@ -12,17 +12,21 @@ import javax.annotation.Nullable;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 
 public class FileChooserController implements SourceChooser {
     @FXML
     private TextField pathField;
     @FXML
-    private GridPane rootPane;
+    private Pane rootPane;
 
     @FXML
     private Button explorerButton;
