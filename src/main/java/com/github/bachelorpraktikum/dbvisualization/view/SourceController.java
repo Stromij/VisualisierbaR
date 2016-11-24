@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 
 import javax.annotation.Nonnull;
 
@@ -131,6 +132,7 @@ public class SourceController implements SourceChooser {
      */
     private void openMainWindow() {
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+        mainLoader.setResources(ResourceBundle.getBundle("bundles.localization"));
         Pane mainPane = null;
         try {
             mainLoader.load();

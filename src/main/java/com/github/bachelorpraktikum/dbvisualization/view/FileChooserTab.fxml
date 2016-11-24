@@ -20,7 +20,7 @@
         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
     </rowConstraints>
     <children>
-        <Label maxWidth="106.0" prefHeight="16.0" prefWidth="106.0" text="Choose a File"
+        <Label maxWidth="106.0" prefHeight="16.0" prefWidth="106.0" text="%choose_log_file"
                GridPane.halignment="CENTER">
             <GridPane.margin>
                 <Insets left="6.0"/>
@@ -32,7 +32,7 @@
             </GridPane.margin>
         </TextField>
         <Button fx:id="explorerButton" mnemonicParsing="false" prefHeight="26.0" prefWidth="75.0"
-                text="Explorer" GridPane.columnIndex="1">
+                text="%explorer" GridPane.columnIndex="1">
             <GridPane.margin>
                 <Insets right="6.0"/>
             </GridPane.margin>

@@ -14,11 +14,11 @@
         <AnchorPane>
             <children>
                 <FlowPane alignment="CENTER_LEFT">
-                    <ToggleButton fx:id="logToggle" text="Show/Hide log entries"/>
+                    <ToggleButton fx:id="logToggle" text="%show_hide_logs"/>
                 </FlowPane>
                 <FlowPane alignment="CENTER_RIGHT" AnchorPane.rightAnchor="0.0">
                     <children>
-                        <Button fx:id="closeButton" text="Close data source"/>
+                        <Button fx:id="closeButton" text="%close_data_source"/>
                     </children>
                 </FlowPane>
             </children>

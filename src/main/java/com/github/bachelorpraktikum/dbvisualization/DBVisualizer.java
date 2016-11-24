@@ -4,6 +4,7 @@ import com.github.bachelorpraktikum.dbvisualization.view.SourceController;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ResourceBundle;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -26,6 +27,7 @@ public class DBVisualizer extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("view/SourceChooser.fxml"));
+        loader.setResources(ResourceBundle.getBundle("bundles.localization"));
         loader.load();
         SourceController controller = loader.getController();
 

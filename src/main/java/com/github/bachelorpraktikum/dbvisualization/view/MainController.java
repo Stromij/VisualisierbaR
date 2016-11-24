@@ -10,6 +10,7 @@ import com.github.bachelorpraktikum.dbvisualization.model.Train;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.annotation.Nonnull;
 
@@ -110,6 +111,7 @@ public class MainController {
 
     private void showSourceChooser() {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("SourceChooser.fxml"));
+        loader.setResources(ResourceBundle.getBundle("bundles.localization"));
         try {
             loader.load();
         } catch (IOException e) {

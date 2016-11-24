@@ -22,7 +22,7 @@
         <BorderPane BorderPane.alignment="CENTER">
             <center>
                 <Button fx:id="openSource" contentDisplay="TEXT_ONLY" disable="true"
-                        mnemonicParsing="false" text="Open" textAlignment="CENTER" wrapText="true">
+                        mnemonicParsing="false" text="%open_data_source" textAlignment="CENTER" wrapText="true">
                     <BorderPane.margin>
                         <Insets left="75.0"/>
                     </BorderPane.margin>
@@ -30,7 +30,7 @@
             </center>
             <right>
                 <Button fx:id="closeWindowButton" contentDisplay="TEXT_ONLY" mnemonicParsing="false"
-                        text="Close">
+                        text="%close">
                     <BorderPane.margin>
                         <Insets right="4.0"/>
                     </BorderPane.margin>
