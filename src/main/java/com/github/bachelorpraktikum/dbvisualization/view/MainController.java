@@ -55,6 +55,8 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        fireOnEnterPress(closeButton);
+        fireOnEnterPress(logToggle);
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {

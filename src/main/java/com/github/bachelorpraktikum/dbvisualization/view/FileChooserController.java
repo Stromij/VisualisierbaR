@@ -12,14 +12,12 @@ import javax.annotation.Nullable;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import javafx.stage.Window;
 
 
 public class FileChooserController implements SourceChooser {
@@ -39,6 +37,12 @@ public class FileChooserController implements SourceChooser {
         fileURLProperty = new ReadOnlyObjectWrapper<>();
         fileChooser = new FileChooser();
         explorerButton.setOnAction(event -> updatePath(openFileChooser()));
+
+        explorerButton.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                explorerButton.fire();
+            }
+        });
 
         pathField.textProperty().addListener((o, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {

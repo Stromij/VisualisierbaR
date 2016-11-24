@@ -48,6 +48,8 @@ public class SourceController implements SourceChooser {
         controllers = new LinkedList<>();
         controllers.add(fileChooserTabController);
 
+        fireOnEnterPress(openSource);
+        fireOnEnterPress(closeWindowButton);
 
         // Set the activeController based on the selected tab
         tabPane.getSelectionModel().selectedItemProperty().addListener(
