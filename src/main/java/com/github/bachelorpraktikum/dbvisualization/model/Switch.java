@@ -45,21 +45,6 @@ public final class Switch {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-
-        Switch aSwitch = (Switch) obj;
-
-        return elements.equals(aSwitch.elements);
-    }
-
-    @Override
-    public int hashCode() {
-        return elements.hashCode();
-    }
-
-    @Override
     public String toString() {
         return "Switch{"
                 + "elements=" + elements
