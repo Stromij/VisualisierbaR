@@ -17,6 +17,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -61,6 +63,14 @@ public class SourceController implements SourceChooser {
         openSource.setOnAction(event -> openMainWindow());
 
         closeWindowButton.setOnAction(event -> closeWindow());
+    }
+
+    private void fireOnEnterPress(Button button) {
+        button.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                button.fire();
+            }
+        });
     }
 
     /**
