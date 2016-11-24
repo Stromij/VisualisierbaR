@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class SwitchTest {
@@ -61,19 +63,12 @@ public class SwitchTest {
 
     @Test
     public void testOnlyThree() {
-        Node node1 = Node.in(context).create("n1", new Coordinates(0, 0));
-        Node node2 = Node.in(context).create("n2", new Coordinates(1, 0));
-        Node node3 = Node.in(context).create("n3", new Coordinates(2, 0));
-        Node node4 = Node.in(context).create("n4", new Coordinates(3, 0));
+        Switch testSwitch = createSwitch();
 
-        Element element1 = Element.in(context).create("e1", Element.Type.WeichenPunktImpl, node1, Element.State.NOSIG);
-        Element element2 = Element.in(context).create("e2", Element.Type.WeichenPunktImpl, node2, Element.State.FAHRT);
-        Element element3 = Element.in(context).create("e3", Element.Type.WeichenPunktImpl, node3, Element.State.STOP);
-        Element element4 = Element.in(context).create("e4", Element.Type.WeichenPunktImpl, node4, Element.State.NOSIG);
+        Node node1 = Node.in(context).create("n", new Coordinates(10, 0));
+        Element element1 = Element.in(context).create("e", Element.Type.WeichenPunktImpl, node1, Element.State.NOSIG);
 
-        assertEquals(3, element1.getSwitch().get().getElements().size());
-        assertEquals(3, element2.getSwitch().get().getElements().size());
-        assertEquals(3, element3.getSwitch().get().getElements().size());
+        assertEquals(3, testSwitch.getElements().size());
     }
 
     @Test
@@ -88,5 +83,13 @@ public class SwitchTest {
 
         expected.expect(IllegalStateException.class);
         switch1.getElements();
+    }
+
+    @Test
+    public void testToString() {
+        Switch testSwitch = createSwitch();
+
+        assertNotNull(testSwitch.toString());
+        assertFalse(testSwitch.toString().trim().isEmpty());
     }
 }
