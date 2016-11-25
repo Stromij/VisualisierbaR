@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.bachelorpraktikum</groupId>
     <artifactId>DBVisualization</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <url>https://github.com/Bachelorpraktikum/DBVisualization</url>
     <name>${project.groupId}:${project.artifactId}</name>
@@ -59,14 +59,17 @@
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
-        <!-- TODO ask team about opinions on jsr305
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
             <version>3.0.1</version>
             <scope>compile</scope>
         </dependency>
-        -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.5.3</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -80,7 +83,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>*</include>
+                    <include>**/*</include>
                 </includes>
             </resource>
             <resource>
@@ -129,6 +132,45 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-maven-plugin</artifactId>
+                <version>4.5.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr4</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--one of these can be deactivated when we have decided which to use-->
+                    <listener>true</listener>
+                    <visitor>true</visitor>
+                </configuration>
+            </plugin>
+            <!--Makes output classes of antlr4-maven-plugin package-private-->
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>maven-replacer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>
+                        <include>target/generated-sources/antlr4/**/*.java</include>
+                    </includes>
+                    <variableTokenValueMap>
+                        public class=class,public interface=interface
+                    </variableTokenValueMap>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <reporting>
@@ -162,6 +204,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>2.17</version>
+                <configuration>
+                    <configLocation>src/test/resources/google_checks_4_spaces.xml</configLocation>
+                </configuration>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -198,7 +243,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.5.201505241946</version>
+                <version>0.7.7.201606060606</version>
             </plugin>
         </plugins>
     </reporting>

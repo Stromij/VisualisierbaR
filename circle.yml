@@ -1,0 +1,11 @@
+test:
+  post:
+    - mvn site -P site
+    - cp -r target/site $CIRCLE_ARTIFACTS/reports
+
+deployment:
+  packaging:
+    branch: [master, develop]
+    commands:
+      - mvn package -DskipTests
+      - cp target/DBVisualization-*-SNAPSHOT-jar-with-dependencies.jar $CIRCLE_ARTIFACTS/dbvisualization.jar
