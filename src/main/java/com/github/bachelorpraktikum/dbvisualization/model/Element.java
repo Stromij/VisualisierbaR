@@ -188,7 +188,7 @@ public final class Element {
 
             this.switchFactory = Switch.in(context);
             this.unorderedEvents = FXCollections.observableArrayList();
-            this.events = new SortedList<>(unorderedEvents);
+            this.events = unorderedEvents.sorted();
             this.currentTime = -1;
             this.nextIndex = 0;
         }

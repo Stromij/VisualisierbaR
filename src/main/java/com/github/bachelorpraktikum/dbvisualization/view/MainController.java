@@ -144,7 +144,7 @@ public class MainController {
                 }
 
                 ObservableList<Event> events = new CompositeObservableEventList(lists);
-                logList.setItems(new SortedList<>(events));
+                logList.setItems(events.sorted());
                 return;
             default:
                 return;

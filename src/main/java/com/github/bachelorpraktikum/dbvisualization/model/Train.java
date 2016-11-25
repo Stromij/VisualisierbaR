@@ -51,7 +51,7 @@ public class Train {
         this.length = length;
 
         unorderedStates = FXCollections.observableArrayList();
-        states = new SortedList<>(unorderedStates);
+        states = unorderedStates.sorted();
     }
 
     /**
