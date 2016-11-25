@@ -509,7 +509,7 @@ public class Train {
             String event = "Reach{"
                     + "time=" + time
                     + ", distance=" + movedDistance
-                    + ", reached=" + reached
+                    + ", reached=" + reached.getName()
                     + "}";
             List<String> newEvents = createEvents(time, event);
             int newDistance = getTotalDistance() + movedDistance;
@@ -521,7 +521,7 @@ public class Train {
             String event = "Leave{"
                     + "time=" + time
                     + ", distance=" + movedDistance
-                    + ", left=" + left
+                    + ", left=" + left.getName()
                     + "}";
             List<String> newEvents = createEvents(time, event);
             int newDistance = getTotalDistance() + movedDistance;
@@ -590,7 +590,7 @@ public class Train {
         @Nonnull
         @Override
         public String getDescription() {
-            return toString(); // TODO change to something more user-friendly
+            return getTrain().getReadableName() + " " + toString(); // TODO change to something more user-friendly
         }
 
         @Override
@@ -668,7 +668,9 @@ public class Train {
         private final TrainPosition position;
 
         InitState(Train train, TrainPosition position) {
-            super(train, 0, 0, 0, Collections.singletonList("Init{" + position + "}"));
+            super(train, 0, 0, 0, Collections.singletonList("Init{"
+                    + "backEdge=" + position.getBackEdge().getName()
+                    + "}"));
             this.position = position;
         }
 
