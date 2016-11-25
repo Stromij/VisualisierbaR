@@ -207,8 +207,7 @@ public class TrainTest {
         assertTrue(state.isTerminated());
         assertEquals(14, state.getPosition().getFrontDistance());
         assertEquals(4, state.getTotalDistance());
-        expected.expect(IllegalStateException.class);
-        state.getSpeed();
+        assertEquals(20, state.getSpeed());
     }
 
     @Test

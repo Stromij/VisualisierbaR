@@ -537,7 +537,7 @@ public class Train {
             List<String> newEvents = createEvents(time, event);
             TrainPosition newPosition = getPosition().move(distance);
             int newDistance = getTotalDistance() + distance;
-            return new TerminatedState(getTrain(), index, newPosition, time, newDistance, newEvents);
+            return new TerminatedState(getTrain(), index, newPosition, time, newDistance, getSpeed(), newEvents);
         }
 
         @Nonnull
@@ -639,10 +639,12 @@ public class Train {
     @ParametersAreNonnullByDefault
     private static final class TerminatedState extends InterpolatableState {
         private final TrainPosition position;
+        private final int speed;
 
-        TerminatedState(Train train, int index, TrainPosition position, int time, int distance, List<String> events) {
+        TerminatedState(Train train, int index, TrainPosition position, int time, int distance, int endSpeed, List<String> events) {
             super(train, index, time, distance, events);
             this.position = position;
+            this.speed = endSpeed;
         }
 
         @Override
@@ -652,7 +654,7 @@ public class Train {
 
         @Override
         public int getSpeed() {
-            throw new IllegalStateException("Train is terminated");
+            return speed;
         }
 
         @Nonnull
