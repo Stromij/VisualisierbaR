@@ -97,16 +97,16 @@ public class ElementTest {
     public void testAddEventCurrentTime() {
         Element element = createElement();
 
-        Element.State initState = Element.State.NOSIG;
+        Element.State initState = Element.State.STOP;
         Element.State newState = Element.State.FAHRT;
 
         element.addEvent(initState, 1);
-        Element.in(context).setTime(1);
+        Element.in(context).setTime(2);
         assertEquals(initState, element.getState());
 
         // Since the current time of all events is 1,
         // the element should be updated without a call to Element.in(context).setTime()
-        element.addEvent(newState, 1);
+        element.addEvent(newState, 2);
         assertEquals(newState, element.getState());
     }
 

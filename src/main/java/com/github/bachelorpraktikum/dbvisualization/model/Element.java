@@ -300,6 +300,7 @@ public final class Element {
                 nextIndex += 1;
                 event.fire();
             }
+            currentTime = time;
         }
 
         public ObservableList<? extends Event> getEvents() {
