@@ -45,7 +45,7 @@ speed: INT;
 distance: INT;
 train_readable_name: (WORD | INT)+;
 elem_name: name;
-name: name_prefix (WORD+ | UNDERSCORE)+;
+name: name_prefix? (WORD+ | UNDERSCORE)+;
 coord: INT SEP INT;
 name_prefix: '<' INT DOT INT DOT INT '>' COLON;
 time: rat | INT;
