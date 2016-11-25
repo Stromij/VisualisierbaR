@@ -205,15 +205,6 @@ public final class GraphParser {
             }
         }
 
-        private class CoordinatesVisitor extends LogBaseVisitor<Coordinates> {
-            @Override
-            public Coordinates visitCoord(LogParser.CoordContext ctx) {
-                int x = Integer.parseInt(ctx.INT(0).getText());
-                int y = Integer.parseInt(ctx.INT(1).getText());
-                return new Coordinates(x, y);
-            }
-        }
-
         private class EdgeVisitor extends LogBaseVisitor<Edge> {
             @Override
             public Edge visitEdge(LogParser.EdgeContext ctx) {
@@ -239,7 +230,16 @@ public final class GraphParser {
             }
         }
 
-        private class TimeVisitor extends LogBaseVisitor<Integer> {
+        private static class CoordinatesVisitor extends LogBaseVisitor<Coordinates> {
+            @Override
+            public Coordinates visitCoord(LogParser.CoordContext ctx) {
+                int x = Integer.parseInt(ctx.INT(0).getText());
+                int y = Integer.parseInt(ctx.INT(1).getText());
+                return new Coordinates(x, y);
+            }
+        }
+
+        private static class TimeVisitor extends LogBaseVisitor<Integer> {
             private final BigInteger thousandInt;
 
             TimeVisitor() {
