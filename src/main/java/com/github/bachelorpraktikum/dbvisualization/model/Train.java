@@ -1,6 +1,5 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,12 +12,12 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 
 /**
  * Represents a train.<br> There will always be exactly one instance of this class per name per
@@ -38,9 +37,7 @@ public class Train {
     private final int length;
 
     @Nonnull
-    private final ObservableList<InterpolatableState> unorderedStates;
-    @Nonnull
-    private final SortedList<InterpolatableState> states;
+    private final ObservableList<TrainEvent> events;
 
     private Train(String name, String readableName, int length) {
         this.name = Objects.requireNonNull(name);
@@ -50,8 +47,7 @@ public class Train {
         }
         this.length = length;
 
-        unorderedStates = FXCollections.observableArrayList();
-        states = unorderedStates.sorted();
+        events = FXCollections.observableArrayList();
     }
 
     /**
@@ -180,7 +176,7 @@ public class Train {
      * @return the list of events
      */
     public ObservableList<? extends Event> getEvents() {
-        return FXCollections.unmodifiableObservableList(states);
+        return FXCollections.unmodifiableObservableList(events);
     }
 
     /**
@@ -240,22 +236,22 @@ public class Train {
             throw new IllegalArgumentException("time is negative");
         }
 
-        if (states.isEmpty()) {
+        if (events.isEmpty()) {
             throw new IllegalStateException("not initialized");
         }
 
-        Iterator<InterpolatableState> iterator = states.listIterator(startingIndex);
-        InterpolatableState result = iterator.next();
+        Iterator<TrainEvent> iterator = events.listIterator(startingIndex);
+        TrainEvent result = iterator.next();
 
         while (iterator.hasNext()) {
-            InterpolatableState state = iterator.next();
-            if (state.getTime() > time) {
-                return result.interpolate(time, state);
+            TrainEvent event = iterator.next();
+            if (event.getTime() > time) {
+                return result.getState().interpolate(time, event.getState());
             }
-            result = state;
+            result = event;
         }
 
-        return result;
+        return result.getState();
     }
 
     /**
@@ -278,9 +274,9 @@ public class Train {
     }
 
     @FunctionalInterface
-    private interface StateMutator {
+    private interface EventCreator {
         @Nonnull
-        InterpolatableState mutate(int index, InterpolatableState before);
+        TrainEvent create(TrainEvent before);
     }
 
     /**
@@ -293,44 +289,37 @@ public class Train {
 
         /**
          * Initializes the {@link Train} instance corresponding to this factory.
-         * The back of the train will be at distance 0 from the start of the edge.
+         * The back of the train will be at totalDistance 0 from the start of the edge.
          *
          * @param edge the edge on which this train should be initialized.
          * @throws IllegalStateException if this method is called twice for the same train.
          */
         public void init(Edge edge) {
-            if (!states.isEmpty()) {
+            if (!events.isEmpty()) {
                 throw new IllegalStateException("already initialized");
             }
-            TrainPosition initPosition = TrainPosition.init(Train.this, edge);
-            InterpolatableState initState = new InitState(Train.this, initPosition);
-            unorderedStates.add(initState);
+            events.add(new InitEvent(Train.this, edge));
         }
 
-        private void addState(int time, StateMutator mutator) {
-            if (states.isEmpty()) {
+        private void addState(int time, EventCreator creator) {
+            if (events.isEmpty()) {
                 throw new IllegalStateException("not initialized");
             }
-            InterpolatableState before = states.get(states.size() - 1);
-            if (before.isTerminated()) {
+            TrainEvent before = events.get(events.size() - 1);
+            if (before instanceof TerminateEvent) {
                 throw new IllegalStateException("already terminated");
             }
             if (before.getTime() > time) {
-                throw new IllegalStateException("tried to insert state before last element");
+                throw new IllegalStateException("tried to insert event before last element");
             }
-            int index = states.size();
-            if (before.getTime() == time) {
-                index--;
-                unorderedStates.remove(index);
-            }
-            unorderedStates.add(mutator.mutate(index, before));
+            events.add(creator.create(before));
         }
 
         /**
          * Registers a speed event.
          *
          * @param time       the time of the event
-         * @param distance   the distance travelled since the last event
+         * @param distance   the totalDistance travelled since the last event
          * @param speedAfter the speed at this point of time
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
@@ -338,53 +327,53 @@ public class Train {
          *                               event
          */
         public void speed(int time, int distance, int speedAfter) {
-            addState(time, (index, before) -> before.speed(time, index, distance, speedAfter));
+            addState(time, (before) -> new SpeedEvent(before, time, distance, speedAfter));
         }
 
         /**
          * Registers a reachStart event.<br> After this event the front of the train will be at
-         * distance 0 from the start of the given {@link Edge}.
+         * totalDistance 0 from the start of the given {@link Edge}.
          *
          * @param time     the time of the event
          * @param edge     the edge the train reached
-         * @param distance the distance travelled since the last event
+         * @param distance the totalDistance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
          *                               event
          */
         public void reach(int time, Edge edge, int distance) {
-            addState(time, (index, before) -> before.reach(time, index, edge, distance));
+            addState(time, (before) -> new ReachEvent(before, time, distance, edge));
         }
 
         /**
          * Registers a leave event.<br> After this event the back of the train will be at
-         * distance 0 from the start of the given {@link Edge}.
+         * totalDistance 0 from the start of the given {@link Edge}.
          *
          * @param time     the time of the event
          * @param edge     the edge the train reached
-         * @param distance the distance travelled since the last event
+         * @param distance the totalDistance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
          *                               event
          */
         public void leave(int time, Edge edge, int distance) {
-            addState(time, (index, before) -> before.leave(time, index, edge, distance));
+            addState(time, (before) -> new LeaveEvent(before, time, distance, edge));
         }
 
         /**
          * Terminates this train. Can only be called once.
          *
          * @param time     the time of the event
-         * @param distance the distance travelled since the last event
+         * @param distance the totalDistance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has already been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
          *                               event
          */
         public void terminate(int time, int distance) {
-            addState(time, (index, before) -> before.terminate(time, index, distance));
+            addState(time, (before) -> new TerminateEvent(before, time, distance));
         }
     }
 
@@ -393,9 +382,11 @@ public class Train {
      */
     @Immutable
     @ParametersAreNonnullByDefault
-    public interface State extends Event {
+    public interface State extends Comparable<State> {
         @Nonnull
         Train getTrain();
+
+        int getTime();
 
         boolean isTerminated();
 
@@ -405,11 +396,16 @@ public class Train {
         Position getPosition();
 
         /**
-         * Gets the total distance the train has travelled at this point.
+         * Gets the total totalDistance the train has travelled at this point.
          *
-         * @return the distance in meters
+         * @return the totalDistance in meters
          */
         int getTotalDistance();
+
+        @Override
+        default int compareTo(State other) {
+            return Integer.compare(getTime(), other.getTime());
+        }
     }
 
     /**
@@ -435,10 +431,10 @@ public class Train {
         Edge getFrontEdge();
 
         /**
-         * Gets the distance the front of the train has travelled on the {@link #getFrontEdge()
+         * Gets the totalDistance the front of the train has travelled on the {@link #getFrontEdge()
          * front edge}.
          *
-         * @return the distance in meters
+         * @return the totalDistance in meters
          */
         int getFrontDistance();
 
@@ -451,10 +447,10 @@ public class Train {
         Edge getBackEdge();
 
         /**
-         * Gets the distance the back of the train is away from the end of the {@link #getBackEdge()
-         * back edge}.
+         * Gets the totalDistance the back of the train is away from the end of the {@link
+         * #getBackEdge() back edge}.
          *
-         * @return the distance in meters
+         * @return the totalDistance in meters
          */
         int getBackDistance();
 
@@ -462,81 +458,351 @@ public class Train {
         List<Edge> getEdges();
     }
 
+    private abstract static class TrainEvent implements Event {
+        private final int index;
+        @Nonnull
+        private final Train train;
+        private final int time;
+        private final int distance;
+        private final int totalDistance;
+        @Nonnull
+        private final TrainPosition position;
+
+        TrainEvent(int index, @Nonnull Train train, int time, int distance, int totalDistance, @Nonnull TrainPosition position) {
+            this.index = index;
+            this.train = train;
+            this.time = time;
+            this.distance = distance;
+            this.totalDistance = totalDistance;
+            this.position = position;
+        }
+
+        final int getIndex() {
+            return index;
+        }
+
+        @Nonnull
+        final Train getTrain() {
+            return train;
+        }
+
+        @Override
+        public final int getTime() {
+            return time;
+        }
+
+        final int getDistance() {
+            return distance;
+        }
+
+        final int getTotalDistance() {
+            return totalDistance;
+        }
+
+        @Nonnull
+        final TrainPosition getPosition() {
+            return position;
+        }
+
+        @Nonnull
+        InterpolatableState.Builder stateBuilder() {
+            return new InterpolatableState.Builder(getTrain())
+                    .index(getIndex())
+                    .time(getTime())
+                    .distance(getTotalDistance())
+                    .position(getPosition());
+        }
+
+        /**
+         * Gets the state of the train after this event.
+         * This method may return different states for consecutive calls.
+         *
+         * @return the state
+         */
+        @Nonnull
+        final InterpolatableState getState() {
+            return stateBuilder().build();
+        }
+    }
+
+    private static class SpeedEvent extends TrainEvent {
+        private final int speed;
+
+        SpeedEvent(int index, @Nonnull Train train, int time, int distance, int totalDistance, @Nonnull TrainPosition position, int speed) {
+            super(index, train, time, distance, totalDistance, position);
+            this.speed = speed;
+        }
+
+        SpeedEvent(TrainEvent before, int time, int distance, int speed) {
+            this(before.getIndex() + 1,
+                    before.getTrain(),
+                    time,
+                    distance,
+                    before.getTotalDistance() + distance,
+                    before.getPosition().move(distance),
+                    speed
+            );
+        }
+
+        final int getSpeed() {
+            return speed;
+        }
+
+        @Nonnull
+        @Override
+        InterpolatableState.Builder stateBuilder() {
+            return super.stateBuilder()
+                    .speed(getSpeed());
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Speed{"
+                    + "time=" + getTime()
+                    + ", totalDistance=" + getTotalDistance()
+                    + ", speed=" + getSpeed()
+                    + "}";
+        }
+    }
+
+    private static class InitEvent extends SpeedEvent {
+        InitEvent(@Nonnull Train train, Edge startEdge) {
+            super(0, train, 0, 0, 0, TrainPosition.init(train, startEdge), 0);
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Init{"
+                    + "startEdge=" + getPosition().getBackEdge().getName()
+                    + "}";
+        }
+    }
+
+    private static class TerminateEvent extends PositionEvent {
+        TerminateEvent(TrainEvent before, int time, int distance) {
+            super(before.getIndex() + 1,
+                    before.getTrain(),
+                    time,
+                    distance,
+                    before.getTotalDistance() + distance,
+                    before.getPosition().move(distance)
+            );
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Terminate{"
+                    + "time=" + getTime()
+                    + ", totalDistance=" + getTotalDistance()
+                    + "}";
+        }
+
+        @Nonnull
+        @Override
+        InterpolatableState.Builder stateBuilder() {
+            return super.stateBuilder()
+                    .terminated(true);
+        }
+    }
+
+    private abstract static class PositionEvent extends TrainEvent {
+
+        PositionEvent(int index, @Nonnull Train train, int time, int distance, int totalDistance, @Nonnull TrainPosition position) {
+            super(index, train, time, distance, totalDistance, position);
+        }
+
+        @Nonnull
+        @Override
+        InterpolatableState.Builder stateBuilder() {
+            return super.stateBuilder()
+                    .speed(calculateSpeed());
+        }
+
+        @Nonnull
+        private SpeedEvent getSpeedEventBefore() {
+            for (int index = getIndex() - 1; index >= 0; index--) {
+                TrainEvent event = getTrain().events.get(index);
+                if (event instanceof SpeedEvent) {
+                    return (SpeedEvent) event;
+                }
+            }
+            throw new IllegalStateException("Missing init event");
+        }
+
+        @Nullable
+        private SpeedEvent getSpeedEventAfter() {
+            List<TrainEvent> events = getTrain().events;
+            for (int index = getIndex() + 1; index < events.size(); index++) {
+                TrainEvent event = events.get(index);
+                if (event instanceof SpeedEvent) {
+                    return (SpeedEvent) event;
+                }
+            }
+            return null;
+        }
+
+        private int calculateSpeed() {
+            SpeedEvent before = getSpeedEventBefore();
+            SpeedEvent after = getSpeedEventAfter();
+
+            if (after == null) {
+                return before.getSpeed();
+            }
+
+            int relativeAfterTime = after.getTime() - before.getTime();
+            int relativeTime = getTime() - before.getTime();
+
+            int interpolatedSpeed = before.getSpeed();
+            int speedDiff = after.getSpeed() - before.getSpeed();
+            interpolatedSpeed += (int) (((double) speedDiff) / relativeAfterTime * relativeTime);
+            return interpolatedSpeed;
+        }
+    }
+
+    private static class ReachEvent extends PositionEvent {
+        @Nonnull
+        private final Edge reached;
+
+        ReachEvent(TrainEvent before, int time, int distance, Edge reached) {
+            super(before.getIndex() + 1,
+                    before.getTrain(),
+                    time,
+                    distance,
+                    before.getTotalDistance() + distance,
+                    before.getPosition().reachFront(reached));
+            this.reached = reached;
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Reach{"
+                    + "time=" + getTime()
+                    + ", distance=" + getDistance()
+                    + ", reached=" + reached.getName()
+                    + "}";
+        }
+    }
+
+    private static class LeaveEvent extends PositionEvent {
+        @Nonnull
+        private final Edge left;
+
+        LeaveEvent(TrainEvent before, int time, int distance, Edge left) {
+            super(before.getIndex() + 1,
+                    before.getTrain(),
+                    time,
+                    distance,
+                    before.getTotalDistance() + distance,
+                    before.getPosition().leaveBack(left, distance));
+            this.left = left;
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Leave{"
+                    + "time=" + getTime()
+                    + ", distance=" + getDistance()
+                    + ", left=" + left.getName()
+                    + "}";
+        }
+    }
+
     @Immutable
     @ParametersAreNonnullByDefault
-    private abstract static class InterpolatableState implements State {
+    private static final class InterpolatableState implements State {
         @Nonnull
         private final Train train;
         private final int index;
         private final int time;
         private final int distance;
         @Nonnull
-        private final List<String> events;
+        private final TrainPosition position;
+        private final int speed;
+        private final boolean terminated;
 
-        InterpolatableState(Train train, int index, int time, int distance, List<String> events) {
-            this.train = train;
-            this.index = index;
-            this.time = time;
-            this.distance = distance;
-            this.events = new ArrayList<>(events);
-        }
-
-        private List<String> createEvents(int newTime, String newEvent) {
-            if (getTime() == newTime) {
-                List<String> newEvents = new ArrayList<>(getEvents());
-                newEvents.add(newEvent);
-                return newEvents;
-            } else {
-                return Collections.singletonList(newEvent);
+        private InterpolatableState(Train train,
+                                    int index,
+                                    boolean terminated,
+                                    int time,
+                                    int distance,
+                                    TrainPosition position,
+                                    int speed) {
+            this.train = Objects.requireNonNull(train);
+            if (index < 0) {
+                throw new IllegalArgumentException("index is negative");
             }
+            this.index = index;
+            this.terminated = terminated;
+            if (time < 0) {
+                throw new IllegalArgumentException("time is negative");
+            }
+            this.time = time;
+            if (distance < 0) {
+                throw new IllegalArgumentException("distance is negative");
+            }
+            this.distance = distance;
+            this.position = Objects.requireNonNull(position);
+            if (speed < 0) {
+                throw new IllegalArgumentException(String.format("speed (%d) is negative", speed));
+            }
+            this.speed = speed;
         }
 
-        final InterpolatableState speed(int time, int index, int distance, int speed) {
-            String event = "Speed{"
-                    + "time=" + time
-                    + ", distance=" + distance
-                    + ", speed=" + speed
-                    + "}";
-            List<String> newEvents = createEvents(time, event);
+        @ParametersAreNonnullByDefault
+        static class Builder {
+            @Nonnull
+            private final Train train;
 
-            int newDistance = getTotalDistance() + distance;
-            TrainPosition newPosition = getPosition().move(distance);
-            return new NormalState(getTrain(), index, time, newDistance, speed, newPosition, newEvents);
-        }
+            private int time = -1;
+            private int speed = -1;
+            private boolean terminated = false;
+            private int index = -1;
+            private int distance = -1;
+            private TrainPosition position = null;
 
-        final InterpolatableState reach(int time, int index, Edge reached, int movedDistance) {
-            String event = "Reach{"
-                    + "time=" + time
-                    + ", distance=" + movedDistance
-                    + ", reached=" + reached.getName()
-                    + "}";
-            List<String> newEvents = createEvents(time, event);
-            int newDistance = getTotalDistance() + movedDistance;
-            TrainPosition newPosition = getPosition().reachFront(reached, movedDistance);
-            return new NormalState(getTrain(), index, time, newDistance, getSpeed(), newPosition, newEvents);
-        }
+            Builder(Train train) {
+                this.train = train;
+            }
 
-        final InterpolatableState leave(int time, int index, Edge left, int movedDistance) {
-            String event = "Leave{"
-                    + "time=" + time
-                    + ", distance=" + movedDistance
-                    + ", left=" + left.getName()
-                    + "}";
-            List<String> newEvents = createEvents(time, event);
-            int newDistance = getTotalDistance() + movedDistance;
-            TrainPosition newPosition = getPosition().leaveBack(left, movedDistance);
-            return new NormalState(getTrain(), index, time, newDistance, getSpeed(), newPosition, newEvents);
-        }
+            Builder time(int time) {
+                this.time = time;
+                return this;
+            }
 
-        final InterpolatableState terminate(int time, int index, int distance) {
-            String event = "Terminate{"
-                    + "time=" + time
-                    + ", distance=" + distance
-                    + "}";
-            List<String> newEvents = createEvents(time, event);
-            TrainPosition newPosition = getPosition().move(distance);
-            int newDistance = getTotalDistance() + distance;
-            return new TerminatedState(getTrain(), index, newPosition, time, newDistance, getSpeed(), newEvents);
+            Builder speed(int speed) {
+                this.speed = speed;
+                return this;
+            }
+
+            Builder terminated(boolean terminated) {
+                this.terminated = terminated;
+                return this;
+            }
+
+            Builder index(int index) {
+                this.index = index;
+                return this;
+            }
+
+            Builder distance(int distance) {
+                this.distance = distance;
+                return this;
+            }
+
+            Builder position(TrainPosition position) {
+                this.position = position;
+                return this;
+            }
+
+
+            InterpolatableState build() {
+                return new InterpolatableState(train, index, terminated, time, distance, position, speed);
+            }
         }
 
         @Nonnull
@@ -568,7 +834,14 @@ public class Train {
                 interpolatedPosition = interpolatedPosition.interpolationMove(interpolationDistance, other.getPosition().getFrontEdge());
             }
 
-            return new NormalState(getTrain(), getIndex(), targetTime, interpolatedDistance, interpolatedSpeed, interpolatedPosition, getEvents());
+
+            return new Builder(getTrain())
+                    .index(getIndex())
+                    .time(targetTime)
+                    .distance(interpolatedDistance)
+                    .speed(interpolatedSpeed)
+                    .position(interpolatedPosition)
+                    .build();
         }
 
         @Nonnull
@@ -579,17 +852,13 @@ public class Train {
 
         @Nonnull
         @Override
-        public abstract TrainPosition getPosition();
+        public TrainPosition getPosition() {
+            return position;
+        }
 
         @Override
         public int getTime() {
             return time;
-        }
-
-        @Nonnull
-        @Override
-        public String getDescription() {
-            return getTrain().getReadableName() + " " + toString(); // TODO change to something more user-friendly
         }
 
         @Override
@@ -601,9 +870,14 @@ public class Train {
             return index;
         }
 
-        @Nonnull
-        public List<String> getEvents() {
-            return events;
+        @Override
+        public int getSpeed() {
+            return speed;
+        }
+
+        @Override
+        public boolean isTerminated() {
+            return terminated;
         }
 
         @Override
@@ -626,99 +900,6 @@ public class Train {
             result = 31 * result + getSpeed();
             result = 31 * result + getPosition().hashCode();
             return result;
-        }
-
-        @Override
-        public String toString() {
-            return getEvents().toString();
-        }
-    }
-
-    @Immutable
-    @ParametersAreNonnullByDefault
-    private static final class TerminatedState extends InterpolatableState {
-        private final TrainPosition position;
-        private final int speed;
-
-        TerminatedState(Train train, int index, TrainPosition position, int time, int distance, int endSpeed, List<String> events) {
-            super(train, index, time, distance, events);
-            this.position = position;
-            this.speed = endSpeed;
-        }
-
-        @Override
-        public boolean isTerminated() {
-            return true;
-        }
-
-        @Override
-        public int getSpeed() {
-            return speed;
-        }
-
-        @Nonnull
-        @Override
-        public TrainPosition getPosition() {
-            return position;
-        }
-    }
-
-    @Immutable
-    @ParametersAreNonnullByDefault
-    private static final class InitState extends InterpolatableState {
-        private final TrainPosition position;
-
-        InitState(Train train, TrainPosition position) {
-            super(train, 0, 0, 0, Collections.singletonList("Init{"
-                    + "backEdge=" + position.getBackEdge().getName()
-                    + "}"));
-            this.position = position;
-        }
-
-        @Override
-        public boolean isTerminated() {
-            return false;
-        }
-
-        @Override
-        public int getSpeed() {
-            return 0;
-        }
-
-        @Nonnull
-        @Override
-        public TrainPosition getPosition() {
-            return position;
-        }
-    }
-
-    @Immutable
-    @ParametersAreNonnullByDefault
-    private static final class NormalState extends InterpolatableState {
-        private final int speed;
-        @Nonnull
-        private final TrainPosition position;
-
-        NormalState(Train train, int index, int time, int distance, int speed, TrainPosition position, List<String> events) {
-            super(train, index, time, distance, events);
-            this.speed = speed;
-            this.position = position;
-        }
-
-        @Override
-        public boolean isTerminated() {
-            return false;
-        }
-
-        @Override
-        public int getSpeed() {
-            return speed;
-        }
-
-        @Nonnull
-        @Override
-        public TrainPosition getPosition() {
-            return position;
         }
     }
 
@@ -808,7 +989,7 @@ public class Train {
         }
 
         @Nonnull
-        TrainPosition reachFront(Edge newStart, int movedDistance) {
+        TrainPosition reachFront(Edge newStart) {
             LinkedList<Edge> edges = new LinkedList<>(getEdges());
             edges.addFirst(newStart);
             return new TrainPosition(getTrain(), edges, 0);

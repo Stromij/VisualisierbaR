@@ -225,6 +225,21 @@ public class TrainTest {
     }
 
     @Test
+    public void testSpeedInterpolationWithNonSpeedInbetween() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Edge[] edges = createEdges(10, 50);
+        train.eventFactory().init(edges[0]);
+
+        train.eventFactory().speed(10, 5, 10);
+        train.eventFactory().leave(15, edges[1], 5);
+        train.eventFactory().speed(20, 5, 20);
+
+        assertEquals(12, train.getState(12).getSpeed());
+        assertEquals(15, train.getState(15).getSpeed());
+        assertEquals(17, train.getState(17).getSpeed());
+    }
+
+    @Test
     public void testPositionInterpolation() {
         Train train = Train.in(context).create("t", "train", 10);
         Edge edge = createEdges(50)[0];
