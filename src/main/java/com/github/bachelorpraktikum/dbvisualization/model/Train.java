@@ -174,13 +174,12 @@ public class Train {
     }
 
     /**
-     * Gets an unmodifiable list of all known exact states of this train.
-     * The list will get updated if a new state is appended to the end.<br>
-     * If you want an interpolated state, use {@link #getState(int)}.
+     * Gets an unmodifiable list of all known events of this train.
+     * The list will get updated if a new event is appended to the end.
      *
-     * @return the list of states
+     * @return the list of events
      */
-    public ObservableList<? extends State> getStates() {
+    public ObservableList<? extends Event> getEvents() {
         return FXCollections.unmodifiableObservableList(states);
     }
 

@@ -15,7 +15,6 @@ import java.util.ResourceBundle;
 import javax.annotation.Nonnull;
 
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -140,7 +139,7 @@ public class MainController {
                 List<ObservableList<? extends Event>> lists = new LinkedList<>();
                 lists.add(Element.in(context).getEvents());
                 for (Train train : Train.in(context).getAll()) {
-                    lists.add(train.getStates());
+                    lists.add(train.getEvents());
                 }
 
                 ObservableList<Event> events = new CompositeObservableEventList(lists);
