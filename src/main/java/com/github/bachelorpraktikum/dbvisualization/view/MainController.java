@@ -5,7 +5,7 @@ import com.github.bachelorpraktikum.dbvisualization.logparser.GraphParser;
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
-import com.github.bachelorpraktikum.dbvisualization.model.Train;
+import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
 
 import java.io.IOException;
 import java.util.LinkedList;

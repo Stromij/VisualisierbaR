@@ -5,7 +5,7 @@ import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
 import com.github.bachelorpraktikum.dbvisualization.model.Node;
-import com.github.bachelorpraktikum.dbvisualization.model.Train;
+import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.BailErrorStrategy;

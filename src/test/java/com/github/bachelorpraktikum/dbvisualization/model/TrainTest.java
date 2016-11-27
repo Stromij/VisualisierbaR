@@ -1,5 +1,7 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
+import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
