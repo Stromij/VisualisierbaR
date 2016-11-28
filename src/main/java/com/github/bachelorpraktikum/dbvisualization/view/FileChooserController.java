@@ -57,6 +57,12 @@ public class FileChooserController implements SourceChooser {
                 // This won't ever happen, because File.toURI().toURL() won't ever create an URL with an invalid protocol.
             }
         });
+
+        pathField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                ((Button) rootPane.getScene().lookup("#openSource")).fire();
+            }
+        });
     }
 
     /**
