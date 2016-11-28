@@ -36,6 +36,7 @@ public class FileChooserController implements SourceChooser {
     private void initialize() {
         fileURLProperty = new ReadOnlyObjectWrapper<>();
         fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         explorerButton.setOnAction(event -> updatePath(openFileChooser()));
 
         explorerButton.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
