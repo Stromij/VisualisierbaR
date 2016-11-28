@@ -73,7 +73,6 @@ public class FileChooserController implements SourceChooser {
      *
      * @return A {@link File file} or null
      */
-    @Nullable
     private File openFileChooser() {
         return fileChooser.showOpenDialog(rootPane.getScene().getWindow());
     }
