@@ -13,10 +13,10 @@
     <top>
         <AnchorPane>
             <children>
-                <FlowPane alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <FlowPane alignment="CENTER_LEFT" hgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <ToggleButton fx:id="logToggle" text="%show_hide_logs" />
                 </FlowPane>
-                <FlowPane alignment="CENTER_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                <FlowPane alignment="CENTER_RIGHT" hgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
                         <Button fx:id="closeButton" text="%close_data_source" />
                     </children>
