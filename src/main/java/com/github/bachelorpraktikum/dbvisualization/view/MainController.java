@@ -118,6 +118,8 @@ public class MainController {
     void setStage(@Nonnull Stage stage) {
         this.stage = stage;
         stage.setScene(new Scene(rootPane));
+
+        stage.centerOnScreen();
     }
 
     void setDataSource(@Nonnull DataSource source) {
