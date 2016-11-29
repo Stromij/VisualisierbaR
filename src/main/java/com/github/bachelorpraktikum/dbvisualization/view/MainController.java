@@ -146,7 +146,7 @@ public class MainController {
                     lists.add(train.getEvents());
                 }
 
-                ObservableList<Event> events = new CompositeObservableEventList(lists);
+                ObservableList<Event> events = new CompositeObservableList<>(lists);
                 logList.setItems(events.sorted());
                 return;
             default:

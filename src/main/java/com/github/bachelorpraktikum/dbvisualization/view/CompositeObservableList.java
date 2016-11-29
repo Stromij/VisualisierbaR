@@ -16,18 +16,18 @@ import javafx.collections.ObservableListBase;
  * containing an {@link Event} subtype.
  */
 @ParametersAreNonnullByDefault
-class CompositeObservableEventList extends ObservableListBase<Event> {
-    private final List<ObservableList<? extends Event>> lists;
+class CompositeObservableList<T> extends ObservableListBase<T> {
+    private final List<ObservableList<? extends T>> lists;
 
     /**
      * Creates a new instance. A defensive copy of the given list is created, so changes to the list
      * after calling this constructor won't be represented in this object.
      *
-     * @param eventLists the lists this list is composed of
-     * @throws NullPointerException if eventLists is null
+     * @param lists the lists this list is composed of
+     * @throws NullPointerException if lists is null
      */
-    CompositeObservableEventList(List<ObservableList<? extends Event>> eventLists) {
-        this.lists = new ArrayList<>(Objects.requireNonNull(eventLists));
+    CompositeObservableList(List<ObservableList<? extends T>> lists) {
+        this.lists = new ArrayList<>(Objects.requireNonNull(lists));
         registerListeners();
     }
 
@@ -35,18 +35,18 @@ class CompositeObservableEventList extends ObservableListBase<Event> {
      * Registers change listeners for all lists this list is composed of.
      */
     private void registerListeners() {
-        for (ObservableList<? extends Event> list : lists) {
+        for (ObservableList<? extends T> list : lists) {
             list.addListener(this::fireChange);
         }
     }
 
     @Override
-    public Event get(int index) {
+    public T get(int index) {
         if (index < 0) {
             throw new IndexOutOfBoundsException("index is negative");
         }
 
-        for (ObservableList<? extends Event> list : lists) {
+        for (ObservableList<? extends T> list : lists) {
             if (list.size() <= index) {
                 index -= list.size();
             } else {
