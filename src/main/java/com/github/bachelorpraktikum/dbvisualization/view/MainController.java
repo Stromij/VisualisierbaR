@@ -128,8 +128,10 @@ public class MainController {
                     context = new GraphParser(source.getUrl().getFile()).parse();
                 } catch (IOException | RuntimeException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setHeaderText("Verarbeitungs-Fehler");
-                    alert.setContentText("Can't parse chosen data source");
+                    String headerText = ResourceBundle.getBundle("bundles.localization").getString("parse_error_header");
+                    alert.setHeaderText(headerText);
+                    String contentText = ResourceBundle.getBundle("bundles.localization").getString("parse_error_content");
+                    alert.setContentText(contentText);
                     alert.show();
                     showSourceChooser();
                     return;
