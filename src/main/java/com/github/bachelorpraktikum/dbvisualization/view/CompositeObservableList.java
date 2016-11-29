@@ -12,8 +12,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableListBase;
 
 /**
- * An {@link ObservableList} implementation that is composed of multiple observable lists each
- * containing an {@link Event} subtype.
+ * An {@link ObservableList} implementation that is composed of multiple observable lists.
+ * Does not implement optional operations like {@link #add(Object)}.
  */
 @ParametersAreNonnullByDefault
 class CompositeObservableList<T> extends ObservableListBase<T> {
