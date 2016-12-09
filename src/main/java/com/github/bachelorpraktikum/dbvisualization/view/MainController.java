@@ -9,16 +9,21 @@ import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Graph;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Shapeable;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.SimpleCoordinatesAdapter;
+import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendItem;
+import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCell;
 
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -29,8 +34,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBase;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -38,12 +45,28 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 public class MainController {
+    @FXML
+    private ListView<String> elementList;
+    @FXML
+    private CheckBox elementFilter;
+    @FXML
+    private CheckBox trainFilter;
+    @FXML
+    private TextField filterText;
+
+    @FXML
+    private StackPane sidebar;
+    @FXML
+    private ListView<LegendItem> legend;
+    @FXML
+    private ToggleButton legendButton;
     @FXML
     private Button closeButton;
     @FXML
@@ -72,6 +95,10 @@ public class MainController {
             public void handle(ActionEvent event) {
                 showSourceChooser();
             }
+        });
+
+        legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            legend.setVisible(newValue);
         });
 
         // Hide logList by default
@@ -141,6 +168,37 @@ public class MainController {
         stage.centerOnScreen();
     }
 
+    private void showLegend() {
+        Context context = ContextHolder.getInstance().getContext();
+        Stream<LegendItem> str = Element.in(context).getAll().stream()
+                .map(Element::getType)
+                .distinct()
+                .map(type -> new LegendItem(LegendItem.Type.ELEMENT, type.getName()));
+
+        legend.setItems(FXCollections.observableArrayList(str.collect(Collectors.toList())));
+        Train t = Train.in(context).getAll().stream().iterator().next();
+        legend.getItems().add(new LegendItem(LegendItem.Type.TRAIN, t.getName()));
+        legend.setCellFactory(studentListView -> new LegendListViewCell());
+    }
+
+    private void showElements() {
+        Context context = ContextHolder.getInstance().getContext();
+
+        Stream<String> elements = Element.in(context).getAll().stream()
+                .map(Element::getName).filter(el -> elementFilter.isSelected());
+        Stream<String> trains = Train.in(context).getAll().stream()
+                .map(Train::getName).filter(el -> trainFilter.isSelected());
+
+        ObservableList<String> items = FXCollections.observableList(
+                Stream.concat(elements, trains)
+                        .filter(t -> t.toLowerCase().contains(filterText.getText().trim().toLowerCase()))
+                        .collect(Collectors.toList())
+        );
+
+        elementList.setItems(items);
+        // legend.setCellFactory();
+    }
+
     void setDataSource(@Nonnull DataSource source) {
         switch (source.getType()) {
             case LOG_FILE:
@@ -167,12 +225,18 @@ public class MainController {
 
                 ObservableList<Event> events = new CompositeObservableList<>(lists);
                 logList.setItems(events.sorted());
-
                 fitGraphToCenter(getGraphShape());
-                return;
+
+                break;
             default:
                 return;
         }
+
+        showLegend();
+        showElements();
+        trainFilter.selectedProperty().addListener((observable, oldValue, newValue) -> showElements());
+        elementFilter.selectedProperty().addListener((observable, oldValue, newValue) -> showElements());
+        filterText.textProperty().addListener((observable, oldValue, newValue) -> showElements());
     }
 
     /**

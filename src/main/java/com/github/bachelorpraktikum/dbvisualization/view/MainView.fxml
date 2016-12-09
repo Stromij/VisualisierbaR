@@ -2,7 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -18,13 +21,14 @@
                 </FlowPane>
                 <FlowPane alignment="CENTER_RIGHT" hgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
+                        <ToggleButton fx:id="legendButton" text="Legende" />
                         <Button fx:id="closeButton" text="%close_data_source" />
                     </children>
                 </FlowPane>
             </children>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
+            <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+            </padding>
         </AnchorPane>
     </top>
     <left>
@@ -38,8 +42,28 @@
         </StackPane>
     </center>
     <right>
-        <StackPane>
-
+        <StackPane fx:id="sidebar" maxWidth="240">
+            <ListView fx:id="legend" fixedCellSize="0.0" style="-fx-background-color: #ccc;" visible="false">
+                <Label text="Legend goes here." />
+            </ListView>
+            <BorderPane>
+                <center>
+                    <ListView fx:id="elementList" style="-fx-padding: 1px;">
+                    </ListView>
+                </center>
+                <top>
+                    <AnchorPane>
+                        <TextField fx:id="filterText" promptText="Filtern..." AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <FlowPane fx:id="filterPane" hgap="4" vgap="4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+                            <CheckBox fx:id="elementFilter" selected="true" text="Elemente" />
+                            <CheckBox fx:id="trainFilter" selected="true" text="Züge anzeigen" />
+                        </FlowPane>
+                        <padding>
+                            <Insets bottom="5.0" />
+                        </padding>
+                    </AnchorPane>
+                </top>
+            </BorderPane>
         </StackPane>
     </right>
 </BorderPane>
