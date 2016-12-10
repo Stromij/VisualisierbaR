@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +41,7 @@ public final class Node {
      * Ensures there is always only one instance of node per name per {@link Context}.
      */
     public static final class Factory {
-        private static final int INITIAL_NODES_CAPACITY = 64;
+        private static final int INITIAL_NODES_CAPACITY = 128;
         private static final Map<Context, Factory> instances = new WeakHashMap<>();
 
         @Nonnull
@@ -55,7 +56,7 @@ public final class Node {
         }
 
         private Factory() {
-            this.nodes = new HashMap<>(INITIAL_NODES_CAPACITY);
+            this.nodes = new LinkedHashMap<>(INITIAL_NODES_CAPACITY);
         }
 
         /**

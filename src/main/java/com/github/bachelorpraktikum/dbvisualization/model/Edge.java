@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.dbvisualization.model;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -41,7 +42,7 @@ public final class Edge {
      */
     @ParametersAreNonnullByDefault
     public static final class Factory {
-        private static final int INITIAL_EDGES_CAPACITY = 128;
+        private static final int INITIAL_EDGES_CAPACITY = 512;
         private static final Map<Context, Factory> instances = new WeakHashMap<>();
 
         @Nonnull
@@ -55,7 +56,7 @@ public final class Edge {
         }
 
         private Factory() {
-            this.edges = new HashMap<>(INITIAL_EDGES_CAPACITY);
+            this.edges = new LinkedHashMap<>(INITIAL_EDGES_CAPACITY);
         }
 
         /**
