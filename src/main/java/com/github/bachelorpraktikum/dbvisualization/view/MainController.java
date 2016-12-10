@@ -22,14 +22,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -61,7 +63,7 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 public class MainController {
-    private Map<Context, List<ChangeListener>> listeners;
+    private Map<Context, List<ObservableValue>> listeners;
 
     @FXML
     private ListView<String> elementList;
@@ -237,34 +239,31 @@ public class MainController {
 
         FilteredList<String> trains = FXCollections.observableList(Train.in(context).getAll().stream()
                 .map(Train::getReadableName).collect(Collectors.toList()))
-                .filtered(t -> trainFilter.isSelected());
-
-        ChangeListener<Boolean> trainListener = (observable, oldValue, newValue) ->
-                trains.setPredicate(t -> trainFilter.isSelected());
-        listeners.get(context).add(trainListener);
-        trainFilter.selectedProperty().addListener(new WeakChangeListener<>(trainListener));
+                .filtered(null);
+        ObservableValue<Predicate<String>> trainBinding = Bindings.createObjectBinding(() -> s ->
+                        trainFilter.isSelected(),
+                trainFilter.selectedProperty());
+        listeners.get(context).add(trainBinding);
+        trains.predicateProperty().bind(trainBinding);
 
         FilteredList<String> elements = FXCollections.observableList(Element.in(context).getAll().stream()
                 .map(Element::getName).collect(Collectors.toList())
-        ).filtered(e -> elementFilter.isSelected());
-
-        ChangeListener<Boolean> elementListener = (observable, oldValue, newValue) ->
-                elements.setPredicate(t -> elementFilter.isSelected());
-        listeners.get(context).add(elementListener);
-        elementFilter.selectedProperty().addListener(new WeakChangeListener<>(elementListener));
+        ).filtered(null);
+        ObservableValue<Predicate<String>> elementBinding = Bindings.createObjectBinding(() -> s ->
+                        elementFilter.isSelected(),
+                elementFilter.selectedProperty());
+        listeners.get(context).add(elementBinding);
+        elements.predicateProperty().bind(elementBinding);
 
         List<ObservableList<? extends String>> lists = Arrays.asList(trains, elements);
         ObservableList<String> items = new CompositeObservableList<>(lists);
-
-        FilteredList<String> textFilteredItems = items.filtered(s ->
-                s.toLowerCase().contains(filterText.getText().trim().toLowerCase()));
-
-        ChangeListener<String> textFilterListener = (observable, oldValue, newValue) -> {
-            String t = filterText.getText().trim().toLowerCase();
-            textFilteredItems.setPredicate(s -> s.toLowerCase().contains(t));
-        };
-        listeners.get(context).add(textFilterListener);
-        filterText.textProperty().addListener(textFilterListener);
+        FilteredList<String> textFilteredItems = items.filtered(null);
+        ObservableValue<Predicate<String>> textFilterBinding = Bindings.createObjectBinding(() -> {
+            String text = filterText.getText().trim().toLowerCase();
+            return s -> s.toLowerCase().contains(text);
+        });
+        listeners.get(context).add(textFilterBinding);
+        textFilteredItems.predicateProperty().bind(textFilterBinding);
 
         elementList.setItems(textFilteredItems);
         // legend.setCellFactory();
