@@ -14,11 +14,14 @@ import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCe
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,8 +29,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -56,6 +61,8 @@ import javafx.util.Callback;
 import javafx.util.StringConverter;
 
 public class MainController {
+    private Map<Context, List<ChangeListener>> listeners;
+
     @FXML
     private ListView<String> elementList;
     @FXML
@@ -90,8 +97,10 @@ public class MainController {
 
     private Stage stage;
 
+
     @FXML
     private void initialize() {
+        this.listeners = new WeakHashMap<>();
         fireOnEnterPress(closeButton);
         fireOnEnterPress(logToggle);
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -226,18 +235,38 @@ public class MainController {
     private void showElements() {
         Context context = ContextHolder.getInstance().getContext();
 
-        Stream<String> elements = Element.in(context).getAll().stream()
-                .map(Element::getName).filter(el -> elementFilter.isSelected());
-        Stream<String> trains = Train.in(context).getAll().stream()
-                .map(Train::getReadableName).filter(el -> trainFilter.isSelected());
+        FilteredList<String> trains = FXCollections.observableList(Train.in(context).getAll().stream()
+                .map(Train::getReadableName).collect(Collectors.toList()))
+                .filtered(t -> trainFilter.isSelected());
 
-        ObservableList<String> items = FXCollections.observableList(
-                Stream.concat(elements, trains)
-                        .filter(t -> t.toLowerCase().contains(filterText.getText().trim().toLowerCase()))
-                        .collect(Collectors.toList())
-        );
+        ChangeListener<Boolean> trainListener = (observable, oldValue, newValue) ->
+                trains.setPredicate(t -> trainFilter.isSelected());
+        listeners.get(context).add(trainListener);
+        trainFilter.selectedProperty().addListener(new WeakChangeListener<>(trainListener));
 
-        elementList.setItems(items);
+        FilteredList<String> elements = FXCollections.observableList(Element.in(context).getAll().stream()
+                .map(Element::getName).collect(Collectors.toList())
+        ).filtered(e -> elementFilter.isSelected());
+
+        ChangeListener<Boolean> elementListener = (observable, oldValue, newValue) ->
+                elements.setPredicate(t -> elementFilter.isSelected());
+        listeners.get(context).add(elementListener);
+        elementFilter.selectedProperty().addListener(new WeakChangeListener<>(elementListener));
+
+        List<ObservableList<? extends String>> lists = Arrays.asList(trains, elements);
+        ObservableList<String> items = new CompositeObservableList<>(lists);
+
+        FilteredList<String> textFilteredItems = items.filtered(s ->
+                s.toLowerCase().contains(filterText.getText().trim().toLowerCase()));
+
+        ChangeListener<String> textFilterListener = (observable, oldValue, newValue) -> {
+            String t = filterText.getText().trim().toLowerCase();
+            textFilteredItems.setPredicate(s -> s.toLowerCase().contains(t));
+        };
+        listeners.get(context).add(textFilterListener);
+        filterText.textProperty().addListener(textFilterListener);
+
+        elementList.setItems(textFilteredItems);
         // legend.setCellFactory();
     }
 
@@ -257,6 +286,7 @@ public class MainController {
                     showSourceChooser();
                     return;
                 }
+                listeners.put(context, new LinkedList<>());
                 ContextHolder.getInstance().setContext(context);
 
                 List<ObservableList<? extends Event>> lists = new LinkedList<>();
@@ -276,9 +306,6 @@ public class MainController {
 
         showLegend();
         showElements();
-        trainFilter.selectedProperty().addListener((observable, oldValue, newValue) -> showElements());
-        elementFilter.selectedProperty().addListener((observable, oldValue, newValue) -> showElements());
-        filterText.textProperty().addListener((observable, oldValue, newValue) -> showElements());
     }
 
     /**
