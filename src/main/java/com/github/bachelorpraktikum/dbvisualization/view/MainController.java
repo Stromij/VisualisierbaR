@@ -261,7 +261,7 @@ public class MainController {
         ObservableValue<Predicate<String>> textFilterBinding = Bindings.createObjectBinding(() -> {
             String text = filterText.getText().trim().toLowerCase();
             return s -> s.toLowerCase().contains(text);
-        });
+        }, filterText.textProperty());
         listeners.get(context).add(textFilterBinding);
         textFilteredItems.predicateProperty().bind(textFilterBinding);
 
