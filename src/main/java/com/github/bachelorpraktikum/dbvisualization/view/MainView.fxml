@@ -22,7 +22,7 @@
                 </FlowPane>
                 <FlowPane alignment="CENTER_RIGHT" hgap="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <children>
-                        <ToggleButton fx:id="legendButton" text="Legende" />
+                        <ToggleButton fx:id="legendButton" text="%legend" />
                         <Button fx:id="closeButton" text="%close_data_source" />
                     </children>
                 </FlowPane>
@@ -54,10 +54,10 @@
                 </center>
                 <top>
                     <AnchorPane>
-                        <TextField fx:id="filterText" promptText="Filtern..." AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <TextField fx:id="filterText" promptText="%filter" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                         <FlowPane fx:id="filterPane" hgap="4" vgap="4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
-                            <CheckBox fx:id="elementFilter" selected="true" text="Elemente anzeigen" />
-                            <CheckBox fx:id="trainFilter" selected="true" text="Züge anzeigen" />
+                            <CheckBox fx:id="elementFilter" selected="true" text="%filter_elements" />
+                            <CheckBox fx:id="trainFilter" selected="true" text="%filter_trains" />
                         </FlowPane>
                         <padding>
                             <Insets bottom="5.0" />
