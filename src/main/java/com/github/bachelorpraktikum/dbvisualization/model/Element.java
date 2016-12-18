@@ -498,8 +498,8 @@ public final class Element {
         @Override
         public String toString() {
             return "ElementEvent{"
-                    + "element=" + getElement().getName()
                     + ", time=" + time
+                    + "element=" + getElement().getName()
                     + ", state=" + state
                     + '}';
         }
