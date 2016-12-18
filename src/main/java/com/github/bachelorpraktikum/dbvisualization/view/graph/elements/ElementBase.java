@@ -2,6 +2,7 @@ package com.github.bachelorpraktikum.dbvisualization.view.graph.elements;
 
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
 import com.github.bachelorpraktikum.dbvisualization.model.Node;
+import com.github.bachelorpraktikum.dbvisualization.view.TooltipUtil;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShapeBase;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
 
@@ -12,6 +13,7 @@ import javafx.beans.property.ReadOnlyProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Point2D;
+import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Shape;
 import javafx.scene.transform.Transform;
 
@@ -61,10 +63,16 @@ abstract class ElementBase<T extends Shape> extends GraphShapeBase<Element, T> {
         return nearVec.multiply(-1.0).multiply(super.getOffset().magnitude());
     }
 
+    private void attachTooltip(T shape) {
+        Tooltip tooltip = new Tooltip(getRepresented().getName());
+        TooltipUtil.install(shape, tooltip);
+    }
+
     @Override
     public T initializeShape() {
         T shape = super.initializeShape();
         displayState(shape);
+        attachTooltip(shape);
         return shape;
     }
 

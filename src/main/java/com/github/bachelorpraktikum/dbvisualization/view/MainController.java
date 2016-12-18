@@ -151,15 +151,8 @@ public class MainController {
             @Override
             public ListCell<Event> call(ListView<Event> param) {
                 ListCell<Event> result = factory.call(param);
-                Tooltip tooltip = new Tooltip();
-
-                result.setOnMouseEntered(event -> {
-                    tooltip.setText(result.getText());
-                    Bounds bounds = result.localToScreen(result.getBoundsInLocal());
-                    tooltip.show(result, bounds.getMinX(), bounds.getMaxY());
-                });
-
-                result.setOnMouseExited(event -> tooltip.hide());
+                Tooltip tooltip = new Tooltip(result.getText());
+                TooltipUtil.install(result, tooltip);
 
                 return result;
             }
