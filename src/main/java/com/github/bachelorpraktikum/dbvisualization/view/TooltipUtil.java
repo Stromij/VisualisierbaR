@@ -1,5 +1,7 @@
 package com.github.bachelorpraktikum.dbvisualization.view;
 
+import java.util.function.Supplier;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Bounds;
@@ -26,5 +28,26 @@ public final class TooltipUtil {
         node.setOnMouseExited(event -> {
             waitForHide.play();
         });
+    }
+
+    public static void install(Node node, Supplier<String> textSupplier) {
+        Tooltip tooltip = new Tooltip();
+
+        Timeline waitForHide = new Timeline(new KeyFrame(
+                Duration.millis(300),
+                ae -> tooltip.hide()
+        ));
+
+        node.setOnMouseEntered(event -> {
+            waitForHide.stop();
+            Bounds bounds = node.localToScreen(node.getBoundsInLocal());
+            tooltip.setText(textSupplier.get());
+            tooltip.show(node, bounds.getMinX(), bounds.getMaxY());
+        });
+
+        node.setOnMouseExited(event -> {
+            waitForHide.play();
+        });
+
     }
 }

@@ -158,8 +158,7 @@ public class MainController {
             @Override
             public ListCell<Event> call(ListView<Event> param) {
                 ListCell<Event> result = factory.call(param);
-                Tooltip tooltip = new Tooltip(result.getText());
-                TooltipUtil.install(result, tooltip);
+                TooltipUtil.install(result, result::getText);
 
                 return result;
             }
