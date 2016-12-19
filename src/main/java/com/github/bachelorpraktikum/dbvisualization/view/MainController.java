@@ -124,12 +124,7 @@ public class MainController {
         this.legendStates = new HashMap<>(256);
         fireOnEnterPress(closeButton);
         fireOnEnterPress(logToggle);
-        closeButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                showSourceChooser();
-            }
-        });
+        closeButton.setOnAction(event -> showSourceChooser());
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             legend.setVisible(newValue);
