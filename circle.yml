@@ -8,4 +8,4 @@ deployment:
     branch: [master, develop]
     commands:
       - mvn package -DskipTests
-      - cp target/DBVisualization-*-SNAPSHOT-jar-with-dependencies.jar $CIRCLE_ARTIFACTS/dbvisualization.jar
+      - cp target/DBVisualization-*-jar-with-dependencies.jar $CIRCLE_ARTIFACTS/dbvisualization.jar
