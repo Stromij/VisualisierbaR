@@ -22,7 +22,7 @@ public class GraphParserTest {
         assertNotNull(context);
     }
 
-    @Ignore
+    @Ignore("Not parseable due to errors in log file")
     @Test
     public void testLog3() throws IOException {
         Context context = new GraphParser("src/test/resources/test3.zug.clean").parse();
@@ -38,6 +38,13 @@ public class GraphParserTest {
     @Test
     public void testLog5() throws IOException {
         Context context = new GraphParser("src/test/resources/test5.zug.clean").parse();
+        assertNotNull(context);
+    }
+
+    @Ignore("Currently not parseable due to the unknown Element type 'GeschwindigkeitsVorAnzeiger'")
+    @Test
+    public void testLog6() throws IOException {
+        Context context = new GraphParser("src/test/resources/test6.zug").parse();
         assertNotNull(context);
     }
 }

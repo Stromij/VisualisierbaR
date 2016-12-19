@@ -142,6 +142,8 @@ public class SourceController implements SourceChooser {
 
         Scene scene = new Scene(rootPane);
         stage.setScene(scene);
+
+        stage.centerOnScreen();
     }
 
     /**

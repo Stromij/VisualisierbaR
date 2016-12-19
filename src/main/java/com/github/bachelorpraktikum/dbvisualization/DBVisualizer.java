@@ -13,6 +13,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 
 public class DBVisualizer extends Application {
+
+    private static final String APP_NAME_KEY = "app_name";
+
     static {
         try (InputStream in = DBVisualizer.class.getResourceAsStream("/logging.properties")) {
             LogManager.getLogManager().readConfiguration(in);
@@ -26,8 +29,11 @@ public class DBVisualizer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
+        primaryStage.setTitle(localizationBundle.getString(APP_NAME_KEY));
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("view/SourceChooser.fxml"));
-        loader.setResources(ResourceBundle.getBundle("bundles.localization"));
+        loader.setResources(localizationBundle);
         loader.load();
         SourceController controller = loader.getController();
 

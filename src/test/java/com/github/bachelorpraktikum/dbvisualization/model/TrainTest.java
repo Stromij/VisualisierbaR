@@ -1,5 +1,7 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
+import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -207,8 +209,7 @@ public class TrainTest {
         assertTrue(state.isTerminated());
         assertEquals(14, state.getPosition().getFrontDistance());
         assertEquals(4, state.getTotalDistance());
-        expected.expect(IllegalStateException.class);
-        state.getSpeed();
+        assertEquals(20, state.getSpeed());
     }
 
     @Test
@@ -218,6 +219,21 @@ public class TrainTest {
         train.eventFactory().init(edge);
 
         train.eventFactory().speed(10, 5, 10);
+        train.eventFactory().speed(20, 5, 20);
+
+        assertEquals(12, train.getState(12).getSpeed());
+        assertEquals(15, train.getState(15).getSpeed());
+        assertEquals(17, train.getState(17).getSpeed());
+    }
+
+    @Test
+    public void testSpeedInterpolationWithNonSpeedInbetween() {
+        Train train = Train.in(context).create("t", "train", 10);
+        Edge[] edges = createEdges(10, 50);
+        train.eventFactory().init(edges[0]);
+
+        train.eventFactory().speed(10, 5, 10);
+        train.eventFactory().leave(15, edges[1], 5);
         train.eventFactory().speed(20, 5, 20);
 
         assertEquals(12, train.getState(12).getSpeed());
