@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -119,6 +121,10 @@ public class MainController {
 
     private double mousePressedX = -1;
     private double mousePressedY = -1;
+
+    private boolean autoChange = false;
+    private Pattern timePattern;
+
     private Map<GraphObject<?>, ObservableValue<LegendItem.State>> legendStates;
 
     private List<TrainView> trains;
@@ -128,6 +134,7 @@ public class MainController {
 
     @FXML
     private void initialize() {
+        timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
         this.listeners = new WeakHashMap<>();
         this.legendStates = new HashMap<>(256);
@@ -176,9 +183,34 @@ public class MainController {
                 return result;
             }
         };
+
         logList.setCellFactory(listCellFactory);
         logList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            simulationTime.set(newValue.getTime());
+            if (!autoChange) {
+                simulationTime.set(newValue.getTime());
+            }
+        });
+
+        timeText.setOnAction(event -> {
+            String text = timeText.getText();
+            Matcher timeMatch = timePattern.matcher(text);
+            int newTime = 0;
+
+            if (timeMatch.find()) {
+                try {
+                    newTime = getMsFromString(text);
+                } catch (NumberFormatException e) {
+                    timeText.setText(simulationTime.get() + "ms");
+                    return;
+                }
+            }
+
+            simulationTime.set(newTime);
+        });
+        timeText.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue) {
+                timeText.setText(simulationTime.get() + "ms");
+            }
         });
 
         ChangeListener<Number> boundsListener = (observable, oldValue, newValue) -> {
@@ -240,6 +272,7 @@ public class MainController {
                 Context context = ContextHolder.getInstance().getContext();
                 timeText.setText(String.format("%dms", newValue.intValue()));
                 Element.in(context).setTime(newValue.intValue());
+                selectClosestLogEntry(newValue.intValue());
             }
         });
 
@@ -259,9 +292,61 @@ public class MainController {
             } else {
                 simulation.stop();
             }
+            timeText.setDisable(newValue);
         });
     }
 
+    private void selectClosestLogEntry(int time) {
+        autoChange = true;
+
+        Event last = null;
+        for (Event event : logList.getItems()) {
+            if (event.getTime() > time) {
+                break;
+            }
+            last = event;
+        }
+        if (last == null) {
+            last = logList.getItems().get(0);
+        }
+        logList.getSelectionModel().select(last);
+        logList.scrollTo(last);
+
+        autoChange = false;
+    }
+
+    private int getMsFromString(String timeString) {
+        int ms = -1;
+
+        Matcher timeMatch = timePattern.matcher(timeString);
+        String type = "ms";
+        int time = ms;
+
+        if (timeMatch.find()) {
+            String typeMatch = timeMatch.group(2);
+            if (typeMatch != null) {
+                type = typeMatch;
+            }
+
+            time = Integer.valueOf(timeMatch.group(1));
+        }
+
+        switch (type) {
+            case "s":
+                ms = time * 1000;
+                break;
+            case "m":
+                ms = time * 1000 * 60;
+                break;
+            case "h":
+                ms = time * 1000 * 60 * 60;
+                break;
+            default:
+                ms = time;
+        }
+
+        return ms;
+    }
 
     /**
      * Adds an EventHandler to the button which fires the button on pressing enter
