@@ -139,7 +139,9 @@ public class MainController {
         this.listeners = new WeakHashMap<>();
         this.legendStates = new HashMap<>(256);
         this.simulation = new Timeline(new KeyFrame(Duration.millis(50), event -> {
-            simulationTime.set((int) (simulationTime.get() + (velocity.get() * 0.05)));
+            int time = (int) (simulationTime.get() + (velocity.get() * 0.05));
+            simulationTime.set(time);
+            selectClosestLogEntry(time);
         }));
         simulation.setCycleCount(Animation.INDEFINITE);
         fireOnEnterPress(closeButton);
@@ -272,7 +274,6 @@ public class MainController {
                 Context context = ContextHolder.getInstance().getContext();
                 timeText.setText(String.format("%dms", newValue.intValue()));
                 Element.in(context).setTime(newValue.intValue());
-                selectClosestLogEntry(newValue.intValue());
             }
         });
 
