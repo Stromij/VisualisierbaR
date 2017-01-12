@@ -1,6 +1,7 @@
 package com.github.bachelorpraktikum.dbvisualization.view.graph.elements;
 
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
+import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
 
 import java.io.IOException;
@@ -9,26 +10,23 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import javafx.beans.property.ReadOnlyProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Shape;
-import javafx.scene.transform.Transform;
 
-class PathElement extends ElementBase<Shape> {
-    PathElement(Element element, ReadOnlyProperty<Transform> parentTransform, CoordinatesAdapter adapter) {
-        super(element, parentTransform, adapter);
+class PathElement extends SingleElementBase<Shape> {
+    PathElement(Element element, Node node, CoordinatesAdapter adapter) {
+        super(element, node, adapter);
     }
 
     @Override
     protected void relocate(Shape shape) {
         Point2D nodePos = getNodePosition().add(getOffset());
-        Point2D parentPos = parentTransformProperty().getValue().transform(nodePos);
 
         Bounds bounds = shape.getBoundsInLocal();
-        double x = parentPos.getX() - (bounds.getWidth()) / 2;
-        double y = parentPos.getY() - bounds.getHeight() / 2;
+        double x = nodePos.getX() - (bounds.getWidth()) / 2;
+        double y = nodePos.getY() - bounds.getHeight() / 2;
 
         shape.relocate(x, y);
     }
@@ -49,7 +47,7 @@ class PathElement extends ElementBase<Shape> {
     }
 
     protected List<URL> getImageUrls() {
-        return getRepresented().getType().getImageUrls();
+        return getElement().getType().getImageUrls();
     }
 
     @Nonnull
