@@ -4,6 +4,7 @@ import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 
+import com.github.bachelorpraktikum.dbvisualization.model.train.TrainEvent.Move;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -335,6 +336,21 @@ public class Train {
          */
         public void speed(int time, int distance, int speedAfter) {
             addState(time, (before) -> new TrainEvent.Speed(before, time, distance, speedAfter));
+        }
+
+        /**
+         * Registers a speed event without a new speed.
+         * This is a workaround for speed log entries without a speed.
+         *
+         * @param time       the time of the event
+         * @param distance   the totalDistance travelled since the last event
+         * @throws IllegalStateException if the train has not been initialized
+         * @throws IllegalStateException if the train has been terminated
+         * @throws IllegalStateException if the specified time lies before the time of the last
+         *                               event
+         */
+        public void move(int time, int distance) {
+            addState(time, (before) -> new TrainEvent.Move(before, time, distance));
         }
 
         /**

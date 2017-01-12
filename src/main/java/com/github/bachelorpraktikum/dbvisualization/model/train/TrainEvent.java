@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.dbvisualization.model.train;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 
+import com.github.bachelorpraktikum.dbvisualization.model.train.InterpolatableState.Builder;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -74,6 +75,33 @@ abstract class TrainEvent implements Event {
     @Nonnull
     final InterpolatableState getState() {
         return stateBuilder().build();
+    }
+
+    /**
+     * This is a workaround for speed events without a speed.
+     */
+    @ParametersAreNonnullByDefault
+    static class Move extends Position {
+        Move(TrainEvent before, int time, int distance) {
+            super(before.getIndex() + 1,
+                    before.getTrain(),
+                    time,
+                    distance,
+                    before.getTotalDistance() + distance,
+                    before.getPosition().move(distance)
+            );
+
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Speed{"
+                    + "time=" + getTime()
+                    + ", distance=" + getDistance()
+                    + ", speed=NULL"
+                    + "}";
+        }
     }
 
     @ParametersAreNonnullByDefault
