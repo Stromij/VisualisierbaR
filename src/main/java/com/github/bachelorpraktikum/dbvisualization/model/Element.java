@@ -84,14 +84,15 @@ public final class Element {
      * Every type is associated with an image file containing the symbol for the element.
      */
     public enum Type {
-        GeschwindigkeitsAnzeigerImpl("HauptsignalGeschwindigkeitImpl"),
+        GeschwindigkeitsAnzeigerImpl,
         VorSignalImpl("VorsignalImpl"),
         HauptSignalImpl("HauptsignalImpl"),
         SichtbarkeitsPunktImpl("SichtbarkeitspunktImpl", "SichtbarkeitspunktImpl2"),
         GefahrenPunktImpl("GefahrenpunktImpl"),
         MagnetImpl("MagnetImpl"),
         WeichenPunktImpl,
-        SwWechselImpl("SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4");
+        SwWechselImpl("SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4"),
+        UnknownElement;
 
         private final List<URL> imageUrls;
 
@@ -128,10 +129,10 @@ public final class Element {
 
         /**
          * Gets the {@link Type} corresponding to the given type name.
+         * Falls back to UnknownElement.
          *
          * @param name the unique type name
          * @return a type
-         * @throws IllegalArgumentException if no type with that name exists
          */
         @Nonnull
         public static Type fromName(String name) {
@@ -156,7 +157,7 @@ public final class Element {
                 case "GeschwindigkeitsAnzeigerImpl":
                     return GeschwindigkeitsAnzeigerImpl;
                 default:
-                    throw new IllegalArgumentException("unknown type: " + name);
+                    return UnknownElement;
             }
         }
     }
