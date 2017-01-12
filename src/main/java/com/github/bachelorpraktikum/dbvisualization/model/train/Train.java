@@ -4,7 +4,6 @@ import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 
-import com.github.bachelorpraktikum.dbvisualization.model.train.TrainEvent.Move;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
