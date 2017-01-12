@@ -49,9 +49,9 @@ public abstract class ElementDetailBase {
             }
 
             return shape;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException | IllegalStateException e) {
             return new Rectangle(20, 20);
+            // e.printStackTrace();
             // throw new IllegalStateException(e);
         }
     }
