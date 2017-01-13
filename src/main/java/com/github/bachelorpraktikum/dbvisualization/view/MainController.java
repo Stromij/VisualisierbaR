@@ -247,6 +247,7 @@ public class MainController {
             }
 
             simulationTime.set(newTime);
+            selectClosestLogEntry(newTime);
         });
         timeText.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
@@ -314,7 +315,6 @@ public class MainController {
                 Context context = ContextHolder.getInstance().getContext();
                 timeText.setText(String.format("%dms", newValue.intValue()));
                 Element.in(context).setTime(newValue.intValue());
-                selectClosestLogEntry(newValue.intValue());
 
                 updateDetailView(newValue.intValue());
             }
