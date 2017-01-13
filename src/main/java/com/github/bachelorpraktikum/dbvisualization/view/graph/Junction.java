@@ -21,7 +21,7 @@ final class Junction extends SingleGraphShapeBase<Node, Circle> {
     protected void relocate(Circle shape) {
         Node node = getRepresented();
         CoordinatesAdapter adapter = getCoordinatesAdapter();
-        Point2D position = adapter.apply(node.getCoordinates());
+        Point2D position = adapter.apply(node);
         shape.setCenterX(position.getX());
         shape.setCenterY(position.getY());
     }

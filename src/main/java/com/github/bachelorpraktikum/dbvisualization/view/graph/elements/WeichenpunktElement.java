@@ -25,7 +25,7 @@ final class WeichenpunktElement extends SingleElementBase<Polygon> {
         int i = 0;
         for (Element element : swit.getElements()) {
             if (!element.equals(getElement())) {
-                others[i++] = adapter.apply(element.getNode().getCoordinates());
+                others[i++] = adapter.apply(element.getNode());
             }
         }
 

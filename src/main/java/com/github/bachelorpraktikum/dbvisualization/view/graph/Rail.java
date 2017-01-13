@@ -20,8 +20,8 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
     @Override
     protected void relocate(Line shape) {
         CoordinatesAdapter adapter = getCoordinatesAdapter();
-        Point2D start = adapter.apply(getRepresented().getNode1().getCoordinates());
-        Point2D end = adapter.apply(getRepresented().getNode2().getCoordinates());
+        Point2D start = adapter.apply(getRepresented().getNode1());
+        Point2D end = adapter.apply(getRepresented().getNode2());
         shape.setStartX(start.getX());
         shape.setStartY(start.getY());
         shape.setEndX(end.getX());

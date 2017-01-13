@@ -43,7 +43,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
     }
 
     final Point2D getNodePosition() {
-        return getCoordinatesAdapter().apply(getNode().getCoordinates());
+        return getCoordinatesAdapter().apply(getNode());
     }
 
     @Override
@@ -52,7 +52,6 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
 
         List<Point2D> otherVecs = node.getEdges().stream()
                 .map(edge -> edge.getNode1().equals(node) ? edge.getNode2() : edge.getNode1())
-                .map(n -> n.getCoordinates())
                 .map(getCoordinatesAdapter())
                 .map(point -> point.subtract(getNodePosition()))
                 .map(Point2D::normalize)

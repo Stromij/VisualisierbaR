@@ -2,6 +2,7 @@ package com.github.bachelorpraktikum.dbvisualization.view.graph.adapter;
 
 import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
 
+import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import javax.annotation.Nonnull;
 
 import javafx.geometry.Point2D;
@@ -18,7 +19,8 @@ public final class SimpleCoordinatesAdapter implements CoordinatesAdapter {
 
     @Nonnull
     @Override
-    public Point2D apply(@Nonnull Coordinates coordinates) {
+    public Point2D apply(@Nonnull Node node) {
+        Coordinates coordinates = node.getCoordinates();
         return new Point2D(coordinates.getX(), coordinates.getY());
     }
 }

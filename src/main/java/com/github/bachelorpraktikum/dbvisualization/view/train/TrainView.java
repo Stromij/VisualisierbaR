@@ -26,7 +26,7 @@ import javafx.scene.shape.StrokeLineCap;
 public final class TrainView {
     private final Train train;
     private final IntegerProperty timeProperty;
-    private final Function<Coordinates, Point2D> coordinatesTranslator;
+    private final Function<Node, Point2D> coordinatesTranslator;
     private final Path path;
 
     public TrainView(Train train, Graph graph) {
@@ -121,12 +121,9 @@ public final class TrainView {
     }
 
     private Point2D toPos(Node node) {
-        return toPos(node.getCoordinates());
+        return coordinatesTranslator.apply(node);
     }
 
-    private Point2D toPos(Coordinates coordinates) {
-        return coordinatesTranslator.apply(coordinates);
-    }
 
     private Node findNextNode(Edge last, Edge current) {
         Node node1 = current.getNode1();
