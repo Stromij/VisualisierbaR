@@ -59,6 +59,10 @@ public final class GraphObject<T> {
                 }
             }
 
+            if(shape == null) {
+                return new Rectangle(2, 2);
+            }
+
             return shape;
         } catch (IOException e) {
             e.printStackTrace();
