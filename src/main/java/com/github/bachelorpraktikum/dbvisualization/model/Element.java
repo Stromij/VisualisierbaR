@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -84,14 +85,15 @@ public final class Element {
      * Every type is associated with an image file containing the symbol for the element.
      */
     public enum Type {
-        HauptSignalImpl("HauptsignalImpl"),
+        GeschwindigkeitsAnzeigerImpl,
         VorSignalImpl("VorsignalImpl"),
+        HauptSignalImpl("HauptsignalImpl"),
         SichtbarkeitsPunktImpl("SichtbarkeitspunktImpl", "SichtbarkeitspunktImpl2"),
         GefahrenPunktImpl("GefahrenpunktImpl"),
         MagnetImpl("MagnetImpl"),
         WeichenPunktImpl,
         SwWechselImpl("SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4"),
-        GeschwindigkeitsAnzeigerImpl("HauptsignalGeschwindigkeitImpl");
+        UnknownElement;
 
         private final List<URL> imageUrls;
 
@@ -128,10 +130,10 @@ public final class Element {
 
         /**
          * Gets the {@link Type} corresponding to the given type name.
+         * Falls back to UnknownElement.
          *
          * @param name the unique type name
          * @return a type
-         * @throws IllegalArgumentException if no type with that name exists
          */
         @Nonnull
         public static Type fromName(String name) {
@@ -156,7 +158,7 @@ public final class Element {
                 case "GeschwindigkeitsAnzeigerImpl":
                     return GeschwindigkeitsAnzeigerImpl;
                 default:
-                    throw new IllegalArgumentException("unknown type: " + name);
+                    return UnknownElement;
             }
         }
     }
@@ -282,13 +284,16 @@ public final class Element {
         }
 
         private void addEvent(Element element, State state, int time) {
+            List<String> warnings = new LinkedList<>();
             if (time < 0) {
-                throw new IllegalArgumentException("time is negative");
+                warnings.add("original time was " + time);
+                time = 0;
             }
             if (!events.isEmpty() && time < events.get(events.size() - 1).getTime()) {
-                throw new IllegalStateException("tried to add event before last event");
+                warnings.add("tried to add before last event at " + time);
+                time = events.get(events.size() - 1).getTime();
             }
-            unorderedEvents.add(new ElementEvent(element, time, state));
+            unorderedEvents.add(new ElementEvent(element, time, state, warnings));
             // maybe the states has to be updated
             if (time <= currentTime) {
                 int refreshTime = currentTime;
@@ -444,11 +449,18 @@ public final class Element {
         private final int time;
         @Nonnull
         private final State state;
+        @Nonnull
+        private final List<String> warnings;
 
         private ElementEvent(Element element, int time, State state) {
+            this(element, time, state, Collections.emptyList());
+        }
+
+        private ElementEvent(Element element, int time, State state, List<String> warnings) {
             this.element = element;
             this.time = time;
             this.state = state;
+            this.warnings = warnings;
         }
 
         @Nonnull
@@ -466,6 +478,12 @@ public final class Element {
         public String getDescription() {
             // TODO replace by something more human readable
             return toString();
+        }
+
+        @Nonnull
+        @Override
+        public List<String> getWarnings() {
+            return warnings;
         }
 
         @Nonnull
@@ -498,8 +516,8 @@ public final class Element {
         @Override
         public String toString() {
             return "ElementEvent{"
-                    + ", time=" + time
-                    + "element=" + getElement().getName()
+                    + "time=" + time
+                    + ", element=" + getElement().getName()
                     + ", state=" + state
                     + '}';
         }

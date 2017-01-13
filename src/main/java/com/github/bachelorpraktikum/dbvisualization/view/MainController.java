@@ -1,20 +1,25 @@
 package com.github.bachelorpraktikum.dbvisualization.view;
 
 import com.github.bachelorpraktikum.dbvisualization.DataSource;
+import com.github.bachelorpraktikum.dbvisualization.database.Database;
 import com.github.bachelorpraktikum.dbvisualization.logparser.GraphParser;
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
+import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetail;
+import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetailBase;
+import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetailController;
+import com.github.bachelorpraktikum.dbvisualization.view.detail.TrainDetail;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Graph;
-import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShape;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendItem;
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCell;
+import com.github.bachelorpraktikum.dbvisualization.view.train.TrainView;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,26 +27,33 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.binding.Binding;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -51,23 +63,30 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Shape;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
 
 public class MainController {
+    @FXML
+    public AnchorPane detail;
+    @FXML
+    private VBox detailBox;
+    @FXML
+    private ElementDetailController detailBoxController;
     private Map<Context, List<ObservableValue>> listeners;
 
     @FXML
@@ -83,13 +102,21 @@ public class MainController {
     private StackPane sidebar;
     @FXML
     private ListView<LegendItem> legend;
+    // @FXML
+    // private Pane detailView;
     @FXML
     private ToggleButton legendButton;
+    @FXML
+    private TextField velocityText;
+    @FXML
+    private ToggleButton playToggle;
     @FXML
     private Button closeButton;
     @FXML
     private BorderPane rootPane;
 
+    @FXML
+    private Button closeDetailButton;
     @FXML
     private Pane leftPane;
     @FXML
@@ -108,20 +135,34 @@ public class MainController {
 
     private Stage stage;
 
-    private Group rootGroup;
-
     private double SCALE_DELTA = 1.1;
 
     private double mousePressedX = -1;
     private double mousePressedY = -1;
+
+    private boolean autoChange = false;
+    private Pattern timePattern;
+
+    private int time;
     private Map<GraphObject<?>, ObservableValue<LegendItem.State>> legendStates;
+
+    private List<TrainView> trains;
+    private IntegerProperty simulationTime;
+    private IntegerProperty velocity;
+    private Animation simulation;
 
     @FXML
     private void initialize() {
+        timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
         this.listeners = new WeakHashMap<>();
-        this.rootGroup = new Group();
         this.legendStates = new HashMap<>(256);
+        this.simulation = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+            int time = (int) (simulationTime.get() + (velocity.get() * 0.05));
+            simulationTime.set(time);
+            selectClosestLogEntry(time);
+        }));
+        simulation.setCycleCount(Animation.INDEFINITE);
         fireOnEnterPress(closeButton);
         fireOnEnterPress(logToggle);
         closeButton.setOnAction(event -> showSourceChooser());
@@ -133,6 +174,7 @@ public class MainController {
             } else
                 legend.toBack();
         });
+        closeDetailButton.setOnAction(event -> hideDetailView());
 
         // Hide logList by default
         rootPane.setLeft(null);
@@ -158,15 +200,59 @@ public class MainController {
             @Override
             public ListCell<Event> call(ListView<Event> param) {
                 ListCell<Event> result = factory.call(param);
-                TooltipUtil.install(result, result::getText);
+                Paint textFill = result.getTextFill();
+                result.itemProperty().addListener(((observable, oldValue, newValue) -> {
+                    if (newValue != null) {
+                        if (newValue.getWarnings().isEmpty()) {
+                            result.setTextFill(textFill);
+                        } else {
+                            result.setTextFill(Color.rgb(255, 0, 0));
+                        }
+                    }
+                }));
+
+                TooltipUtil.install(result, () -> {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(result.getItem().getDescription());
+                    for (String warning : result.getItem().getWarnings()) {
+                        sb.append(System.lineSeparator()).append("[WARN]: ").append(warning);
+                    }
+                    return sb.toString();
+                });
 
                 return result;
             }
         };
+
         logList.setCellFactory(listCellFactory);
         logList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (!autoChange) {
+                simulationTime.set(newValue.getTime());
+            }
             Element.in(ContextHolder.getInstance().getContext()).setTime(newValue.getTime());
-            timeText.setText(String.format("%dms", newValue.getTime()));
+        });
+
+        timeText.setOnAction(event -> {
+            String text = timeText.getText();
+            Matcher timeMatch = timePattern.matcher(text);
+            int newTime = 0;
+
+            if (timeMatch.find()) {
+                try {
+                    newTime = getMsFromString(text);
+                } catch (NumberFormatException e) {
+                    timeText.setText(simulationTime.get() + "ms");
+                    return;
+                }
+            }
+
+            simulationTime.set(newTime);
+            selectClosestLogEntry(newTime);
+        });
+        timeText.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                timeText.setText(simulationTime.get() + "ms");
+            }
         });
 
         ChangeListener<Number> boundsListener = (observable, oldValue, newValue) -> {
@@ -179,17 +265,20 @@ public class MainController {
         centerPane.setOnScroll(new EventHandler<ScrollEvent>() {
             @Override
             public void handle(ScrollEvent event) {
-                Bounds bounds = rootGroup.localToScene(rootGroup.getBoundsInLocal());
-                double oldScale = rootGroup.getScaleX();
-                double scaleFactor = oldScale * ((event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA);
-                double translateX = event.getScreenX() - (bounds.getWidth() / 2 + bounds.getMinX());
-                double translateY = event.getScreenY() - (bounds.getHeight() / 2 + bounds.getMinY());
-                double f = (scaleFactor / oldScale) - 1;
+                if (graph != null) {
+                    Group group = graph.getGroup();
+                    Bounds bounds = group.localToScene(group.getBoundsInLocal());
+                    double oldScale = group.getScaleX();
+                    double scaleFactor = oldScale * ((event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA);
+                    double translateX = event.getScreenX() - (bounds.getWidth() / 2 + bounds.getMinX());
+                    double translateY = event.getScreenY() - (bounds.getHeight() / 2 + bounds.getMinY());
+                    double f = (scaleFactor / oldScale) - 1;
 
-                rootGroup.setScaleX(scaleFactor);
-                rootGroup.setScaleY(scaleFactor);
-                rootGroup.setTranslateX(rootGroup.getTranslateX() - f * translateX);
-                rootGroup.setTranslateY(rootGroup.getTranslateY() - f * translateY);
+                    group.setScaleX(scaleFactor);
+                    group.setScaleY(scaleFactor);
+                    group.setTranslateX(group.getTranslateX() - f * translateX);
+                    group.setTranslateY(group.getTranslateY() - f * translateY);
+                }
             }
         });
         centerPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
@@ -218,6 +307,124 @@ public class MainController {
                 event.consume();
             }
         });
+
+        this.trains = new LinkedList<>();
+        simulationTime = new SimpleIntegerProperty();
+        simulationTime.addListener((observable, oldValue, newValue) -> {
+            if (ContextHolder.getInstance().hasContext()) {
+                Context context = ContextHolder.getInstance().getContext();
+                timeText.setText(String.format("%dms", newValue.intValue()));
+                Element.in(context).setTime(newValue.intValue());
+
+                updateDetailView(newValue.intValue());
+            }
+        });
+
+        velocity = new SimpleIntegerProperty(1000);
+        velocityText.textProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                int newVelocity = Integer.parseUnsignedInt(newValue);
+                velocity.set(newVelocity);
+            } catch (NumberFormatException e) {
+                velocityText.setText(oldValue);
+            }
+        });
+
+        playToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                simulation.playFromStart();
+            } else {
+                simulation.stop();
+            }
+            timeText.setDisable(newValue);
+        });
+
+        elementList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            Context context = ContextHolder.getInstance().getContext();
+            ElementDetailBase detail;
+
+            if (newValue == null) {
+                // Selection has been cleared
+                return;
+            }
+
+            try {
+                detail = new ElementDetail(Element.in(context).get(newValue));
+            } catch (IllegalArgumentException ignored) {
+                detail = new TrainDetail(Train.in(context).getByReadable(newValue));
+            }
+
+            showDetailView();
+            detailBoxController.setDetail(detail);
+        });
+    }
+
+    private void selectClosestLogEntry(int time) {
+        autoChange = true;
+
+        Event last = null;
+        for (Event event : logList.getItems()) {
+            if (event.getTime() > time) {
+                break;
+            }
+            last = event;
+        }
+        if (last == null) {
+            last = logList.getItems().get(0);
+        }
+        logList.getSelectionModel().select(last);
+        logList.scrollTo(last);
+
+        autoChange = false;
+    }
+
+    private int getMsFromString(String timeString) {
+        int ms = -1;
+
+        Matcher timeMatch = timePattern.matcher(timeString);
+        String type = "ms";
+        int time = ms;
+
+        if (timeMatch.find()) {
+            String typeMatch = timeMatch.group(2);
+            if (typeMatch != null) {
+                type = typeMatch;
+            }
+
+            time = Integer.valueOf(timeMatch.group(1));
+        }
+
+        switch (type) {
+            case "s":
+                ms = time * 1000;
+                break;
+            case "m":
+                ms = time * 1000 * 60;
+                break;
+            case "h":
+                ms = time * 1000 * 60 * 60;
+                break;
+            default:
+                ms = time;
+        }
+
+        return ms;
+    }
+
+    private void showDetailView() {
+        detail.toFront();
+        legend.toBack();
+        elementList.toBack();
+    }
+
+    private void hideDetailView() {
+        detail.toBack();
+        elementList.toFront();
+        elementList.getSelectionModel().clearSelection();
+    }
+
+    private void updateDetailView(int time) {
+        detailBoxController.setTime(time);
     }
 
     /**
@@ -260,6 +467,10 @@ public class MainController {
         legend.setCellFactory(studentListView -> new LegendListViewCell());
     }
 
+    private int getCurrentTime() {
+        return time;
+    }
+
     private void showElements() {
         Context context = ContextHolder.getInstance().getContext();
 
@@ -292,7 +503,6 @@ public class MainController {
         textFilteredItems.predicateProperty().bind(textFilterBinding);
 
         elementList.setItems(textFilteredItems);
-        // legend.setCellFactory();
     }
 
     void setDataSource(@Nonnull DataSource source) {
@@ -300,8 +510,9 @@ public class MainController {
             case LOG_FILE:
                 Context context = null;
                 try {
-                    context = new GraphParser(source.getUrl().getFile()).parse();
+                    context = new GraphParser(source.getUri().toURL().getFile()).parse();
                 } catch (IOException | RuntimeException e) {
+                    e.printStackTrace();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     String headerText = ResourceBundle.getBundle("bundles.localization").getString("parse_error_header");
                     alert.setHeaderText(headerText);
@@ -325,6 +536,18 @@ public class MainController {
                 fitGraphToCenter(getGraph());
 
                 break;
+            case DATABASE:
+                Database db;
+                try {
+                    db = new Database(source.getUri());
+                    db.testConnection();
+                } catch (SQLException e) {
+                    if (e.getMessage().contains("ACCESS_DENIED")) {
+                        showLoginWindow();
+                    } else {
+                        System.out.println(e.getMessage());
+                    }
+                }
             default:
                 return;
         }
@@ -344,33 +567,27 @@ public class MainController {
         if (graph == null) {
             Context context = ContextHolder.getInstance().getContext();
             graph = new Graph(context, new SimpleCoordinatesAdapter());
-            addToCenter(graph.getNodes().values());
-            addToCenter(graph.getEdges().values());
-            addToCenter(graph.getElements().values());
-            centerPane.getChildren().add(rootGroup);
+            centerPane.getChildren().add(graph.getGroup());
             showLegend();
-            graph.getElements().values()
-                    .forEach(element -> {
-                        ObservableValue<LegendItem.State> state = legendStates.get(GraphObject.element(element.getRepresented().getType()));
+            graph.getElements().entrySet()
+                    .forEach(entry -> {
+                        Element element = entry.getKey();
+                        ObservableValue<LegendItem.State> state = legendStates.get(GraphObject.element(element.getType()));
                         Binding<Boolean> binding = Bindings.createBooleanBinding(() -> state.getValue() != LegendItem.State.DISABLED, state);
                         listeners.get(context).add(binding);
-                        element.getShape().visibleProperty().bind(binding);
+                        entry.getValue().getShape().visibleProperty().bind(binding);
                     });
+            for (Train train : Train.in(context).getAll()) {
+                TrainView trainView = new TrainView(train, graph);
+                trainView.timeProperty().bind(simulationTime);
+                trains.add(trainView);
+            }
         }
         return graph;
     }
 
-    private void addToCenter(Collection<? extends GraphShape<?>> values) {
-        ObservableList<Node> children = centerPane.getChildren();
-        for (GraphShape<?> graphShape : values) {
-            Shape shape = graphShape.getShape();
-            //children.add(shape);
-            rootGroup.getChildren().add(shape);
-        }
-    }
-
     private void fitGraphToCenter(Graph graph) {
-        Bounds graphBounds = graph.getBounds();
+        Bounds graphBounds = graph.getGroup().getBoundsInParent();
         double widthFactor = (centerPane.getWidth()) / graphBounds.getWidth();
         double heightFactor = (centerPane.getHeight()) / graphBounds.getHeight();
 
@@ -389,7 +606,7 @@ public class MainController {
     }
 
     private void moveGraphToCenter(Graph graph) {
-        Bounds graphBounds = graph.getBounds();
+        Bounds graphBounds = graph.getGroup().getBoundsInParent();
 
         double finalX = (centerPane.getWidth() - graphBounds.getWidth()) / 2;
         double xTranslate = finalX - graphBounds.getMinX();
@@ -401,7 +618,11 @@ public class MainController {
     }
 
     private void showSourceChooser() {
-        graph = null;
+        if (graph != null) {
+            centerPane.getChildren().remove(graph.getGroup());
+            graph = null;
+        }
+        trains.clear();
         ContextHolder.getInstance().setContext(null);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("SourceChooser.fxml"));
         loader.setResources(ResourceBundle.getBundle("bundles.localization"));
@@ -412,6 +633,21 @@ public class MainController {
             return;
         }
         SourceController controller = loader.getController();
+        controller.setStage(stage);
+    }
+
+    private void showLoginWindow() {
+        graph = null;
+        ContextHolder.getInstance().setContext(null);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
+        loader.setResources(ResourceBundle.getBundle("bundles.localization"));
+        try {
+            loader.load();
+        } catch (IOException e) {
+            // This should never happen, because the location is set (see load function)
+            return;
+        }
+        LoginController controller = loader.getController();
         controller.setStage(stage);
     }
 }

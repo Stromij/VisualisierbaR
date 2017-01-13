@@ -3,6 +3,8 @@ package com.github.bachelorpraktikum.dbvisualization.model.train;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 
+import com.github.bachelorpraktikum.dbvisualization.model.train.InterpolatableState.Builder;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -19,6 +21,8 @@ abstract class TrainEvent implements Event {
     private final int totalDistance;
     @Nonnull
     private final TrainPosition position;
+    @Nonnull
+    private final List<String> warnings;
 
     private TrainEvent(int index, Train train, int time, int distance, int totalDistance, TrainPosition position) {
         this.index = index;
@@ -27,6 +31,17 @@ abstract class TrainEvent implements Event {
         this.distance = distance;
         this.totalDistance = totalDistance;
         this.position = position;
+        this.warnings = new LinkedList<>();
+    }
+
+    protected void addWarning(String warning) {
+        warnings.add(warning);
+    }
+
+    @Override
+    @Nonnull
+    public List<String> getWarnings() {
+        return warnings;
     }
 
     final int getIndex() {
@@ -76,6 +91,33 @@ abstract class TrainEvent implements Event {
         return stateBuilder().build();
     }
 
+    /**
+     * This is a workaround for speed events without a speed.
+     */
+    @ParametersAreNonnullByDefault
+    static class Move extends Position {
+        Move(TrainEvent before, int time, int distance) {
+            super(before.getIndex() + 1,
+                    before.getTrain(),
+                    time,
+                    distance,
+                    before.getTotalDistance() + distance,
+                    before.getPosition().move(distance)
+            );
+            addWarning("Speed event without speed!");
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Speed{"
+                    + "time=" + getTime()
+                    + ", distance=" + getDistance()
+                    + ", speed=NULL"
+                    + "}";
+        }
+    }
+
     @ParametersAreNonnullByDefault
     static class Speed extends TrainEvent {
         private final int speed;
@@ -112,7 +154,7 @@ abstract class TrainEvent implements Event {
         public String getDescription() {
             return getTrain().getReadableName() + ": Speed{"
                     + "time=" + getTime()
-                    + ", totalDistance=" + getTotalDistance()
+                    + ", distance=" + getDistance()
                     + ", speed=" + getSpeed()
                     + "}";
         }
@@ -262,7 +304,7 @@ abstract class TrainEvent implements Event {
             return getTrain().getReadableName() + ": Leave{"
                     + "time=" + getTime()
                     + ", distance=" + getDistance()
-                    + ", left=" + left.getName()
+                    + ", backEdge=" + left.getName()
                     + "}";
         }
     }

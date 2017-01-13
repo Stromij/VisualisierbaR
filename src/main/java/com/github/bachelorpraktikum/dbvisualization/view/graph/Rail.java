@@ -1,20 +1,20 @@
 package com.github.bachelorpraktikum.dbvisualization.view.graph;
 
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
+import com.github.bachelorpraktikum.dbvisualization.view.TooltipUtil;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
 
 import javax.annotation.Nonnull;
 
-import javafx.beans.property.ReadOnlyProperty;
 import javafx.geometry.Point2D;
+import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Line;
-import javafx.scene.transform.Transform;
 
-final class Rail extends GraphShapeBase<Edge, Line> {
+final class Rail extends SingleGraphShapeBase<Edge, Line> {
     private static final double CALIBRATION_COEFFICIENT = 0.05;
 
-    protected Rail(Edge edge, ReadOnlyProperty<Transform> parentTransform, CoordinatesAdapter adapter) {
-        super(edge, parentTransform, adapter);
+    protected Rail(Edge edge, CoordinatesAdapter adapter) {
+        super(edge, adapter);
     }
 
     @Override
@@ -31,6 +31,11 @@ final class Rail extends GraphShapeBase<Edge, Line> {
     @Override
     protected void resize(Line line) {
         line.setStrokeWidth(getCalibrationBase() * CALIBRATION_COEFFICIENT);
+    }
+
+    @Override
+    protected void initializedShape(Line line) {
+        TooltipUtil.install(line, new Tooltip(getRepresented().getName() + " " + getRepresented().getLength() + "m"));
     }
 
     @Nonnull

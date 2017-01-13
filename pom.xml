@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.bachelorpraktikum</groupId>
     <artifactId>DBVisualization</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
 
     <url>https://github.com/Bachelorpraktikum/DBVisualization</url>
     <name>${project.groupId}:${project.artifactId}</name>
@@ -69,6 +69,12 @@
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
             <version>4.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>2.5.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

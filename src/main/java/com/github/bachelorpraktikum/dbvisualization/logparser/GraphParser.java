@@ -132,11 +132,12 @@ public final class GraphParser {
             Train train = Train.in(context).get(trainName);
             int time = timeVisitor.visitTime(ctx.time());
             int distance = Integer.parseInt(ctx.distance().getText());
-            int speed = -1;
-            if (ctx.speed() != null) {
-                speed = Integer.parseInt(ctx.speed().INT().getText());
+            if (ctx.speed() == null) {
+                train.eventFactory().move(time, distance);
+            } else {
+                int speed = Integer.parseInt(ctx.speed().INT().getText());
+                train.eventFactory().speed(time, distance, speed);
             }
-            train.eventFactory().speed(time, distance, speed);
             return context;
         }
 
