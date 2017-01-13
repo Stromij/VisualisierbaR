@@ -52,6 +52,13 @@ public final class Graph {
         this.nodes = new LinkedHashMap<>(128);
         this.elements = new LinkedHashMap<>(256);
         this.group = new Group();
+        this.edges = new LinkedHashMap<>(256);
+        for (Edge edge : Edge.in(context).getAll()) {
+            GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
+            edges.put(edge, shape);
+            group.getChildren().add(shape.getShape());
+        }
+
         for (Node node : Node.in(context).getAll()) {
             GraphShape<Node> shape = new Junction(node, coordinatesAdapter);
             nodes.put(node, shape);
@@ -63,13 +70,6 @@ public final class Graph {
                 }
                 group.getChildren().add(elementShape.getShape());
             }
-        }
-
-        this.edges = new LinkedHashMap<>(256);
-        for (Edge edge : Edge.in(context).getAll()) {
-            GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
-            edges.put(edge, shape);
-            group.getChildren().add(shape.getShape());
         }
     }
 
