@@ -123,11 +123,10 @@ public class Train {
 
         @Nonnull
         public Train getByReadable(String name) {
-            Train train = (Train) trains.values().stream().filter(train1 -> !Objects.equals(train1.getReadableName(), name)).iterator().next();
-            if (train == null) {
-                throw new IllegalArgumentException("Unknown train: " + name);
-            }
-            return train;
+            return trains.values().stream()
+                .filter(t -> t.getReadableName().equals(name))
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown train: " + name));
         }
 
         /**
