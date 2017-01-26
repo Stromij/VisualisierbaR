@@ -3,7 +3,7 @@ package com.github.bachelorpraktikum.dbvisualization.model.train;
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
-
+import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.function.Function;
 import java.util.logging.Logger;
-
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 /**
  * Represents a train.<br> There will always be exactly one instance of this class per name per
@@ -344,7 +344,7 @@ public class Train {
          * Registers a speed event.
          *
          * @param time       the time of the event
-         * @param distance   the totalDistance travelled since the last event
+         * @param distance   the distance travelled since the last event
          * @param speedAfter the speed at this point of time
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
@@ -360,7 +360,7 @@ public class Train {
          * This is a workaround for speed log entries without a speed.
          *
          * @param time       the time of the event
-         * @param distance   the totalDistance travelled since the last event
+         * @param distance   the distance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
@@ -372,11 +372,11 @@ public class Train {
 
         /**
          * Registers a reachStart event.<br> After this event the front of the train will be at
-         * totalDistance 0 from the start of the given {@link Edge}.
+         * distance 0 from the start of the given {@link Edge}.
          *
          * @param time     the time of the event
          * @param edge     the edge the train reached
-         * @param distance the totalDistance travelled since the last event
+         * @param distance the distance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
@@ -388,11 +388,11 @@ public class Train {
 
         /**
          * Registers a leave event.<br> After this event the back of the train will be at
-         * totalDistance 0 from the start of the given {@link Edge}.
+         * distance 0 from the start of the given {@link Edge}.
          *
          * @param time     the time of the event
          * @param edge     the edge the train reached
-         * @param distance the totalDistance travelled since the last event
+         * @param distance the distance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
@@ -406,7 +406,7 @@ public class Train {
          * Terminates this train. Can only be called once.
          *
          * @param time     the time of the event
-         * @param distance the totalDistance travelled since the last event
+         * @param distance the distance travelled since the last event
          * @throws IllegalStateException if the train has not been initialized
          * @throws IllegalStateException if the train has already been terminated
          * @throws IllegalStateException if the specified time lies before the time of the last
@@ -471,6 +471,7 @@ public class Train {
 
         /**
          * Gets the {@link Edge} the front of the {@link Train} is on.
+         * This is a convenience method for {@link #getEdges() getEdges().get(0)}.
          *
          * @return the edge
          */
@@ -478,15 +479,37 @@ public class Train {
         Edge getFrontEdge();
 
         /**
-         * Gets the totalDistance the front of the train has travelled on the {@link #getFrontEdge()
+         * Gets the distance the front of the train has travelled on the {@link #getFrontEdge()
          * front edge}.
          *
-         * @return the totalDistance in meters
+         * @return the distance in meters
          */
         int getFrontDistance();
 
         /**
-         * Gets the {@link Edge} the back of the {@link Train} is on.
+         * Gets the real coordinates of the train's front.
+         *
+         * @param adapter the adapter to translate the Coordinates of the nearest Nodes to real
+         * coordinates.
+         * @return the real position of the front
+         */
+        @Nonnull
+        Point2D getFrontPosition(Function<Node, Point2D> adapter);
+
+        /**
+         * Gets the position of the train's front in the virtual coordinate system of the
+         * simulation. The coordinates returned by this function can not confidently translated to
+         * real coordinates, because the actual layout might differ from the virtual one. If you
+         * want real coordinates of the front, use {@link #getFrontPosition(Function)}.
+         *
+         * @return the virtual coordinates of the front
+         */
+        @Nonnull
+        Point2D getFrontCoordinates();
+
+        /**
+         * Gets the {@link Edge} the back of the {@link Train} is on. This is a convenience method
+         * for {@link #getEdges() getEdges().get(getEdges().size() - 1)}.
          *
          * @return the edge
          */
@@ -494,13 +517,51 @@ public class Train {
         Edge getBackEdge();
 
         /**
-         * Gets the totalDistance the back of the train is away from the end of the {@link
+         * Gets the distance the back of the train is away from the end of the {@link
          * #getBackEdge() back edge}.
+         * In other words, this is the distance the back end of the train still has to travel until
+         * it reaches the end of the edge.
          *
-         * @return the totalDistance in meters
+         * @return the distance in meters
          */
         int getBackDistance();
 
+        /**
+         * Gets the real coordinates of the train's back.
+         *
+         * @param adapter the adapter to translate the Coordinates of the nearest Nodes to real
+         * coordinates.
+         * @return the real position of the back
+         */
+        @Nonnull
+        Point2D getBackPosition(Function<Node, Point2D> adapter);
+
+        /**
+         * Gets the position of the train's back in the virtual coordinate system of the
+         * simulation. The coordinates returned by this function can not confidently translated to
+         * real coordinates, because the actual layout might differ from the virtual one. If you
+         * want real coordinates of the back, use {@link #getBackPosition(Function)}.
+         *
+         * @return the virtual coordinates of the back
+         */
+        @Nonnull
+        Point2D getBackCoordinates();
+
+        /**
+         * Gets all significant points this train is on, from front to start.
+         * This includes all nodes and the exact positions of the front and back.
+         * @param adapter the adapter to translate Node Coordinates to real positions.
+         * @return a list of real positions
+         */
+        @Nonnull
+        List<Point2D> getPositions(Function<Node, Point2D> adapter);
+
+        /**
+         * Gets all edges this train is on. The list starts with the front edge and ends with the
+         * back edge.
+         *
+         * @return a list of all edges this train is on
+         */
         @Nonnull
         List<Edge> getEdges();
     }
