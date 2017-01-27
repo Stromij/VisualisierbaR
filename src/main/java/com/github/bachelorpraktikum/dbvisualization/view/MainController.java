@@ -76,6 +76,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class MainController {
+
     @FXML
     private AnchorPane detail;
     @FXML
