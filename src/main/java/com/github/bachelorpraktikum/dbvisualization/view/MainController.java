@@ -476,6 +476,8 @@ public class MainController {
         stage.setScene(new Scene(rootPane));
 
         stage.centerOnScreen();
+        stage.setMaximized(false);
+        stage.setMaximized(true);
     }
 
     private void showLegend() {
@@ -640,6 +642,7 @@ public class MainController {
     }
 
     private void showSourceChooser() {
+        stage.setMaximized(false);
         if (graph != null) {
             simulation.stop();
             centerPane.getChildren().clear();
