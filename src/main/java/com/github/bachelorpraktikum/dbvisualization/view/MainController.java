@@ -13,6 +13,7 @@ import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetailBas
 import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetailController;
 import com.github.bachelorpraktikum.dbvisualization.view.detail.TrainDetail;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Graph;
+import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShape;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendItem;
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCell;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -68,6 +70,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -77,6 +80,8 @@ import javax.annotation.Nullable;
 
 public class MainController {
 
+    private static final double HIGHLIGHT_FACTOR = 0.6;
+    private static final double HIGHLIGHT_STROKE_WIDTH = 0.05;
     @FXML
     private AnchorPane detail;
     @FXML
@@ -129,6 +134,7 @@ public class MainController {
     private Pane centerPane;
     @Nullable
     private Graph graph;
+    private Map<Train, TrainView> trains;
 
     private Stage stage;
 
@@ -146,10 +152,15 @@ public class MainController {
     private IntegerProperty velocity;
     private Animation simulation;
     private Timeline eventTraversalTimeline;
+    private Paint resetColor;
+    private Group highlighters;
 
     @FXML
     private void initialize() {
+        resetColor = Color.TRANSPARENT;
+        highlighters = new Group();
         timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
+        trains = new WeakHashMap<>();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
         this.legendStates = new HashMap<>(256);
         this.simulation = new Timeline(new KeyFrame(Duration.millis(50), event -> {
@@ -170,15 +181,16 @@ public class MainController {
             legend.setVisible(newValue);
             if (newValue) {
                 legend.toFront();
-            } else
+            } else {
                 legend.toBack();
+            }
         });
         closeDetailButton.setOnAction(event -> hideDetailView());
 
         // Hide logList by default
         rootPane.setLeft(null);
         logToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
-                rootPane.setLeft(newValue ? leftPane : null)
+            rootPane.setLeft(newValue ? leftPane : null)
         );
 
         Callback<ListView<Event>, ListCell<Event>> listCellFactory = new Callback<ListView<Event>, ListCell<Event>>() {
@@ -194,7 +206,8 @@ public class MainController {
                 }
             };
 
-            private final Callback<ListView<Event>, ListCell<Event>> factory = TextFieldListCell.forListView(stringConverter);
+            private final Callback<ListView<Event>, ListCell<Event>> factory = TextFieldListCell
+                .forListView(stringConverter);
 
             @Override
             public ListCell<Event> call(ListView<Event> param) {
@@ -226,12 +239,13 @@ public class MainController {
         };
 
         logList.setCellFactory(listCellFactory);
-        logList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (!autoChange) {
-                simulationTime.set(newValue.getTime());
-            }
-            Element.in(ContextHolder.getInstance().getContext()).setTime(newValue.getTime());
-        });
+        logList.getSelectionModel().selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                if (!autoChange) {
+                    simulationTime.set(newValue.getTime());
+                }
+                Element.in(ContextHolder.getInstance().getContext()).setTime(newValue.getTime());
+            });
 
         timeText.setOnAction(event -> {
             String text = timeText.getText();
@@ -270,9 +284,12 @@ public class MainController {
                     Group group = graph.getGroup();
                     Bounds bounds = group.localToScene(group.getBoundsInLocal());
                     double oldScale = group.getScaleX();
-                    double scaleFactor = oldScale * ((event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA);
-                    double translateX = event.getScreenX() - (bounds.getWidth() / 2 + bounds.getMinX());
-                    double translateY = event.getScreenY() - (bounds.getHeight() / 2 + bounds.getMinY());
+                    double scaleFactor =
+                        oldScale * ((event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA);
+                    double translateX =
+                        event.getScreenX() - (bounds.getWidth() / 2 + bounds.getMinX());
+                    double translateY =
+                        event.getScreenY() - (bounds.getHeight() / 2 + bounds.getMinY());
                     double f = (scaleFactor / oldScale) - 1;
 
                     group.setScaleX(scaleFactor);
@@ -292,8 +309,9 @@ public class MainController {
         centerPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if (!event.isPrimaryButtonDown())
+                if (!event.isPrimaryButtonDown()) {
                     return;
+                }
 
                 if (mousePressedX == -1 && mousePressedY == -1) {
                     mousePressedX = event.getX();
@@ -339,25 +357,51 @@ public class MainController {
             timeText.setDisable(newValue);
         });
 
-        elementList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            Context context = ContextHolder.getInstance().getContext();
-            ElementDetailBase detail;
+        elementList.getSelectionModel().selectedItemProperty()
+            .addListener((observable, oldValue, newValue) -> {
+                for (TrainView tv : trains.values()) {
+                    tv.setHighlighted(false);
+                }
 
-            if (newValue == null) {
-                // Selection has been cleared
-                return;
-            }
+                Context context = ContextHolder.getInstance().getContext();
+                ElementDetailBase detail;
+                boolean isElement = false;
+                Element element = null;
+                Train train = null;
 
-            try {
-                detail = new ElementDetail(Element.in(context).get(newValue));
-            } catch (IllegalArgumentException ignored) {
-                detail = new TrainDetail(Train.in(context).getByReadable(newValue));
-            }
+                if (newValue == null) {
+                    highlighters.getChildren().clear();
+                    return;
+                }
 
-            showDetailView();
-            detailBoxController.setDetail(detail);
-            detailBoxController.setTime(simulationTime.get());
-        });
+                try {
+                    element = Element.in(context).get(newValue);
+                    detail = new ElementDetail(element);
+                    isElement = true;
+                } catch (IllegalArgumentException ignored) {
+                    train = Train.in(context).getByReadable(newValue);
+                    detail = new TrainDetail(train);
+                }
+
+                if (isElement) {
+                    if (element.getSwitch().isPresent()) {
+                        for (Element e : element.getSwitch().get().getElements()) {
+                            highlightNode(graph.getNodes().get(e.getNode()).getShape(),
+                                HIGHLIGHT_FACTOR * 2.1);
+                        }
+                    } else {
+                        GraphShape<Element> graphElement = graph.getElements().get(element);
+                        javafx.scene.Node shape = graphElement.getShape();
+                        highlightNode(shape);
+                    }
+                } else {
+                    trains.get(train).setHighlighted(true);
+                }
+
+                showDetailView();
+                detailBoxController.setDetail(detail);
+                detailBoxController.setTime(simulationTime.get());
+            });
 
         eventTraversalTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             Event nextEvent = selectNextEvent(getCurrentTime());
@@ -372,6 +416,28 @@ public class MainController {
             timeText.setDisable(newValue);
         });
         eventTraversalTimeline.setCycleCount(Timeline.INDEFINITE);
+    }
+
+    private void highlightNode(javafx.scene.Node shape) {
+        highlightNode(shape, HIGHLIGHT_FACTOR);
+    }
+
+    private void highlightNode(javafx.scene.Node shape, double factor) {
+        Circle c = new Circle();
+        Bounds parentBounds = shape.getBoundsInParent();
+        c.setCenterY(parentBounds.getMinY() + parentBounds.getHeight() / 2);
+        c.setCenterX(parentBounds.getMinX() + parentBounds.getWidth() / 2);
+        c.setRadius(
+            Math.max(parentBounds.getWidth(), parentBounds.getHeight())
+                * factor
+        );
+
+        c.setFill(Color.TRANSPARENT);
+        c.setStroke(Color.BLUE);
+        c.setStrokeWidth(
+            HIGHLIGHT_STROKE_WIDTH * graph.getCoordinatesAdapter()
+                .getCalibrationBase());
+        highlighters.getChildren().add(c);
     }
 
     private int getLastEventIndex(int time) {
@@ -486,13 +552,13 @@ public class MainController {
     private void showLegend() {
         Context context = ContextHolder.getInstance().getContext();
         ObservableList<LegendItem> items = FXCollections.observableList(
-                Stream.concat(Stream.of(new LegendItem(GraphObject.trains())),
-                        Element.in(context).getAll().stream()
-                                .map(Element::getType)
-                                .distinct()
-                                .map(GraphObject::element)
-                                .map(LegendItem::new)
-                ).collect(Collectors.toList())
+            Stream.concat(Stream.of(new LegendItem(GraphObject.trains())),
+                Element.in(context).getAll().stream()
+                    .map(Element::getType)
+                    .distinct()
+                    .map(GraphObject::element)
+                    .map(LegendItem::new)
+            ).collect(Collectors.toList())
         );
 
         for (LegendItem item : items) {
@@ -510,21 +576,23 @@ public class MainController {
     private void showElements() {
         Context context = ContextHolder.getInstance().getContext();
 
-        FilteredList<String> trains = FXCollections.observableList(Train.in(context).getAll().stream()
+        FilteredList<String> trains = FXCollections
+            .observableList(Train.in(context).getAll().stream()
                 .map(Train::getReadableName).collect(Collectors.toList()))
-                .filtered(null);
+            .filtered(null);
         ObservableValue<Predicate<String>> trainBinding = Bindings.createObjectBinding(() -> s ->
-                        trainFilter.isSelected(),
-                trainFilter.selectedProperty());
+                trainFilter.isSelected(),
+            trainFilter.selectedProperty());
         context.addObject(trainBinding);
         trains.predicateProperty().bind(trainBinding);
 
-        FilteredList<String> elements = FXCollections.observableList(Element.in(context).getAll().stream()
+        FilteredList<String> elements = FXCollections
+            .observableList(Element.in(context).getAll().stream()
                 .map(Element::getName).collect(Collectors.toList())
-        ).filtered(null);
+            ).filtered(null);
         ObservableValue<Predicate<String>> elementBinding = Bindings.createObjectBinding(() -> s ->
-                        elementFilter.isSelected(),
-                elementFilter.selectedProperty());
+                elementFilter.isSelected(),
+            elementFilter.selectedProperty());
         context.addObject(elementBinding);
         elements.predicateProperty().bind(elementBinding);
 
@@ -549,9 +617,11 @@ public class MainController {
                 } catch (IOException | RuntimeException e) {
                     e.printStackTrace();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
-                    String headerText = ResourceBundle.getBundle("bundles.localization").getString("parse_error_header");
+                    String headerText = ResourceBundle.getBundle("bundles.localization")
+                        .getString("parse_error_header");
                     alert.setHeaderText(headerText);
-                    String contentText = ResourceBundle.getBundle("bundles.localization").getString("parse_error_content");
+                    String contentText = ResourceBundle.getBundle("bundles.localization")
+                        .getString("parse_error_content");
                     alert.setContentText(contentText);
                     alert.show();
                     showSourceChooser();
@@ -597,22 +667,26 @@ public class MainController {
             centerPane.getChildren().add(graph.getGroup());
             showLegend();
             graph.getElements().entrySet()
-                    .forEach(entry -> {
-                        Element element = entry.getKey();
-                        ObservableValue<LegendItem.State> state = legendStates.get(GraphObject.element(element.getType()));
-                        Binding<Boolean> binding = Bindings.createBooleanBinding(() -> state.getValue() != LegendItem.State.DISABLED, state);
-                        context.addObject(binding);
-                        entry.getValue().getShape().visibleProperty().bind(binding);
-                        entry.getValue().getShape(element).setOnMouseClicked(event -> {
-                            setDetail(new ElementDetail(element));
-                        });
+                .forEach(entry -> {
+                    Element element = entry.getKey();
+                    ObservableValue<LegendItem.State> state = legendStates
+                        .get(GraphObject.element(element.getType()));
+                    Binding<Boolean> binding = Bindings
+                        .createBooleanBinding(() -> state.getValue() != LegendItem.State.DISABLED,
+                            state);
+                    context.addObject(binding);
+                    entry.getValue().getShape().visibleProperty().bind(binding);
+                    entry.getValue().getShape(element).setOnMouseClicked(event -> {
+                        setDetail(new ElementDetail(element));
                     });
+                });
             for (Train train : Train.in(context).getAll()) {
                 TrainView trainView = new TrainView(train, graph);
                 trainView.timeProperty().bind(simulationTime);
-                context.addObject(trainView);
+                trains.put(train, trainView);
                 trainView.setOnMouseClicked(e -> setDetail(new TrainDetail(train)));
             }
+            graph.getGroup().getChildren().add(highlighters);
         }
         return graph;
     }
