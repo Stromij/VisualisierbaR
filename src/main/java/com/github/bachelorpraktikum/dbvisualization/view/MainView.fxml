@@ -18,7 +18,7 @@
             xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.github.bachelorpraktikum.dbvisualization.view.MainController">
     <center>
-        <Pane fx:id="centerPane"/>
+        <Pane fx:id="centerPane" />
     </center>
     <top>
         <StackPane>
@@ -34,6 +34,7 @@
                         <ToggleButton fx:id="playToggle" text="%play_simulation"/>
                         <ToggleButton fx:id="eventTraversal" text="%eventTravsersal"/>
                         <HBox fx:id="rightSpacer" alignment="CENTER_RIGHT"/>
+                        <ToggleButton fx:id="proportionalToggle" mnemonicParsing="false" text="%layout" />
                         <ToggleButton fx:id="legendButton" text="%legend"/>
                         <Button fx:id="closeButton" text="%close_data_source"/>
                     </items>
@@ -43,7 +44,7 @@
     </top>
     <left>
         <StackPane fx:id="leftPane">
-            <ListView fx:id="logList"/>
+            <ListView fx:id="logList" />
         </StackPane>
     </left>
     <right>
@@ -56,26 +57,21 @@
                         AnchorPane.rightAnchor="5"/>
             </AnchorPane>
             <ListView fx:id="legend" fixedCellSize="0.0" style="-fx-background-color: #ccc;">
-                <Label text="Legend goes here."/>
+                <Label text="Legend goes here." />
             </ListView>
             <BorderPane>
                 <center>
-                    <ListView fx:id="elementList" style="-fx-padding: 1px;"/>
+                    <ListView fx:id="elementList" style="-fx-padding: 1px;" />
                 </center>
                 <top>
                     <AnchorPane style="-fx-background-color: #f4f4f4">
-                        <TextField fx:id="filterText" promptText="%filter"
-                                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                   AnchorPane.topAnchor="0.0"/>
-                        <FlowPane fx:id="filterPane" hgap="4" vgap="4" AnchorPane.bottomAnchor="0.0"
-                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                  AnchorPane.topAnchor="30.0">
-                            <CheckBox fx:id="elementFilter" selected="true"
-                                      text="%filter_elements"/>
-                            <CheckBox fx:id="trainFilter" selected="true" text="%filter_trains"/>
+                        <TextField fx:id="filterText" promptText="%filter" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                        <FlowPane fx:id="filterPane" hgap="4" vgap="4" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+                            <CheckBox fx:id="elementFilter" selected="true" text="%filter_elements" />
+                            <CheckBox fx:id="trainFilter" selected="true" text="%filter_trains" />
                         </FlowPane>
                         <padding>
-                            <Insets bottom="5.0"/>
+                            <Insets bottom="5.0" />
                         </padding>
                     </AnchorPane>
                 </top>
