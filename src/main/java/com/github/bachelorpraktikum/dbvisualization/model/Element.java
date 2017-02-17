@@ -16,7 +16,6 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.scene.paint.Color;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -227,30 +226,50 @@ public final class Element {
         }
 
         /**
-         * Potentially creates a new instance of {@link Element}.<br>
-         * If an element with the same name already exists, it is returned.
+         * Potentially creates a new instance of {@link Element}.
          *
-         * @param name  the unique name of this element
-         * @param type  the {@link Type}
-         * @param node  the {@link Node} this element is located on
+         * @param name the unique name of this element
+         * @param type the {@link Type}
+         * @param node the {@link Node} this element is located on
          * @param state the initial state of the element
          * @return an element
-         * @throws NullPointerException     if either of the arguments is null
+         * @throws NullPointerException if either of the arguments is null
+         * @throws IllegalArgumentException if an element with the same name but different parameters
+         * already exists
          */
         @Nonnull
         public Element create(String name, Type type, Node node, State state) {
             Element element = elements.computeIfAbsent(Objects.requireNonNull(name), elementName ->
                     new Element(this, elementName, type, node, state)
             );
+            State resultInitState = getStateAtTime(element, Context.INIT_STATE_TIME);
             if (!element.getName().equals(name)
                     || !element.getType().equals(type)
-                    || !element.getNode().equals(node)) {
-                // we SHOULD also check for the initial state, but it's not easily accessible,
-                // so I'm going to let it slide for now
-                String errorMessage = String.format("element with this name (%s) already exists, but differently", name);
-                log.warning(errorMessage);
+                    || !element.getNode().equals(node)
+                    || !resultInitState.equals(state)) {
+                String elementFormat = "(type: %s, node: %s, initState: %s)";
+                String message = "Element with name: %s already exists:\n"
+                    + elementFormat + ", tried to recreate with following arguments:\n"
+                    + elementFormat;
+                message = String.format(message, name, type, node, state,
+                    element.getType(), element.getNode(), resultInitState);
+                throw new IllegalArgumentException(message);
             }
             return element;
+        }
+
+        /**
+         * Gets the state of an element at the given time, then resets the time to the previous value.
+         * @param element the element
+         * @param time the time to look up the state for
+         * @return the state of the element at the given time
+         */
+        private State getStateAtTime(Element element, int time) {
+            int resetTime = currentTime;
+            setTime(time);
+            State result = element.getState();
+            setTime(resetTime);
+            return result;
         }
 
         /**

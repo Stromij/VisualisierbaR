@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyProperty;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -51,7 +50,10 @@ public class ElementTest {
     public void testInstanceManagerExistsDifferentType() {
         Element element = createElement();
 
-        assertSame(element, Element.in(context).create(element.getName(), Element.Type.GefahrenPunktImpl, element.getNode(), element.getState()));
+        expected.expect(IllegalArgumentException.class);
+        Element.in(context)
+            .create(element.getName(), Element.Type.GefahrenPunktImpl, element.getNode(),
+                element.getState());
     }
 
     @Test
@@ -59,16 +61,18 @@ public class ElementTest {
         Element element = createElement();
         Node otherNode = Node.in(context).create("otherNode", new Coordinates(10, 10));
 
-        assertSame(element, Element.in(context).create(element.getName(), element.getType(), otherNode, element.getState()));
+        expected.expect(IllegalArgumentException.class);
+        Element.in(context)
+            .create(element.getName(), element.getType(), otherNode, element.getState());
     }
 
-    @Ignore("the initial state is currently not checked in the factory")
     @Test
     public void testInstanceManagerExistsDifferentState() {
         Element element = createElement();
 
         expected.expect(IllegalArgumentException.class);
-        Element.in(context).create(element.getName(), element.getType(), element.getNode(), Element.State.FAHRT);
+        Element.in(context)
+            .create(element.getName(), element.getType(), element.getNode(), Element.State.FAHRT);
     }
 
     @Test
