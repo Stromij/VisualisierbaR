@@ -10,12 +10,11 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
 public class ConfigFile extends Properties {
 
-    private final static String USER_HOME = System.getProperty("user.home");
+    private static final String USER_HOME = System.getProperty("user.home");
     private static final Logger log = Logger.getLogger(ConfigFile.class.getName());
 
     private static ConfigFile instance = new ConfigFile();
@@ -50,7 +49,7 @@ public class ConfigFile extends Properties {
         store(outputStream, null);
     }
 
-    public void load() {
+    private void load() {
         try (InputStream inputStream = new FileInputStream(filepath)) {
             load(inputStream);
         } catch (IOException io) {

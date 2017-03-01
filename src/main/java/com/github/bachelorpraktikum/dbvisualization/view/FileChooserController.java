@@ -2,15 +2,9 @@ package com.github.bachelorpraktikum.dbvisualization.view;
 
 import com.github.bachelorpraktikum.dbvisualization.DataSource;
 import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
-
 import java.io.File;
 import java.net.URI;
 import java.util.ResourceBundle;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.Resource;
-
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.fxml.FXML;
@@ -20,9 +14,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
 public class FileChooserController implements SourceChooser {
+
     @FXML
     private TextField pathField;
     @FXML
@@ -32,11 +29,11 @@ public class FileChooserController implements SourceChooser {
     private Button explorerButton;
     private FileChooser fileChooser;
 
-    private ReadOnlyObjectWrapper<URI> fileURIProperty;
+    private ReadOnlyObjectWrapper<URI> fileUriProperty;
 
     @FXML
     private void initialize() {
-        fileURIProperty = new ReadOnlyObjectWrapper<>();
+        fileUriProperty = new ReadOnlyObjectWrapper<>();
         fileChooser = new FileChooser();
         String initialDirectory = getInitialDirectory();
         setInitialDirectory(initialDirectory);
@@ -48,13 +45,13 @@ public class FileChooserController implements SourceChooser {
             }
         });
 
-        pathField.textProperty().addListener((o, oldValue, newValue) -> {
+        pathField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {
-                fileURIProperty.set(null);
+                fileUriProperty.set(null);
                 return;
             }
             URI uri = new File(newValue).getAbsoluteFile().toURI();
-            fileURIProperty.set(uri);
+            fileUriProperty.set(uri);
         });
 
         pathField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -92,36 +89,24 @@ public class FileChooserController implements SourceChooser {
         fileChooser.setInitialDirectory(new File(initialDirectory));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Nullable
     @Override
-    public URI getResourceURI() {
-        return fileURIProperty.getValue();
+    public URI getResourceUri() {
+        return fileUriProperty.getValue();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Nonnull
     @Override
-    public ReadOnlyObjectProperty<URI> resourceURIProperty() {
-        return fileURIProperty.getReadOnlyProperty();
+    public ReadOnlyObjectProperty<URI> resourceUriProperty() {
+        return fileUriProperty.getReadOnlyProperty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Nonnull
     @Override
     public String getRootPaneId() {
         return rootPane.getId();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Nonnull
     @Override
     public DataSource.Type getResourceType() {
@@ -129,10 +114,10 @@ public class FileChooserController implements SourceChooser {
     }
 
     @Override
-    public void setInitialURI(URI initialURI) {
-        setInitialDirectory(initialURI.getPath());
+    public void setInitialUri(URI initialUri) {
+        setInitialDirectory(initialUri.getPath());
 
-        ConfigFile.getInstance().put(getLogFileKey(), initialURI.getPath());
+        ConfigFile.getInstance().put(getLogFileKey(), initialUri.getPath());
     }
 
     /**
@@ -144,11 +129,13 @@ public class FileChooserController implements SourceChooser {
     private String getInitialDirectory() {
         String defaultDirectory = System.getProperty("user.home");
 
-        return String.valueOf(ConfigFile.getInstance().getOrDefault(getLogFileKey(), defaultDirectory));
+        return String
+            .valueOf(ConfigFile.getInstance().getOrDefault(getLogFileKey(), defaultDirectory));
     }
 
     private String getLogFileKey() {
-        String logFileKey = ResourceBundle.getBundle("config_keys").getString("initialDirectoryKey");
+        String logFileKey = ResourceBundle.getBundle("config_keys")
+            .getString("initialDirectoryKey");
         return String.format(logFileKey, getResourceType().toString());
     }
 }

@@ -11,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.DoubleAdder;
-import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -26,6 +25,7 @@ import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
 
 final class CompositeElement extends ElementBase<Group> {
+
     private static final double MAX_SHAPE_WIDTH = 2.0;
     private static final double ELEMENT_SPACING = 0.7;
     private static final double GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR = 0.5;
@@ -83,9 +83,9 @@ final class CompositeElement extends ElementBase<Group> {
 
     private void resizeNode(javafx.scene.Node node, double maxWidth) {
         Bounds bounds = node.getLayoutBounds();
-        double f = maxWidth / bounds.getWidth();
-        node.setScaleX(node.getScaleX() * f);
-        node.setScaleY(node.getScaleY() * f);
+        double factor = maxWidth / bounds.getWidth();
+        node.setScaleX(node.getScaleX() * factor);
+        node.setScaleY(node.getScaleY() * factor);
     }
 
     @Override
@@ -93,57 +93,12 @@ final class CompositeElement extends ElementBase<Group> {
         return shapes.get(represented);
     }
 
-    private Shape createShape(Element.Type type) {
-        double maxWidth = MAX_SHAPE_WIDTH;
-        Shape shape = null;
-        switch (type) {
-            case VorSignalImpl:
-            case HauptSignalImpl:
-                shape = createPathShape(type);
-                break;
-            case GeschwindigkeitsAnzeigerImpl:
-                shape = new Polygon(0, 2, 1, 0, 2, 2);
-                maxWidth *= GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR;
-                break;
-            case GeschwindigkeitsVoranzeiger:
-                shape = new Polygon(0, 0, 1, 2, 2, 0);
-                maxWidth *= GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR;
-                break;
-            case UnknownElement:
-            default:
-                shape = new Rectangle(2, 2);
-                break;
-        }
-        resizeNode(shape, getCalibrationBase() * maxWidth);
-        return shape;
-    }
-
-    private Shape createPathShape(Element.Type type) {
-        try {
-            Shape shape = null;
-
-            for (URL url : type.getImageUrls()) {
-                FXMLLoader loader = new FXMLLoader(url);
-                if (shape == null) {
-                    shape = loader.load();
-                } else {
-                    shape = Shape.union(shape, loader.load());
-                }
-            }
-
-            shape.setRotate(90);
-            return shape;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException(e);
-        }
-    }
-
     @Nonnull
     @Override
     protected Group createShape() {
         Group group = new Group(shapes.values().stream()
-                .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
         Bounds bounds = group.getLayoutBounds();
         double endY = bounds.getHeight() + FOOT_HEIGHT * getCalibrationBase();
         Line line = new Line(0, 0, 0, endY);
@@ -159,4 +114,22 @@ final class CompositeElement extends ElementBase<Group> {
         bottomLine.toBack();
         return group;
     }
+
+    private Shape createShape(Element.Type type) {
+        double maxWidth = MAX_SHAPE_WIDTH;
+        Shape shape = type.createShape();
+        switch (type) {
+            case GeschwindigkeitsAnzeiger:
+                maxWidth *= GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR;
+                break;
+            case GeschwindigkeitsVoranzeiger:
+                maxWidth *= GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR;
+                break;
+            default:
+                break;
+        }
+        resizeNode(shape, getCalibrationBase() * maxWidth);
+        return shape;
+    }
+
 }

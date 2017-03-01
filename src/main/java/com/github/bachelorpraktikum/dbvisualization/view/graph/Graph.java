@@ -1,25 +1,21 @@
 package com.github.bachelorpraktikum.dbvisualization.view.graph;
 
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
-import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
 import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.elements.Elements;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-
+import javafx.scene.Group;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import javafx.geometry.Point2D;
-import javafx.scene.Group;
-
 @ParametersAreNonnullByDefault
 public final class Graph {
+
     @Nonnull
     private final Context context;
     @Nonnull
@@ -40,10 +36,10 @@ public final class Graph {
      * Creates a new graph for the given context. The graph is laid out by using the given {@link
      * CoordinatesAdapter}.
      *
-     * @param context            the context
+     * @param context the context
      * @param coordinatesAdapter the coordinates adapter to translate coordinates from the model to
-     *                           real coordinates
-     * @throws NullPointerException  if either argument is null
+     * real coordinates
+     * @throws NullPointerException if either argument is null
      * @throws IllegalStateException if there is nothing for this context to show
      */
     public Graph(Context context, CoordinatesAdapter coordinatesAdapter) {
@@ -56,19 +52,19 @@ public final class Graph {
         for (Edge edge : Edge.in(context).getAll()) {
             GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
             edges.put(edge, shape);
-            group.getChildren().add(shape.getShape());
+            group.getChildren().add(shape.getFullNode());
         }
 
         for (Node node : Node.in(context).getAll()) {
             GraphShape<Node> shape = new Junction(node, coordinatesAdapter);
             nodes.put(node, shape);
-            group.getChildren().add(shape.getShape());
+            group.getChildren().add(shape.getFullNode());
 
             for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
                 for (Element element : elementShape.getRepresentedObjects()) {
                     elements.put(element, elementShape);
                 }
-                group.getChildren().add(elementShape.getShape());
+                group.getChildren().add(elementShape.getFullNode());
             }
         }
     }

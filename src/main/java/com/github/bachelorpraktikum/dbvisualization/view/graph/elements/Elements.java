@@ -5,7 +5,6 @@ import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import com.github.bachelorpraktikum.dbvisualization.model.Switch;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShape;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class Elements {
+
     private Elements() {
     }
 
@@ -27,28 +27,29 @@ public final class Elements {
 
         for (Element element : node.getElements()) {
             switch (element.getType()) {
-                case MagnetImpl:
+                case Magnet:
                     shapes.add(new MagnetElement(element, node, adapter));
                     break;
-                case SichtbarkeitsPunktImpl:
-                case GefahrenPunktImpl:
+                case SichtbarkeitsPunkt:
+                case GefahrenPunkt:
                     shapes.add(new RotatedDefaultOffsetElement(element, node, adapter, count++));
                     break;
-                case WeichenPunktImpl:
-                    Switch aSwitch = element.getSwitch().get();
-                    if(!switches.containsKey(aSwitch)) {
-                        GraphShape<Element> switchShape = new WeichenpunktElement(aSwitch, node, adapter);
+                case WeichenPunkt:
+                    Switch aSwitch = element.getSwitch();
+                    if (!switches.containsKey(aSwitch)) {
+                        GraphShape<Element> switchShape = new WeichenpunktElement(aSwitch, node,
+                            adapter);
                         switches.put(aSwitch, switchShape);
                         shapes.add(switchShape);
                     }
                     break;
-                case SwWechselImpl:
+                case SwWechsel:
                     shapes.add(new StellwerkWechselElement(element, node, adapter));
                     break;
                 case GeschwindigkeitsVoranzeiger:
-                case VorSignalImpl:
-                case HauptSignalImpl:
-                case GeschwindigkeitsAnzeigerImpl:
+                case VorSignal:
+                case HauptSignal:
+                case GeschwindigkeitsAnzeiger:
                     compositeElements.add(element);
                     break;
                 default:

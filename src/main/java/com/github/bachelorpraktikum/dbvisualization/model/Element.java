@@ -9,14 +9,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.WeakHashMap;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
+import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,7 +33,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * <p>There is only one instance of Element per name per {@link Context}.</p>
  */
 @ParametersAreNonnullByDefault
-public final class Element {
+public final class Element implements GraphObject<Shape> {
+
     private static final Logger log = Logger.getLogger(Element.class.getName());
     @Nonnull
     private final Factory factory;
@@ -70,7 +76,7 @@ public final class Element {
          * @param name the name
          * @return a state
          * @throws IllegalArgumentException if there is no state with that name
-         * @throws NullPointerException     if name is null
+         * @throws NullPointerException if name is null
          */
         @Nonnull
         public static State fromName(String name) {
@@ -82,28 +88,45 @@ public final class Element {
      * Represents the type of an {@link Element}.
      * Every type is associated with an image file containing the symbol for the element.
      */
-    public enum Type {
-        GeschwindigkeitsAnzeigerImpl,
-        VorSignalImpl("VorsignalImpl"),
-        HauptSignalImpl("HauptsignalImpl"),
-        GeschwindigkeitsVoranzeiger,
-        SichtbarkeitsPunktImpl("SichtbarkeitspunktImpl", "SichtbarkeitspunktImpl2"),
-        GefahrenPunktImpl("GefahrenpunktImpl"),
-        MagnetImpl("MagnetImpl"),
-        WeichenPunktImpl,
-        SwWechselImpl("SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4"),
-        UnknownElement;
+    public enum Type implements Shapeable {
+        GeschwindigkeitsAnzeiger("GeschwindigkeitsAnzeigerImpl", () ->
+            new Polygon(-1, 1, 1, 1, 0, -1)
+        ),
+        VorSignal("VorSignalImpl", "VorsignalImpl"),
+        HauptSignal("HauptSignalImpl", "HauptsignalImpl"),
+        GeschwindigkeitsVoranzeiger("GeschwindigkeitsVoranzeigerImpl", () ->
+            new Polygon(-1, -1, 1, -1, 0, 1)
+        ),
+        SichtbarkeitsPunkt("SichtbarkeitsPunktImpl",
+            "SichtbarkeitspunktImpl", "SichtbarkeitspunktImpl2"),
+        GefahrenPunkt("GefahrenPunktImpl", "GefahrenpunktImpl"),
+        Magnet("MagnetImpl", "MagnetImpl"),
+        WeichenPunkt("WeichenPunktImpl", Polygon::new),
+        SwWechsel("SwWechselImpl",
+            "SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4"),
+        UnknownElement("", Rectangle::new);
 
-        private final List<URL> imageUrls;
+        private final String logName;
+        private final Property<VisibleState> stateProperty;
+        private final Supplier<Shape> shapeSupplier;
 
-        Type(String... imageNames) {
+        Type(String logName, String... imageNames) {
+            this.logName = logName;
+            this.stateProperty = new SimpleObjectProperty<>(VisibleState.AUTO);
             List<URL> imageUrls = new ArrayList<>(imageNames.length);
 
             for (String imageName : imageNames) {
-                imageUrls.add(Element.class.getResource(String.format("symbols/%s.fxml", imageName)));
+                imageUrls
+                    .add(Element.class.getResource(String.format("symbols/%s.fxml", imageName)));
             }
 
-            this.imageUrls = Collections.unmodifiableList(imageUrls);
+            this.shapeSupplier = () -> Shapeable.createShape(imageUrls);
+        }
+
+        Type(String logName, Supplier<Shape> shapeSupplier) {
+            this.logName = logName;
+            this.stateProperty = new SimpleObjectProperty<>(VisibleState.AUTO);
+            this.shapeSupplier = shapeSupplier;
         }
 
         /**
@@ -116,15 +139,25 @@ public final class Element {
             return name();
         }
 
-        /**
-         * Gets a URL to FXML files each containing one SVGPath representing this {@link Type}.<br>
-         * Typically, the FXML files are contained in the application's jar file.
-         *
-         * @return the image URLs
-         */
-        @Nonnull
-        public List<URL> getImageUrls() {
-            return imageUrls;
+        private String getLogName() {
+            return logName;
+        }
+
+        @Override
+        public Shape createShape() {
+            Shape shape = shapeSupplier.get();
+            if (this == HauptSignal || this == VorSignal) {
+                shape.setRotate(90);
+            }
+            if (this == Magnet) {
+                shape.setRotate(180);
+            }
+            return shape;
+        }
+
+        @Override
+        public Property<VisibleState> visibleStateProperty() {
+            return stateProperty;
         }
 
         /**
@@ -136,31 +169,15 @@ public final class Element {
          */
         @Nonnull
         public static Type fromName(String name) {
-            // TODO change this. The name of the type should be given as an constructor argument.
             String[] nameParts = name.split("_");
-            String typeName = nameParts[nameParts.length - 1];
-            switch (typeName) {
-                case "HauptSignalImpl":
-                    return HauptSignalImpl;
-                case "VorSignalImpl":
-                    return VorSignalImpl;
-                case "SichtbarkeitsPunktImpl":
-                    return SichtbarkeitsPunktImpl;
-                case "GefahrenPunktImpl":
-                    return GefahrenPunktImpl;
-                case "MagnetImpl":
-                    return MagnetImpl;
-                case "WeichenPunktImpl":
-                    return WeichenPunktImpl;
-                case "SwWechselImpl":
-                    return SwWechselImpl;
-                case "GeschwindigkeitsAnzeigerImpl":
-                    return GeschwindigkeitsAnzeigerImpl;
-                case "GeschwindigkeitsVorAnzeigerImpl":
-                    return GeschwindigkeitsVoranzeiger;
-                default:
-                    return UnknownElement;
+            String typeName = nameParts[nameParts.length - 1].toLowerCase();
+            for (Type type : values()) {
+                String lowerType = type.getLogName();
+                if (lowerType.equalsIgnoreCase(typeName)) {
+                    return type;
+                }
             }
+            return UnknownElement;
         }
     }
 
@@ -173,7 +190,7 @@ public final class Element {
 
         node.addElement(this);
 
-        if (this.type == Type.WeichenPunktImpl) {
+        if (this.type == Type.WeichenPunkt) {
             this.aSwitch = factory.getSwitchFactory().create(this);
         } else {
             this.aSwitch = null;
@@ -190,6 +207,7 @@ public final class Element {
      */
     @ParametersAreNonnullByDefault
     public static final class Factory {
+
         private static final int INITIAL_ELEMENTS_CAPACITY = 256;
         private static final Map<Context, Factory> instances = new WeakHashMap<>();
 
@@ -234,19 +252,19 @@ public final class Element {
          * @param state the initial state of the element
          * @return an element
          * @throws NullPointerException if either of the arguments is null
-         * @throws IllegalArgumentException if an element with the same name but different parameters
-         * already exists
+         * @throws IllegalArgumentException if an element with the same name but different
+         * parameters already exists
          */
         @Nonnull
         public Element create(String name, Type type, Node node, State state) {
             Element element = elements.computeIfAbsent(Objects.requireNonNull(name), elementName ->
-                    new Element(this, elementName, type, node, state)
+                new Element(this, elementName, type, node, state)
             );
             State resultInitState = getStateAtTime(element, Context.INIT_STATE_TIME);
             if (!element.getName().equals(name)
-                    || !element.getType().equals(type)
-                    || !element.getNode().equals(node)
-                    || !resultInitState.equals(state)) {
+                || !element.getType().equals(type)
+                || !element.getNode().equals(node)
+                || !resultInitState.equals(state)) {
                 String elementFormat = "(type: %s, node: %s, initState: %s)";
                 String message = "Element with name: %s already exists:\n"
                     + elementFormat + ", tried to recreate with following arguments:\n"
@@ -259,7 +277,9 @@ public final class Element {
         }
 
         /**
-         * Gets the state of an element at the given time, then resets the time to the previous value.
+         * Gets the state of an element at the given time, then resets the time to the previous
+         * value.
+         *
          * @param element the element
          * @param time the time to look up the state for
          * @return the state of the element at the given time
@@ -277,7 +297,7 @@ public final class Element {
          *
          * @param name the element's name
          * @return the element instance with this name
-         * @throws NullPointerException     if the name is null
+         * @throws NullPointerException if the name is null
          * @throws IllegalArgumentException if there is no element associated with the name
          */
         @Nonnull
@@ -330,7 +350,7 @@ public final class Element {
          */
         public void setTime(int time) {
             if (time < -1) {
-               throw new IllegalArgumentException("invalid time: " + time);
+                throw new IllegalArgumentException("invalid time: " + time);
             }
 
             if (time == currentTime) {
@@ -377,9 +397,9 @@ public final class Element {
      * If the time is negative, it will be corrected to 0 and a warning will be added to the event.
      *
      * @param state new state after this event
-     * @param time  the time of the event in milliseconds
-     * @throws NullPointerException     if state is null
-     * @throws IllegalStateException    if there is already another event after this one
+     * @param time the time of the event in milliseconds
+     * @throws NullPointerException if state is null
+     * @throws IllegalStateException if there is already another event after this one
      */
     public void addEvent(State state, int time) {
         List<String> warnings = new LinkedList<>();
@@ -390,14 +410,15 @@ public final class Element {
         getFactory().addEvent(this, Objects.requireNonNull(state), warnings, time);
     }
 
-    /**
-     * Gets the unique name of this {@link Element}.
-     *
-     * @return the name
-     */
+    @Override
     @Nonnull
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Shapeable getShapeable() {
+        return getType();
     }
 
     /**
@@ -445,25 +466,30 @@ public final class Element {
 
     /**
      * Gets the switch this {@link Element} is part of.<br>There will only be a value present, if
-     * the type of this element is {@link Type#WeichenPunktImpl}.
+     * the type of this element is {@link Type#WeichenPunkt}.
      *
      * @return the switch this element is part of
+     * @throws IllegalStateException if this element doesn't have the WeichenPunkt type
      */
     @Nonnull
-    public Optional<Switch> getSwitch() {
-        return Optional.ofNullable(aSwitch);
+    public Switch getSwitch() {
+        if (aSwitch == null) {
+            throw new IllegalStateException();
+        }
+        return aSwitch;
     }
 
     @Override
     public String toString() {
         return "Element{"
-                + "name='" + name + '\''
-                + ", state=" + stateProperty.getValue()
-                + '}';
+            + "name='" + name + '\''
+            + ", state=" + stateProperty.getValue()
+            + '}';
     }
 
     @ParametersAreNonnullByDefault
     private static class ElementEvent implements Event {
+
         @Nonnull
         private final Element element;
         private final int time;
@@ -517,12 +543,18 @@ public final class Element {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || getClass() != obj.getClass()) {
+                return false;
+            }
 
             ElementEvent event = (ElementEvent) obj;
 
-            if (time != event.time) return false;
+            if (time != event.time) {
+                return false;
+            }
             return state == event.state;
         }
 
@@ -536,10 +568,10 @@ public final class Element {
         @Override
         public String toString() {
             return "ElementEvent{"
-                    + "time=" + time
-                    + ", element=" + getElement().getName()
-                    + ", state=" + state
-                    + '}';
+                + "time=" + time
+                + ", element=" + getElement().getName()
+                + ", state=" + state
+                + '}';
         }
     }
 }
