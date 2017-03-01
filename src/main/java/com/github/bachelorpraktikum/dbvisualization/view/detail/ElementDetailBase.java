@@ -3,8 +3,6 @@ package com.github.bachelorpraktikum.dbvisualization.view.detail;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
 import com.github.bachelorpraktikum.dbvisualization.model.GraphObject;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
-import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
@@ -46,7 +44,7 @@ public abstract class ElementDetailBase<E extends GraphObject<?>> {
     }
 
     protected Shape getShape() {
-        return getElement().getShapeable().createIconShape();
+        return getElement().createIconShape();
     }
 
     public static ElementDetailBase create(GraphObject object, IntegerProperty timeProperty) {
