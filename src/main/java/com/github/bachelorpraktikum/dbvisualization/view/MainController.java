@@ -3,6 +3,8 @@ package com.github.bachelorpraktikum.dbvisualization.view;
 import com.github.bachelorpraktikum.dbvisualization.CompositeObservableList;
 import com.github.bachelorpraktikum.dbvisualization.DataSource;
 import com.github.bachelorpraktikum.dbvisualization.FXCollectors;
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
 import com.github.bachelorpraktikum.dbvisualization.database.Database;
 import com.github.bachelorpraktikum.dbvisualization.logparser.GraphParser;
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
@@ -770,6 +772,13 @@ public class MainController {
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
                 new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
                 new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg"));
+        String initDirString = ConfigFile.getInstance().getProperty(
+            ConfigKey.initialDirectory.getKey(),
+            System.getProperty("user.home")
+        );
+        File initDir = new File(initDirString);
+        fileChooser.setInitialDirectory(initDir);
+        fileChooser.setInitialFileName("Graph");
 
         File file = fileChooser.showSaveDialog(rootPane.getScene().getWindow());
 
