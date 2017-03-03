@@ -20,6 +20,8 @@ import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.Proportio
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.dbvisualization.view.train.TrainView;
+
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -68,6 +70,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -92,6 +95,8 @@ public class MainController {
     private TextField filterText;
     @FXML
     private ToggleButton proportionalToggle;
+    @FXML
+    private Button exportButton;
 
     @FXML
     private ListView<Shapeable> legend;
@@ -228,6 +233,7 @@ public class MainController {
         fireOnEnterPress(closeButton);
         fireOnEnterPress(logToggle);
         closeButton.setOnAction(event -> showSourceChooser());
+        exportButton.setOnAction(event -> exportGraph());
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
@@ -757,5 +763,17 @@ public class MainController {
         graphPane.getChildren().clear();
         graph = null;
         fitGraphToCenter(getGraph());
+    }
+
+    private void exportGraph() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
+                new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
+                new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg"));
+
+        File file = fileChooser.showSaveDialog(rootPane.getScene().getWindow());
+
+        if(file != null)
+            Exporter.exportGraph(this.getGraph(), file);
     }
 }

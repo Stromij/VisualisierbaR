@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -53,8 +54,26 @@
         <Insets bottom="3" left="10" right="10" top="3"/>
       </VBox.margin>
     </AnchorPane>
+
     <fx:include fx:id="vtChart" source="LineChart.fxml"/>
+    <Button mnemonicParsing="false" onAction="#exportVTChart" text="%graphExport">
+      <VBox.margin>
+        <Insets bottom="10.0" left="60.0" top="5.0"/>
+      </VBox.margin>
+    </Button>
+
     <fx:include fx:id="vdChart" source="LineChart.fxml"/>
+    <Button mnemonicParsing="false" onAction="#exportVDChart" text="%graphExport">
+      <VBox.margin>
+        <Insets left="60.0"/>
+      </VBox.margin>
+    </Button>
+
     <fx:include fx:id="dtChart" source="LineChart.fxml"/>
+    <Button mnemonicParsing="false" onAction="#exportDTChart" text="%graphExport">
+      <VBox.margin>
+        <Insets left="60.0"/>
+      </VBox.margin>
+    </Button>
   </VBox>
 </VBox>

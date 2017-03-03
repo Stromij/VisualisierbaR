@@ -3,6 +3,8 @@ package com.github.bachelorpraktikum.dbvisualization.view.detail;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train.State;
+import com.github.bachelorpraktikum.dbvisualization.view.Exporter;
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
@@ -30,6 +32,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Shape;
+import javafx.stage.FileChooser;
 
 public class ElementDetailController {
 
@@ -337,5 +340,34 @@ public class ElementDetailController {
         }
         state = train.getState(time, state);
         data.add(new Data<>(xFunction.apply(state), yFunction.apply(state)));
+    }
+
+    @FXML
+    private void exportVTChart() {
+        export(vtChart, "vt");
+    }
+
+    @FXML
+    private void exportVDChart() {
+        export(vdChart, "vd");
+    }
+
+    @FXML
+    private void exportDTChart() {
+        export(dtChart, "dt");
+    }
+
+    private void export(LineChart chart, String type) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters()
+            .addAll(new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
+                new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
+                new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg"));
+
+        File file = fileChooser.showSaveDialog(trainBox.getScene().getWindow());
+
+        if (file != null) {
+            Exporter.exportTrainDetail(chart, type, file);
+        }
     }
 }
