@@ -5,12 +5,14 @@ import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train.State;
+import com.github.bachelorpraktikum.dbvisualization.view.ContextMenuUtil;
 import com.github.bachelorpraktikum.dbvisualization.view.Exporter;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,6 +33,8 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Shape;
@@ -167,6 +171,9 @@ public class ElementDetailController {
             chart.getYAxis().setLabel(type.getYAxisName());
 
             registerMagnifier(type);
+            MenuItem exportItem = new MenuItem("Export");
+            exportItem.setOnAction(event -> export(type));
+            ContextMenuUtil.attach(chart, Collections.singletonList(exportItem));
         }
     }
 
@@ -182,18 +189,20 @@ public class ElementDetailController {
 
     private void registerMagnifier(ChartType type) {
         charts.get(type).setOnMouseClicked(event -> {
-            if (currentBigChart == type) {
-                bigChart.setData(FXCollections.emptyObservableList());
-                bigChart.setVisible(false);
-                currentBigChart = null;
-            } else {
-                Series<Double, Double> data = new Series<>(chartData.get(type));
-                bigChart.setData(FXCollections.singletonObservableList(data));
-                bigChart.setTitle(type.getTitle());
-                bigChart.getXAxis().setLabel(type.getXAxisName());
-                bigChart.getYAxis().setLabel(type.getYAxisName());
-                bigChart.setVisible(true);
-                currentBigChart = type;
+            if (event.getButton() == MouseButton.PRIMARY) {
+                if (currentBigChart == type) {
+                    bigChart.setData(FXCollections.emptyObservableList());
+                    bigChart.setVisible(false);
+                    currentBigChart = null;
+                } else {
+                    Series<Double, Double> data = new Series<>(chartData.get(type));
+                    bigChart.setData(FXCollections.singletonObservableList(data));
+                    bigChart.setTitle(type.getTitle());
+                    bigChart.getXAxis().setLabel(type.getXAxisName());
+                    bigChart.getYAxis().setLabel(type.getYAxisName());
+                    bigChart.setVisible(true);
+                    currentBigChart = type;
+                }
             }
         });
     }
@@ -342,21 +351,6 @@ public class ElementDetailController {
         }
         state = train.getState(time, state);
         data.add(new Data<>(xFunction.apply(state), yFunction.apply(state)));
-    }
-
-    @FXML
-    private void exportVTChart() {
-        export(ChartType.vt);
-    }
-
-    @FXML
-    private void exportVDChart() {
-        export(ChartType.vd);
-    }
-
-    @FXML
-    private void exportDTChart() {
-        export(ChartType.dt);
     }
 
     private void export(ChartType type) {

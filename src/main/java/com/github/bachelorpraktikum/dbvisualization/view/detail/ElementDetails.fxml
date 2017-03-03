@@ -56,24 +56,7 @@
     </AnchorPane>
 
     <fx:include fx:id="vtChart" source="LineChart.fxml"/>
-    <Button mnemonicParsing="false" onAction="#exportVTChart" text="%graphExport">
-      <VBox.margin>
-        <Insets bottom="10.0" left="60.0" top="5.0"/>
-      </VBox.margin>
-    </Button>
-
     <fx:include fx:id="vdChart" source="LineChart.fxml"/>
-    <Button mnemonicParsing="false" onAction="#exportVDChart" text="%graphExport">
-      <VBox.margin>
-        <Insets left="60.0"/>
-      </VBox.margin>
-    </Button>
-
     <fx:include fx:id="dtChart" source="LineChart.fxml"/>
-    <Button mnemonicParsing="false" onAction="#exportDTChart" text="%graphExport">
-      <VBox.margin>
-        <Insets left="60.0"/>
-      </VBox.margin>
-    </Button>
   </VBox>
 </VBox>

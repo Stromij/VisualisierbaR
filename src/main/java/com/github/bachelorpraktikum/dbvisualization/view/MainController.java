@@ -22,11 +22,11 @@ import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.Proportio
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.dbvisualization.view.train.TrainView;
-
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -59,6 +59,7 @@ import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -97,8 +98,6 @@ public class MainController {
     private TextField filterText;
     @FXML
     private ToggleButton proportionalToggle;
-    @FXML
-    private Button exportButton;
 
     @FXML
     private ListView<Shapeable> legend;
@@ -235,7 +234,6 @@ public class MainController {
         fireOnEnterPress(closeButton);
         fireOnEnterPress(logToggle);
         closeButton.setOnAction(event -> showSourceChooser());
-        exportButton.setOnAction(event -> exportGraph());
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
@@ -334,6 +332,9 @@ public class MainController {
             graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
             event.consume();
         });
+        MenuItem exportItem = new MenuItem("Export");
+        exportItem.setOnAction(event -> exportGraph());
+        ContextMenuUtil.attach(centerPane, Collections.singletonList(exportItem));
     }
 
     private void initializeLogList() {
@@ -769,9 +770,11 @@ public class MainController {
 
     private void exportGraph() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
-                new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
-                new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg"));
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
+            new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
+            new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg")
+        );
         String initDirString = ConfigFile.getInstance().getProperty(
             ConfigKey.initialDirectory.getKey(),
             System.getProperty("user.home")
@@ -782,7 +785,8 @@ public class MainController {
 
         File file = fileChooser.showSaveDialog(rootPane.getScene().getWindow());
 
-        if(file != null)
+        if (file != null) {
             Exporter.exportGraph(this.getGraph(), file);
+        }
     }
 }
