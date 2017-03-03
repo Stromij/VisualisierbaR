@@ -4,42 +4,43 @@ import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Graph;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShape;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
-
-import javax.imageio.ImageIO;
-
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.image.WritableImage;
 import javafx.scene.transform.Transform;
+import javax.imageio.ImageIO;
 
 public class Exporter {
+
     private static final double pixelScale = 2.0;
 
-    public static void exportTrainDetail(LineChart chart, String type, File file) {
-        String fileType = file.getPath().substring(file.getPath().length()-3);
+    public static void exportTrainDetail(LineChart<Double, Double> chart, File file) {
+        String fileType = file.getPath().substring(file.getPath().length() - 3);
 
-        if(fileType.equals("dat"))
-            exportTrainDetailAsGNU(chart, type, file);
-        else
+        if (fileType.equals("dat")) {
+            exportTrainDetailAsGNU(chart.getData().get(0).getData(), file);
+        } else {
             exportTrainDetailAsImage(chart, file, fileType);
+        }
     }
 
     public static void exportGraph(Graph graph, File file) {
-        String fileType = file.getPath().substring(file.getPath().length()-3);
+        String fileType = file.getPath().substring(file.getPath().length() - 3);
 
-        if(fileType.equals("dat"))
+        if (fileType.equals("dat")) {
             exportGraphAsGNU(graph, file);
-        else
+        } else {
             exportGraphAsImage(graph, file, fileType);
+        }
     }
 
     /**
@@ -54,8 +55,8 @@ public class Exporter {
             Bounds bounds = graph.getGroup().getBoundsInParent();
 
             // aim for a 3000x2500 pixel image
-            double scaleX = 3000/bounds.getWidth();
-            double scaleY = 2500/bounds.getHeight();
+            double scaleX = 3000 / bounds.getWidth();
+            double scaleY = 2500 / bounds.getHeight();
             double snapScale = (scaleX > scaleY) ? scaleX : scaleY;
             SnapshotParameters snp = new SnapshotParameters();
             snp.setTransform(Transform.scale(snapScale, snapScale));
@@ -84,7 +85,7 @@ public class Exporter {
             FileWriter fileWriter = new FileWriter(file);
             CoordinatesAdapter coordinatesAdapter = graph.getCoordinatesAdapter();
 
-            for(Map.Entry<Edge, GraphShape<Edge>> entry: graph.getEdges().entrySet()) {
+            for (Map.Entry<Edge, GraphShape<Edge>> entry : graph.getEdges().entrySet()) {
                 Point2D p1 = coordinatesAdapter.apply(entry.getKey().getNode1());
                 Point2D p2 = coordinatesAdapter.apply(entry.getKey().getNode2());
                 fileWriter.write(String.format("%f, %f\r\n", p1.getX(), -p1.getY()));
@@ -123,31 +124,22 @@ public class Exporter {
      * Exports LineChart data in a file for usage with gnuplot.
      *
      * @param chart Chart that will be used
-     * @param type Type of the chart
      * @param file Export file
      */
-    private static void exportTrainDetailAsGNU(LineChart chart, String type, File file) {
+    private static void exportTrainDetailAsGNU(ObservableList<Data<Double, Double>> chart,
+        File file) {
         try {
             FileWriter fileWriter = new FileWriter(file);
 
-            for (Object chartData : chart.getData()) {
-                XYChart.Series xyChart = (XYChart.Series) chartData;
+            for (Data<Double, Double> data : chart) {
+                Double xValue = data.getXValue();
+                Double yValue = data.getYValue();
 
-                for (Object data : xyChart.getData()) {
-                    XYChart.Data xyData = (XYChart.Data) data;
-                    Object xValue = xyData.getXValue();
-                    Object yValue = xyData.getYValue();
-
-                    if(type.equals("vt") || type.equals("vd")) {
-                        fileWriter.write(String.format("%e %d\r\n", xValue, yValue));
-                    } else if(type.equals("dt")) {
-                        fileWriter.write(String.format("%e %e\r\n", xValue, yValue));
-                    }
-                }
+                fileWriter.write(String.format("%f %f\r\n", xValue, yValue));
             }
 
             fileWriter.close();
-        } catch(IOException e) {
+        } catch (IOException e) {
         }
     }
 }

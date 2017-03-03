@@ -1,5 +1,7 @@
 package com.github.bachelorpraktikum.dbvisualization.view.detail;
 
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train.State;
@@ -344,30 +346,38 @@ public class ElementDetailController {
 
     @FXML
     private void exportVTChart() {
-        export(vtChart, "vt");
+        export(ChartType.vt);
     }
 
     @FXML
     private void exportVDChart() {
-        export(vdChart, "vd");
+        export(ChartType.vd);
     }
 
     @FXML
     private void exportDTChart() {
-        export(dtChart, "dt");
+        export(ChartType.dt);
     }
 
-    private void export(LineChart chart, String type) {
+    private void export(ChartType type) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters()
             .addAll(new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
                 new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
                 new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg"));
+        String initDirString = ConfigFile.getInstance().getProperty(
+            ConfigKey.initialDirectory.getKey(),
+            System.getProperty("user.home")
+        );
+        File initDir = new File(initDirString);
+        fileChooser.setInitialDirectory(initDir);
+        fileChooser.setInitialFileName(type.getTitle());
 
         File file = fileChooser.showSaveDialog(trainBox.getScene().getWindow());
 
         if (file != null) {
-            Exporter.exportTrainDetail(chart, type, file);
+            LineChart<Double, Double> chart = charts.get(type);
+            Exporter.exportTrainDetail(chart, file);
         }
     }
 }
