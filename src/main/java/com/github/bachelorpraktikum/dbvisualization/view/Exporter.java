@@ -52,11 +52,12 @@ public class Exporter {
      */
     private static void exportGraphAsImage(Graph graph, File file, String fileType) {
         try {
-            Bounds bounds = graph.getGroup().getBoundsInParent();
+            Bounds localBounds = graph.getGroup().getBoundsInLocal();
+            Bounds screenBounds = graph.getGroup().localToScreen(localBounds);
 
             // aim for a 3000x2500 pixel image
-            double scaleX = 3000 / bounds.getWidth();
-            double scaleY = 2500 / bounds.getHeight();
+            double scaleX = 3000 / screenBounds.getWidth();
+            double scaleY = 2500 / screenBounds.getHeight();
             double snapScale = (scaleX > scaleY) ? scaleX : scaleY;
             SnapshotParameters snp = new SnapshotParameters();
             snp.setTransform(Transform.scale(snapScale, snapScale));
@@ -107,16 +108,18 @@ public class Exporter {
      */
     private static void exportTrainDetailAsImage(LineChart chart, File file, String fileType) {
         try {
-            //TODO: something with scale
-            double oldScale = chart.getScaleX();
-            chart.setScaleX(5.0);
-            chart.setScaleY(5.0);
+            Bounds bounds = chart.localToScreen(chart.getBoundsInLocal());
+            // aim for a 1920x1080 pixel image
+            double scaleX = 1920 / bounds.getWidth();
+            double scaleY = 1080 / bounds.getHeight();
+            double snapScale = (scaleX > scaleY) ? scaleX : scaleY;
+            SnapshotParameters snp = new SnapshotParameters();
+            snp.setTransform(Transform.scale(snapScale, snapScale));
             WritableImage image = chart.snapshot(new SnapshotParameters(), null);
 
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), fileType, file);
-            chart.setScaleX(oldScale);
-            chart.setScaleY(oldScale);
         } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
