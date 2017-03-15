@@ -2,6 +2,8 @@ package com.github.bachelorpraktikum.dbvisualization.view;
 
 import com.github.bachelorpraktikum.dbvisualization.CompositeObservableList;
 import com.github.bachelorpraktikum.dbvisualization.FXCollectors;
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
 import com.github.bachelorpraktikum.dbvisualization.datasource.DataSource;
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
@@ -19,8 +21,10 @@ import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.SimpleCoo
 import com.github.bachelorpraktikum.dbvisualization.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.dbvisualization.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.dbvisualization.view.train.TrainView;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -52,6 +56,7 @@ import javafx.scene.control.ButtonBase;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.TextFieldListCell;
@@ -65,6 +70,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -323,6 +329,9 @@ public class MainController {
             graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
             event.consume();
         });
+        MenuItem exportItem = new MenuItem("Export");
+        exportItem.setOnAction(event -> exportGraph());
+        ContextMenuUtil.attach(centerPane, Collections.singletonList(exportItem));
     }
 
     private void initializeLogList() {
@@ -719,5 +728,27 @@ public class MainController {
         graphPane.getChildren().clear();
         graph = null;
         fitGraphToCenter(getGraph());
+    }
+
+    private void exportGraph() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
+            new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
+            new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg")
+        );
+        String initDirString = ConfigFile.getInstance().getProperty(
+            ConfigKey.initialLogFileDirectory.getKey(),
+            System.getProperty("user.home")
+        );
+        File initDir = new File(initDirString);
+        fileChooser.setInitialDirectory(initDir);
+        fileChooser.setInitialFileName("Graph");
+
+        File file = fileChooser.showSaveDialog(rootPane.getScene().getWindow());
+
+        if (file != null) {
+            Exporter.exportGraph(this.getGraph(), file);
+        }
     }
 }

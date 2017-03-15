@@ -4,8 +4,12 @@ import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Node;
+import com.sun.javafx.geom.Vec2d;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import javafx.geometry.Point2D;
@@ -17,12 +21,14 @@ import javax.annotation.Nonnull;
  */
 public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter {
 
+    private Context context;
     private double shortestEdgeLength;
     private Node startingNode;
     private Point2D startingPoint;
     private HashMap<Node, Point2D> transformationMap = new HashMap<>();
 
     public ProportionalCoordinatesAdapter(Context context) {
+        this.context = context;
         shortestEdgeLength = Double.MAX_VALUE;
 
         // search for the shortest Edge
@@ -56,6 +62,110 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
 
         // calculate all transformation Vectors
         this.dfs();
+
+        // find nodes that overlay with other edges
+        // and fix their transformation vector
+        /*boolean foundCollisions = true;
+        while(foundCollisions) {
+            foundCollisions = removeCollisions();
+        }*/
+        //removeCollisions();
+    }
+
+    /**
+     *  Finds and fixes Nodes overlapping with other Edges
+     *
+     * @return true if a collision was found and fixed, false otherwise.
+     */
+    private boolean removeCollisions() {
+        boolean foundCollisions = false;
+
+        // first find overlapping nodes and replace their transformation vectors
+        for(Map.Entry<Node, Point2D> entry: transformationMap.entrySet()) {
+            for(Map.Entry<Node, Point2D> entry2: transformationMap.entrySet()) {
+                if(entry.getValue().equals(entry2.getValue()) &&
+                        !entry.getKey().equals(entry2.getKey())) {
+                    // same transformation Vector but different Nodes
+                    Node node = entry2.getKey();
+                    Edge edge = null;
+                    Point2D edgeVec = null;
+                    // look for an edge that will serve as a vector to move the node
+                    for(Edge e: node.getEdges()) {
+                        double p1X = this.apply(e.getNode1()).getX();
+                        double p1Y = this.apply(e.getNode1()).getY();
+                        double p2X = this.apply(e.getNode2()).getX();
+                        double p2Y = this.apply(e.getNode2()).getY();
+                        double dx = (p1X > p2X) ? p2X - p1X : p1X - p2X;
+                        double dy = (p1Y > p2Y) ? p2Y - p1Y : p1Y - p2Y;
+                        Point2D eVec = new Point2D(dx, dy);
+
+                        // prefer vertical edges
+                        if(eVec.getY() == 0) {
+                            edge = e;
+                            edgeVec = eVec.normalize();
+                            continue;
+                        }
+
+                        // horizontal edges used if no better edge is found
+                        if(eVec.getY() == 0 && edge == null) {
+                            edge = e;
+                            edgeVec = eVec.normalize();
+                            continue;
+                        }
+
+                        edge = e;
+                        edgeVec = eVec.normalize();
+                    }
+
+                    Point2D oldVec = entry2.getValue();
+                    Point2D newVec = oldVec.add(edgeVec.multiply(5));
+                    transformationMap.replace(node, newVec);
+
+                    foundCollisions = true;
+                }
+            }
+        }
+
+        // find nodes that lie on other edges and move them
+        for(Node node: Node.in(context).getAll()) {
+            Point2D nodePoint = this.apply(node);
+
+            for(Edge edge: Edge.in(context).getAll()) {
+                // check if the current node should be part
+                // of the current edge and continue with another edge
+                // if that is the case
+                boolean isNodeEdge = false;
+                for(Edge nodeEdge: node.getEdges()) {
+                    if(nodeEdge.equals(edge))
+                        isNodeEdge = true;
+                }
+                if(isNodeEdge)
+                    continue;
+
+                Point2D edgeP1 = this.apply(edge.getNode1());
+                Point2D edgeP2 = this.apply(edge.getNode2());
+                double dx = edgeP2.getX() - edgeP1.getX();
+                double dy = edgeP2.getY() - edgeP2.getY();
+                Point2D edgeNormal = new Point2D(-dy, dx).normalize();
+
+                // find the distance of the nodePoint (P) from
+                // the edge end points (A, B).
+                double AB = edgeP1.distance(edgeP2);
+                double AP = edgeP1.distance(nodePoint);
+                double BP = edgeP2.distance(nodePoint);
+
+                if(AB == AP + BP) {
+                    // nodePoint lies on the edge
+                    Point2D oldVec = transformationMap.get(node);
+                    // move the node along the normal of the edge
+                    Point2D newVec = oldVec.add(edgeNormal.multiply(5));
+                    transformationMap.replace(node, newVec);
+                    foundCollisions = true;
+                }
+            }
+        }
+
+        return foundCollisions;
     }
 
     @Override
