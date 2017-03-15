@@ -360,7 +360,7 @@ public class ElementDetailController {
                 new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
                 new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg"));
         String initDirString = ConfigFile.getInstance().getProperty(
-            ConfigKey.initialDirectory.getKey(),
+            ConfigKey.initialLogFileDirectory.getKey(),
             System.getProperty("user.home")
         );
         File initDir = new File(initDirString);

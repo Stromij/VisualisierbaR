@@ -4,8 +4,6 @@ import com.github.bachelorpraktikum.dbvisualization.CompositeObservableList;
 import com.github.bachelorpraktikum.dbvisualization.FXCollectors;
 import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
 import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
-import com.github.bachelorpraktikum.dbvisualization.database.Database;
-import com.github.bachelorpraktikum.dbvisualization.logparser.GraphParser;
 import com.github.bachelorpraktikum.dbvisualization.datasource.DataSource;
 import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Element;
@@ -740,7 +738,7 @@ public class MainController {
             new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg")
         );
         String initDirString = ConfigFile.getInstance().getProperty(
-            ConfigKey.initialDirectory.getKey(),
+            ConfigKey.initialLogFileDirectory.getKey(),
             System.getProperty("user.home")
         );
         File initDir = new File(initDirString);
