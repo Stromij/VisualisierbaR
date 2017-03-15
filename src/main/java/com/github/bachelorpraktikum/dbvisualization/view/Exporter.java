@@ -4,6 +4,9 @@ import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Graph;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShape;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.CoordinatesAdapter;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -52,16 +55,39 @@ public class Exporter {
      */
     private static void exportGraphAsImage(Graph graph, File file, String fileType) {
         try {
-            Bounds localBounds = graph.getGroup().getBoundsInLocal();
-            Bounds screenBounds = graph.getGroup().localToScreen(localBounds);
+            Bounds bounds = graph.getGroup().getBoundsInParent();
 
             // aim for a 3000x2500 pixel image
-            double scaleX = 3000 / screenBounds.getWidth();
-            double scaleY = 2500 / screenBounds.getHeight();
+            double scaleX = 3000/bounds.getWidth();
+            double scaleY = 2500/bounds.getHeight();
             double snapScale = (scaleX > scaleY) ? scaleX : scaleY;
+            // limit scaling to 2.5 to avoid
+            // very large images
+            if(scaleX > 2.5 || scaleY > 2.5)
+                snapScale = 2.5;
+
             SnapshotParameters snp = new SnapshotParameters();
             snp.setTransform(Transform.scale(snapScale, snapScale));
             WritableImage image = graph.getGroup().snapshot(snp, null);
+
+            // rewrite image with a gray background
+            // and then save it to avoid red tint
+            // in jpeg images
+            if(fileType.equals("jpg")) {
+                BufferedImage original = SwingFXUtils.fromFXImage(image, null);
+
+                double width = image.getWidth();
+                double height = image.getHeight();
+
+                BufferedImage saveImage = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
+                Graphics2D g2 = saveImage.createGraphics();
+                g2.setPaint(new Color(244, 244, 244));
+                g2.fillRect(0, 0, (int) width, (int) height);
+                g2.drawImage(original, 0, 0, null);
+
+                ImageIO.write(saveImage, fileType, file);
+                return;
+            }
 
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), fileType, file);
         } catch (IOException e) {
