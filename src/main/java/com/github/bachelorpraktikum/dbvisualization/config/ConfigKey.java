@@ -9,6 +9,8 @@ public enum ConfigKey {
     colors("trainColors"),
     speedCheckDelta("speedCheckDelta"),
     initialDatabaseUri("database_initialDirectory"),
+    graphExportDimensions("graph_export_dimensions"),
+    chartExportDimensions("chart_export_dimensions"),
     initialRestDirectory("rest_initialDirectory"),
     initialRestExecutable("rest_initialExecutable");
 
