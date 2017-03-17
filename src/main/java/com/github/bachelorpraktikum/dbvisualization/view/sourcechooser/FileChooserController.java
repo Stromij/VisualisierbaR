@@ -1,15 +1,13 @@
-package com.github.bachelorpraktikum.dbvisualization.view;
+package com.github.bachelorpraktikum.dbvisualization.view.sourcechooser;
 
-import com.github.bachelorpraktikum.dbvisualization.DataSource;
-
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
+import com.github.bachelorpraktikum.dbvisualization.datasource.FileSource;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -17,9 +15,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 
-public class FileChooserController implements SourceChooser {
+public class FileChooserController implements SourceChooser<FileSource> {
+
     @FXML
     private TextField pathField;
     @FXML
@@ -29,30 +30,33 @@ public class FileChooserController implements SourceChooser {
     private Button explorerButton;
     private FileChooser fileChooser;
 
-    private ReadOnlyObjectWrapper<URI> fileURIProperty;
+    private ReadOnlyObjectWrapper<URI> fileUriProperty;
+    private BooleanBinding fileChosen;
 
     @FXML
     private void initialize() {
-        fileURIProperty = new ReadOnlyObjectWrapper<>();
+        fileUriProperty = new ReadOnlyObjectWrapper<>();
+        fileChosen = fileUriProperty.isNotNull();
         fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        explorerButton.setOnAction(event -> updatePath(openFileChooser()));
+        String initialDirectory = getInitialDirectory();
+        fileChooser.setInitialDirectory(new File(initialDirectory));
 
+        explorerButton.setOnAction(event -> updatePath(openFileChooser()));
         explorerButton.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 explorerButton.fire();
             }
         });
 
-        pathField.textProperty().addListener((o, oldValue, newValue) -> {
+        pathField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue == null || newValue.trim().isEmpty()) {
-                fileURIProperty.set(null);
+                fileUriProperty.set(null);
                 return;
             }
+            setInitialDirectory(newValue);
             URI uri = new File(newValue).getAbsoluteFile().toURI();
-            fileURIProperty.set(uri);
+            fileUriProperty.set(uri);
         });
-
         pathField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 ((Button) rootPane.getScene().lookup("#openSource")).fire();
@@ -67,6 +71,7 @@ public class FileChooserController implements SourceChooser {
      *
      * @return A {@link File file} or null
      */
+    @Nullable
     private File openFileChooser() {
         return fileChooser.showOpenDialog(rootPane.getScene().getWindow());
     }
@@ -84,39 +89,34 @@ public class FileChooserController implements SourceChooser {
         pathField.setText(file.getAbsolutePath());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Nullable
+    @Nonnull
     @Override
-    public URI getResourceURI() {
-        return fileURIProperty.getValue();
+    public FileSource getResource() throws IOException {
+        return new FileSource(new File(fileUriProperty.get().toURL().getFile()));
+    }
+
+    @Nonnull
+    @Override
+    public ObservableBooleanValue inputChosen() {
+        return fileChosen;
     }
 
     /**
-     * {@inheritDoc}
+     * Tries to retrieve the initial directory from the configuration file.
+     * If that fails, the $HOME directory will be used.
+     *
+     * @return Initial directory for the file chooser
      */
-    @Nonnull
-    @Override
-    public ReadOnlyObjectProperty<URI> resourceURIProperty() {
-        return fileURIProperty.getReadOnlyProperty();
+    private String getInitialDirectory() {
+        return ConfigKey.initialLogFileDirectory.get(System.getProperty("user.home"));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    @Override
-    public String getRootPaneId() {
-        return rootPane.getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Nonnull
-    @Override
-    public DataSource.Type getResourceType() {
-        return DataSource.Type.LOG_FILE;
+    private void setInitialDirectory(String path) {
+        File file = new File(path);
+        if (file.isFile()) {
+            path = file.getParent();
+            ConfigKey.initialLogFileDirectory.set(path);
+            fileChooser.setInitialDirectory(new File(path));
+        }
     }
 }

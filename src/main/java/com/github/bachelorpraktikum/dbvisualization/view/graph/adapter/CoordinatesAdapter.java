@@ -1,23 +1,21 @@
 package com.github.bachelorpraktikum.dbvisualization.view.graph.adapter;
 
-import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
-
+import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import java.util.function.Function;
-
-import javax.annotation.Nonnull;
-
 import javafx.geometry.Point2D;
+import javax.annotation.Nonnull;
 
 /**
  * Represents an adapter for transforming the abstract coordinates of the model package to real
  * coordinates for visualization.
  */
-public interface CoordinatesAdapter extends Function<Coordinates, Point2D> {
+public interface CoordinatesAdapter extends Function<Node, Point2D> {
+
     /**
      * Gets the length of the shortest edge in the graph. Should be used to determine the size of
      * elements in the graph, like the size of nodes or the width of edges.<br> The length returned
      * by this method is the real length corresponding to the real coordinates returned by {@link
-     * #apply(Coordinates)}.
+     * #apply(Node)}.
      *
      * @return the length of the shortest edge
      */
@@ -31,5 +29,5 @@ public interface CoordinatesAdapter extends Function<Coordinates, Point2D> {
      */
     @Nonnull
     @Override
-    Point2D apply(@Nonnull Coordinates node);
+    Point2D apply(@Nonnull Node node);
 }

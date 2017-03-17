@@ -1,18 +1,51 @@
 package com.github.bachelorpraktikum.dbvisualization.model.train;
 
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigKey;
+import com.github.bachelorpraktikum.dbvisualization.model.Context;
 import com.github.bachelorpraktikum.dbvisualization.model.Edge;
 import com.github.bachelorpraktikum.dbvisualization.model.Event;
-
+import com.github.bachelorpraktikum.dbvisualization.model.Node;
 import com.github.bachelorpraktikum.dbvisualization.model.train.InterpolatableState.Builder;
 import java.util.LinkedList;
-import java.util.List;
-
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 abstract class TrainEvent implements Event {
+
+    private static final Logger log = Logger.getLogger(TrainEvent.class.getName());
+    private static final double SPEED_COMPARE_DELTA_DEFAULT = 0.5;
+    private static final double SPEED_COMPARE_DELTA;
+
+    static {
+        String deltaString = ConfigKey.speedCheckDelta.get();
+        if (deltaString == null) {
+            log.warning(String.format(
+                "Missing config entry %s, using default value %f",
+                ConfigKey.speedCheckDelta.getKey(),
+                SPEED_COMPARE_DELTA_DEFAULT
+            ));
+            SPEED_COMPARE_DELTA = SPEED_COMPARE_DELTA_DEFAULT;
+        } else {
+            double delta;
+            try {
+                delta = Double.parseDouble(deltaString);
+            } catch (NumberFormatException e) {
+                log.warning(String.format(
+                    "Could not parse %s in config file, using default value %f",
+                    ConfigKey.speedCheckDelta.getKey(),
+                    SPEED_COMPARE_DELTA_DEFAULT
+                ));
+                delta = SPEED_COMPARE_DELTA_DEFAULT;
+            }
+            SPEED_COMPARE_DELTA = delta;
+        }
+    }
+
     private final int index;
     @Nonnull
     private final Train train;
@@ -20,27 +53,45 @@ abstract class TrainEvent implements Event {
     private final int distance;
     private final int totalDistance;
     @Nonnull
-    private final TrainPosition position;
-    @Nonnull
-    private final List<String> warnings;
+    private final ObservableList<String> warnings;
+    private boolean speedChecked = false;
 
-    private TrainEvent(int index, Train train, int time, int distance, int totalDistance, TrainPosition position) {
+    private final InterpolatableState.Builder stateBuilder;
+
+    private TrainEvent(
+        int index,
+        Train train,
+        int time,
+        int distance,
+        int totalDistance
+    ) {
         this.index = index;
         this.train = train;
         this.time = time;
         this.distance = distance;
         this.totalDistance = totalDistance;
-        this.position = position;
-        this.warnings = new LinkedList<>();
+        this.warnings = FXCollections.observableList(new LinkedList<>());
+        this.stateBuilder = new InterpolatableState.Builder(getTrain())
+            .index(getIndex())
+            .time(getTime())
+            .distance(getTotalDistance());
     }
 
     protected void addWarning(String warning) {
         warnings.add(warning);
     }
 
+    @Nullable
+    protected TrainEvent getPreviousEvent() {
+        if (getIndex() == 0) {
+            return null;
+        }
+        return getTrain().getTrainEvents().get(getIndex() - 1);
+    }
+
     @Override
     @Nonnull
-    public List<String> getWarnings() {
+    public ObservableList<String> getWarnings() {
         return warnings;
     }
 
@@ -66,18 +117,35 @@ abstract class TrainEvent implements Event {
         return totalDistance;
     }
 
-    @Nonnull
-    final TrainPosition getPosition() {
-        return position;
-    }
+    abstract double getSpeed();
+
+    @Nullable
+    abstract TrainPosition getPosition();
 
     @Nonnull
     InterpolatableState.Builder stateBuilder() {
-        return new InterpolatableState.Builder(getTrain())
-                .index(getIndex())
-                .time(getTime())
-                .distance(getTotalDistance())
-                .position(getPosition());
+        double speed = getSpeed();
+        if (!speedChecked) {
+            speedChecked = true;
+            TrainEvent prevEvent = getPreviousEvent();
+            if (prevEvent instanceof Speed) {
+                Speed speedEvent = (Speed) prevEvent;
+                int expectedSpeed = speedEvent.getSpeedAfter();
+                if (!equalWithDelta(speed, expectedSpeed, SPEED_COMPARE_DELTA)) {
+                    addWarning(String.format(
+                        "Expected speed: %d; Calculated: %f", expectedSpeed, speed
+                    ));
+                }
+            }
+        }
+        return stateBuilder
+            .speed(speed)
+            .position(getPosition());
+    }
+
+    private boolean equalWithDelta(double d1, double d2, double delta) {
+        double diff = Math.abs(d1 - d2);
+        return diff < delta;
     }
 
     /**
@@ -91,98 +159,183 @@ abstract class TrainEvent implements Event {
         return stateBuilder().build();
     }
 
+    @Override
+    public String toString() {
+        return getDescription();
+    }
+
     /**
-     * This is a workaround for speed events without a speed.
+     * This is a workaround for speedAfter events without a speedAfter.
      */
     @ParametersAreNonnullByDefault
     static class Move extends Position {
+
         Move(TrainEvent before, int time, int distance) {
             super(before.getIndex() + 1,
-                    before.getTrain(),
-                    time,
-                    distance,
-                    before.getTotalDistance() + distance,
-                    before.getPosition().move(distance)
+                before.getTrain(),
+                time,
+                distance,
+                before.getTotalDistance() + distance
             );
-            addWarning("Speed event without speed!");
+            addWarning("Speed event without speedAfter!");
+        }
+
+        @Nonnull
+        @Override
+        TrainPosition getPosition() {
+            return getPreviousEvent().getPosition().move(getDistance());
         }
 
         @Nonnull
         @Override
         public String getDescription() {
             return getTrain().getReadableName() + ": Speed{"
-                    + "time=" + getTime()
-                    + ", distance=" + getDistance()
-                    + ", speed=NULL"
-                    + "}";
+                + "time=" + getTime()
+                + ", distance=" + getDistance()
+                + ", speedAfter=NULL"
+                + "}";
         }
     }
 
     @ParametersAreNonnullByDefault
-    static class Speed extends TrainEvent {
-        private final int speed;
+    static class Speed extends Position {
 
-        private Speed(int index, Train train, int time, int distance, int totalDistance, TrainPosition position, int speed) {
-            super(index, train, time, distance, totalDistance, position);
-            this.speed = speed;
+        private final int speedAfter;
+
+        private Speed(int index, Train train, int time, int distance, int totalDistance,
+            int speed) {
+            super(index, train, time, distance, totalDistance);
+            this.speedAfter = speed;
         }
 
         Speed(TrainEvent before, int time, int distance, int speed) {
             this(before.getIndex() + 1,
-                    before.getTrain(),
-                    time,
-                    distance,
-                    before.getTotalDistance() + distance,
-                    before.getPosition().move(distance),
-                    speed
+                before.getTrain(),
+                time,
+                distance,
+                before.getTotalDistance() + distance,
+                speed
             );
         }
 
-        final int getSpeed() {
-            return speed;
+        int getSpeedAfter() {
+            return speedAfter;
         }
 
         @Nonnull
         @Override
-        InterpolatableState.Builder stateBuilder() {
-            return super.stateBuilder()
-                    .speed(getSpeed());
+        TrainPosition getPosition() {
+            return getPreviousEvent().getPosition().move(getDistance());
         }
 
         @Nonnull
         @Override
         public String getDescription() {
             return getTrain().getReadableName() + ": Speed{"
-                    + "time=" + getTime()
-                    + ", distance=" + getDistance()
-                    + ", speed=" + getSpeed()
-                    + "}";
+                + "time=" + getTime()
+                + ", distance=" + getDistance()
+                + ", speedAfter=" + speedAfter
+                + "}";
         }
     }
 
     @ParametersAreNonnullByDefault
-    static class Init extends Speed {
-        Init(Train train, Edge startEdge) {
-            super(0, train, 0, 0, 0, TrainPosition.init(train, startEdge), 0);
+    static class Start extends TrainEvent {
+
+        Start(Train train) {
+            super(0, train, Context.INIT_STATE_TIME, 0, 0);
+        }
+
+        @Nonnull
+        @Override
+        Builder stateBuilder() {
+            return super.stateBuilder().initialized(false);
+        }
+
+        @Override
+        double getSpeed() {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        TrainPosition getPosition() {
+            return null;
+        }
+
+        @Nonnull
+        @Override
+        public String getDescription() {
+            return getTrain().getReadableName() + ": Start{"
+                + "time=" + getTime()
+                + ", this event purely serves as a helper for interpolation";
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    static class Init extends TrainEvent {
+
+        private final Edge startEdge;
+
+        Init(int time, Train train, Edge startEdge) {
+            super(1,
+                train,
+                time,
+                0,
+                0);
+            this.startEdge = startEdge;
+        }
+
+        private static TrainPosition getPositionWithLookahead(Train train, Edge startEdge) {
+            Reach reach = findFirstReachEvent(train);
+            if (reach == null) {
+                return TrainPosition
+                    .init(train, startEdge, startEdge.getNode1(), startEdge.getNode2());
+            }
+            Edge reached = reach.getReached();
+            Node common = reached.getCommonNode(startEdge);
+            Node other = startEdge.getOtherNode(common);
+            return TrainPosition.init(train, startEdge, other, common);
+        }
+
+        private static Reach findFirstReachEvent(Train train) {
+            for (Event event : train.getTrainEvents()) {
+                if (event instanceof Reach) {
+                    return (Reach) event;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        double getSpeed() {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        TrainPosition getPosition() {
+            return Init.getPositionWithLookahead(getTrain(), startEdge);
         }
 
         @Nonnull
         @Override
         public String getDescription() {
             return getTrain().getReadableName() + ": Init{"
-                    + "startEdge=" + getPosition().getBackEdge().getName()
-                    + "}";
+                + "time=" + getTime()
+                + ", startEdge=" + getPosition().getBackEdge().getName()
+                + "}";
         }
     }
 
     static class Terminate extends Position {
+
         Terminate(TrainEvent before, int time, int distance) {
             super(before.getIndex() + 1,
-                    before.getTrain(),
-                    time,
-                    distance,
-                    before.getTotalDistance() + distance,
-                    before.getPosition().move(distance)
+                before.getTrain(),
+                time,
+                distance,
+                before.getTotalDistance() + distance
             );
         }
 
@@ -190,122 +343,113 @@ abstract class TrainEvent implements Event {
         @Override
         public String getDescription() {
             return getTrain().getReadableName() + ": Terminate{"
-                    + "time=" + getTime()
-                    + ", totalDistance=" + getTotalDistance()
-                    + "}";
+                + "time=" + getTime()
+                + ", totalDistance=" + getTotalDistance()
+                + "}";
+        }
+
+        @Nonnull
+        @Override
+        TrainPosition getPosition() {
+            return getPreviousEvent().getPosition().move(getDistance());
         }
 
         @Nonnull
         @Override
         InterpolatableState.Builder stateBuilder() {
             return super.stateBuilder()
-                    .terminated(true);
+                .terminated(true);
         }
     }
 
     @ParametersAreNonnullByDefault
     private abstract static class Position extends TrainEvent {
-        Position(int index, Train train, int time, int distance, int totalDistance, TrainPosition position) {
-            super(index, train, time, distance, totalDistance, position);
+
+        Position(int index, Train train, int time, int distance, int totalDistance) {
+            super(index, train, time, distance, totalDistance);
+        }
+
+        @Override
+        double getSpeed() {
+            TrainEvent before = getPreviousEvent();
+            double diffSeconds = (getTime() - before.getTime()) / 1000.0;
+            if (diffSeconds == 0) {
+                return before.getSpeed();
+            }
+            return getDistance() / diffSeconds;
         }
 
         @Nonnull
         @Override
-        InterpolatableState.Builder stateBuilder() {
-            return super.stateBuilder()
-                    .speed(calculateSpeed());
-        }
-
-        @Nonnull
-        private Speed getSpeedEventBefore() {
-            for (int index = getIndex() - 1; index >= 0; index--) {
-                TrainEvent event = getTrain().getTrainEvents().get(index);
-                if (event instanceof Speed) {
-                    return (Speed) event;
-                }
-            }
-            throw new IllegalStateException("Missing init event");
-        }
-
-        @Nullable
-        private Speed getSpeedEventAfter() {
-            List<TrainEvent> events = getTrain().getTrainEvents();
-            for (int index = getIndex() + 1; index < events.size(); index++) {
-                TrainEvent event = events.get(index);
-                if (event instanceof Speed) {
-                    return (Speed) event;
-                }
-            }
-            return null;
-        }
-
-        private int calculateSpeed() {
-            Speed before = getSpeedEventBefore();
-            Speed after = getSpeedEventAfter();
-
-            if (after == null) {
-                return before.getSpeed();
-            }
-
-            int relativeAfterTime = after.getTime() - before.getTime();
-            int relativeTime = getTime() - before.getTime();
-
-            int interpolatedSpeed = before.getSpeed();
-            int speedDiff = after.getSpeed() - before.getSpeed();
-            interpolatedSpeed += (int) (((double) speedDiff) / relativeAfterTime * relativeTime);
-            return interpolatedSpeed;
-        }
+        abstract TrainPosition getPosition();
     }
 
     @ParametersAreNonnullByDefault
     static class Reach extends Position {
+
         @Nonnull
         private final Edge reached;
 
         Reach(TrainEvent before, int time, int distance, Edge reached) {
             super(before.getIndex() + 1,
-                    before.getTrain(),
-                    time,
-                    distance,
-                    before.getTotalDistance() + distance,
-                    before.getPosition().reachFront(reached));
+                before.getTrain(),
+                time,
+                distance,
+                before.getTotalDistance() + distance);
             this.reached = reached;
+        }
+
+        @Nonnull
+        Edge getReached() {
+            return reached;
+        }
+
+        @Nonnull
+        @Override
+        TrainPosition getPosition() {
+            return getPreviousEvent().getPosition().reachFront(reached);
         }
 
         @Nonnull
         @Override
         public String getDescription() {
             return getTrain().getReadableName() + ": Reach{"
-                    + "time=" + getTime()
-                    + ", distance=" + getDistance()
-                    + ", reached=" + reached.getName()
-                    + "}";
+                + "time=" + getTime()
+                + ", distance=" + getDistance()
+                + ", reached=" + reached.getName()
+                + "}";
         }
     }
 
     @ParametersAreNonnullByDefault
     static class Leave extends Position {
+
         @Nonnull
         private final Edge left;
 
         Leave(TrainEvent before, int time, int distance, Edge left) {
             super(before.getIndex() + 1,
-                    before.getTrain(),
-                    time,
-                    distance,
-                    before.getTotalDistance() + distance,
-                    before.getPosition().leaveBack(left, distance));
+                before.getTrain(),
+                time,
+                distance,
+                before.getTotalDistance() + distance);
             this.left = left;
+        }
+
+        @Nonnull
+        @Override
+        TrainPosition getPosition() {
+            return getPreviousEvent().getPosition().leaveBack(left, getDistance());
         }
 
         @Nonnull
         @Override
         public String getDescription() {
             return getTrain().getReadableName() + ": Leave{"
-                    + "time=" + getTime()
-                    + ", distance=" + getDistance()
-                    + ", backEdge=" + left.getName()
-                    + "}";
+                + "time=" + getTime()
+                + ", distance=" + getDistance()
+                + ", backEdge=" + left.getName()
+                + "}";
         }
     }
 }

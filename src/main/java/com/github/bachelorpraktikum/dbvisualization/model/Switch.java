@@ -5,22 +5,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
-
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.shape.Polygon;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Represents a switch consisting of exactly 3 {@link Element elements} of type {@link
- * Element.Type#WeichenPunktImpl}.
+ * Element.Type#WeichenPunkt}.
  */
 @ParametersAreNonnullByDefault
-public final class Switch {
+public final class Switch implements Shapeable<Polygon> {
+
     @Nonnull
     private final List<Element> elements;
+    private final Property<VisibleState> stateProperty;
 
     private Switch() {
         elements = new ArrayList<>(3);
+        stateProperty = new SimpleObjectProperty<>();
     }
 
     private void addElement(Element element) {
@@ -39,7 +44,8 @@ public final class Switch {
     @Nonnull
     public List<Element> getElements() {
         if (elements.size() < 3) {
-            throw new IllegalStateException("Switch not completely initialized. Elements: " + elements);
+            throw new IllegalStateException(
+                "Switch not completely initialized. Elements: " + elements);
         }
         return Collections.unmodifiableList(elements);
     }
@@ -52,16 +58,16 @@ public final class Switch {
     @Nonnull
     public Element getMainElement() {
         return elements.stream()
-                .filter(element -> element.getNode().getEdges().size() == 3)
-                .findFirst()
-                .orElseThrow(IllegalStateException::new);
+            .filter(element -> element.getNode().getEdges().size() == 3)
+            .findFirst()
+            .orElseThrow(IllegalStateException::new);
     }
 
     @Override
     public String toString() {
         return "Switch{"
-                + "elements=" + elements
-                + '}';
+            + "elements=" + elements
+            + '}';
     }
 
     /**
@@ -76,7 +82,26 @@ public final class Switch {
         return Factory.getInstance(context);
     }
 
+    @Nonnull
+    @Override
+    public String getName() {
+        return toString();
+    }
+
+    @Nonnull
+    @Override
+    public Polygon createShape() {
+        return new Polygon();
+    }
+
+    @Nonnull
+    @Override
+    public Property<VisibleState> visibleStateProperty() {
+        return stateProperty;
+    }
+
     static final class Factory {
+
         private static final Map<Context, Factory> instances = new WeakHashMap<>();
         @Nullable
         private Switch currentSwitch;

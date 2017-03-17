@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.bachelorpraktikum</groupId>
-    <artifactId>DBVisualization</artifactId>
-    <version>0.4.0</version>
+    <artifactId>VisualisierbaR</artifactId>
+    <version>0.6.0</version>
 
     <url>https://github.com/Bachelorpraktikum/DBVisualization</url>
     <name>${project.groupId}:${project.artifactId}</name>
@@ -75,6 +75,17 @@
             <artifactId>HikariCP</artifactId>
             <version>2.5.1</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>retrofit</artifactId>
+            <version>2.2.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.retrofit2</groupId>
+            <artifactId>converter-gson</artifactId>
+            <version>2.2.0</version>
         </dependency>
     </dependencies>
 
@@ -250,6 +261,11 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.7.201606060606</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0</version>
             </plugin>
         </plugins>
     </reporting>

@@ -2,15 +2,18 @@ package com.github.bachelorpraktikum.dbvisualization.model;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.scene.shape.Circle;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -19,7 +22,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * There is only one instance of Node per name per {@link Context}.
  */
 @ParametersAreNonnullByDefault
-public final class Node {
+public final class Node implements GraphObject<Circle> {
+
+    private static final Logger log = Logger.getLogger(Node.class.getName());
+
     @Nonnull
     private final String name;
     @Nonnull
@@ -28,12 +34,21 @@ public final class Node {
     private final Set<Edge> edges;
     @Nonnull
     private final Set<Element> elements;
+    @Nonnull
+    private final Property<VisibleState> stateProperty;
 
     private Node(String name, Coordinates coordinates) {
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);
-        this.edges = new HashSet<>();
+        this.edges = new LinkedHashSet<>();
         this.elements = new HashSet<>();
+        this.stateProperty = new SimpleObjectProperty<>();
+    }
+
+    @Nonnull
+    @Override
+    public Circle createShape() {
+        return new Circle(1);
     }
 
     /**
@@ -41,6 +56,7 @@ public final class Node {
      * Ensures there is always only one instance of node per name per {@link Context}.
      */
     public static final class Factory {
+
         private static final int INITIAL_NODES_CAPACITY = 128;
         private static final Map<Context, Factory> instances = new WeakHashMap<>();
 
@@ -63,21 +79,26 @@ public final class Node {
          * Potentially creates a new instance of {@link Node}.<br>
          * If an node with the same name already exists, it is returned.
          *
-         * @param name        the unique name of this node
+         * @param name the unique name of this node
          * @param coordinates the {@link Coordinates} of this node
          * @return an element
-         * @throws NullPointerException     if either of the arguments is null
-         * @throws IllegalArgumentException if an node with this name already exists, but with
-         *                                  different coordinates
+         * @throws NullPointerException if either of the arguments is null
+         * @throws IllegalArgumentException if a node with the same name but different coordinates
+         * already exists
          */
         @Nonnull
         public Node create(String name, Coordinates coordinates) {
             Node result = nodes.computeIfAbsent(Objects.requireNonNull(name), nodeName ->
-                    new Node(nodeName, coordinates
-                    ));
+                new Node(nodeName, coordinates)
+            );
 
             if (!result.getCoordinates().equals(coordinates)) {
-                throw new IllegalArgumentException("node with that name already exists, but differently");
+                String nodeFormat = "(Coordinates: %s)";
+                String message = "Node with name: %s already exists:\n"
+                    + nodeFormat + ", tried to recreate with following arguments:\n"
+                    + nodeFormat;
+                message = String.format(message, name, coordinates, result.getCoordinates());
+                throw new IllegalArgumentException(message);
             }
 
             return result;
@@ -88,7 +109,7 @@ public final class Node {
          *
          * @param name the node's name
          * @return the node instance with this name
-         * @throws NullPointerException     if the name is null
+         * @throws NullPointerException if the name is null
          * @throws IllegalArgumentException if there is no node associated with the name
          */
         @Nonnull
@@ -126,11 +147,7 @@ public final class Node {
         edges.add(Objects.requireNonNull(edge));
     }
 
-    /**
-     * Gets the unique name of this node in its context.
-     *
-     * @return the name
-     */
+    @Override
     @Nonnull
     public String getName() {
         return name;
@@ -159,8 +176,8 @@ public final class Node {
             throw new NullPointerException("edge is null");
         }
         return edges.stream()
-                .filter(e -> !e.equals(edge))
-                .collect(Collectors.toSet());
+            .filter(e -> !e.equals(edge))
+            .collect(Collectors.toSet());
     }
 
     /**
@@ -187,11 +204,17 @@ public final class Node {
         elements.add(Objects.requireNonNull(element));
     }
 
+    @Nonnull
+    @Override
+    public Property<VisibleState> visibleStateProperty() {
+        return stateProperty;
+    }
+
     @Override
     public String toString() {
         return "Node{"
-                + "name='" + name + '\''
-                + ", coordinates=" + coordinates
-                + '}';
+            + "name='" + name + '\''
+            + ", coordinates=" + coordinates
+            + '}';
     }
 }

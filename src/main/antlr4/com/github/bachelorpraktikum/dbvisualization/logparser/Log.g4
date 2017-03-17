@@ -1,7 +1,8 @@
 grammar Log;
 
-start: (elements NEWLINE)+;
+start: (element_line | error_char)+;
 
+element_line: elements NEWLINE;
 elements:         node
                 | edge
                 | elem
@@ -12,6 +13,7 @@ elements:         node
                 | mv_start
                 | mv_term
                 | ch
+                | msg
                 | data;
 
 node: 'NODE' SEP node_name SEP coord;
@@ -34,6 +36,8 @@ mv_term: MV_IND SEP 'TERM' SEP train_name SEP time SEP distance;
 
 ch: 'CH' SEP elem_name SEP STATE SEP time;
 
+msg: 'MSG' SEP node_name SEP time SEP message;
+
 data: 'DATA' SEP train_readable_name SEP time WHITESPACE speed SEP time_with_wrapper;
 
 MV_IND: 'MV';
@@ -45,12 +49,15 @@ speed: INT;
 distance: INT;
 train_readable_name: (WORD | INT)+;
 elem_name: name;
-name: name_prefix? (WORD+ | UNDERSCORE)+;
+name: any+;
 coord: INT SEP INT;
 name_prefix: '<' INT DOT INT DOT INT '>' COLON;
 time: rat | INT;
 rat: INT '/' INT;
 time_with_wrapper: 'Time' '(' time ')';
+message: any+;
+any: ~(NEWLINE | SEP);
+error_char: .;
 
 
 STATE:   NOSIG

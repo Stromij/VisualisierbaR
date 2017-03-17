@@ -1,13 +1,13 @@
 package com.github.bachelorpraktikum.dbvisualization;
 
-import com.github.bachelorpraktikum.dbvisualization.view.SourceController;
-
+import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
+import com.github.bachelorpraktikum.dbvisualization.view.DataSourceHolder;
+import com.github.bachelorpraktikum.dbvisualization.view.sourcechooser.SourceController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ResourceBundle;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
@@ -32,16 +32,28 @@ public class DBVisualizer extends Application {
         ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
         primaryStage.setTitle(localizationBundle.getString(APP_NAME_KEY));
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/SourceChooser.fxml"));
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("view/sourcechooser/SourceChooser.fxml")
+        );
         loader.setResources(localizationBundle);
         loader.load();
         SourceController controller = loader.getController();
 
         controller.setStage(primaryStage);
+        primaryStage.setOnHiding(event ->
+            DataSourceHolder.getInstance().ifPresent(dataSource -> {
+                try {
+                    dataSource.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            })
+        );
         primaryStage.show();
     }
 
     public static void main(String[] args) {
         Application.launch(DBVisualizer.class, args);
+        ConfigFile.getInstance().store();
     }
 }

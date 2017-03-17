@@ -1,17 +1,16 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import java.util.Collection;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Collection;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class NodeTest {
     private Context context;
@@ -92,7 +91,7 @@ public class NodeTest {
     @Test
     public void testAddElement() {
         Node node = Node.in(context).create("node", new Coordinates(0, 0));
-        Element element = Element.in(context).create("element", Element.Type.HauptSignalImpl, node, Element.State.NOSIG);
+        Element element = Element.in(context).create("element", Element.Type.HauptSignal, node, Element.State.NOSIG);
 
         Node testNode = Node.in(context).create("testNode", new Coordinates(10, 0));
         testNode.addElement(element);

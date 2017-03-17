@@ -1,58 +1,61 @@
 package com.github.bachelorpraktikum.dbvisualization.view.detail;
 
-import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-
-import javafx.fxml.FXMLLoader;
-import javafx.scene.shape.Rectangle;
+import com.github.bachelorpraktikum.dbvisualization.model.Element;
+import com.github.bachelorpraktikum.dbvisualization.model.GraphObject;
+import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
+import java.util.ResourceBundle;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.shape.Shape;
+import javax.annotation.Nullable;
 
-public abstract class ElementDetailBase {
-    private int time;
+public abstract class ElementDetailBase<E extends GraphObject<?>> {
+
+    private final E element;
+    private final IntegerProperty time;
+
+    ElementDetailBase(E element, IntegerProperty time) {
+        this.element = element;
+        this.time = time;
+    }
+
+    E getElement() {
+        return element;
+    }
 
     abstract String getName();
 
-    abstract List<URL> getImageUrls();
+    @Nullable
+    abstract Point2D getCoordinates();
 
-    abstract Coordinates getCoordinates();
-
-    String getCoordinatesString() {
-        Coordinates coord = getCoordinates();
-
-        return String.format("x: %d | y: %d", coord.getX(), coord.getY());
+    String getCoordinatesString(Point2D coord) {
+        if (coord == null) {
+            return ResourceBundle.getBundle("bundles.localization").getString("unavailable");
+        } else {
+            return String.format("x: %f | y: %f", coord.getX(), coord.getY());
+        }
     }
 
     abstract boolean isTrain();
 
-    void setTime(int time) {
-        this.time = time;
-    }
-
-    int getTime() {
+    ReadOnlyIntegerProperty timeProperty() {
         return time;
     }
 
     protected Shape getShape() {
-        try {
-            Shape shape = null;
+        return getElement().createIconShape();
+    }
 
-            for (URL url : getImageUrls()) {
-                FXMLLoader loader = new FXMLLoader(url);
-                if (shape == null) {
-                    shape = loader.load();
-                } else {
-                    shape = Shape.union(shape, loader.load());
-                }
-            }
-
-            return shape;
-        } catch (IOException | IllegalStateException e) {
-            return new Rectangle(20, 20);
-            // e.printStackTrace();
-            // throw new IllegalStateException(e);
+    public static ElementDetailBase create(GraphObject object, IntegerProperty timeProperty) {
+        if (object instanceof Train) {
+            Train train = (Train) object;
+            return new TrainDetail(train, timeProperty);
+        } else if (object instanceof Element) {
+            Element element = (Element) object;
+            return new ElementDetail(element, timeProperty);
+        } else {
+            throw new IllegalArgumentException();
         }
     }
 }
