@@ -101,7 +101,9 @@ public final class Element implements GraphObject<Shape> {
             "SichtbarkeitspunktImpl", "SichtbarkeitspunktImpl2"),
         GefahrenPunkt("GefahrenPunktImpl", "GefahrenpunktImpl"),
         Magnet("MagnetImpl", "MagnetImpl"),
-        WeichenPunkt("WeichenPunktImpl", Polygon::new),
+        WeichenPunkt("WeichenPunktImpl", () ->
+            new Polygon(0, 1, 2, 1, 2, 0)
+        ),
         SwWechsel("SwWechselImpl",
             "SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4"),
         UnknownElement("", Rectangle::new);

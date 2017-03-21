@@ -13,8 +13,8 @@ import com.github.bachelorpraktikum.dbvisualization.model.GraphObject;
 import com.github.bachelorpraktikum.dbvisualization.model.Messages;
 import com.github.bachelorpraktikum.dbvisualization.model.Shapeable;
 import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
-import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetailBase;
-import com.github.bachelorpraktikum.dbvisualization.view.detail.ElementDetailController;
+import com.github.bachelorpraktikum.dbvisualization.view.detail.DetailsBase;
+import com.github.bachelorpraktikum.dbvisualization.view.detail.DetailsController;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.Graph;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.GraphShape;
 import com.github.bachelorpraktikum.dbvisualization.view.graph.adapter.ProportionalCoordinatesAdapter;
@@ -43,6 +43,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableIntegerValue;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -112,9 +113,7 @@ public class MainController {
     private BorderPane rootPane;
 
     @FXML
-    private ElementDetailController detailBoxController;
-    @FXML
-    private Button closeDetailButton;
+    private DetailsController detailBoxController;
     @FXML
     private Pane leftPane;
     @FXML
@@ -153,6 +152,10 @@ public class MainController {
     private Pattern timePattern;
 
     private IntegerProperty simulationTime;
+    /**
+     * Is updated when simulationTime changes, but AFTER the model state has been updated
+     */
+    private ObservableIntegerValue postSimulationTime;
     private IntegerProperty velocity;
     private Animation simulation;
     private Timeline eventTraversalTimeline;
@@ -166,6 +169,8 @@ public class MainController {
         // START OF TIME RELATED INIT
 
         simulationTime = new SimpleIntegerProperty();
+        IntegerProperty postSimulationTime = new SimpleIntegerProperty();
+        this.postSimulationTime = postSimulationTime;
         simulationTime.addListener((observable, oldValue, newValue) -> {
             DataSourceHolder.getInstance().ifPresent(dataSource -> {
                 Context context = dataSource.getContext();
@@ -185,6 +190,7 @@ public class MainController {
                     }
                 }
             });
+            postSimulationTime.setValue(newValue);
         });
 
         timeText.setOnAction(event -> {
@@ -252,7 +258,7 @@ public class MainController {
                 legend.toBack();
             }
         });
-        closeDetailButton.setOnAction(event -> hideDetailView());
+        detailBoxController.setOnClose(event -> hideDetailView());
 
         // Hide logList by default
         rootPane.setLeft(null);
@@ -283,8 +289,6 @@ public class MainController {
             timeText.setDisable(newValue);
             eventTraversal.setDisable(newValue);
         });
-
-        detailBoxController.setCenterPane(centerPane);
 
         DataSourceHolder.getInstance().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -462,7 +466,7 @@ public class MainController {
                 }
                 lastHighlighted.highlightedProperty().set(true);
 
-                setDetail(ElementDetailBase.create(newValue, simulationTime));
+                setDetail(DetailsBase.create(newValue, postSimulationTime, centerPane));
             });
     }
 
@@ -675,7 +679,7 @@ public class MainController {
         return graph;
     }
 
-    private void setDetail(ElementDetailBase detail) {
+    private void setDetail(DetailsBase detail) {
         showDetailView();
         detailBoxController.setDetail(detail);
     }
