@@ -55,10 +55,8 @@ public class DetailsController {
 
         elementImage.getChildren().clear();
         Shape shape = detail.getShape();
-        if (shape != null) {
-            resizeShape(shape, 30);
-            elementImage.getChildren().add(shape);
-        }
+        resizeShape(shape, 30);
+        elementImage.getChildren().add(shape);
     }
 
     private void resizeShape(Shape shape, double max) {
