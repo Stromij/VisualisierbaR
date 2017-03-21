@@ -15,7 +15,7 @@ import javafx.scene.control.Label;
 import javax.annotation.Nonnull;
 
 
-public class ElementDetails extends DetailsBase<Element> {
+class ElementDetails extends DetailsBase<Element> {
 
     private static final String FXML_LOCATION = "ElementDetails.fxml";
 

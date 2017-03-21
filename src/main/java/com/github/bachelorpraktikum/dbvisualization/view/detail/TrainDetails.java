@@ -45,7 +45,7 @@ import javafx.stage.FileChooser;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TrainDetails extends DetailsBase<Train> {
+class TrainDetails extends DetailsBase<Train> {
 
     private static final String FXML_LOCATION = "TrainDetails.fxml";
 
