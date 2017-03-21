@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
-import javafx.beans.property.IntegerProperty;
 import javafx.beans.value.ObservableIntegerValue;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
@@ -16,7 +16,10 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
 public abstract class DetailsBase<O extends GraphObject<?>> {
 
     private final O element;
@@ -24,8 +27,8 @@ public abstract class DetailsBase<O extends GraphObject<?>> {
     private final List<Object> bindings;
 
     DetailsBase(O element, ObservableIntegerValue time, String fxmlLocation) {
-        this.element = element;
-        this.time = time;
+        this.element = Objects.requireNonNull(element);
+        this.time = Objects.requireNonNull(time);
         this.bindings = new LinkedList<>();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlLocation));
@@ -39,22 +42,35 @@ public abstract class DetailsBase<O extends GraphObject<?>> {
         }
     }
 
+    /**
+     * Stores the given binding so it won't be garbage collected.
+     *
+     * @param binding a binding, or any object
+     */
     void addBinding(Object binding) {
-        bindings.add(binding);
+        bindings.add(Objects.requireNonNull(binding));
     }
 
+    @Nonnull
     O getObject() {
         return element;
     }
 
+    @Nonnull
     String getName() {
         return getObject().getReadableName();
     }
 
+    /**
+     * Gets the GraphObject-specific details for the represented object.
+     *
+     * @return an arbitrary node
+     */
     @Nonnull
     abstract Node getDetails();
 
-    String getCoordinatesString(Point2D coord) {
+    @Nonnull
+    String getCoordinatesString(@Nullable Point2D coord) {
         if (coord == null) {
             return ResourceBundle.getBundle("bundles.localization").getString("unavailable");
         } else {
@@ -62,15 +78,40 @@ public abstract class DetailsBase<O extends GraphObject<?>> {
         }
     }
 
+    /**
+     * <p>Gets an ObservableIntegerValue holding the current simulation time.</p>
+     *
+     * <p>Warning: Only weak listeners should be registered on this Observable</p>
+     *
+     * @return the observable time
+     */
+    @Nonnull
     ObservableIntegerValue timeProperty() {
         return time;
     }
 
-    protected Shape getShape() {
+    /**
+     * Gets the icon shape for the represented object.
+     *
+     * @return the icon shape
+     */
+    @Nonnull
+    Shape getShape() {
         return getObject().createIconShape();
     }
 
-    public static DetailsBase create(GraphObject<?> object, ObservableIntegerValue timeProperty,
+    /**
+     * Creates the appropriate DetailsBase for the given GraphObject.
+     *
+     * @param object the GraphObject
+     * @param timeProperty a property holding the simulation time
+     * @param centerPane the center pane of the main window
+     * @return a DetailsBase instance
+     * @throws IllegalArgumentException if there is no appropriate implementation for the type of
+     * the given object
+     */
+    @Nonnull
+    public static DetailsBase<?> create(GraphObject<?> object, ObservableIntegerValue timeProperty,
         Pane centerPane) {
         if (object instanceof Train) {
             Train train = (Train) object;
