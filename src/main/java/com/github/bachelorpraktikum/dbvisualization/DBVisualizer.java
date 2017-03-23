@@ -1,7 +1,11 @@
 package com.github.bachelorpraktikum.dbvisualization;
 
 import com.github.bachelorpraktikum.dbvisualization.config.ConfigFile;
+import com.github.bachelorpraktikum.dbvisualization.datasource.DataSource;
+import com.github.bachelorpraktikum.dbvisualization.datasource.InputParserSource;
+import com.github.bachelorpraktikum.dbvisualization.datasource.RestSource;
 import com.github.bachelorpraktikum.dbvisualization.view.DataSourceHolder;
+import com.github.bachelorpraktikum.dbvisualization.view.MainController;
 import com.github.bachelorpraktikum.dbvisualization.view.sourcechooser.SourceController;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,15 +35,6 @@ public class DBVisualizer extends Application {
     public void start(Stage primaryStage) throws Exception {
         ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
         primaryStage.setTitle(localizationBundle.getString(APP_NAME_KEY));
-
-        FXMLLoader loader = new FXMLLoader(
-            getClass().getResource("view/sourcechooser/SourceChooser.fxml")
-        );
-        loader.setResources(localizationBundle);
-        loader.load();
-        SourceController controller = loader.getController();
-
-        controller.setStage(primaryStage);
         primaryStage.setOnHiding(event ->
             DataSourceHolder.getInstance().ifPresent(dataSource -> {
                 try {
@@ -49,6 +44,41 @@ public class DBVisualizer extends Application {
                 }
             })
         );
+
+        FXMLLoader loader = new FXMLLoader();
+        loader.setResources(localizationBundle);
+
+        if (getParameters().getUnnamed().contains("--live")
+            || getParameters().getUnnamed().contains("--pipe")) {
+            log.info("Loading...");
+
+            DataSource dataSource;
+            // start the data source
+            if (getParameters().getUnnamed().contains("--live")) {
+                dataSource = new RestSource();
+            } else {
+                dataSource = new InputParserSource(System.in);
+            }
+
+            log.info("Launching GUI...");
+            // skip the chooser window
+            loader.setLocation(
+                getClass().getResource("view/MainView.fxml")
+            );
+            loader.load();
+            MainController controller = loader.getController();
+            controller.setDataSource(dataSource);
+            controller.setStage(primaryStage);
+        } else {
+            loader.setLocation(
+                getClass().getResource("view/sourcechooser/SourceChooser.fxml")
+            );
+
+            loader.load();
+            SourceController controller = loader.getController();
+            controller.setStage(primaryStage);
+        }
+
         primaryStage.show();
     }
 
