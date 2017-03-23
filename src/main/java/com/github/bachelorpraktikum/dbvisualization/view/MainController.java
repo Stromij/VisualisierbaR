@@ -123,6 +123,8 @@ public class MainController {
     @FXML
     private Button resetButton;
     @FXML
+    private Button resetViewButton;
+    @FXML
     private TextField timeText;
     @FXML
     private Button continueSimulation;
@@ -247,6 +249,8 @@ public class MainController {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
         });
+
+        resetViewButton.setOnAction(event -> resetGraphView());
 
         proportionalToggle.setOnAction(ActionEvent -> switchGraph());
 
@@ -744,6 +748,13 @@ public class MainController {
         controller.setStage(stage);
     }
 
+    private void resetGraphView() {
+        fitGraphToCenter(getGraph());
+        graphPane.setTranslateX(0);
+        graphPane.setTranslateY(0);
+    }
+
+
     private void cleanUp() {
         stage.setMaximized(false);
         if (graph != null) {
@@ -755,9 +766,15 @@ public class MainController {
     }
 
     private void switchGraph() {
+        GraphObject selected = elementList.getSelectionModel().getSelectedItem();
         graphPane.getChildren().clear();
         graph = null;
         fitGraphToCenter(getGraph());
+        if(selected != null) {
+            // reselect element
+            elementList.getSelectionModel().select(null);
+            elementList.getSelectionModel().select(selected);
+        }
     }
 
     private void exportGraph() {
