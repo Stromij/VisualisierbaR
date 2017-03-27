@@ -1,20 +1,27 @@
-package com.github.bachelorpraktikum.dbvisualization.model;
+package com.github.bachelorpraktikum.dbvisualization.model.train;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.github.bachelorpraktikum.dbvisualization.model.train.Train;
+import com.github.bachelorpraktikum.dbvisualization.model.Context;
+import com.github.bachelorpraktikum.dbvisualization.model.Coordinates;
+import com.github.bachelorpraktikum.dbvisualization.model.Edge;
+import com.github.bachelorpraktikum.dbvisualization.model.Event;
+import com.github.bachelorpraktikum.dbvisualization.model.FactoryTest;
+import com.github.bachelorpraktikum.dbvisualization.model.Node;
+import com.github.bachelorpraktikum.dbvisualization.model.train.Train.TrainFactory;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class TrainTest {
+public class TrainTest extends FactoryTest<Train> {
 
     private Context context;
+    private int counter = 0;
 
     @Rule
     public ExpectedException expected = ExpectedException.none();
@@ -24,37 +31,44 @@ public class TrainTest {
         context = new Context();
     }
 
-    @Test
-    public void testInstanceManager() {
-        Train train = Train.in(context).create("t", "train", 100);
-        assertSame(train, Train.in(context).get(train.getName()));
-        assertSame(train,
-            Train.in(context).create(train.getName(), train.getReadableName(), train.getLength()));
-        assertTrue(Train.in(context).getAll().contains(train));
+
+    @Override
+    protected TrainFactory getFactory(Context context) {
+        return Train.in(context);
     }
 
-    @Test
-    public void testInstanceManagerInvalidName() {
-        expected.expect(IllegalArgumentException.class);
-        Train.in(context).get("t");
+    @Override
+    protected Train createRandom(Context context) {
+        int count = this.counter++;
+        return getFactory(context).create("train" + count, "t" + count, 10);
     }
 
-    @Test
-    public void testInstanceManagerExistsDifferentLength() {
-        String name = "t";
-        String readableName = "train";
-        Train train = Train.in(context).create(name, readableName, 10);
-        expected.expect(IllegalArgumentException.class);
-        Train.in(context).create(name, readableName, 20);
+    @Override
+    protected Train createSame(Context context, Train train) {
+        return getFactory(context)
+            .create(train.getName(), train.getReadableName(), train.getLength());
     }
 
-    @Test
-    public void testInstanceManagerExistsDifferentReadableName() {
-        String name = "t";
-        String readableName = "train";
-        Train train = Train.in(context).create(name, readableName, 10);
-        expected.expect(IllegalArgumentException.class);
-        Train.in(context).create(name, "trainz", 10);
+    @Override
+    public void testCreateDifferentArg(Context context, Train train, int argIndex) {
+        switch (argIndex) {
+            case 1:
+                getFactory(context).create(
+                    train.getName(),
+                    train.getReadableName() + "invalid",
+                    train.getLength()
+                );
+                break;
+            case 2:
+                getFactory(context).create(
+                    train.getName(),
+                    train.getReadableName(),
+                    train.getLength() + 1
+                );
+                break;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     private Edge[] createEdges(Integer edgeLength, Integer... edgeLengths) {
@@ -88,6 +102,12 @@ public class TrainTest {
     public void testLength() {
         Train train = Train.in(context).create("t", "train", 50);
         assertEquals(50, train.getLength());
+    }
+
+    @Test
+    public void testColor() {
+        Train train = createRandom(context);
+        assertNotNull(train.getColor());
     }
 
     @Test
@@ -129,14 +149,19 @@ public class TrainTest {
     public void testInitMiddle() {
         Train train = Train.in(context).create("t", "train", 20);
         Edge edge2 = createEdges(30, 40, 50)[1];
-        train.eventFactory().init(0, edge2);
+        train.eventFactory().init(5, edge2);
 
-        Train.State state = train.getState(0);
+        Train.State state = train.getState(5);
         assertEquals(train.getLength(), state.getPosition().getFrontDistance());
         assertEquals(edge2, state.getPosition().getFrontEdge());
         assertEquals(edge2.getLength(), state.getPosition().getBackDistance());
         assertEquals(0, state.getTotalDistance());
         assertTrue(state.isInitialized());
+
+        String description = train.getEvents().get(1).getDescription().toLowerCase();
+        assertTrue(description.contains("init"));
+        assertTrue(description.contains(String.valueOf(5)));
+        assertTrue(description.contains(edge2.getName().toLowerCase()));
     }
 
     @Test
@@ -165,6 +190,12 @@ public class TrainTest {
         assertTrue(state.isInitialized());
 
         assertEquals(state, train.getState(time * 2));
+
+        String description = train.getEvents().get(2).getDescription().toLowerCase();
+        assertTrue(description.contains("speed"));
+        assertTrue(description.contains(String.valueOf(time)));
+        assertTrue(description.contains(String.valueOf(distance)));
+        assertTrue(description.contains(String.valueOf(speed)));
     }
 
     @Test
@@ -183,6 +214,12 @@ public class TrainTest {
         assertEquals(edges[0], state.getPosition().getBackEdge());
         assertEquals(10, state.getPosition().getBackDistance());
         assertFalse(state.isTerminated());
+
+        String description = train.getEvents().get(2).getDescription().toLowerCase();
+        assertTrue(description.contains("reach"));
+        assertTrue(description.contains(String.valueOf(10)));
+        assertTrue(description.contains(String.valueOf(10)));
+        assertTrue(description.contains(edges[1].getName()));
     }
 
     @Test
@@ -202,6 +239,12 @@ public class TrainTest {
         assertEquals(10, state.getPosition().getFrontDistance());
         assertEquals(20, state.getTotalDistance());
         assertFalse(state.isTerminated());
+
+        String description = train.getEvents().get(3).getDescription().toLowerCase();
+        assertTrue(description.contains("leave"));
+        assertTrue(description.contains(String.valueOf(20)));
+        assertTrue(description.contains(String.valueOf(10)));
+        assertTrue(description.contains(edges[1].getName()));
     }
 
     @Test
@@ -218,6 +261,10 @@ public class TrainTest {
         assertEquals(18, state.getPosition().getFrontDistance());
         assertEquals(8, state.getTotalDistance());
         assertEquals(0.8, state.getSpeed(), 0.01);
+
+        String description = train.getEvents().get(3).getDescription().toLowerCase();
+        assertTrue(description.contains("terminate"));
+        assertTrue(description.contains(String.valueOf(10000)));
     }
 
     @Test
@@ -441,5 +488,14 @@ public class TrainTest {
         assertFalse(newEvent.getWarnings().isEmpty());
         assertEquals(10, newEvent.getTime());
         assertEquals(beforeEvent.getTime(), newEvent.getTime());
+    }
+
+    @Test
+    public void testToString() {
+        Train train = createRandom(context);
+        assertNotNull(train.toString());
+        assertTrue(train.toString().contains(String.valueOf(train.getLength())));
+        assertTrue(train.toString().contains(train.getName()));
+        assertTrue(train.toString().contains(train.getReadableName()));
     }
 }

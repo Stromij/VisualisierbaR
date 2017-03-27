@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -218,13 +219,15 @@ public final class Element implements GraphObject<Shape> {
     public static final class ElementFactory implements Factory<Element> {
 
         private static final int INITIAL_ELEMENTS_CAPACITY = 256;
-        private static final Map<Context, ElementFactory> instances = new WeakHashMap<>();
+        private static final Map<Context, WeakReference<ElementFactory>> instances = new WeakHashMap<>();
 
         @Nonnull
         private final Map<String, Element> elements;
 
         @Nonnull
         private final Switch.Factory switchFactory;
+        @Nonnull
+        private final Factory<Node> nodeFactory;
         @Nonnull
         private final ObservableList<ElementEvent> events;
         private int currentTime;
@@ -235,13 +238,24 @@ public final class Element implements GraphObject<Shape> {
             if (context == null) {
                 throw new NullPointerException("context is null");
             }
-            return instances.computeIfAbsent(context, g -> new ElementFactory(context));
+
+            ElementFactory result = instances.computeIfAbsent(context, ctx -> {
+                ElementFactory factory = new ElementFactory(ctx);
+                ctx.addObject(factory);
+                return new WeakReference<>(factory);
+            }).get();
+
+            if (result == null) {
+                throw new IllegalStateException();
+            }
+            return result;
         }
 
         private ElementFactory(Context context) {
             this.elements = new LinkedHashMap<>(INITIAL_ELEMENTS_CAPACITY);
 
             this.switchFactory = Switch.in(context);
+            this.nodeFactory = Node.in(context);
             this.events = FXCollections.observableArrayList();
             this.currentTime = -1;
             this.nextIndex = 0;
@@ -263,9 +277,14 @@ public final class Element implements GraphObject<Shape> {
          * @throws NullPointerException if either of the arguments is null
          * @throws IllegalArgumentException if an element with the same name but different
          * parameters already exists
+         * @throws IllegalArgumentException if the given node is from within another context
          */
         @Nonnull
         public Element create(String name, Type type, Node node, State state) {
+            if (!nodeFactory.checkAffiliated(node)) {
+                throw new IllegalArgumentException("Node is from the wrong context. " + node);
+            }
+
             Element element = elements.computeIfAbsent(Objects.requireNonNull(name), elementName ->
                 new Element(this, elementName, type, node, state)
             );
@@ -315,6 +334,11 @@ public final class Element implements GraphObject<Shape> {
         @Nonnull
         public Collection<Element> getAll() {
             return Collections.unmodifiableCollection(elements.values());
+        }
+
+        @Override
+        public boolean checkAffiliated(@Nonnull Element element) {
+            return elements.get(element.getName()) == element;
         }
 
         private void addEvent(Element element, State state, int time) {
@@ -505,10 +529,6 @@ public final class Element implements GraphObject<Shape> {
         @Nonnull
         private final ObservableList<String> warnings;
 
-        private ElementEvent(Element element, int time, State state) {
-            this(element, time, state, FXCollections.emptyObservableList());
-        }
-
         private ElementEvent(Element element, int time, State state,
             ObservableList<String> warnings) {
             this.element = element;
@@ -560,6 +580,9 @@ public final class Element implements GraphObject<Shape> {
 
             ElementEvent event = (ElementEvent) obj;
 
+            if (!element.equals(event.element)) {
+                return false;
+            }
             if (time != event.time) {
                 return false;
             }

@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.dbvisualization.model;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -58,7 +59,7 @@ public final class Node implements GraphObject<Circle> {
     public static final class NodeFactory implements Factory<Node> {
 
         private static final int INITIAL_NODES_CAPACITY = 128;
-        private static final Map<Context, NodeFactory> instances = new WeakHashMap<>();
+        private static final Map<Context, WeakReference<NodeFactory>> instances = new WeakHashMap<>();
 
         @Nonnull
         private final Map<String, Node> nodes;
@@ -68,7 +69,16 @@ public final class Node implements GraphObject<Circle> {
             if (context == null) {
                 throw new NullPointerException("context is null");
             }
-            return instances.computeIfAbsent(context, g -> new NodeFactory());
+            NodeFactory result = instances.computeIfAbsent(context, ctx -> {
+                NodeFactory factory = new NodeFactory();
+                ctx.addObject(factory);
+                return new WeakReference<>(factory);
+            }).get();
+
+            if (result == null) {
+                throw new IllegalStateException();
+            }
+            return result;
         }
 
         private NodeFactory() {
@@ -107,7 +117,7 @@ public final class Node implements GraphObject<Circle> {
         @Override
         @Nonnull
         public Node get(String name) {
-            Node node = nodes.get(name);
+            Node node = nodes.get(Objects.requireNonNull(name));
             if (node == null) {
                 throw new IllegalArgumentException("unknown node: " + name);
             }
@@ -118,6 +128,11 @@ public final class Node implements GraphObject<Circle> {
         @Nonnull
         public Collection<Node> getAll() {
             return Collections.unmodifiableCollection(nodes.values());
+        }
+
+        @Override
+        public boolean checkAffiliated(@Nonnull Node node) {
+            return nodes.get(node.getName()) == node;
         }
     }
 

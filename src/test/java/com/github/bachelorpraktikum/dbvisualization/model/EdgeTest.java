@@ -2,18 +2,15 @@ package com.github.bachelorpraktikum.dbvisualization.model;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
 
+import com.github.bachelorpraktikum.dbvisualization.model.Edge.EdgeFactory;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-/**
- * Created by chabare on 19.11.16
- */
-public class EdgeTest {
+public class EdgeTest extends FactoryTest<Edge> {
 
     private Context context;
     private Random random;
@@ -34,51 +31,13 @@ public class EdgeTest {
             random.nextInt(Integer.MAX_VALUE));
     }
 
-    private Node getNode() {
+    private Node getNode(Context context) {
         nodeCounter++;
         return Node.in(context).create("node" + nodeCounter, getCoordinate());
     }
 
-    @Test
-    public void testInstanceManager() {
-        Edge edge = Edge.in(context).create("edge1", 30, getNode(), getNode());
-        assertSame(edge, Edge.in(context).get(edge.getName()));
-        assertSame(edge, Edge.in(context).create(edge.getName(),
-            edge.getLength(), edge.getNode1(), edge.getNode2()));
-        assertTrue(Edge.in(context).getAll().contains(edge));
-    }
-
-    @Test
-    public void testInstanceManagerInvalidName() {
-        expected.expect(IllegalArgumentException.class);
-        Edge.in(context).get("t");
-    }
-
-    @Test
-    public void testInstanceManagerExistsDifferentLength() {
-        String name = "Edge";
-        Edge edge = Edge.in(context).create(name, 10, getNode(), getNode());
-
-        expected.expect(IllegalArgumentException.class);
-        Edge.in(context).create(name, 20, edge.getNode1(), edge.getNode2());
-    }
-
-    @Test
-    public void testInstanceManagerExistsDifferentNode1() {
-        String name = "t";
-        Edge edge = Edge.in(context).create(name, 10, getNode(), getNode());
-
-        expected.expect(IllegalArgumentException.class);
-        Edge.in(context).create(name, 10, getNode(), edge.getNode2());
-    }
-
-    @Test
-    public void testInstanceManagerExistsDifferentNode2() {
-        String name = "t";
-        Edge edge = Edge.in(context).create(name, 10, getNode(), getNode());
-
-        expected.expect(IllegalArgumentException.class);
-        Edge.in(context).create(name, 10, edge.getNode1(), getNode());
+    private Node getNode() {
+        return getNode(context);
     }
 
     @Test
@@ -137,5 +96,67 @@ public class EdgeTest {
     public void testNullName() {
         expected.expect(NullPointerException.class);
         Edge edge = Edge.in(context).create(null, 50, getNode(), getNode());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateNodeDifferentContext() {
+        Node node1 = getNode();
+        Node node2 = getNode();
+
+        Context otherContext = new Context();
+        Edge.in(otherContext).create("e", 1, node1, node2);
+    }
+
+    @Override
+    protected EdgeFactory getFactory(Context context) {
+        return Edge.in(context);
+    }
+
+    @Override
+    protected Edge createRandom(Context context) {
+        return getFactory(context)
+            .create("edge" + nodeCounter++, random.nextInt(), getNode(context), getNode(context));
+    }
+
+    @Override
+    protected Edge createSame(Context context, Edge edge) {
+        return getFactory(context).create(
+            edge.getName(),
+            edge.getLength(),
+            edge.getNode1(),
+            edge.getNode2()
+        );
+    }
+
+    @Override
+    public void testCreateDifferentArg(Context context, Edge edge, int argIndex) {
+        switch (argIndex) {
+            case 1:
+                getFactory(context).create(
+                    edge.getName(),
+                    edge.getLength() + 1,
+                    edge.getNode1(),
+                    edge.getNode2()
+                );
+                break;
+            case 2:
+                getFactory(context).create(
+                    edge.getName(),
+                    edge.getLength(),
+                    getNode(context),
+                    edge.getNode2()
+                );
+                break;
+            case 3:
+                getFactory(context).create(
+                    edge.getName(),
+                    edge.getLength(),
+                    edge.getNode1(),
+                    getNode(context)
+                );
+                break;
+            default:
+                throw new IllegalStateException();
+        }
     }
 }
