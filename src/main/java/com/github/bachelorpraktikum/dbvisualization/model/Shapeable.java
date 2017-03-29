@@ -5,11 +5,13 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import java.util.logging.Logger;
 import javafx.beans.property.Property;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -70,11 +72,24 @@ public interface Shapeable<S extends Shape> {
         return 20;
     }
 
-    default boolean isVisible(Bounds bounds) {
-        if (bounds == null) {
-            return true;
-        }
+    /**
+     * <p>Decides whether a Shape created by this Shapeable should be visible.</p>
+     *
+     * <p>If the current visibleState is {@link VisibleState#AUTO}, the visibility is determined by
+     * the given bounds of the shape and the minimum size returned by {@link #minSize()}. If the
+     * bounds are null, AUTO is equal to {@link VisibleState#ENABLED}</p>
+     *
+     * <p><b>Implementation note:</b><br> The current implementation treats AUTO and ENABLED
+     * equally and ignores {@link #minSize()}. </p>
+     *
+     * @param bounds the bounds on screen of the shape, or null
+     * @return whether the shape should be visible
+     */
+    default boolean isVisible(@Nullable Bounds bounds) {
         VisibleState state = visibleStateProperty().getValue();
+        if (bounds == null) {
+            return state != VisibleState.DISABLED;
+        }
         switch (state) {
             case ENABLED:
                 return true;
@@ -127,7 +142,10 @@ public interface Shapeable<S extends Shape> {
 
             return shape;
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.getLogger(Shapeable.class.getName())
+                .severe("Error trying to load Shape from FXML file:"
+                    + System.lineSeparator()
+                    + e);
             throw new IllegalArgumentException(e);
         }
     }
