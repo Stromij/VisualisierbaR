@@ -146,7 +146,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.github.bachelorpraktikum.dbvisualization.DBVisualizer
+                            <mainClass>com.github.bachelorpraktikum.visualisierbar.Visualisierbar
                             </mainClass>
                         </manifest>
                     </archive>
