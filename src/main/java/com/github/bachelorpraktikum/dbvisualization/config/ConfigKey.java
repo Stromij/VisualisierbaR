@@ -14,7 +14,12 @@ public enum ConfigKey {
     initialRestDirectory("rest_initialDirectory"),
     initialRestExecutable("rest_initialExecutable"),
     initialDatabasePort("database_initialPort"),
-    initialDatabaseName("database_initialName");
+    initialDatabaseName("database_initialName"),
+    databaseUsername("database_username"),
+    databasePassword("database_password"),
+    absExportPath("abs_export_path"),
+    absToolchain("abs_toolchain"),
+    experimentalAbsExportForAttributes("experimental_attributes_abs_export");
 
     private final String key;
 
@@ -35,6 +40,10 @@ public enum ConfigKey {
     @Nonnull
     public String get(@Nonnull String defaultValue) {
         return ConfigFile.getInstance().getProperty(getKey(), defaultValue);
+    }
+
+    public boolean getBoolean() {
+        return Boolean.parseBoolean(ConfigFile.getInstance().getProperty(getKey()));
     }
 
     public void set(@Nullable String value) {

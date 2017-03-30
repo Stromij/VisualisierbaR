@@ -15,7 +15,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class SubprocessSource extends InputParserSource {
 
-    private final Process process;
+    private Process process;
+
+    /**
+     * {@link #init(String, String...)} has to be called if this constructor is used to execute the
+     * process
+     */
+    SubprocessSource() {
+        process = null;
+    }
 
     /**
      * Creates a new {@link Context} and starts the process specified by the command with the
@@ -29,6 +37,10 @@ public class SubprocessSource extends InputParserSource {
      * @throws IOException if the process can't be started
      */
     public SubprocessSource(String command, String... args) throws IOException {
+        init(command, args);
+    }
+
+    void init(String command, String... args) throws IOException {
         this.process = createProcess(Objects.requireNonNull(command), args);
 
         // TODO create constructor with the first timeout explicitly given

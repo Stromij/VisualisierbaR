@@ -1,5 +1,6 @@
-package com.github.bachelorpraktikum.dbvisualization.view;
+package com.github.bachelorpraktikum.dbvisualization.view.sourcechooser;
 
+import java.util.Optional;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -9,10 +10,11 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import javax.annotation.Nonnull;
 
 public class LoginController {
 
+    @FXML
+    private Button closeButton;
     @FXML
     private Button openButton;
     @FXML
@@ -24,6 +26,7 @@ public class LoginController {
 
     private ObjectProperty<String> userProperty;
     private ObjectProperty<String> passwordProperty;
+    private boolean manuallyClosed;
 
     @FXML
     public void initialize() {
@@ -43,23 +46,43 @@ public class LoginController {
                 openButton.setDisable(false);
             }
         });
+
+        openButton.setOnAction(event -> close(false));
+        closeButton.setOnAction(event -> close(true));
     }
 
-    @Nonnull
+    Button getOpenButton() {
+        return openButton;
+    }
+
     public String getUser() {
-        return userProperty.getValue();
+        return Optional.ofNullable(userProperty.getValue()).orElse("");
     }
 
-    @Nonnull
     public String getPassword() {
-        return userProperty.getValue();
+        return Optional.ofNullable(passwordProperty.getValue()).orElse("");
     }
-
 
     void setStage(Stage stage) {
         Scene scene = new Scene(rootPane);
         stage.setScene(scene);
-
         stage.centerOnScreen();
+    }
+
+    public void show() {
+        Stage stage = new Stage();
+        Scene scene = new Scene(rootPane);
+
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
+
+    public void close(boolean manualClose) {
+        manuallyClosed = manualClose;
+        ((Stage) rootPane.getScene().getWindow()).close();
+    }
+
+    boolean manuallyClosed() {
+        return manuallyClosed || openButton.isDisabled();
     }
 }

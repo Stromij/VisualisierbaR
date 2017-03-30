@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane fx:id="rootPane" prefHeight="130.0" prefWidth="393.0"
   xmlns:fx="http://javafx.com/fxml/1"
-  fx:controller="com.github.bachelorpraktikum.dbvisualization.view.LoginController">
+  fx:controller="com.github.bachelorpraktikum.dbvisualization.view.sourcechooser.LoginController">
   <right>
     <AnchorPane prefHeight="124.0" prefWidth="160.0" AnchorPane.rightAnchor="0.0">
       <TextField fx:id="userField" AnchorPane.topAnchor="0.0"/>
@@ -20,11 +20,22 @@
     </AnchorPane>
   </right>
   <bottom>
-    <Button fx:id="openButton" text="%login" BorderPane.alignment="CENTER">
-      <BorderPane.margin>
-        <Insets bottom="6.0" top="6.0"/>
-      </BorderPane.margin>
-    </Button>
+    <BorderPane>
+      <center>
+        <Button fx:id="openButton" text="%login" BorderPane.alignment="CENTER" disable="true">
+          <BorderPane.margin>
+            <Insets bottom="6.0" top="6.0"/>
+          </BorderPane.margin>
+        </Button>
+      </center>
+      <right>
+        <Button fx:id="closeButton" text="%close" BorderPane.alignment="CENTER">
+          <BorderPane.margin>
+            <Insets bottom="6.0" top="6.0"/>
+          </BorderPane.margin>
+        </Button>
+      </right>
+    </BorderPane>
   </bottom>
   <left>
     <AnchorPane AnchorPane.leftAnchor="0.0">

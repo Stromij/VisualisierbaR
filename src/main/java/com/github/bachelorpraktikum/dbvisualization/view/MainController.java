@@ -734,20 +734,6 @@ public class MainController {
         controller.setStage(stage);
     }
 
-    private void showLoginWindow() {
-        cleanUp();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("LoginWindow.fxml"));
-        loader.setResources(ResourceBundle.getBundle("bundles.localization"));
-        try {
-            loader.load();
-        } catch (IOException e) {
-            // This should never happen, because the location is set (see load function)
-            return;
-        }
-        LoginController controller = loader.getController();
-        controller.setStage(stage);
-    }
-
     private void resetGraphView() {
         fitGraphToCenter(getGraph());
         graphPane.setTranslateX(0);

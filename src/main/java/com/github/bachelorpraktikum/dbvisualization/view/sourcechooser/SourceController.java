@@ -137,7 +137,7 @@ public class SourceController {
      * Sets the scene for the current stage to the main view.
      */
     private void openMainWindow() {
-        DataSource dataSource;
+        DataSource dataSource = null;
         try {
             dataSource = activeController.getValue().getResource();
             Context context = dataSource.getContext();
@@ -155,6 +155,15 @@ public class SourceController {
             contentText = String.format(contentText, e.getMessage());
             alert.setContentText(contentText);
             alert.showAndWait();
+
+            if (dataSource != null) {
+                try {
+                    dataSource.close();
+                } catch (IOException e1) {
+                    Logger.getLogger(getClass().getName())
+                        .info(String.format("Error closing datasource: %s", e1));
+                }
+            }
             return;
         }
 
