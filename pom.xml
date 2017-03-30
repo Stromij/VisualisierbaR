@@ -6,7 +6,7 @@
     <artifactId>VisualisierbaR</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <url>https://github.com/Bachelorpraktikum/DBVisualization</url>
+    <url>https://github.com/Bachelorpraktikum/VisualisierbaR</url>
     <name>${project.groupId}:${project.artifactId}</name>
     <licenses>
         <license>
@@ -41,10 +41,10 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:git:https://github.com/Bachelorpraktikum/DBVisualization.git</connection>
-        <developerConnection>scm:git:git@github.com:Bachelorpraktikum/DBVisualization.git
+        <connection>scm:git:https://github.com/Bachelorpraktikum/VisualisierbaR.git</connection>
+        <developerConnection>scm:git:git@github.com:Bachelorpraktikum/VisualisierbaR.git
         </developerConnection>
-        <url>https://github.com/Bachelorpraktikum/DBVisualization</url>
+        <url>https://github.com/Bachelorpraktikum/VisualisierbaR</url>
     </scm>
 
     <properties>
