@@ -49,7 +49,7 @@ public class DetailsController {
         TooltipUtil.install(elementName, () -> details.get().getName());
     }
 
-    public void setDetail(DetailsBase<GraphObject<?>> detail) {
+    public void setDetail(DetailsBase<? extends GraphObject<?>> detail) {
         details.set(detail);
         elementName.textProperty().setValue(detail.getName());
 

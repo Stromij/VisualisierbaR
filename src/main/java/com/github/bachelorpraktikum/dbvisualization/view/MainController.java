@@ -683,7 +683,7 @@ public class MainController {
         return graph;
     }
 
-    private void setDetail(DetailsBase detail) {
+    private void setDetail(DetailsBase<? extends GraphObject<?>> detail) {
         showDetailView();
         detailBoxController.setDetail(detail);
     }
