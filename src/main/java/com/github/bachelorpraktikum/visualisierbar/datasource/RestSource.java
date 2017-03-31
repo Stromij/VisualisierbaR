@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.beans.property.Property;
@@ -179,6 +180,34 @@ public class RestSource implements DataSource {
                 if (onDone != null) {
                     Platform.runLater(onDone);
                 }
+            }
+        });
+    }
+
+    public void fetchIsBroken(Element element, Consumer<Boolean> isBrokenConsumer) {
+        if (!hasSignal(element)) {
+            throw new IllegalArgumentException("can't be broken");
+        }
+
+        getService().getSignal(signals.get(element)).enqueue(new Callback<LiveSignal>() {
+            @Override
+            public void onResponse(Call<LiveSignal> call, Response<LiveSignal> response) {
+                if (response.isSuccessful()) {
+                    LiveSignal signal = response.body();
+                    callback(signal.isBroken());
+                    return;
+                }
+                callback(false);
+            }
+
+            @Override
+            public void onFailure(Call<LiveSignal> call, Throwable throwable) {
+                callback(false);
+            }
+
+            private void callback(Boolean isBroken) {
+                log.fine("Signal " + signals.get(element) + " is broken: " + isBroken);
+                Platform.runLater(() -> isBrokenConsumer.accept(isBroken));
             }
         });
     }

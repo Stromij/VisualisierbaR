@@ -2,6 +2,7 @@ package com.github.bachelorpraktikum.visualisierbar.datasource;
 
 import com.github.bachelorpraktikum.visualisierbar.model.Context;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,8 @@ class LiveSignal {
     @SerializedName("sp")
     private String sicht;
     private String name;
+    @SerializedName("broken")
+    private JsonElement isBroken;
 
     public boolean contains(Element element) {
         String elementName = element.getName();
@@ -42,4 +45,7 @@ class LiveSignal {
         return name;
     }
 
+    boolean isBroken() {
+        return !"false".equals(isBroken.getAsString());
+    }
 }

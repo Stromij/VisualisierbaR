@@ -13,7 +13,8 @@
   <Label text="%state" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
   <Label fx:id="stateValue" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-  <Button fx:id="breakButton" text="%break_now" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+  <Button fx:id="breakButton" text="%break_now" GridPane.columnIndex="0" GridPane.rowIndex="3"
+    disable="true"/>
 
   <padding>
     <Insets left="10.0" right="10.0"/>

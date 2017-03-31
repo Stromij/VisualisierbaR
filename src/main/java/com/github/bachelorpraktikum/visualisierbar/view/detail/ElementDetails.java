@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.view.detail;
 
+import com.github.bachelorpraktikum.visualisierbar.datasource.DataSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
@@ -77,6 +78,11 @@ class ElementDetails extends DetailsBase<Element> {
             // maybe show some success message? or make method accept onFailure to re-enable button?
             dataSource.breakElement(getObject(), null);
         });
+
+        if(isRestSourceAndCanBeBroken.get()) {
+            RestSource restSource = (RestSource) DataSourceHolder.getInstance().get();
+            restSource.fetchIsBroken(getObject(), isBroken -> breakButton.setDisable(isBroken));
+        }
     }
 
     @Nonnull
