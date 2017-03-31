@@ -1,0 +1,27 @@
+ALTER TABLE `edges` ADD CONSTRAINT FK_VERTEX_FROM_ID  FOREIGN KEY (vertex_ID_from) REFERENCES vertices(ID);
+ALTER TABLE `edges` ADD CONSTRAINT FK_VERTEX_TO_ID  FOREIGN KEY (vertex_ID_to) REFERENCES vertices(ID);
+
+# Currently, not every row in objects_attributes can be bound to one in vertices
+# Get object_IDs without vertices row:
+# SELECT object_ID as ID FROM `objects_attributes` WHERE object_ID NOT IN(SELECT ID FROM `vertices`)
+# SELECT attribute_ID as ID FROM `objects_attributes` WHERE attribute_ID NOT IN(SELECT ID FROM `attributes`)
+# -> There are attribute_IDs with value 0
+# ALTER TABLE `objects_attributes` CHANGE `object_ID` `object_ID` INT(11) NOT NULL;
+# ALTER TABLE `objects_attributes` CHANGE `attribute_ID` `attribute_ID` INT(11) UNSIGNED NOT NULL;
+# ALTER TABLE `objects_attributes` ADD CONSTRAINT FK_VERTEX  FOREIGN KEY (object_ID) REFERENCES vertices(ID);
+# ALTER TABLE `objects_attributes` ADD CONSTRAINT FK_ATTRIBUTE  FOREIGN KEY (attribute_ID) REFERENCES attributes(ID);
+
+ALTER TABLE `object_object_attributes` CHANGE `attribute_ID` `attribute_ID` INT(11) UNSIGNED NOT NULL;
+ALTER TABLE `object_object_attributes` ADD CONSTRAINT FK_ATTRIBUTE FOREIGN KEY (attribute_ID) REFERENCES attributes(ID);
+
+ALTER TABLE `neighbors` ADD CONSTRAINT FK_VERTEX_1 FOREIGN KEY (vertex1_ID) REFERENCES vertices(ID);
+ALTER TABLE `neighbors` ADD CONSTRAINT FK_VERTEX_2 FOREIGN KEY (vertex2_ID) REFERENCES vertices(ID);
+
+# Betriebsstellen can be NULL in vertices. Delete those -> Make betriebsstellen_ID NONNULL and add the foreign key
+# ALTER TABLE `vertices` CHANGE `betriebsstellen_ID` `betriebsstellen_ID` SMALLINT(5) NOT NULL;
+# ALTER TABLE `vertices` ADD CONSTRAINT FK_BETRIEBSSTELLE (betriebsstellen_ID) REFERENCES betriebsstellen(ID);
+# Same goes for edge_ID
+UPDATE `vertices`, `edges` SET vertices.edge_ID=edges.ID WHERE vertices.ID=edges.vertex_ID_from WHERE edge_ID IS NULL;
+UPDATE `vertices`, `edges` SET vertices.edge_ID=edges.ID WHERE vertices.ID=edges.vertex_ID_to WHERE edge_ID IS NULL;
+# REMOVE NULL edge_IDs
+# ALTER TABLE `vertices` ADD CONSTRAINT FK_EDGE FOREIGN KEY (edge_ID) REFERENCES edge(ID);
