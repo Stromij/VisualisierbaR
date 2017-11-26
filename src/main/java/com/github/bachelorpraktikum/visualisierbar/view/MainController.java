@@ -120,6 +120,8 @@ public class MainController {
     @FXML
     private ToggleButton logToggle;
     @FXML
+    private ToggleButton editorToggle;
+    @FXML
     private ListView<Event> logList;
     @FXML
     private Button resetButton;
@@ -247,6 +249,7 @@ public class MainController {
 
         fireOnEnterPress(closeButton);
         fireOnEnterPress(logToggle);
+        fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
