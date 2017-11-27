@@ -23,6 +23,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoor
 import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -261,6 +262,17 @@ public class MainController {
 
         proportionalToggle.setOnAction(ActionEvent -> switchGraph());
 
+        editorToggle.setOnAction((t)->{
+
+
+            if (editorToggle.isSelected()){
+                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
+            }
+            else {
+                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
+            }
+        });
+
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             legend.setVisible(newValue);
             if (newValue) {
@@ -276,6 +288,9 @@ public class MainController {
         logToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
             rootPane.setLeft(newValue ? leftPane : null)
         );
+
+
+
 
         initializeElementList();
         initializeLogList();
