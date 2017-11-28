@@ -32,9 +32,12 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             ChangeListener<Element.State> listener = (observable, oldValue, newValue) -> {
                 displayState(element);
+
             };
             listeners.add(listener);
             element.stateProperty().addListener(new WeakChangeListener<>(listener));
+
+
         }
     }
 
@@ -89,6 +92,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
             TooltipUtil.install(elementShape, new Tooltip(element.getName()));
+            this.node.movedProperty().addListener((observable, oldValue, newValue) -> {relocate(this.getShape());});
             displayState(element);
         }
     }

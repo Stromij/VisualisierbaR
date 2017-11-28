@@ -7,12 +7,7 @@ import com.github.bachelorpraktikum.visualisierbar.config.ConfigFile;
 import com.github.bachelorpraktikum.visualisierbar.config.ConfigKey;
 import com.github.bachelorpraktikum.visualisierbar.datasource.DataSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
-import com.github.bachelorpraktikum.visualisierbar.model.Context;
-import com.github.bachelorpraktikum.visualisierbar.model.Element;
-import com.github.bachelorpraktikum.visualisierbar.model.Event;
-import com.github.bachelorpraktikum.visualisierbar.model.GraphObject;
-import com.github.bachelorpraktikum.visualisierbar.model.Messages;
-import com.github.bachelorpraktikum.visualisierbar.model.Shapeable;
+import com.github.bachelorpraktikum.visualisierbar.model.*;
 import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsBase;
 import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsController;
@@ -176,6 +171,7 @@ public class MainController {
 
         // START OF TIME RELATED INIT
 
+
         simulationTime = new SimpleIntegerProperty();
         IntegerProperty postSimulationTime = new SimpleIntegerProperty();
         this.postSimulationTime = postSimulationTime;
@@ -262,16 +258,17 @@ public class MainController {
 
         proportionalToggle.setOnAction(ActionEvent -> switchGraph());
 
-        editorToggle.setOnAction((t)->{
+
+        editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if(graph.getNodes()==null) return;
+            if(newValue) graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
+            else graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
 
 
-            if (editorToggle.isSelected()){
-                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
-            }
-            else {
-                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
-            }
+
+
         });
+
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             legend.setVisible(newValue);
@@ -288,8 +285,6 @@ public class MainController {
         logToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
             rootPane.setLeft(newValue ? leftPane : null)
         );
-
-
 
 
         initializeElementList();

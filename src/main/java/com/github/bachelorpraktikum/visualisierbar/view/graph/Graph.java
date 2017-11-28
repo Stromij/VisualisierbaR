@@ -57,7 +57,6 @@ public final class Graph {
 
         for (Node node : Node.in(context).getAll()) {
             GraphShape<Node> shape = new Junction(node, coordinatesAdapter);
-            //make Nodes moveable
 
             nodes.put(node, shape);
             group.getChildren().add(shape.getFullNode());

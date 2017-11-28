@@ -12,7 +12,10 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.Circle;
 import javax.annotation.Nonnull;
@@ -30,13 +33,15 @@ public final class Node implements GraphObject<Circle> {
     @Nonnull
     private final String name;
     @Nonnull
-    private final Coordinates coordinates;
+    private  Coordinates coordinates;
     @Nonnull
     private final Set<Edge> edges;
     @Nonnull
     private final Set<Element> elements;
     @Nonnull
     private final Property<VisibleState> stateProperty;
+    @Nonnull
+    private final BooleanProperty movedProperty;
 
     private Node(String name, Coordinates coordinates) {
         this.name = Objects.requireNonNull(name);
@@ -44,6 +49,7 @@ public final class Node implements GraphObject<Circle> {
         this.edges = new LinkedHashSet<>();
         this.elements = new HashSet<>();
         this.stateProperty = new SimpleObjectProperty<>();
+        this.movedProperty = new SimpleBooleanProperty(false);
     }
 
     @Nonnull
@@ -167,6 +173,8 @@ public final class Node implements GraphObject<Circle> {
         return coordinates;
     }
 
+    public void setCoordinates(Coordinates a ){this.coordinates=a;}
+
     /**
      * Gets a set of all {@link Edge edges} connected with this node, except the given one.
      *
@@ -213,6 +221,7 @@ public final class Node implements GraphObject<Circle> {
     public Property<VisibleState> visibleStateProperty() {
         return stateProperty;
     }
+    public BooleanProperty movedProperty(){return movedProperty;}
 
     @Override
     public String toString() {

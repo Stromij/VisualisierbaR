@@ -1,9 +1,11 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph;
 
+import com.github.bachelorpraktikum.visualisierbar.model.Coordinates;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.moveable;
+import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Circle;
@@ -31,7 +33,18 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             Circle c = (Circle)event.getSource();
             c.setTranslateX(Math.round(c.getTranslateX()));
             c.setTranslateY(Math.round(c.getTranslateY()));
-            //System.out.println(("X:" + this.getRepresented().getCoordinates().toPoint2D().getX()+" " + "Y:" + this.getRepresented().getCoordinates().toPoint2D().getX() ));
+
+
+            System.out.println(("Node X:" + this.getRepresented().getCoordinates().toPoint2D().getX()+" " + "Node Y:" + this.getRepresented().getCoordinates().toPoint2D().getY() ));
+            System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
+            c.setCenterX(c.getCenterX()+c.getTranslateX());
+            c.setCenterY(c.getCenterY()+c.getTranslateY());
+            this.getRepresented().setCoordinates(new Coordinates(((int) c.getCenterX()),(int) c.getCenterY()));
+            c.setTranslateX(0);
+            c.setTranslateY(0);
+            this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
+            ////////////
+            //this.getRepresented().getElements().forEach((a)->{a.});
         });
         this.getShape().setOnMouseDragged((t) -> {
 
@@ -47,10 +60,15 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             double offsetX=(t.getX() - mousePressedX);
             double offsetY=(t.getY() - mousePressedY);
 
+
+
             Circle c = (Circle) (t.getSource());
 
             c.setTranslateX(c.getTranslateX()+offsetX);
             c.setTranslateY(c.getTranslateY()+offsetY);
+
+
+            //this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
 
             t.consume();
         });
