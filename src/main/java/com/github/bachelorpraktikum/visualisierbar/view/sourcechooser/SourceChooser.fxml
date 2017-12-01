@@ -21,6 +21,9 @@
       <Tab text="%live_simulation">
         <fx:include fx:id="restChooserTab" source="RestChooserTab.fxml"/>
       </Tab>
+      <Tab text="%abs_file">
+        <fx:include fx:id="absChooserTab" source="AbsChooserTab.fxml"/>
+      </Tab>
     </TabPane>
   </center>
   <bottom>

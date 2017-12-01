@@ -44,6 +44,10 @@ public class SourceController {
     @FXML
     private RestChooserController restChooserTabController;
     @FXML
+    private Node absChooserTab;
+    @FXML
+    private AbsChooserController absChooserTabController;
+    @FXML
     private TabPane tabPane;
 
     private Stage stage;
@@ -65,6 +69,7 @@ public class SourceController {
         controllers.put(fileChooserTab, fileChooserTabController);
         controllers.put(databaseChooserTab, databaseChooserTabController);
         controllers.put(restChooserTab, restChooserTabController);
+        controllers.put(absChooserTab, absChooserTabController);
 
         fireOnEnterPress(openSource);
         fireOnEnterPress(closeWindowButton);

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.control.Button?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="rootPane"
+            fx:controller="com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsChooserController">
+    <center>
+        <BorderPane>
+            <top>
+                <BorderPane>
+                    <left>
+                        <Label text="%choose_abs" minWidth="150" BorderPane.alignment="CENTER"/>
+                    </left>
+                    <center>
+                        <TextField fx:id="absFileURIField" maxWidth="1.7976931348623157E308"
+                                   prefWidth="300"
+                                   BorderPane.alignment="CENTER">
+                        </TextField>
+                    </center>
+                    <right>
+                        <Button fx:id="explorerButton" minWidth="-Infinity" mnemonicParsing="false" text="%explorer"
+                                BorderPane.alignment="CENTER">
+                            <BorderPane.margin>
+                                <Insets left="6.0"/>
+                            </BorderPane.margin>
+                        </Button>
+                    </right>
+                </BorderPane>
+            </top>
+            <center>
+                <BorderPane>
+                    <left>
+                        <Label text="%choose_product" minWidth="150" BorderPane.alignment="CENTER"/>
+                    </left>
+                    <center>
+                        <TextField fx:id="productNameField" promptText="e.g. Small"
+                                   maxWidth="1.7976931348623157E308" prefWidth="300"
+                                   BorderPane.alignment="CENTER">
+                        </TextField>
+                    </center>
+                </BorderPane>
+            </center>
+        </BorderPane>
+    </center>
+    <bottom>
+        
+    </bottom>
+    <padding>
+        <Insets bottom="6.0" left="6.0" right="6.0" top="6.0"/>
+    </padding>
+</BorderPane>
