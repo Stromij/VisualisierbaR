@@ -48,17 +48,11 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Side;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBase;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -138,8 +132,11 @@ public class MainController {
     private Pane centerPane;
     @FXML
     private Pane graphPane;
+
     @Nullable
     private Graph graph;
+    //private NumberAxis xAxis;
+    //private NumberAxis yAxis;
     private Map<Train, TrainView> trains;
     @Nullable
     private Highlightable lastHighlighted = null;
@@ -168,6 +165,8 @@ public class MainController {
         timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
         trains = new WeakHashMap<>();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+
+
 
         // START OF TIME RELATED INIT
 
@@ -260,9 +259,26 @@ public class MainController {
 
 
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+
+
             if(graph.getNodes()==null) return;
-            if(newValue) graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
-            else graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
+            if(newValue) {
+                proportionalToggle.setVisible(false);
+                if (proportionalToggle.isSelected()){
+                    proportionalToggle.fire();
+                }
+                //coordinatesField.setVisible(true);
+                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
+                logToggle.setVisible(false);
+                rootPane.setLeft(null);
+            }
+            else {
+                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
+                proportionalToggle.setVisible(true);
+                logToggle.setVisible(true);
+                //coordinatesField.setVisible(false);
+
+            }
 
 
 
@@ -285,6 +301,11 @@ public class MainController {
         logToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
             rootPane.setLeft(newValue ? leftPane : null)
         );
+
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
 
         initializeElementList();
@@ -327,6 +348,9 @@ public class MainController {
             modelTime.setText(String.format(text, source.getTime()));
             continueSimulation.setDisable(false);
         });
+
+
+
     }
 
     private void initializeCenterPane() {
@@ -337,24 +361,39 @@ public class MainController {
         };
         graphPane.heightProperty().addListener(boundsListener);
         graphPane.widthProperty().addListener(boundsListener);
+
+
         graphPane.setOnScroll(event -> {
             if (graph != null) {
                 Group group = graph.getGroup();
                 Bounds bounds = group.localToScene(group.getBoundsInLocal());
+
                 double oldScale = group.getScaleX();
                 double scaleFactor =
-                    oldScale * ((event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA);
+                        oldScale * ((event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA);
                 double translateX =
-                    event.getScreenX() - (bounds.getWidth() / 2 + bounds.getMinX());
+                        event.getScreenX() - (bounds.getWidth() / 2 + bounds.getMinX());
                 double translateY =
-                    event.getScreenY() - (bounds.getHeight() / 2 + bounds.getMinY());
+                        event.getScreenY() - (bounds.getHeight() / 2 + bounds.getMinY());
                 double factor = (scaleFactor / oldScale) - 1;
+
+
 
                 group.setScaleX(scaleFactor);
                 group.setScaleY(scaleFactor);
-                group.setTranslateX(group.getTranslateX() - factor * translateX);
-                group.setTranslateY(group.getTranslateY() - factor * translateY);
+                group.setTranslateX(group.getTranslateX() - factor  * translateX);
+                group.setTranslateY(group.getTranslateY() - factor  * translateY);
+                //yAxis.setScaleX(scaleFactor);
+                //yAxis.setScaleY(scaleFactor);
+                //yAxis.setTranslateX(yAxis.getTranslateX() - factor * translateX);
+                //yAxis.setTranslateY(yAxis.getTranslateY() - factor/4 * translateY);
+
+                //yAxis.setLayoutX(yAxis.getLayoutX() * 1+(scaleFactor-oldScale)/2 );
+                //yAxis.setLayoutY(yAxis.getLayoutY() * 1+(scaleFactor-oldScale)/2 );
+                //yAxis.setUpperBound(yAxis.getUpperBound()*scaleFactor);
+
             }
+
         });
         graphPane.setOnMouseReleased(event -> {
             mousePressedX = -1;
@@ -375,6 +414,11 @@ public class MainController {
 
             graphPane.setTranslateX(graphPane.getTranslateX() + xOffset);
             graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
+            if (graph!=null) {
+                graph.getGroup().getScaleY();
+                //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getGroup().getScaleY());
+                //yAxis.setTranslateX(yAxis.getTranslateX() - xOffset);
+            }
             event.consume();
         });
         MenuItem exportItem = new MenuItem("Export");
@@ -696,7 +740,19 @@ public class MainController {
                 trains.put(train, trainView);
                 trainView.setOnMouseClicked(e -> elementList.getSelectionModel().select(train));
             }
+            /*
+            Bounds graphBounds = graph.getGroup().getBoundsInParent();
+            yAxis=new NumberAxis(0,graphBounds.getHeight(),1);
+            yAxis.setSide(Side.LEFT);
+            yAxis.setPrefHeight(graphPane.getHeight());
+            yAxis.setMinorTickVisible(false);
+            yAxis.setLayoutY(graph.getGroup().getLayoutY());
+            //graph.getGroup().getChildren().add(yAxis);
+            graphPane.getChildren().add(yAxis);
+            */
         }
+
+
         return graph;
     }
 
@@ -755,6 +811,8 @@ public class MainController {
         fitGraphToCenter(getGraph());
         graphPane.setTranslateX(0);
         graphPane.setTranslateY(0);
+        //yAxis.setTranslateX(0);
+        //yAxis.setTranslateY(0);
     }
 
 

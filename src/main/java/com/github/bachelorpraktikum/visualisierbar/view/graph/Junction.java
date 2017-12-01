@@ -34,17 +34,26 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             c.setTranslateX(Math.round(c.getTranslateX()));
             c.setTranslateY(Math.round(c.getTranslateY()));
 
+            if (c.getCenterX()+c.getTranslateX()<0 || c.getCenterY()+c.getTranslateY()<0){
+                System.out.println("Coordiantes invalid");
+                c.setTranslateY(0);
+                c.setTranslateX(0);
+                return;
+            }
 
-            System.out.println(("Node X:" + this.getRepresented().getCoordinates().toPoint2D().getX()+" " + "Node Y:" + this.getRepresented().getCoordinates().toPoint2D().getY() ));
-            System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
             c.setCenterX(c.getCenterX()+c.getTranslateX());
             c.setCenterY(c.getCenterY()+c.getTranslateY());
+            //TODO Coordiantes Adapter??
             this.getRepresented().setCoordinates(new Coordinates(((int) c.getCenterX()),(int) c.getCenterY()));
             c.setTranslateX(0);
             c.setTranslateY(0);
             this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
             ////////////
             //this.getRepresented().getElements().forEach((a)->{a.});
+            //TooltipUtil.install(c,this.getRepresented().getName());
+            //Tooltip.
+            System.out.println(("Node X:" + this.getRepresented().getCoordinates().toPoint2D().getX()+" " + "Node Y:" + this.getRepresented().getCoordinates().toPoint2D().getY() ));
+            System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
         });
         this.getShape().setOnMouseDragged((t) -> {
 
@@ -63,10 +72,12 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
 
             Circle c = (Circle) (t.getSource());
+            //Tooltip tc = new Tooltip("("+(Math.round(c.getTranslateX()+offsetX) + "," + Math.round(c.getTranslateY()+offsetY)+ ")"));
+            //Tooltip.install(c,tc);
 
             c.setTranslateX(c.getTranslateX()+offsetX);
             c.setTranslateY(c.getTranslateY()+offsetY);
-
+            //System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
 
             //this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
 

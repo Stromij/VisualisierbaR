@@ -94,6 +94,9 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
 
     protected abstract Node createHighlight(S node);
 
+    //protected void setHighlight(Node highlight){this.highlight=highlight;}
+    //protected Node getHighlight(){return highlight;}
+
     protected Node createCircleHighlight(Node node) {
         Circle circle = new Circle();
         Bounds nodeBounds = node.getBoundsInParent();
