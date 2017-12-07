@@ -63,6 +63,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -133,6 +134,16 @@ public class MainController {
     @FXML
     private Pane graphPane;
 
+    @FXML
+    private ToolBar standartTB;
+    @FXML
+    private ChoiceBox toolSelector;
+
+    private Rectangle selectionRec;
+    /*
+    @FXML
+    private ToolBar editorTB;
+*/
     @Nullable
     private Graph graph;
     //private NumberAxis xAxis;
@@ -263,27 +274,58 @@ public class MainController {
 
             if(graph.getNodes()==null) return;
             if(newValue) {
+                /*
                 proportionalToggle.setVisible(false);
+                playToggle.setVisible(false);
+                resetButton.setVisible(false);
+                modelTime.setVisible(false);
+                */
+                standartTB.getItems().forEach((a)->{a.setVisible(false); });
+                resetButton.setVisible(true);
+                editorToggle.setVisible(true);
+                closeButton.setVisible(true);
+
+
+                toolSelector.setVisible(true);
+                toolSelector.setManaged(true);
                 if (proportionalToggle.isSelected()){
                     proportionalToggle.fire();
                 }
+                if (eventTraversal.isSelected()){
+                    eventTraversal.fire();
+                }
+
+                if (playToggle.isSelected()){
+                    playToggle.fire();
+                    resetButton.fire();
+
+                }
+                resetButton.fire();
                 //coordinatesField.setVisible(true);
                 graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
-                logToggle.setVisible(false);
+                //logToggle.setVisible(false);
                 rootPane.setLeft(null);
             }
             else {
                 graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
+
+                toolSelector.setManaged(false);
+                /*
                 proportionalToggle.setVisible(true);
+                playToggle.setVisible(true);
                 logToggle.setVisible(true);
                 //coordinatesField.setVisible(false);
-
+                */
+                standartTB.getItems().forEach((a)->{a.setVisible(true); });
+                toolSelector.setVisible(false);
+                toolSelector.setValue(toolSelector.getItems().get(0));
             }
 
 
 
 
         });
+
 
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -304,6 +346,11 @@ public class MainController {
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        toolSelector.setItems(FXCollections.observableArrayList("move", "select", "connect", "disconnect", "delete"));
+        toolSelector.setVisible(false);
+        toolSelector.setValue(toolSelector.getItems().get(0));
+        toolSelector.setManaged(false);
+
 
 
 
@@ -311,6 +358,7 @@ public class MainController {
         initializeElementList();
         initializeLogList();
         initializeCenterPane();
+        graphPane.getChildren().add(selectionRec);
 
         velocity = new SimpleIntegerProperty(1000);
         velocityText.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -398,29 +446,57 @@ public class MainController {
         graphPane.setOnMouseReleased(event -> {
             mousePressedX = -1;
             mousePressedY = -1;
+            selectionRec.setVisible(false);
         });
+        selectionRec=new Rectangle();
+        selectionRec.setVisible(false);
+        selectionRec.setFill(Color.BLUE);
+        selectionRec.setOpacity(0.2);
         graphPane.setOnMouseDragged(event -> {
+
             if (!event.isPrimaryButtonDown()) {
                 return;
             }
+            if (toolSelector.getValue()=="move") {
+                if (mousePressedX == -1 && mousePressedY == -1) {
+                    mousePressedX = event.getX();
+                    mousePressedY = event.getY();
+                }
 
-            if (mousePressedX == -1 && mousePressedY == -1) {
-                mousePressedX = event.getX();
-                mousePressedY = event.getY();
+                double xOffset = (event.getX() - mousePressedX);
+                double yOffset = (event.getY() - mousePressedY);
+
+                graphPane.setTranslateX(graphPane.getTranslateX() + xOffset);
+                graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
+                if (graph != null) {
+                    graph.getGroup().getScaleY();
+                    //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getGroup().getScaleY());
+                    //yAxis.setTranslateX(yAxis.getTranslateX() - xOffset);
+                }
             }
+            else{
+                if (mousePressedX == -1 && mousePressedY == -1) {
+                    //System.out.println("CLICK");
+                    selectionRec.setVisible(true);
+                    mousePressedX = event.getX();
+                    mousePressedY = event.getY();
+                    selectionRec.setX(mousePressedX);
+                    selectionRec.setY(mousePressedY);
+                }
+                double xOffset = (event.getX() - mousePressedX);
+                double yOffset = (event.getY() - mousePressedY);
+                if (xOffset<0){selectionRec.setX(mousePressedX+xOffset);}
+                else{selectionRec.setX(mousePressedX);}
+                if (yOffset<0){selectionRec.setY(mousePressedY+yOffset);}
+                else{selectionRec.setY(mousePressedY);}
+                selectionRec.setWidth(Math.abs(xOffset));
+                selectionRec.setHeight(Math.abs(yOffset));
 
-            double xOffset = (event.getX() - mousePressedX);
-            double yOffset = (event.getY() - mousePressedY);
 
-            graphPane.setTranslateX(graphPane.getTranslateX() + xOffset);
-            graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
-            if (graph!=null) {
-                graph.getGroup().getScaleY();
-                //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getGroup().getScaleY());
-                //yAxis.setTranslateX(yAxis.getTranslateX() - xOffset);
             }
             event.consume();
         });
+        //graphPane.getChildren().add(selectionRec);
         MenuItem exportItem = new MenuItem("Export");
         exportItem.setOnAction(event -> exportGraph());
         ContextMenuUtil.attach(centerPane, Collections.singletonList(exportItem));
