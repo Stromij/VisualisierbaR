@@ -8,17 +8,20 @@ import com.github.bachelorpraktikum.visualisierbar.view.moveable;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javax.annotation.Nonnull;
 import javafx.scene.Cursor;
 
+import java.util.HashSet;
 
 
 public final class Junction extends SingleGraphShapeBase<Node, Circle> implements com.github.bachelorpraktikum.visualisierbar.view.moveable {
 
     private static final double CALIBRATION_COEFFICIENT = 0.1;
-    private double mousePressedX = -1;
-    private double mousePressedY = -1;
+    private static HashSet<Junction> selection= new HashSet<>();
+    private static double mousePressedX = -1;
+    private static double mousePressedY = -1;
 
     private boolean moveable;
 
@@ -30,31 +33,43 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         this.getShape().setOnMouseReleased((event) -> {
             mousePressedX = -1;
             mousePressedY = -1;
-            Circle c = (Circle)event.getSource();
-            c.setTranslateX(Math.round(c.getTranslateX()));
-            c.setTranslateY(Math.round(c.getTranslateY()));
+            selection.forEach((b)->{
+                Circle a=b.getShape();
+            //Circle c = (Circle)event.getSource();
+            a.setTranslateX(Math.round(a.getTranslateX()));
+            a.setTranslateY(Math.round(a.getTranslateY()));
 
-            if (c.getCenterX()+c.getTranslateX()<0 || c.getCenterY()+c.getTranslateY()<0){
+            if (a.getCenterX()+a.getTranslateX()<0 || a.getCenterY()+a.getTranslateY()<0){
                 System.out.println("Coordiantes invalid");
-                c.setTranslateY(0);
-                c.setTranslateX(0);
+                a.setTranslateY(0);
+                a.setTranslateX(0);
                 return;
             }
 
-            c.setCenterX(c.getCenterX()+c.getTranslateX());
-            c.setCenterY(c.getCenterY()+c.getTranslateY());
+            a.setCenterX(a.getCenterX()+a.getTranslateX());
+            a.setCenterY(a.getCenterY()+a.getTranslateY());
             //TODO Coordiantes Adapter??
-            this.getRepresented().setCoordinates(new Coordinates(((int) c.getCenterX()),(int) c.getCenterY()));
-            c.setTranslateX(0);
-            c.setTranslateY(0);
-            this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
+            b.getRepresented().setCoordinates(new Coordinates(((int) a.getCenterX()),(int) a.getCenterY()));
+            a.setTranslateX(0);
+            a.setTranslateY(0);
+            b.getRepresented().movedProperty().setValue(!b.getRepresented().movedProperty().getValue());
             ////////////
             //this.getRepresented().getElements().forEach((a)->{a.});
             //TooltipUtil.install(c,this.getRepresented().getName());
             //Tooltip.
-            System.out.println(("Node X:" + this.getRepresented().getCoordinates().toPoint2D().getX()+" " + "Node Y:" + this.getRepresented().getCoordinates().toPoint2D().getY() ));
-            System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
+            System.out.println(("Node X:" + b.getRepresented().getCoordinates().toPoint2D().getX()+" " + "Node Y:" + b.getRepresented().getCoordinates().toPoint2D().getY() ));
+            System.out.println("X:"+ (a.getCenterX()+a.getTranslateX())+" "+"Y:"+ (a.getCenterY()+a.getTranslateY()));
+            });
         });
+
+        this.getShape().setOnMousePressed((t)->{
+            if(!selection.contains(this)){
+                clearSelection();
+
+            }
+            this.addToSelection();
+        });
+
         this.getShape().setOnMouseDragged((t) -> {
 
 
@@ -69,17 +84,18 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             double offsetX=(t.getX() - mousePressedX);
             double offsetY=(t.getY() - mousePressedY);
 
+            selection.forEach((b)->{
+                Circle a=b.getShape();
+                //Circle c = (Circle) (t.getSource());
+                //Tooltip tc = new Tooltip("("+(Math.round(c.getTranslateX()+offsetX) + "," + Math.round(c.getTranslateY()+offsetY)+ ")"));
+                //Tooltip.install(c,tc);
 
-
-            Circle c = (Circle) (t.getSource());
-            //Tooltip tc = new Tooltip("("+(Math.round(c.getTranslateX()+offsetX) + "," + Math.round(c.getTranslateY()+offsetY)+ ")"));
-            //Tooltip.install(c,tc);
-
-            c.setTranslateX(c.getTranslateX()+offsetX);
-            c.setTranslateY(c.getTranslateY()+offsetY);
+            a.setTranslateX(a.getTranslateX()+offsetX);
+            a.setTranslateY(a.getTranslateY()+offsetY);
             //System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
 
             //this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
+            });
 
             t.consume();
         });
@@ -123,6 +139,18 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         else  this.getShape().setCursor(Cursor.DEFAULT);
     }
 
+    public void addToSelection(){
+        this.getShape().setFill(Color.BLUE);
+        selection.add(this);
+    }
+    public void removeFromSelection(){
+        this.getShape().setFill(Color.BLACK);
+        selection.remove(this);
+    }
+    public static void clearSelection(){
+        selection.forEach((b)->{b.getShape().setFill(Color.BLACK);});
+        selection.clear();
+    }
     @Override
     public boolean getMoveable() {
         return moveable;

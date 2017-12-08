@@ -446,6 +446,8 @@ public class MainController {
             selectionRec.setVisible(false);
             if(toolSelector.getValue()=="select"){
                 //System.out.println( selectionRec.getBoundsInLocal()
+                if(!event.isShiftDown()) Junction.clearSelection();
+                if (graph.getNodes()==null) return;
                 graph.getNodes().forEach((node,shape)->{
 
                     Circle c = (Circle) shape.getShape();
@@ -454,9 +456,9 @@ public class MainController {
                     double srx=selectionRec.getX();
                     double sry=selectionRec.getY();
                     //if(shape.getShape()!=null && (selectionRec.getX()<shape.getShape()) && (selectionRec.getX()+selectionRec.getWidth()>shape.getShape().getLayoutX()) && (selectionRec.getY()<shape.getShape().getLayoutY())&&(selectionRec.getY()+selectionRec.getHeight()>shape.getShape().getLayoutX()))
-                    if(c!=null && srx<sb.getMaxX() && srx+selectionRec.getWidth()>sb.getMinX() && sry<sb.getMaxY() && sry+selectionRec.getHeight()>sb.getMinY()) {
+                    if( srx<sb.getMaxX() && srx+selectionRec.getWidth()>sb.getMinX() && sry<sb.getMaxY() && sry+selectionRec.getHeight()>sb.getMinY()) {
                         //System.out.println("things are happening");
-                        c.setFill(Color.BLUE);
+                        ((Junction)shape).addToSelection();
                         //selected.getChildren().add(shape.getShape());
                     }
                 });
