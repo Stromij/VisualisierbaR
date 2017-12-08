@@ -2,7 +2,6 @@ package com.github.bachelorpraktikum.visualisierbar.view.sourcechooser;
 
 import com.github.bachelorpraktikum.visualisierbar.config.ConfigKey;
 import com.github.bachelorpraktikum.visualisierbar.datasource.AbsSource;
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.fxml.FXML;
@@ -11,7 +10,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
+import javafx.stage.DirectoryChooser;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,27 +32,30 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
 
     @FXML
     private Button explorerButton;
-    private FileChooser fileChooser;
+    private DirectoryChooser directoryChooser;
 
 
     private ReadOnlyObjectWrapper<URI> fileUriProperty;
-    private BooleanBinding fileChosen;
+    private ReadOnlyObjectWrapper<String> productProperty;
+    private ReadOnlyObjectWrapper<String> completeProperty;
+    private ObservableBooleanValue fileChosen;
 
 
     @FXML
     private void initialize() {
 
         fileUriProperty = new ReadOnlyObjectWrapper<>();
-        fileChosen = fileUriProperty.isNotNull();
-        fileChooser = new FileChooser();
+        productProperty = new ReadOnlyObjectWrapper<>();
+        completeProperty = new ReadOnlyObjectWrapper<>();
+        fileChosen = completeProperty.isNotNull();
 
         //Initalisiere den FileChooser
-        fileChooser = new FileChooser();
+        directoryChooser = new DirectoryChooser();
         String initialDirectory = getInitialDirectory();
-        fileChooser.setInitialDirectory(new File(initialDirectory));
+        directoryChooser.setInitialDirectory(new File(initialDirectory));
 
         // Füge dem Durchsuchen-Button einen Eventlistener hinzu und öffne das Durchsuchen-Fenster bei Auslösung
-        explorerButton.setOnAction(event -> updatePath(openFileChooser()));
+        explorerButton.setOnAction(event -> updatePath(openDirectoryChooser()));
         explorerButton.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 explorerButton.fire();
@@ -70,17 +72,28 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
             setInitialDirectory(newValue);
             URI uri = new File(newValue).getAbsoluteFile().toURI();
             fileUriProperty.set(uri);
+            check();
+        });
+
+        // Add a Listener to the Product-Name-Field
+        productNameField.textProperty().addListener((o, oldValue, newValue) -> {
+            if (newValue == null || newValue.trim().isEmpty()) {
+                productProperty.set(null);
+            } else {
+                productProperty.set(newValue.trim());
+            }
+            check();
         });
 
 
-        // Add an EventHandler to the URI-Field: By pressing Enter it schould fire the "Open Source" Button
+        // Add an EventHandler to the URI-Field: By hitting Enter it schould fire the "Open Source" Button
         absFileURIField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 ((Button) rootPane.getScene().lookup("#openSource")).fire();
             }
         });
 
-        // Add an EventHandler to the productName-Field: By pressing Enter it schould fire the "Open Source" Button
+        // Add an EventHandler to the productName-Field: By hitting Enter it schould fire the "Open Source" Button
         productNameField.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
                 ((Button) rootPane.getScene().lookup("#openSource")).fire();
@@ -111,8 +124,8 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
      * @return A {@link File file} or null
      */
     @Nullable
-    private File openFileChooser() {
-        return fileChooser.showOpenDialog(rootPane.getScene().getWindow());
+    private File openDirectoryChooser() {
+        return directoryChooser.showDialog(rootPane.getScene().getWindow());
     }
 
     /**
@@ -138,20 +151,31 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
      */
     private void setInitialDirectory(String path) {
         File file = new File(path);
-        if (file.isFile()) {
-            path = file.getParent();
+        if (file.isDirectory()) {
             ConfigKey.initialLogFileDirectory.set(path);
-            fileChooser.setInitialDirectory(new File(path));
+            directoryChooser.setInitialDirectory(new File(path));
         }
     }
 
     @Nonnull
     @Override
     public AbsSource getResource() throws IOException {
-        return new AbsSource(new File(fileUriProperty.get().toURL().getFile()), productNameField.getText());
+        return new AbsSource(completeProperty.get(), new File(fileUriProperty.getValue().getPath()).getParentFile().toURI());
     }
 
     @Nonnull
     @Override
     public ObservableBooleanValue inputChosen() {return fileChosen;}
+
+
+    private void check(){
+        String command = null;
+
+        if(fileUriProperty.get() != null && productProperty.get() != null)
+            {String parent = new File(fileUriProperty.getValue().getPath()).getParentFile().toString();
+             command = String.format("absc -v -product=%s -erlang %s*.abs -d %s/gen/erlang/",
+                    productProperty.get(), fileUriProperty.getValue().getPath(), parent);}
+
+        completeProperty.set(command);
+    }
 }
