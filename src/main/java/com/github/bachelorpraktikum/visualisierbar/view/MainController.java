@@ -21,12 +21,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -63,6 +58,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
@@ -140,6 +136,7 @@ public class MainController {
     private ChoiceBox toolSelector;
 
     private Rectangle selectionRec;
+    //private LinkedList<> selected;
     /*
     @FXML
     private ToolBar editorTB;
@@ -447,11 +444,30 @@ public class MainController {
             mousePressedX = -1;
             mousePressedY = -1;
             selectionRec.setVisible(false);
+            if(toolSelector.getValue()=="select"){
+                //System.out.println( selectionRec.getBoundsInLocal()
+                graph.getNodes().forEach((node,shape)->{
+
+                    Circle c = (Circle) shape.getShape();
+                    Bounds sb =graph.getGroup().localToParent(c.getBoundsInParent());
+                    //graph.getGroup().get
+                    double srx=selectionRec.getX();
+                    double sry=selectionRec.getY();
+                    //if(shape.getShape()!=null && (selectionRec.getX()<shape.getShape()) && (selectionRec.getX()+selectionRec.getWidth()>shape.getShape().getLayoutX()) && (selectionRec.getY()<shape.getShape().getLayoutY())&&(selectionRec.getY()+selectionRec.getHeight()>shape.getShape().getLayoutX()))
+                    if(c!=null && srx<sb.getMaxX() && srx+selectionRec.getWidth()>sb.getMinX() && sry<sb.getMaxY() && sry+selectionRec.getHeight()>sb.getMinY()) {
+                        //System.out.println("things are happening");
+                        c.setFill(Color.BLUE);
+                        //selected.getChildren().add(shape.getShape());
+                    }
+                });
+            }
+            //if (selected.getChildren().size()>0)
         });
         selectionRec=new Rectangle();
         selectionRec.setVisible(false);
         selectionRec.setFill(Color.BLUE);
         selectionRec.setOpacity(0.2);
+        //selected=new Group();
         graphPane.setOnMouseDragged(event -> {
 
             if (!event.isPrimaryButtonDown()) {
@@ -482,6 +498,7 @@ public class MainController {
                     mousePressedY = event.getY();
                     selectionRec.setX(mousePressedX);
                     selectionRec.setY(mousePressedY);
+                    //selected.getChildren().removeAll();
                 }
                 double xOffset = (event.getX() - mousePressedX);
                 double yOffset = (event.getY() - mousePressedY);
@@ -491,6 +508,8 @@ public class MainController {
                 else{selectionRec.setY(mousePressedY);}
                 selectionRec.setWidth(Math.abs(xOffset));
                 selectionRec.setHeight(Math.abs(yOffset));
+
+
 
 
             }
