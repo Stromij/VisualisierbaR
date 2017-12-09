@@ -134,6 +134,8 @@ public class MainController {
     private ToolBar standartTB;
     @FXML
     private ChoiceBox toolSelector;
+    @FXML
+    private Button deleteButton;
 
     private Rectangle selectionRec;
     //private LinkedList<> selected;
@@ -285,6 +287,9 @@ public class MainController {
 
                 toolSelector.setVisible(true);
                 toolSelector.setManaged(true);
+                deleteButton.setVisible(true);
+                deleteButton.setManaged(true);
+
                 if (proportionalToggle.isSelected()){
                     proportionalToggle.fire();
                 }
@@ -307,6 +312,7 @@ public class MainController {
                 graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
 
                 toolSelector.setManaged(false);
+                deleteButton.setManaged(false);
                 /*
                 proportionalToggle.setVisible(true);
                 playToggle.setVisible(true);
@@ -315,6 +321,7 @@ public class MainController {
                 */
                 standartTB.getItems().forEach((a)->{a.setVisible(true); });
                 toolSelector.setVisible(false);
+                deleteButton.setVisible(false);
                 toolSelector.setValue(toolSelector.getItems().get(0));
             }
 
@@ -323,6 +330,14 @@ public class MainController {
 
         });
 
+        deleteButton.setOnAction((t)->{
+            Junction.getSelection().forEach((a)->{
+
+                graph.removeNode(a.getRepresentedObjects().get(0));
+
+            });
+            Junction.emptySelection();
+        });
 
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {

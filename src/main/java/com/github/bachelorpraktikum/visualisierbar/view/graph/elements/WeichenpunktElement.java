@@ -33,6 +33,7 @@ final class WeichenpunktElement extends ElementBase<Polygon> {
 
     @Override
     protected void relocate(Polygon shape) {
+
         CoordinatesAdapter adapter = getCoordinatesAdapter();
         Point2D[] others = new Point2D[2];
         int index = 0;

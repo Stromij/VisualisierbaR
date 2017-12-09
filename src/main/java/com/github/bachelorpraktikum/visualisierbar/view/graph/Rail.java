@@ -42,8 +42,14 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
     @Nonnull
     @Override
     public Line createShape() {
-        getRepresented().getNode1().movedProperty().addListener((observable, oldValue, newValue) -> {relocate(this.getShape());});
-        getRepresented().getNode2().movedProperty().addListener((observable, oldValue, newValue) -> {relocate(this.getShape());});
+        getRepresented().getNode1().movedProperty().addListener((observable, oldValue, newValue) -> {
+            relocate(this.getShape());
+
+        });
+        getRepresented().getNode2().movedProperty().addListener((observable, oldValue, newValue) -> {
+            relocate(this.getShape());
+
+        });
         return new Line();
     }
 

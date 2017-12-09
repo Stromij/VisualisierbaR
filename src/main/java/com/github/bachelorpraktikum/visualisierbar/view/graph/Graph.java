@@ -6,9 +6,9 @@ import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
+
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -25,11 +25,11 @@ public final class Graph {
     private final Group group;
 
     @Nonnull
-    private final Map<Node, GraphShape<Node>> nodes;
+    private  Map<Node, GraphShape<Node>> nodes;
     @Nonnull
-    private final Map<Edge, GraphShape<Edge>> edges;
+    private  Map<Edge, GraphShape<Edge>> edges;
     @Nonnull
-    private final Map<Element, GraphShape<Element>> elements;
+    private Map<Element, GraphShape<Element>> elements;
 
 
     /**
@@ -100,4 +100,35 @@ public final class Graph {
     public CoordinatesAdapter getCoordinatesAdapter() {
         return coordinatesAdapter;
     }
+
+    public void removeNode(Node node){
+        LinkedList<Element> e =new LinkedList<>();
+        //LinkedList<Node> n =new LinkedList();
+        LinkedList<Edge> ed =new LinkedList<>();
+        elements.forEach((a,b)->{
+            if (a.getNode()==node){
+                e.add(a);
+                group.getChildren().remove(b.getFullNode());
+                //elements.remove(a);
+            }
+        });
+
+        edges.forEach((a,b)->{
+            if(a.getNode1()==node || a.getNode2()==node) {
+                ed.add(a);
+                group.getChildren().remove(b.getFullNode());
+                //edges.remove(a);
+            }
+        });
+        e.forEach((a)->{elements.remove(a);});
+        ed.forEach((a)->{edges.remove(ed);});
+        group.getChildren().remove(nodes.get(node).getFullNode());
+        nodes.remove(node);
+
+
+    }
+    public void removeEdge (Edge edge){
+        edges.remove(edge);
+    }
+
 }
