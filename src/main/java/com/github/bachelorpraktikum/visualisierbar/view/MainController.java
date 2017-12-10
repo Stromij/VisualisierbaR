@@ -136,6 +136,8 @@ public class MainController {
     private ChoiceBox toolSelector;
     @FXML
     private Button deleteButton;
+    @FXML
+    private Button disconnectButton;
 
     private Rectangle selectionRec;
     //private LinkedList<> selected;
@@ -289,6 +291,8 @@ public class MainController {
                 toolSelector.setManaged(true);
                 deleteButton.setVisible(true);
                 deleteButton.setManaged(true);
+                disconnectButton.setManaged(true);
+                disconnectButton.setVisible(true);
 
                 if (proportionalToggle.isSelected()){
                     proportionalToggle.fire();
@@ -313,6 +317,7 @@ public class MainController {
 
                 toolSelector.setManaged(false);
                 deleteButton.setManaged(false);
+                disconnectButton.setManaged(false);
                 /*
                 proportionalToggle.setVisible(true);
                 playToggle.setVisible(true);
@@ -322,6 +327,7 @@ public class MainController {
                 standartTB.getItems().forEach((a)->{a.setVisible(true); });
                 toolSelector.setVisible(false);
                 deleteButton.setVisible(false);
+                disconnectButton.setVisible(false);
                 toolSelector.setValue(toolSelector.getItems().get(0));
             }
 
@@ -337,6 +343,12 @@ public class MainController {
 
             });
             Junction.emptySelection();
+        });
+
+        disconnectButton.setOnAction((t)->{
+            Junction.getSelection().forEach((a)->{
+                graph.disconnect(a.getRepresentedObjects().get(0));
+            });
         });
 
 

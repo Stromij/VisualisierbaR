@@ -35,7 +35,7 @@ public final class Node implements GraphObject<Circle> {
     @Nonnull
     private  Coordinates coordinates;
     @Nonnull
-    private final Set<Edge> edges;
+    private  Set<Edge> edges;
     @Nonnull
     private final Set<Element> elements;
     @Nonnull

@@ -131,4 +131,22 @@ public final class Graph {
         edges.remove(edge);
     }
 
+    public void fullyConnect (HashSet<Junction> selection){
+
+    }
+
+    public void disconnect (Node node){
+        LinkedList<Edge> ed = new LinkedList<>();
+        edges.forEach((a,b)-> {
+            if (a.getNode1() == node || a.getNode2() == node) {
+                ed.add(a);
+                group.getChildren().remove(b.getFullNode());
+            }
+        });
+        ed.forEach((a)->{edges.remove(ed);});
+    }
+
+   // public void addNode (Node node){
+
+    //}
 }
