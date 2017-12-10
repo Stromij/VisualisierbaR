@@ -382,7 +382,8 @@ public class MainController {
         initializeElementList();
         initializeLogList();
         initializeCenterPane();
-        graphPane.getChildren().add(selectionRec);
+        //graphPane.getChildren().add(selectionRec);
+        centerPane.getChildren().add(selectionRec);
 
         velocity = new SimpleIntegerProperty(1000);
         velocityText.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -492,13 +493,13 @@ public class MainController {
             }
             //if (selected.getChildren().size()>0)
         });
+
         selectionRec=new Rectangle();
         selectionRec.setVisible(false);
         selectionRec.setFill(Color.BLUE);
         selectionRec.setOpacity(0.2);
         //selected=new Group();
         graphPane.setOnMouseDragged(event -> {
-
             if (!event.isPrimaryButtonDown()) {
                 return;
             }
@@ -838,6 +839,7 @@ public class MainController {
         if (graph == null) {
             Context context = DataSourceHolder.getInstance().getContext();
             if (proportionalToggle.isSelected()) {
+                //TODO: carry over edited Context? Context History for undo?
                 graph = new Graph(context, new ProportionalCoordinatesAdapter(context));
             } else {
                 graph = new Graph(context, new SimpleCoordinatesAdapter());
@@ -953,6 +955,8 @@ public class MainController {
     private void switchGraph() {
         GraphObject selected = elementList.getSelectionModel().getSelectedItem();
         graphPane.getChildren().clear();
+        //TODO: List of persistend Objects?
+        graphPane.getChildren().add(selectionRec);
         graph = null;
         fitGraphToCenter(getGraph());
         if (selected != null) {
