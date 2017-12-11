@@ -382,8 +382,7 @@ public class MainController {
         initializeElementList();
         initializeLogList();
         initializeCenterPane();
-        //graphPane.getChildren().add(selectionRec);
-        centerPane.getChildren().add(selectionRec);
+        graphPane.getChildren().add(selectionRec);
 
         velocity = new SimpleIntegerProperty(1000);
         velocityText.textProperty().addListener((observable, oldValue, newValue) -> {
