@@ -295,7 +295,7 @@ public class TrainPositionTest {
         );
         CoordinatesAdapter adapter = new SimpleCoordinatesAdapter();
 
-        assertEquals(expected, move.getPositions(adapter));
+        assertEquals(expected, move.getPositions((a)->adapter.apply(a)));
     }
 
     @Test
@@ -303,7 +303,7 @@ public class TrainPositionTest {
         TrainPosition reach = TrainPosition.init(train, edge1, node1, node2).reachFront(edge2);
         CoordinatesAdapter adapter = new SimpleCoordinatesAdapter();
         assertEquals(2, reach.getEdges().size());
-        assertEquals(2, reach.getPositions(adapter).size());
+        assertEquals(2, reach.getPositions((a)->adapter.apply(a)).size());
     }
 
     @Test
@@ -317,7 +317,7 @@ public class TrainPositionTest {
         );
         CoordinatesAdapter adapter = new SimpleCoordinatesAdapter();
 
-        assertEquals(expected, move.getPositions(adapter));
+        assertEquals(expected, move.getPositions((a)->adapter.apply(a)));
     }
 
     private void check(Train.Position position,
@@ -335,12 +335,12 @@ public class TrainPositionTest {
         assertEquals(frontEdge, position.getFrontEdge());
         assertEquals(frontDistance, position.getFrontDistance());
         assertEquals(frontPos, position.getFrontCoordinates());
-        assertEquals(frontPos, position.getFrontPosition(adapter));
+        assertEquals(frontPos, position.getFrontPosition((a)->adapter.apply(a)));
 
         assertEquals(backEdge, position.getBackEdge());
         assertEquals(backDistance, position.getBackDistance());
         assertEquals(backPos, position.getBackCoordinates());
-        assertEquals(backPos, position.getBackPosition(adapter));
+        assertEquals(backPos, position.getBackPosition((a)->adapter.apply(a)));
 
         assertEquals(edges, position.getEdges());
     }

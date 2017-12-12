@@ -31,8 +31,25 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         super(node, adapter);
 
         setMoveable(false);
+      /*
+        adapter.OffsetXproperty().addListener((a)->{
+            Point2D position = adapter.apply(node);
+            this.getShape().setCenterX(position.getX());
+            //this.getShape().setCenterY(position.getY());
+            this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
 
+        });
+
+        adapter.OffsetYproperty().addListener((a)->{
+            Point2D position = adapter.apply(node);
+            this.getShape().setCenterY(position.getY());
+            //this.getShape().setCenterY(position.getY());
+            this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
+
+        });
+        */
         this.getShape().setOnMouseReleased((event) -> {
+            if (!moveable) return;
             mousePressedX = -1;
             mousePressedY = -1;
             selection.forEach((b) -> {
@@ -41,17 +58,20 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 a.setTranslateX(Math.round(a.getTranslateX()));
                 a.setTranslateY(Math.round(a.getTranslateY()));
 
+            /*
                 if (a.getCenterX() + a.getTranslateX() < 0 || a.getCenterY() + a.getTranslateY() < 0) {
                     System.out.println("Coordiantes invalid");
                     a.setTranslateY(0);
                     a.setTranslateX(0);
                     return;
                 }
-
+*/
                 a.setCenterX(a.getCenterX() + a.getTranslateX());
                 a.setCenterY(a.getCenterY() + a.getTranslateY());
                 //TODO Coordiantes Adapter??
-                b.getRepresented().setCoordinates(new Coordinates(((int) a.getCenterX()), (int) a.getCenterY()));
+                //b.getRepresented().setCoordinates(new Coordinates(((int) a.getCenterX()), (int) a.getCenterY()));
+                b.getRepresented().setCoordinates(adapter.reverse(new Point2D (((int) a.getCenterX()), (int) a.getCenterY())));
+
                 a.setTranslateX(0);
                 a.setTranslateY(0);
                 b.getRepresented().movedProperty().setValue(!b.getRepresented().movedProperty().getValue());
@@ -65,6 +85,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         });
 
         this.getShape().setOnMousePressed((t) -> {
+            if (!moveable) return;
             if (!selection.contains(this) && !t.isShiftDown()) {
                 clearSelection();
 
@@ -73,7 +94,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         });
 
         this.getShape().setOnMouseDragged((t) -> {
-
+            if (!moveable) return;
 
             if (!t.isPrimaryButtonDown() || !moveable) {
                 return;

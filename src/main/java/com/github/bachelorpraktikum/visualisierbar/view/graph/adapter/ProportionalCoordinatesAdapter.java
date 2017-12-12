@@ -10,6 +10,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
+import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Point2D;
 import javax.annotation.Nonnull;
 
@@ -26,6 +28,8 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     private HashMap<Node, Point2D> transformationMap = new HashMap<>();
     private LinkedList<GraphSegment> segments = new LinkedList<>();
     private final static double MOVING_DISTANCE = 1.5;
+    private IntegerProperty offsetX;
+    private IntegerProperty offsetY;
 
     public ProportionalCoordinatesAdapter(Context context) {
         this.context = context;
@@ -297,7 +301,27 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
             this.segments.add(currentSegment);
         }
     }
+    /*
+    @Override
+    public IntegerProperty OffsetXproperty() {
+        return null;
+    }
 
+    @Override
+    public IntegerProperty OffsetYproperty() {
+        return null;
+    }
+
+    @Override
+    public void setOffsetX(int x) {
+
+    }
+
+    @Override
+    public void setOffsetY(int y) {
+
+    }
+        */
     @Override
     public double getCalibrationBase() {
         return 2.7;
@@ -314,6 +338,11 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     public Point2D apply(@Nonnull Node node) {
         Point2D transformVec = transformationMap.get(node);
         return startingPoint.add(transformVec);
+    }
+    //dont use, doesnt work
+    @Override
+    public Coordinates reverse(@Nonnull Point2D point) {
+        return new Coordinates(0,0);
     }
 
     /**

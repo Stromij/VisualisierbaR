@@ -146,7 +146,10 @@ public final class Graph {
         ed.forEach((a)->{edges.remove(ed);});
     }
 
-   // public void addNode (Node node){
+    public void addNode (Node node){
+        Junction.getSelection().forEach((a)->{
 
-    //}
+        });
+
+    }
 }

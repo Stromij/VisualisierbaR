@@ -23,9 +23,11 @@ public final class Coordinates {
      * @throws IllegalArgumentException if a coordinate is negative
      */
     public Coordinates(int x, int y) {
+        /*
         if (x < 0 || y < 0) {
             throw new IllegalArgumentException("Coordinate can't be negative");
         }
+        */
         this.x = x;
         this.y = y;
     }

@@ -1,7 +1,10 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph.adapter;
 
+import com.github.bachelorpraktikum.visualisierbar.model.Coordinates;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
 import java.util.function.Function;
+
+import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Point2D;
 import javax.annotation.Nonnull;
 
@@ -9,8 +12,13 @@ import javax.annotation.Nonnull;
  * Represents an adapter for transforming the abstract coordinates of the model package to real
  * coordinates for visualization.
  */
-public interface CoordinatesAdapter extends Function<Node, Point2D> {
+public interface CoordinatesAdapter {
 
+   //IntegerProperty OffsetXproperty();
+   //IntegerProperty OffsetYproperty();
+
+   //void setOffsetX(int x);
+   //void setOffsetY(int y);
     /**
      * Gets the length of the shortest edge in the graph. Should be used to determine the size of
      * elements in the graph, like the size of nodes or the width of edges.<br> The length returned
@@ -28,6 +36,6 @@ public interface CoordinatesAdapter extends Function<Node, Point2D> {
      * @throws NullPointerException if node is null
      */
     @Nonnull
-    @Override
     Point2D apply(@Nonnull Node node);
+    Coordinates reverse(@Nonnull Point2D point);
 }
