@@ -71,13 +71,20 @@ public class AbsSource implements DataSource {
         return context;
     }
 
+    /**
+     * This method parses all used Deltas from the given product from the file.
+     * It collect them in the ArrayList @var delta and return them.
+     *
+     * @return An ArrayList of all Deltas
+     */
+
     public ArrayList getDeltas(){
         ArrayList<Matcher> foundedDeltaLines = new ArrayList();
         ArrayList<String> productNames = new ArrayList<>();
         Matcher matcherProduct;
         Matcher matcherDelta;
 
-        Pattern patternDeltaLines = Pattern.compile("(delta )(.*?)((after .*?)?)( when )(.*?)(;)");
+        Pattern patternDeltaLines = Pattern.compile("(delta )(.*?)(( after .*?)?)( when )(.*?)(;)");
         Pattern patternProduct = Pattern.compile("(product "+this.product+" \\()(.*?)(\\);)");
 
         try {
@@ -94,8 +101,7 @@ public class AbsSource implements DataSource {
                 }
             reader.close();
 
-            // suchen der Deltas
-            // hier müsste auch in ieiner Form die verundete Delta-Klausel implementiert werden
+            // Suchen der Deltas
 
             for(int i=0; i<productNames.size(); i++)
                 {for(int n=0; n<foundedDeltaLines.size(); n++)

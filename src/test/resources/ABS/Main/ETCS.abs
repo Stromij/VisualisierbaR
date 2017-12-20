@@ -1,0 +1,458 @@
+module ETCS;
+
+delta Balises;
+uses TrackElements;
+adds interface Balise extends TrackElement {
+  Unit setBaliseLinks(Balise backB, Int backDist, Balise forB, Int forDist);
+  Balise getBackwardBalise();
+  Balise getForwardBalise();
+  Int getBackwardDist();
+  Int getForwardDist();
+  String getName();
+  }
+  
+adds class BaliseImpl(String name, Node n) implements Balise {
+  Balise backwardBalise = null;
+  Balise forwardBalise = null;
+  Int backwardDist = -1;
+  Int forwardDist = -1;
+  
+  Balise getBackwardBalise(){return backwardBalise;}
+  Balise getForwardBalise(){return forwardBalise;}
+  Int getBackwardDist(){return backwardDist;}
+  Int getForwardDist(){return forwardDist;}
+  String getName(){return name;}
+  
+  Unit setBaliseLinks(Balise backB, Int backDist, Balise forB, Int forDist){
+    this.backwardBalise = backB;
+    this.backwardDist = backDist;
+    this.forwardBalise = forB;
+    this.forwardDist = forDist;
+  }
+  
+  Information triggerFront(Train train, Time t, Edge e){
+    return ChangeLrbg(this);
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+}
+
+
+
+delta ETCSUtil;
+uses Util;
+modifies data Information =   NoInfo 
+				  | TestInfo //for debugging only
+                  | Info(SignalState si) | Prepare(SignalState sp) | StartPrepare(SignalState spp) 
+                  | Limit(Int) | LimitPrepare(Int) | WeichenbereichVerlassen 
+                  | Crash | ChangeResp(ZugFolge)  
+                  | Mhz1000 | Mhz2000 | Mhz500 |
+                   UpdateMA(MovementAuthority) | ReportPosition(PositionReport) | ChangeLrbg(Balise);
+adds data MovementAuthority = MoveAuth(Balise lrbg, Int dist) | NoMoveAuth;
+adds data PositionReport = PosRep(Balise lrbgRep, Int pos, Int safeTrainLength) |NoPosRep;
+
+
+
+
+
+
+
+delta ETCSCore;
+uses Train;
+
+adds import * from Rbc;
+modifies interface Train.Train{
+ 	adds Unit setVmax(Rat vm);  //debug only      //X
+ 	adds Unit setEtcsLevel(EtcsLevel l);          //X
+ 	adds Unit initLrbg(Balise l);                 //X
+	adds Unit setTimerInterval(Rat i);            //X
+ 	adds Unit handleTimer(Rat interval);          //X
+ 	adds Unit initMA(MovementAuthority m);        //X
+ 	adds Unit updateMA(MovementAuthority m);      //X
+}
+
+modifies class Train.TrainImpl{	
+	adds Bool eoaBraking = False; // if the train is in braking state caused by an EoA
+	adds EtcsLevel level = LvNTC_PZB;  // ETCS Level
+	adds Balise lrbg = null;  // Last Relevant Balise Group (LRBG)
+	adds Rat distFromLrbg = 0;  // Distance from LRBG
+	adds MovementAuthority ma = NoMoveAuth;  // Current MA
+	adds Rat lastTimerV = -1; // speed at the last timer tick
+	adds TimerGenerator tGen = null;
+	
+	modifies [Atomic] Unit initMe(){ 
+	    original(); 
+		[HTTPName: "tG"+name] tGen = new local TimerGenerator(this, pGen, name);
+		bu = new local BaliseUtilImpl();
+	}
+	
+	modifies Unit handleEventLocally(GenEvent gen){
+			case gen{
+				EoaEv(ne) =>{
+					//nEv = ne;
+					this!handleEoa(ne);
+				}
+				_ 	=>{
+					original(gen);
+				}
+			}
+	
+	}
+	
+	modifies Unit processInfo(Information i){
+		case i {
+			ChangeLrbg(bal) => {
+				lrbg = bal;
+				String balname = bal.getName();
+				println("----" + name + ": old dist from LRBG: " + toString(distFromLrbg));
+				println("----" + name + ": new LRBG: " + balname);
+				println("----" + name + ": new dist from LRBG: 0");
+				distFromLrbg = 0;
+			}
+			Info(STOP) => {
+				if(level != Lv3){ original(i); }
+			}
+			StartPrepare(STOP) => {
+				if(level != Lv3){ original(i); }
+			}
+			Info(FAHRT) => {
+				if(level != Lv3){ original(i); }
+			}
+			StartPrepare(FAHRT) => {
+				if(level != Lv3){ original(i); }
+			}
+			Mhz1000 => {
+				if(level == LvNTC_PZB){ original(i); }
+			}
+			Mhz500 => {
+				if(level == LvNTC_PZB){ original(i); }
+			}
+			Mhz2000 => {
+				if(level == LvNTC_PZB){ original(i); }
+			}
+			_ => original(i);
+		}
+ 	}
+	
+	modifies GenEvent getNext(List<GenEvent> list, Rat frontNext, Rat backNext) {
+		List<GenEvent> nList = list;
+		if(ma != NoMoveAuth && !eoaBraking){
+			Rat eoaDist = this.calculateEoaDist();
+			GenEvent ev = pGen.getNextEoaEvent(frontNext, backNext, eoaDist, this.fahrCounter, this.emergCount);
+			nList = Cons(ev, nList);
+		}
+		return original(nList, frontNext, backNext);
+	}
+	
+	adds Unit setVmax(Rat vm) { pGen.setVmax(vm); }
+
+	adds Unit setTimerInterval(Rat i) { tGen.setTimerInterval(i); }
+	
+	adds Unit setEtcsLevel(EtcsLevel l) {
+		this.level = l;
+		if(l == Lv3) {
+			tGen.activate(True);
+		}
+		else {
+			tGen.activate(False);
+		}
+	}	
+	
+	adds Unit initLrbg(Balise l) { this.lrbg = l; }
+	
+	
+	adds Unit handleTimer(Rat interval){
+		println("----Timer Event for " + name + " at " + intToString(truncate(timeValue(now()))));
+		Rat break = pGen.getBreak();
+		Rat emerg = pGen.getEmerg();
+		Rat accel = pGen.getAccel();
+		Rat v = pGen.getV();
+		AccelState acc = pGen.getAccelState();
+		println("----AccelState for " + name + ": " + toString(acc));
+		println("----v for " + name + ": " + intToString(truncate(v)));
+		if(lastTimerV < 0){
+			lastTimerV = v;
+		}
+		Rat changeDist = interval * (lastTimerV + v) / 2;
+		distFromLrbg = distFromLrbg + changeDist;
+		lastTimerV = v;
+				
+		
+		if(rbc != null) {
+			PositionReport pr = PosRep(lrbg, truncate(distFromLrbg), length);
+			String lrbgname = lrbg.getName();
+			println("----Position Report from " + name + ": LRBG " + lrbgname + ", dist " + intToString(truncate(distFromLrbg)));
+			rbc!reportPosition(this, pr);
+		}
+		if(ttl > 0 && timeValue(now()) > ttl) {
+			tGen.activate(False);
+		}
+		if(level == Lv3 && wait) {
+			Rat eoaDist = this.calculateEoaDist();
+			Rat vmax = pGen.getVmax();
+			Rat restartDist = pGen.calculateBreakingDistance(vmax, 0);
+			restartDist = restartDist * 2;
+			if(eoaDist > restartDist) {
+				// let the train continue driving if the dist to next EoA is big enough
+				// to accelerate to vmax
+				// here: twice the braking distance
+				println("----set FAHRT for " + name + " at " + intToString(truncate(timeValue(now()))));
+				wait = False;
+				eoaBraking = False;
+				pGen.setAccelMax();
+				emergCount = emergCount + 1;
+				this.detNext();
+			}
+		}
+	}
+	
+	adds Unit handleEoa(NextEvent ev){
+		this.advance(in_short(moment(ev)));
+		//Rat nV = pGen.handleEv(ev);
+		distanceTotal = distanceTotal + ll(ev);
+		//distFromLrbg = distFromLrbg + ll(ev);
+		locFront = locFront+ll(ev);
+		locBack = locBack+ll(ev);
+		pGen.setAccelBreakNull();
+		eoaBraking = True;
+		println("MV;SPEED;"+toString(this)+";"+intToString(truncate(timeValue(now())))+";"+intToString(truncate(ll(ev)))+";"+intToString(truncate(vnew(ev))));
+		println("----EoA Event for " + name + " at " + intToString(truncate(timeValue(now()))));
+		this.detNext();
+	}
+	
+	adds Unit initMA(MovementAuthority m){
+		ma = m;
+	}
+	
+	adds Unit updateMA(MovementAuthority m){
+		ma = m;
+	}
+	
+	adds Rat calculateEoaDist(){
+		Balise maLrbg = lrbg(ma);
+		Int maDist = dist(ma);
+		Rat vmax = pGen.getVmax();
+		Rat breakDist = pGen.calculateBreakingDistance(vmax, 0);
+		//Int breakDist1 = truncate(breakDist);
+		Int trainDist = truncate(distFromLrbg);
+		Int baliseDist = bu.calculateBaliseDistance(maLrbg, lrbg, True);
+		//Int eoaDist = maDist - baliseDist - trainDist - breakDist1;
+		Rat eoaDist = maDist - baliseDist - distFromLrbg - breakDist;
+		if(eoaDist < 0) {
+			eoaDist = 0;
+		}
+		//println("----EoA for " + name + ": " + intToString(truncate(eoaDist)));
+		return eoaDist;
+	}
+}
+
+
+
+
+
+
+delta ETCSTimer;
+uses Generator;
+adds interface TimerGenerator {
+	Unit setTimerInterval(Rat i);
+	Unit activate(Bool act);
+}
+adds class TimerGenerator(Train train, PhysicsGenerator pGen, String name) implements TimerGenerator {
+	Bool active = False;
+	Rat timerInterval = 8;
+	Rat nextEventTime = -1;
+	
+	Unit setTimerInterval(Rat i) { timerInterval = i; }
+	
+	Unit activate(Bool act) {
+		active = act;
+		if(act && timerInterval > 0) {
+			this!generateEvent();
+		}
+	}
+	
+	Unit advance(Rat r){
+		await duration(r,r);
+	}
+	
+	Unit generateEvent(){
+		if(active && timerInterval > 0) {
+			this.advance(timerInterval);
+			train.handleTimer(timerInterval);
+			this!generateEvent();
+		}
+	}
+}
+
+
+
+
+delta ETCSRBC;
+uses Rbc;  
+
+modifies interface Train.Train{
+	adds Unit setRbc(RadioBlockCenter r);
+}
+
+modifies class Train.TrainImpl{
+	adds RadioBlockCenter rbc = null; 
+	adds BaliseUtil bu = null;
+	adds Unit setRbc(RadioBlockCenter r) {
+		this.rbc = r;
+	}
+}
+
+adds export *;
+adds import * from TrackElements;
+adds import * from Train;
+adds import * from Util;
+
+adds interface BaliseUtil {
+	Int calculateBaliseDistance(Balise fromBal, Balise toBal, Bool forward);
+	Int calculatePositionDistance(PositionReport fromRep, PositionReport toRep, Bool forward);
+}
+
+adds class BaliseUtilImpl() implements BaliseUtil {
+
+	Int calculateBaliseDistance(Balise fromBal, Balise toBal, Bool forward) {
+		Int dist = 0;
+		if(fromBal != toBal) {
+			Balise currentBal = fromBal;
+			if(forward) {
+				currentBal = fromBal.getForwardBalise();
+				Int temp =  fromBal.getForwardDist();
+				dist = dist + temp;
+			}
+			else {
+				currentBal = fromBal.getBackwardBalise();
+				Int temp = fromBal.getBackwardDist();
+				dist = dist + temp;
+			}
+			while(currentBal != null && currentBal != toBal && currentBal != fromBal) {
+				if(forward) {
+					Int temp =  currentBal.getForwardDist();
+					dist = dist + temp;
+					currentBal = currentBal.getForwardBalise();
+				
+				}
+				else {
+					Int temp = currentBal.getBackwardDist();
+					dist = dist + temp;
+					currentBal = currentBal.getBackwardBalise();
+				}
+			}
+			if(currentBal == null || currentBal == fromBal) {
+				dist = -1;
+			}
+		}
+		return dist;
+	}
+	
+	Int calculatePositionDistance(PositionReport fromRep, PositionReport toRep, Bool forward) {
+		Int dist = 0;
+		Balise fromBal = lrbgRep(fromRep);
+		Int fromPos = pos(fromRep);
+		Int fromLength = safeTrainLength(fromRep);
+		Balise toBal = lrbgRep(toRep);
+		Int toPos = pos(toRep);
+		Int toLength = safeTrainLength(toRep);
+		if(fromBal == toBal && forward && fromPos > toPos) {
+			Balise newBal = fromBal.getForwardBalise();
+			Int temp =  fromBal.getForwardDist();
+			fromBal = newBal;
+			dist = dist + temp;
+		}
+		else if(fromBal == toBal && !forward && fromPos < toPos) {
+			Balise newBal = fromBal.getBackwardBalise();
+			Int temp = fromBal.getBackwardDist();
+			fromBal = newBal;
+			dist = dist + temp;
+		}
+		Int balisedist = this.calculateBaliseDistance(fromBal, toBal, forward);
+		dist = dist + balisedist;
+		if (dist >= 0 && forward) {
+			dist = dist - fromPos + toPos - toLength;
+		}
+		else if (dist >= 0 && !forward) {
+			dist = dist + fromPos - fromLength - toPos;
+		}
+		
+		return dist;
+	}
+
+}
+
+adds interface RadioBlockCenter {
+	Unit requestMA(Train t);
+	Unit reportPosition(Train t, PositionReport r);
+	Unit initTrainList(List<Train> l);
+	Unit initTrainPositions(Map<Train,PositionReport> m);
+}
+
+
+adds class RadioBlockCenterImpl() implements RadioBlockCenter {
+
+	List<Train> trainList = Nil;
+	Map<Train,PositionReport> trainPositions = EmptyMap;
+	BaliseUtil bu = null;
+	
+	{
+		bu = new local BaliseUtilImpl();
+	}
+	
+	Unit initTrainList(List<Train> l) {trainList = l;}
+	
+	Unit initTrainPositions(Map<Train,PositionReport> m) {trainPositions = m;}
+	
+	
+	
+	Train detectFollowingTrain(Train t, PositionReport p) {
+		Train result = null;
+		Int minDist = 1000000000;
+		Int i = 0;
+		while (i < length(trainList)) {
+			Train current = nth(trainList, i);
+			if(current != t) {
+				PositionReport pos = lookupDefault(trainPositions, current, NoPosRep);
+				Int tempDist = bu.calculatePositionDistance(p, pos, False);
+				if(tempDist >= 0 && tempDist < minDist) {
+					minDist = tempDist;
+					result = current;
+				}
+			}
+			i = i + 1;
+		}
+		
+		return result;
+	}
+	
+	Unit requestMA(Train t) {}
+	
+	Unit reportPosition(Train t, PositionReport r) {
+		String fitn = t.getName();
+		trainPositions = put(trainPositions, t, r);
+		Train followingTrain = this.detectFollowingTrain(t, r);
+		String fotn = followingTrain.getName();
+		
+		if(followingTrain != null) {
+			PositionReport pos = lookupDefault(trainPositions, followingTrain, NoPosRep);
+			Balise firstTrainLrbg = lrbgRep(r);
+			Int firstTrainPos = pos(r);
+			Int firstTrainLength = safeTrainLength(r);
+			String fitlrbgname = firstTrainLrbg.getName();
+			Balise followingTrainLrbg = lrbgRep(pos);
+			Int followingTrainPos = pos(pos);
+			String fotlrbgname = followingTrainLrbg.getName();
+			Int maDistance = bu.calculatePositionDistance(r, pos, False);
+			maDistance = maDistance + followingTrainPos;
+			MovementAuthority ma = MoveAuth(followingTrainLrbg, maDistance);
+			println("----MA for train " + fotn + ": LRBG " + fotlrbgname + ", dist " + intToString(maDistance));
+			followingTrain!updateMA(ma);
+		}
+	}
+
+}

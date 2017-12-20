@@ -1,0 +1,26 @@
+module Util;
+
+export *;
+import * from TrackElements;
+import * from SwElements;
+import * from Stellwerk;
+
+
+
+data VorblockEv = VEvent(ZugFolge zff, SwElements.Strecke stt, Int idd);
+data SignalState = FAHRT | STOP | SLOW | NOSIG | INVALID;
+data Information =  NoInfo 
+				  | TestInfo //for debugging only
+                  | Info(SignalState si) | Prepare(SignalState sp) | StartPrepare(SignalState spp) 
+                  | Limit(Int) | LimitPrepare(Int) | WeichenbereichVerlassen 
+                  | Crash | ChangeResp(ZugFolge)  
+                  | Mhz1000 | Mhz2000 | Mhz500;
+data AccelState = Break(Rat) | Emergency | Accel(Rat) | Stable;
+data Command = EmergencyBrake | Resume;
+data Pos = Front | Middle | Back;
+data NextEvent = Ev(Rat moment, Rat ll, AccelState newState, Rat vnew, Int counter, Int fahrCount, Pos position, Time start, Rat vold, Bool pzbOneLess) | NoEvent;
+data GenEvent = ChangeEv(NextEvent ne1, Bool emergNow) | FrontEv(NextEvent ne2) | BackEv(NextEvent ne3) | PZBIntersectEv(NextEvent ne4) | EoaEv(NextEvent ne5) | NoGenEvent;
+data Order = Ord2 | Ord144;
+data EtcsLevel = Lv0 | Lv1 | Lv2 | Lv3 | LvNTC_PZB;
+data FahrStrasse = Fahr(Int fahrId, List<Switch> switches);
+type FahrMatrix  = List<Pair<Int,Int>>;
