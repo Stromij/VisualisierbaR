@@ -38,6 +38,7 @@
             <TextField fx:id="velocityText" prefWidth="100.0" text="1000" />
             <ToggleButton fx:id="playToggle" text="%play_simulation" />
             <ToggleButton fx:id="eventTraversal" text="%eventTravsersal" />
+            <ChoiceBox fx:id="deltas" prefWidth="250" visible="true" />
             <Button fx:id="continueSimulation" text="%continueSimulation" visible="false" />
             <Label fx:id="modelTime" visible="false" />
             <HBox fx:id="rightSpacer" alignment="CENTER_RIGHT" />

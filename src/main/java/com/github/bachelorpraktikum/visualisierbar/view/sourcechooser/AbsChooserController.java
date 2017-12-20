@@ -160,7 +160,7 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
     @Nonnull
     @Override
     public AbsSource getResource() throws IOException {
-        return new AbsSource(completeProperty.get(), new File(fileUriProperty.getValue().getPath()).getParentFile().toURI());
+        return new AbsSource(completeProperty.get(), new File(fileUriProperty.getValue().getPath()), this.productProperty.getValue());
     }
 
     @Nonnull

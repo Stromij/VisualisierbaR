@@ -5,6 +5,7 @@ import com.github.bachelorpraktikum.visualisierbar.FXCollectors;
 import com.github.bachelorpraktikum.visualisierbar.Visualisierbar;
 import com.github.bachelorpraktikum.visualisierbar.config.ConfigFile;
 import com.github.bachelorpraktikum.visualisierbar.config.ConfigKey;
+import com.github.bachelorpraktikum.visualisierbar.datasource.AbsSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.DataSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.*;
@@ -134,6 +135,8 @@ public class MainController {
     private ToolBar standartTB;
     @FXML
     private ChoiceBox toolSelector;
+    @FXML
+    private ChoiceBox deltas;
     @FXML
     private Button deleteButton;
     @FXML
@@ -268,6 +271,9 @@ public class MainController {
         resetViewButton.setOnAction(event -> resetGraphView());
 
         proportionalToggle.setOnAction(ActionEvent -> switchGraph());
+
+        deltas.setVisible(false);
+        deltas.setManaged(false);
 
 
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -818,6 +824,10 @@ public class MainController {
     }
 
     public void setDataSource(@Nonnull DataSource source) {
+
+        if(source instanceof AbsSource)
+            {initializeDeltas((AbsSource) source);}
+
         DataSourceHolder.getInstance().set(source);
         Context context = source.getContext();
         logList.setItems(context.getObservableEvents().sorted());
@@ -825,6 +835,22 @@ public class MainController {
         simulationTime.set(Context.INIT_STATE_TIME);
         showElements();
     }
+
+
+    /**
+     * Baut bei vorhandenen Deltas eine Choicebox in die GUI zum Auslesen der Deltas
+     *
+     * @param source AbsSource
+     */
+
+    private void initializeDeltas(AbsSource source)
+        {ArrayList<String> deltaArray = source.getDeltas();
+         if(deltaArray.size() <= 0) {return;}
+         this.deltas.setItems(FXCollections.observableArrayList(deltaArray));
+         this.deltas.setVisible(true);
+         this.deltas.setManaged(true);
+         this.deltas.setValue(deltaArray.get(0));
+        }
 
     /**
      * Gets the current graph shape.<br>
