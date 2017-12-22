@@ -61,4 +61,5 @@ public final class Context {
     public void addObject(@Nonnull Object object) {
         objects.add(Objects.requireNonNull(object));
     }
+    public void removeObject(@Nonnull Object object){objects.remove(object);}
 }

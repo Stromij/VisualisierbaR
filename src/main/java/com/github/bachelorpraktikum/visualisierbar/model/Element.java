@@ -304,6 +304,10 @@ public final class Element implements GraphObject<Shape> {
             return element;
         }
 
+        public void remove (Element element){
+            elements.remove(element.getName());
+        }
+
         /**
          * Gets the state of an element at the given time, then resets the time to the previous
          * value.

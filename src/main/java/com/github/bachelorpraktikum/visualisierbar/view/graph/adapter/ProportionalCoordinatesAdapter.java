@@ -10,6 +10,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Point2D;
@@ -28,8 +32,11 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     private HashMap<Node, Point2D> transformationMap = new HashMap<>();
     private LinkedList<GraphSegment> segments = new LinkedList<>();
     private final static double MOVING_DISTANCE = 1.5;
-    private IntegerProperty offsetX;
-    private IntegerProperty offsetY;
+    private int OffsetX;
+    private int OffsetY;
+
+
+
 
     public ProportionalCoordinatesAdapter(Context context) {
         this.context = context;
@@ -43,7 +50,8 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
                 shortestEdgeLength = edgeLength;
             }
         }
-
+        OffsetX=0;
+        OffsetY=0;
         int x = Integer.MAX_VALUE;
         int y = Integer.MAX_VALUE;
 
@@ -72,6 +80,8 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
         this.removeSegmentCollisions();
         // moves single nodes to avoid collisions
         this.removeSingleNodeCollisions();
+
+
     }
 
     /**
@@ -311,7 +321,7 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     public IntegerProperty OffsetYproperty() {
         return null;
     }
-
+    */
     @Override
     public void setOffsetX(int x) {
 
@@ -321,7 +331,7 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     public void setOffsetY(int y) {
 
     }
-        */
+
     @Override
     public double getCalibrationBase() {
         return 2.7;
@@ -344,6 +354,8 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     public Coordinates reverse(@Nonnull Point2D point) {
         return new Coordinates(0,0);
     }
+
+
 
     /**
      * Use Depth-First Search to visit every node in the Graph

@@ -31,6 +31,7 @@
             <ChoiceBox fx:id="toolSelector" prefWidth="150.0" visible="false" />
             <Button fx:id="deleteButton" text="delete" visible="false" />
             <Button fx:id="disconnectButton" text="disconnect" visible="false" />
+            <ToggleButton fx:id="newNodeButton" text="new Node" visible="false"/>
             <Label text="%current_simulation_time" />
             <TextField fx:id="timeText" prefHeight="25.0" prefWidth="100.0" text="-1ms" />
             <Button fx:id="resetButton" text="%reset" />

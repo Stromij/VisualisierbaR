@@ -40,6 +40,7 @@ public final class Node implements GraphObject<Circle> {
     private final Set<Element> elements;
     @Nonnull
     private final Property<VisibleState> stateProperty;
+    //Blinker that signifies change in the offsets
     @Nonnull
     private final BooleanProperty movedProperty;
 
@@ -128,6 +129,10 @@ public final class Node implements GraphObject<Circle> {
                 throw new IllegalArgumentException("unknown node: " + name);
             }
             return node;
+        }
+
+        public void remove(Node node){
+            nodes.remove(node.getName());
         }
 
         @Override

@@ -4,6 +4,7 @@ import com.github.bachelorpraktikum.visualisierbar.model.Coordinates;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
 import java.util.function.Function;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Point2D;
 import javax.annotation.Nonnull;
@@ -17,8 +18,8 @@ public interface CoordinatesAdapter {
    //IntegerProperty OffsetXproperty();
    //IntegerProperty OffsetYproperty();
 
-   //void setOffsetX(int x);
-   //void setOffsetY(int y);
+   void setOffsetX(int x);
+   void setOffsetY(int y);
     /**
      * Gets the length of the shortest edge in the graph. Should be used to determine the size of
      * elements in the graph, like the size of nodes or the width of edges.<br> The length returned
@@ -30,12 +31,18 @@ public interface CoordinatesAdapter {
     double getCalibrationBase();
 
     /**
-     * Gets the real position of this node.
-     *
-     * @param node the node of which the coordinates should be transformed
-     * @throws NullPointerException if node is null
+     * Transforms the Coordinates of a Node in the Model to a Point in the Graph by applying the offsets
+     * @param node the Node to transform the Coordinates of
+     * @return the transformed Point
      */
     @Nonnull
     Point2D apply(@Nonnull Node node);
+
+    /**
+     * Transforms a Point in the Graph to Coordinates in the Model by updating and applying the offsets
+     * @return the transformed Coordinates
+     */
     Coordinates reverse(@Nonnull Point2D point);
+
+    //BooleanProperty movedProperty();
 }

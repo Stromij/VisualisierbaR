@@ -28,6 +28,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -44,7 +46,9 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.geometry.Side;
+import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.chart.NumberAxis;
@@ -63,6 +67,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -141,6 +146,8 @@ public class MainController {
     private Button deleteButton;
     @FXML
     private Button disconnectButton;
+    @FXML
+    private ToggleButton newNodeButton;
 
     private Rectangle selectionRec;
     //private LinkedList<> selected;
@@ -299,6 +306,8 @@ public class MainController {
                 deleteButton.setManaged(true);
                 disconnectButton.setManaged(true);
                 disconnectButton.setVisible(true);
+                newNodeButton.setManaged(true);
+                newNodeButton.setVisible(true);
 
                 if (proportionalToggle.isSelected()){
                     proportionalToggle.fire();
@@ -324,6 +333,7 @@ public class MainController {
                 toolSelector.setManaged(false);
                 deleteButton.setManaged(false);
                 disconnectButton.setManaged(false);
+                newNodeButton.setManaged(false);
                 /*
                 proportionalToggle.setVisible(true);
                 playToggle.setVisible(true);
@@ -334,6 +344,7 @@ public class MainController {
                 toolSelector.setVisible(false);
                 deleteButton.setVisible(false);
                 disconnectButton.setVisible(false);
+                newNodeButton.setVisible(false);
                 toolSelector.setValue(toolSelector.getItems().get(0));
             }
 
@@ -355,6 +366,16 @@ public class MainController {
             Junction.getSelection().forEach((a)->{
                 graph.disconnect(a.getRepresentedObjects().get(0));
             });
+        });
+
+        newNodeButton.selectedProperty().addListener( (observable,oldValue, newValue) ->{
+            if(newValue){
+                centerPane.setCursor(Cursor.CROSSHAIR);
+
+            }
+            else {
+                centerPane.setCursor(Cursor.DEFAULT);
+            }
         });
 
 
@@ -440,7 +461,43 @@ public class MainController {
         graphPane.heightProperty().addListener(boundsListener);
         graphPane.widthProperty().addListener(boundsListener);
 
+        graphPane.setOnMouseClicked((event)->{
+            if (newNodeButton.isSelected()){
+               TextInputDialog dialog = new TextInputDialog();
+               dialog.setTitle("Enter Node Name");
+               dialog.setX(event.getX());
+               dialog.setY(event.getY());
+               dialog.setGraphic(null);
+               dialog.setHeaderText(null);
+               dialog.showAndWait();
+               String name= dialog.getResult();
+               //String name = dialog.getContentText();
+               //System.out.println(name);
+                //System.out.println(event.getX()+" "+ event.getY());
+                //System.out.println(event.getSceneX()+" "+ event.getSceneY());
+                Point2D c =graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
+                //System.out.println(c.getX()+" "+ c.getY());
+                try{
+                    graph.addNode(name, new Coordinates((int)Math.round(c.getX()), (int) Math.round(c.getY())));
 
+                }
+                catch (IllegalArgumentException e ){
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Error");
+                    alert.setX(event.getX());
+                    alert.setY(event.getY());
+                    alert.setGraphic(null);
+                    alert.setHeaderText(null);
+                    alert.setContentText("Node already exists");
+                    alert.showAndWait();
+                }
+                newNodeButton.setSelected(false);
+                event.consume();
+                //graph.addNode(name, new Coordinates(0,0));
+            }
+
+
+        });
         graphPane.setOnScroll(event -> {
             if (graph != null) {
                 Group group = graph.getGroup();
@@ -473,6 +530,9 @@ public class MainController {
             }
 
         });
+
+
+
         graphPane.setOnMouseReleased(event -> {
             mousePressedX = -1;
             mousePressedY = -1;

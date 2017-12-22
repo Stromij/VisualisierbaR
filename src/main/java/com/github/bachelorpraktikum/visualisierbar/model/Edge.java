@@ -132,6 +132,10 @@ public final class Edge implements GraphObject<Line> {
             return edge;
         }
 
+        public void remove(Edge edge){
+            edges.remove(edge.getName());
+        }
+
         @Override
         @Nonnull
         public Collection<Edge> getAll() {

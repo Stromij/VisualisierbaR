@@ -1,9 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph;
 
-import com.github.bachelorpraktikum.visualisierbar.model.Context;
-import com.github.bachelorpraktikum.visualisierbar.model.Edge;
-import com.github.bachelorpraktikum.visualisierbar.model.Element;
-import com.github.bachelorpraktikum.visualisierbar.model.Node;
+import com.github.bachelorpraktikum.visualisierbar.model.*;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 
@@ -120,18 +117,32 @@ public final class Graph {
                 //edges.remove(a);
             }
         });
-        e.forEach((a)->{elements.remove(a);});
-        ed.forEach((a)->{edges.remove(ed);});
+        e.forEach((a)->{
+            elements.remove(a);
+            Element.in(context).remove(a);
+            context.removeObject(a);
+        });
+        ed.forEach((a)->{
+            Edge.in(context).remove(a);
+            edges.remove(a);
+            context.removeObject(a);
+        });
         group.getChildren().remove(nodes.get(node).getFullNode());
         nodes.remove(node);
+        Node.in(context).remove(node);
+        context.removeObject(node);
+
 
 
     }
     public void removeEdge (Edge edge){
+
         edges.remove(edge);
+        context.removeObject(edge);
     }
 
     public void fullyConnect (HashSet<Junction> selection){
+        //Edge edge = Edge.in(context).create()
 
     }
 
@@ -143,13 +154,21 @@ public final class Graph {
                 group.getChildren().remove(b.getFullNode());
             }
         });
-        ed.forEach((a)->{edges.remove(ed);});
+        ed.forEach((a)->{
+            edges.remove(ed);
+            context.removeObject(ed);
+        });
     }
 
-    public void addNode (Node node){
-        Junction.getSelection().forEach((a)->{
+    public void addNode (String name, Coordinates coordinates) throws IllegalArgumentException {
+        Node newNode =Node.in(context).create(name, coordinates);
+        if(nodes.containsKey(newNode)) return;
+        context.addObject(newNode);
+        GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
+        ((Junction) shape).setMoveable(true);
 
-        });
+        nodes.put(newNode, shape);
+        group.getChildren().add(shape.getFullNode());
 
     }
 }

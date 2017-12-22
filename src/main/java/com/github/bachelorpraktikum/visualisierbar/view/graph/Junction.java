@@ -47,6 +47,12 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
 
         });
+
+        adapter.movedProperty().addListener((t)->{
+            this.getRepresented().setCoordinates(adapter.reverse(new Point2D (((int) this.getShape().getCenterX()), (int) this.getShape().getCenterY())));
+            //this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
+
+        });
         */
         this.getShape().setOnMouseReleased((event) -> {
             if (!moveable) return;
@@ -58,14 +64,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 a.setTranslateX(Math.round(a.getTranslateX()));
                 a.setTranslateY(Math.round(a.getTranslateY()));
 
-            /*
+
                 if (a.getCenterX() + a.getTranslateX() < 0 || a.getCenterY() + a.getTranslateY() < 0) {
                     System.out.println("Coordiantes invalid");
                     a.setTranslateY(0);
                     a.setTranslateX(0);
                     return;
                 }
-*/
+
                 a.setCenterX(a.getCenterX() + a.getTranslateX());
                 a.setCenterY(a.getCenterY() + a.getTranslateY());
                 //TODO Coordiantes Adapter??
@@ -79,8 +85,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 //this.getRepresented().getElements().forEach((a)->{a.});
                 //TooltipUtil.install(c,this.getRepresented().getName());
                 //Tooltip.
-                System.out.println(("Node X:" + b.getRepresented().getCoordinates().toPoint2D().getX() + " " + "Node Y:" + b.getRepresented().getCoordinates().toPoint2D().getY()));
-                System.out.println("X:" + (a.getCenterX() + a.getTranslateX()) + " " + "Y:" + (a.getCenterY() + a.getTranslateY()));
+                //System.out.println(("Node X:" + b.getRepresented().getCoordinates().toPoint2D().getX() + " " + "Node Y:" + b.getRepresented().getCoordinates().toPoint2D().getY()));
+                //System.out.println("X:" + (a.getCenterX() + a.getTranslateX()) + " " + "Y:" + (a.getCenterY() + a.getTranslateY()));
+                event.consume();
             });
         });
 
@@ -91,6 +98,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
             }
             this.addToSelection();
+            t.consume();
         });
 
         this.getShape().setOnMouseDragged((t) -> {
