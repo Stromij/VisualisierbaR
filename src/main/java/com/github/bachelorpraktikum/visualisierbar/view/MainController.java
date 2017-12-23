@@ -489,8 +489,8 @@ public class MainController {
                 Point2D c =graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
                 //System.out.println(c.getX()+" "+ c.getY());
                 try{
-                    graph.addNode(name, new Coordinates((int)Math.round(c.getX()), (int) Math.round(c.getY())));
-
+                    //graph.addNode(name, new Coordinates((int)Math.round(c.getX()), (int) Math.round(c.getY())));
+                    graph.addNode(name, graph.getCoordinatesAdapter().reverse(new Point2D((int)Math.round(c.getX()), (int) Math.round(c.getY()))));
                 }
                 catch (IllegalArgumentException e ){
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -499,7 +499,7 @@ public class MainController {
                     alert.setY(event.getY());
                     alert.setGraphic(null);
                     alert.setHeaderText(null);
-                    alert.setContentText("Node already exists");
+                    alert.setContentText("Node already exists or has negative Coordinates");
                     alert.showAndWait();
                 }
                 newNodeButton.setSelected(false);
