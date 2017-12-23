@@ -4,7 +4,10 @@ import com.github.bachelorpraktikum.visualisierbar.model.*;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 
+
 import java.util.*;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
@@ -139,10 +142,62 @@ public final class Graph {
 
         edges.remove(edge);
         context.removeObject(edge);
+        Edge.in(context).remove(edge);
     }
 
     public void fullyConnect (HashSet<Junction> selection){
-        //Edge edge = Edge.in(context).create()
+        HashSet<Node> NodeSet = new HashSet<>(128);
+        Iterator it = Junction.getSelection().iterator();
+        while(it.hasNext()){
+            NodeSet.add(((Junction) it.next()).getRepresented());
+        }
+        LinkedList<Node> sList = new LinkedList();
+        sList.addAll(NodeSet);
+        int l = selection.size();
+        boolean existingEdges[][]=new boolean [l][l];
+
+        for (int i=0; i<l; i++){
+            for (int k=0; k<l ; k++ ){
+                if (i==k) existingEdges[i][k]=true;
+                else existingEdges[i][k]=false;
+            }
+        }
+        edges.forEach((a,b)->{
+            if (NodeSet.contains(a.getNode1()) && NodeSet.contains(a.getNode2())) {
+                int i;
+                int j;
+                for ( i = 0; i < l; i++) {
+                    if(a.getNode1()== sList.get(i)) break;
+                }
+                for ( j = 0; j < l; j++) {
+                    if(a.getNode2()== sList.get(j)) break;
+                }
+                //System.out.println("found edge");
+                existingEdges[i][j]=true;
+                existingEdges[j][i]=true;
+            }
+        });
+
+        RandomString gen = new RandomString(8, ThreadLocalRandom.current());
+        for (int i=0; i<l; i++){
+            for (int k=i; k<l ; k++ ){
+                if (existingEdges[i][k]==false){
+                    String name=null;
+
+                    for (int j=0; j<1000; j++) {
+                        name = gen.nextString();
+                        if(!Edge.in(context).NameExists(name)) break;
+                    }
+                    Edge edge = Edge.in(context).create(name,-1, sList.get(i), sList.get(k));
+                    context.addObject(edge);
+                    GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
+                    edges.put(edge, shape);
+                    group.getChildren().add(shape.getFullNode());
+                    //System.out.println("created edge");
+
+                }
+            }
+        }
 
     }
 
@@ -155,8 +210,9 @@ public final class Graph {
             }
         });
         ed.forEach((a)->{
-            edges.remove(ed);
-            context.removeObject(ed);
+            edges.remove(a);
+            context.removeObject(a);
+            Edge.in(context).remove(a);
         });
     }
 

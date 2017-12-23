@@ -148,6 +148,8 @@ public class MainController {
     private Button disconnectButton;
     @FXML
     private ToggleButton newNodeButton;
+    @FXML
+    private Button fcButton;
 
     private Rectangle selectionRec;
     //private LinkedList<> selected;
@@ -308,6 +310,8 @@ public class MainController {
                 disconnectButton.setVisible(true);
                 newNodeButton.setManaged(true);
                 newNodeButton.setVisible(true);
+                fcButton.setManaged(true);
+                fcButton.setVisible(true);
 
                 if (proportionalToggle.isSelected()){
                     proportionalToggle.fire();
@@ -334,6 +338,7 @@ public class MainController {
                 deleteButton.setManaged(false);
                 disconnectButton.setManaged(false);
                 newNodeButton.setManaged(false);
+                fcButton.setManaged(false);
                 /*
                 proportionalToggle.setVisible(true);
                 playToggle.setVisible(true);
@@ -345,6 +350,7 @@ public class MainController {
                 deleteButton.setVisible(false);
                 disconnectButton.setVisible(false);
                 newNodeButton.setVisible(false);
+                fcButton.setVisible(false);
                 toolSelector.setValue(toolSelector.getItems().get(0));
             }
 
@@ -376,6 +382,10 @@ public class MainController {
             else {
                 centerPane.setCursor(Cursor.DEFAULT);
             }
+        });
+
+        fcButton.setOnAction((t)->{
+            graph.fullyConnect(Junction.getSelection());
         });
 
 
@@ -471,6 +481,7 @@ public class MainController {
                dialog.setHeaderText(null);
                dialog.showAndWait();
                String name= dialog.getResult();
+               if (name== null) return;
                //String name = dialog.getContentText();
                //System.out.println(name);
                 //System.out.println(event.getX()+" "+ event.getY());

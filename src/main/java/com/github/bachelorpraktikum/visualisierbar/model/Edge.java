@@ -132,6 +132,14 @@ public final class Edge implements GraphObject<Line> {
             return edge;
         }
 
+        public boolean NameExists (String name){
+            Edge edge = edges.get(Objects.requireNonNull(name));
+            if (edge == null) {
+                return false;
+            }
+            return true;
+        }
+
         public void remove(Edge edge){
             edges.remove(edge.getName());
         }
