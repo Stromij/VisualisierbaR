@@ -6,6 +6,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.Coordinate
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javax.annotation.Nonnull;
 
@@ -22,10 +23,14 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
         CoordinatesAdapter adapter = getCoordinatesAdapter();
         Point2D start = adapter.apply(getRepresented().getNode1());
         Point2D end = adapter.apply(getRepresented().getNode2());
+        if(getRepresented().getLength()<0) shape.setStroke(Color.RED);
+        else shape.setStroke(Color.BLACK);
         shape.setStartX(start.getX());
         shape.setStartY(start.getY());
         shape.setEndX(end.getX());
         shape.setEndY(end.getY());
+
+        //System.out.println(getRepresented().getLength());
     }
 
     @Override

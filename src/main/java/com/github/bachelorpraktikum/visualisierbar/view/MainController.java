@@ -20,6 +20,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCel
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -72,6 +73,7 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -191,7 +193,6 @@ public class MainController {
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
 
 
-
         // START OF TIME RELATED INIT
 
 
@@ -208,9 +209,9 @@ public class MainController {
 
                 if (newInt > oldInt) {
                     boolean messages = Messages.in(context).fireEventsBetween(
-                        node -> getGraph().getNodes().get(node).getShape(),
-                        oldInt,
-                        newInt
+                            node -> getGraph().getNodes().get(node).getShape(),
+                            oldInt,
+                            newInt
                     );
                     if (messages) {
                         playToggle.setSelected(false);
@@ -288,15 +289,17 @@ public class MainController {
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
 
-            if(graph.getNodes()==null) return;
-            if(newValue) {
+            if (graph.getNodes() == null) return;
+            if (newValue) {
                 /*
                 proportionalToggle.setVisible(false);
                 playToggle.setVisible(false);
                 resetButton.setVisible(false);
                 modelTime.setVisible(false);
                 */
-                standartTB.getItems().forEach((a)->{a.setVisible(false); });
+                standartTB.getItems().forEach((a) -> {
+                    a.setVisible(false);
+                });
                 resetButton.setVisible(true);
                 editorToggle.setVisible(true);
                 closeButton.setVisible(true);
@@ -313,26 +316,29 @@ public class MainController {
                 fcButton.setManaged(true);
                 fcButton.setVisible(true);
 
-                if (proportionalToggle.isSelected()){
+                if (proportionalToggle.isSelected()) {
                     proportionalToggle.fire();
                 }
-                if (eventTraversal.isSelected()){
+                if (eventTraversal.isSelected()) {
                     eventTraversal.fire();
                 }
 
-                if (playToggle.isSelected()){
+                if (playToggle.isSelected()) {
                     playToggle.fire();
                     resetButton.fire();
 
                 }
                 resetButton.fire();
                 //coordinatesField.setVisible(true);
-                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(true);}));
+                graph.getNodes().forEach(((a, b) -> {
+                    ((Junction) b).setMoveable(true);
+                }));
                 //logToggle.setVisible(false);
                 rootPane.setLeft(null);
-            }
-            else {
-                graph.getNodes().forEach(((a,b)->{((Junction)b).setMoveable(false);}));
+            } else {
+                graph.getNodes().forEach(((a, b) -> {
+                    ((Junction) b).setMoveable(false);
+                }));
 
                 toolSelector.setManaged(false);
                 deleteButton.setManaged(false);
@@ -345,7 +351,9 @@ public class MainController {
                 logToggle.setVisible(true);
                 //coordinatesField.setVisible(false);
                 */
-                standartTB.getItems().forEach((a)->{a.setVisible(true); });
+                standartTB.getItems().forEach((a) -> {
+                    a.setVisible(true);
+                });
                 toolSelector.setVisible(false);
                 deleteButton.setVisible(false);
                 disconnectButton.setVisible(false);
@@ -355,12 +363,10 @@ public class MainController {
             }
 
 
-
-
         });
 
-        deleteButton.setOnAction((t)->{
-            Junction.getSelection().forEach((a)->{
+        deleteButton.setOnAction((t) -> {
+            Junction.getSelection().forEach((a) -> {
 
                 graph.removeNode(a.getRepresentedObjects().get(0));
 
@@ -368,23 +374,22 @@ public class MainController {
             Junction.emptySelection();
         });
 
-        disconnectButton.setOnAction((t)->{
-            Junction.getSelection().forEach((a)->{
+        disconnectButton.setOnAction((t) -> {
+            Junction.getSelection().forEach((a) -> {
                 graph.disconnect(a.getRepresentedObjects().get(0));
             });
         });
 
-        newNodeButton.selectedProperty().addListener( (observable,oldValue, newValue) ->{
-            if(newValue){
+        newNodeButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
                 centerPane.setCursor(Cursor.CROSSHAIR);
 
-            }
-            else {
+            } else {
                 centerPane.setCursor(Cursor.DEFAULT);
             }
         });
 
-        fcButton.setOnAction((t)->{
+        fcButton.setOnAction((t) -> {
             graph.fullyConnect(Junction.getSelection());
         });
 
@@ -402,7 +407,7 @@ public class MainController {
         // Hide logList by default
         rootPane.setLeft(null);
         logToggle.selectedProperty().addListener((observable, oldValue, newValue) ->
-            rootPane.setLeft(newValue ? leftPane : null)
+                rootPane.setLeft(newValue ? leftPane : null)
         );
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -411,9 +416,6 @@ public class MainController {
         toolSelector.setVisible(false);
         toolSelector.setValue(toolSelector.getItems().get(0));
         toolSelector.setManaged(false);
-
-
-
 
 
         initializeElementList();
@@ -453,11 +455,10 @@ public class MainController {
             continueSimulation.setDisable(true);
             source.continueSimulation();
             String text = ResourceBundle.getBundle("bundles.localization")
-                .getString("model_time");
+                    .getString("model_time");
             modelTime.setText(String.format(text, source.getTime()));
             continueSimulation.setDisable(false);
         });
-
 
 
     }
@@ -471,35 +472,34 @@ public class MainController {
         graphPane.heightProperty().addListener(boundsListener);
         graphPane.widthProperty().addListener(boundsListener);
 
-        graphPane.setOnMouseClicked((event)->{
-            if (newNodeButton.isSelected()){
-               TextInputDialog dialog = new TextInputDialog();
-               dialog.setTitle("Enter Node Name");
-               dialog.setX(event.getX());
-               dialog.setY(event.getY());
-               dialog.setGraphic(null);
-               dialog.setHeaderText(null);
-               dialog.showAndWait();
-               String name= dialog.getResult();
-               if (name== null) return;
-               //String name = dialog.getContentText();
-               //System.out.println(name);
+        graphPane.setOnMouseClicked((event) -> {
+            if (newNodeButton.isSelected()) {
+                TextInputDialog dialog = new TextInputDialog();
+                dialog.setTitle("Enter Node Name");
+                dialog.setX(event.getX());
+                dialog.setY(event.getY());
+                dialog.setGraphic(null);
+                dialog.setHeaderText(null);
+                dialog.showAndWait();
+                String name = dialog.getResult();
+                if (name == null) return;
+                //String name = dialog.getContentText();
+                //System.out.println(name);
                 //System.out.println(event.getX()+" "+ event.getY());
                 //System.out.println(event.getSceneX()+" "+ event.getSceneY());
-                Point2D c =graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
+                Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
                 //System.out.println(c.getX()+" "+ c.getY());
-                try{
-                    //graph.addNode(name, new Coordinates((int)Math.round(c.getX()), (int) Math.round(c.getY())));
-                    graph.addNode(name, graph.getCoordinatesAdapter().reverse(new Point2D((int)Math.round(c.getX()), (int) Math.round(c.getY()))));
-                }
-                catch (IllegalArgumentException e ){
+                try {
+                    graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
+
+                } catch (IllegalArgumentException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setX(event.getX());
                     alert.setY(event.getY());
                     alert.setGraphic(null);
                     alert.setHeaderText(null);
-                    alert.setContentText("Node already exists or has negative Coordinates");
+                    alert.setContentText("Node already exists");
                     alert.showAndWait();
                 }
                 newNodeButton.setSelected(false);
@@ -524,11 +524,10 @@ public class MainController {
                 double factor = (scaleFactor / oldScale) - 1;
 
 
-
                 group.setScaleX(scaleFactor);
                 group.setScaleY(scaleFactor);
-                group.setTranslateX(group.getTranslateX() - factor  * translateX);
-                group.setTranslateY(group.getTranslateY() - factor  * translateY);
+                group.setTranslateX(group.getTranslateX() - factor * translateX);
+                group.setTranslateY(group.getTranslateY() - factor * translateY);
                 //yAxis.setScaleX(scaleFactor);
                 //yAxis.setScaleY(scaleFactor);
                 //yAxis.setTranslateX(yAxis.getTranslateX() - factor * translateX);
@@ -543,26 +542,25 @@ public class MainController {
         });
 
 
-
         graphPane.setOnMouseReleased(event -> {
             mousePressedX = -1;
             mousePressedY = -1;
             selectionRec.setVisible(false);
-            if(toolSelector.getValue()=="select"){
+            if (toolSelector.getValue() == "select") {
                 //System.out.println( selectionRec.getBoundsInLocal()
-                if(!event.isShiftDown()) Junction.clearSelection();
-                if (graph.getNodes()==null) return;
-                graph.getNodes().forEach((node,shape)->{
+                if (!event.isShiftDown()) Junction.clearSelection();
+                if (graph.getNodes() == null) return;
+                graph.getNodes().forEach((node, shape) -> {
 
                     Circle c = (Circle) shape.getShape();
-                    Bounds sb =graph.getGroup().localToParent(c.getBoundsInParent());
+                    Bounds sb = graph.getGroup().localToParent(c.getBoundsInParent());
                     //graph.getGroup().get
-                    double srx=selectionRec.getX();
-                    double sry=selectionRec.getY();
+                    double srx = selectionRec.getX();
+                    double sry = selectionRec.getY();
                     //if(shape.getShape()!=null && (selectionRec.getX()<shape.getShape()) && (selectionRec.getX()+selectionRec.getWidth()>shape.getShape().getLayoutX()) && (selectionRec.getY()<shape.getShape().getLayoutY())&&(selectionRec.getY()+selectionRec.getHeight()>shape.getShape().getLayoutX()))
-                    if( srx<sb.getMaxX() && srx+selectionRec.getWidth()>sb.getMinX() && sry<sb.getMaxY() && sry+selectionRec.getHeight()>sb.getMinY()) {
+                    if (srx < sb.getMaxX() && srx + selectionRec.getWidth() > sb.getMinX() && sry < sb.getMaxY() && sry + selectionRec.getHeight() > sb.getMinY()) {
                         //System.out.println("things are happening");
-                        ((Junction)shape).addToSelection();
+                        ((Junction) shape).addToSelection();
                         //selected.getChildren().add(shape.getShape());
                     }
                 });
@@ -570,7 +568,7 @@ public class MainController {
             //if (selected.getChildren().size()>0)
         });
 
-        selectionRec=new Rectangle();
+        selectionRec = new Rectangle();
         selectionRec.setVisible(false);
         selectionRec.setFill(Color.BLUE);
         selectionRec.setOpacity(0.2);
@@ -579,7 +577,7 @@ public class MainController {
             if (!event.isPrimaryButtonDown()) {
                 return;
             }
-            if (toolSelector.getValue()=="move") {
+            if (toolSelector.getValue() == "move") {
                 if (mousePressedX == -1 && mousePressedY == -1) {
                     mousePressedX = event.getX();
                     mousePressedY = event.getY();
@@ -595,8 +593,7 @@ public class MainController {
                     //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getGroup().getScaleY());
                     //yAxis.setTranslateX(yAxis.getTranslateX() - xOffset);
                 }
-            }
-            else{
+            } else {
                 if (mousePressedX == -1 && mousePressedY == -1) {
                     //System.out.println("CLICK");
                     selectionRec.setVisible(true);
@@ -608,14 +605,18 @@ public class MainController {
                 }
                 double xOffset = (event.getX() - mousePressedX);
                 double yOffset = (event.getY() - mousePressedY);
-                if (xOffset<0){selectionRec.setX(mousePressedX+xOffset);}
-                else{selectionRec.setX(mousePressedX);}
-                if (yOffset<0){selectionRec.setY(mousePressedY+yOffset);}
-                else{selectionRec.setY(mousePressedY);}
+                if (xOffset < 0) {
+                    selectionRec.setX(mousePressedX + xOffset);
+                } else {
+                    selectionRec.setX(mousePressedX);
+                }
+                if (yOffset < 0) {
+                    selectionRec.setY(mousePressedY + yOffset);
+                } else {
+                    selectionRec.setY(mousePressedY);
+                }
                 selectionRec.setWidth(Math.abs(xOffset));
                 selectionRec.setHeight(Math.abs(yOffset));
-
-
 
 
             }
@@ -641,7 +642,7 @@ public class MainController {
         };
 
         Callback<ListView<Event>, ListCell<Event>> textFactory = TextFieldListCell
-            .forListView(stringConverter);
+                .forListView(stringConverter);
 
         AtomicReference<Binding<Paint>> paintBinding = new AtomicReference<>();
         Callback<ListView<Event>, ListCell<Event>> listCellFactory = cell -> {
@@ -650,9 +651,9 @@ public class MainController {
             result.itemProperty().addListener(((observable, oldValue, newValue) -> {
                 if (newValue != null) {
                     Binding<Paint> warningBinding = Bindings.createObjectBinding(
-                        () -> newValue.getWarnings().isEmpty() ?
-                            defaultTextFill : Color.rgb(255, 0, 0),
-                        newValue.getWarnings()
+                            () -> newValue.getWarnings().isEmpty() ?
+                                    defaultTextFill : Color.rgb(255, 0, 0),
+                            newValue.getWarnings()
                     );
                     paintBinding.set(warningBinding);
                     result.textFillProperty().bind(warningBinding);
@@ -675,13 +676,13 @@ public class MainController {
 
         logList.setCellFactory(listCellFactory);
         logList.getSelectionModel().selectedItemProperty().addListener(
-            (observable, oldValue, newValue) -> {
-                if (!autoChange) {
-                    simulationTime.set(newValue.getTime());
+                (observable, oldValue, newValue) -> {
+                    if (!autoChange) {
+                        simulationTime.set(newValue.getTime());
+                    }
+                    Context context = DataSourceHolder.getInstance().getContext();
+                    Element.in(context).setTime(newValue.getTime());
                 }
-                Context context = DataSourceHolder.getInstance().getContext();
-                Element.in(context).setTime(newValue.getTime());
-            }
         );
     }
 
@@ -698,42 +699,42 @@ public class MainController {
             }
         };
         Callback<ListView<GraphObject>, ListCell<GraphObject>> textFactory = TextFieldListCell
-            .forListView(stringConverter);
+                .forListView(stringConverter);
         Callback<ListView<GraphObject>, ListCell<GraphObject>> elementListCellFactory =
-            (listView) -> {
-                ListCell<GraphObject> cell = textFactory.call(listView);
-                TooltipUtil.install(cell, () -> {
-                    if (cell.getItem() != null) {
-                        return cell.getItem().getName();
-                    } else {
-                        return "";
-                    }
-                });
-                return cell;
-            };
+                (listView) -> {
+                    ListCell<GraphObject> cell = textFactory.call(listView);
+                    TooltipUtil.install(cell, () -> {
+                        if (cell.getItem() != null) {
+                            return cell.getItem().getName();
+                        } else {
+                            return "";
+                        }
+                    });
+                    return cell;
+                };
 
         elementList.setCellFactory(elementListCellFactory);
         elementList.getSelectionModel().selectedItemProperty()
-            .addListener((observable, oldValue, newValue) -> {
-                if (lastHighlighted != null) {
-                    lastHighlighted.highlightedProperty().set(false);
-                }
+                .addListener((observable, oldValue, newValue) -> {
+                    if (lastHighlighted != null) {
+                        lastHighlighted.highlightedProperty().set(false);
+                    }
 
-                if (newValue == null) {
-                    return;
-                }
+                    if (newValue == null) {
+                        return;
+                    }
 
-                if (newValue instanceof Element) {
-                    Element elemnt = (Element) newValue;
-                    lastHighlighted = getGraph().getElements().get(elemnt);
-                } else {
-                    Train train = (Train) newValue;
-                    lastHighlighted = trains.get(train);
-                }
-                lastHighlighted.highlightedProperty().set(true);
+                    if (newValue instanceof Element) {
+                        Element elemnt = (Element) newValue;
+                        lastHighlighted = getGraph().getElements().get(elemnt);
+                    } else {
+                        Train train = (Train) newValue;
+                        lastHighlighted = trains.get(train);
+                    }
+                    lastHighlighted.highlightedProperty().set(true);
 
-                setDetail(DetailsBase.create(newValue, postSimulationTime, centerPane));
-            });
+                    setDetail(DetailsBase.create(newValue, postSimulationTime, centerPane));
+                });
     }
 
 
@@ -845,10 +846,10 @@ public class MainController {
     private void showLegend() {
         Context context = DataSourceHolder.getInstance().getContext();
         ObservableList<Shapeable<?>> items = Stream.concat(
-            Train.in(context).getAll().stream(),
-            Element.in(context).getAll().stream()
-                .map(Element::getType)
-                .distinct()
+                Train.in(context).getAll().stream(),
+                Element.in(context).getAll().stream()
+                        .map(Element::getType)
+                        .distinct()
         ).collect(FXCollectors.toObservableList());
 
         legend.setItems(items);
@@ -863,31 +864,31 @@ public class MainController {
         Context context = DataSourceHolder.getInstance().getContext();
 
         FilteredList<Train> trains = FXCollections.observableList(
-            new ArrayList<>(Train.in(context).getAll())
+                new ArrayList<>(Train.in(context).getAll())
         ).filtered(null);
         ObservableValue<Predicate<Train>> trainBinding = Bindings.createObjectBinding(
-            () -> s -> trainFilter.isSelected(),
-            trainFilter.selectedProperty()
+                () -> s -> trainFilter.isSelected(),
+                trainFilter.selectedProperty()
         );
         context.addObject(trainBinding);
         trains.predicateProperty().bind(trainBinding);
 
         FilteredList<Element> elements = FXCollections.observableList(
-            new ArrayList<>(Element.in(context).getAll())
+                new ArrayList<>(Element.in(context).getAll())
         ).filtered(null);
         ObservableValue<Predicate<Element>> elementBinding = Bindings.createObjectBinding(
-            () -> s -> elementFilter.isSelected(),
-            elementFilter.selectedProperty());
+                () -> s -> elementFilter.isSelected(),
+                elementFilter.selectedProperty());
         context.addObject(elementBinding);
         elements.predicateProperty().bind(elementBinding);
 
         ObservableList<GraphObject> items = new CompositeObservableList<>(trains, elements);
         FilteredList<GraphObject> textFilteredItems = items.filtered(null);
         ObservableValue<Predicate<GraphObject>> textFilterBinding = Bindings
-            .createObjectBinding(() -> {
-                String text = filterText.getText().trim().toLowerCase();
-                return s -> s.getName().toLowerCase().contains(text);
-            }, filterText.textProperty());
+                .createObjectBinding(() -> {
+                    String text = filterText.getText().trim().toLowerCase();
+                    return s -> s.getName().toLowerCase().contains(text);
+                }, filterText.textProperty());
         context.addObject(textFilterBinding);
         textFilteredItems.predicateProperty().bind(textFilterBinding);
 
@@ -896,8 +897,9 @@ public class MainController {
 
     public void setDataSource(@Nonnull DataSource source) {
 
-        if(source instanceof AbsSource)
-            {initializeDeltas((AbsSource) source);}
+        if (source instanceof AbsSource) {
+            initializeDeltas((AbsSource) source);
+        }
 
         DataSourceHolder.getInstance().set(source);
         Context context = source.getContext();
@@ -914,14 +916,16 @@ public class MainController {
      * @param source AbsSource
      */
 
-    private void initializeDeltas(AbsSource source)
-        {ArrayList<String> deltaArray = source.getDeltas();
-         if(deltaArray.size() <= 0) {return;}
-         this.deltas.setItems(FXCollections.observableArrayList(deltaArray));
-         this.deltas.setVisible(true);
-         this.deltas.setManaged(true);
-         this.deltas.setValue(deltaArray.get(0));
+    private void initializeDeltas(AbsSource source) {
+        ArrayList<String> deltaArray = source.getDeltas();
+        if (deltaArray.size() <= 0) {
+            return;
         }
+        this.deltas.setItems(FXCollections.observableArrayList(deltaArray));
+        this.deltas.setVisible(true);
+        this.deltas.setManaged(true);
+        this.deltas.setValue(deltaArray.get(0));
+    }
 
     /**
      * Gets the current graph shape.<br>
@@ -947,8 +951,8 @@ public class MainController {
                 Element element = entry.getKey();
                 Shape elementShape = entry.getValue().getShape(element);
                 Binding<Boolean> binding = Bindings.createBooleanBinding(() ->
-                        element.getType().isVisible(elementShape.getBoundsInParent()),
-                    element.getType().visibleStateProperty()
+                                element.getType().isVisible(elementShape.getBoundsInParent()),
+                        element.getType().visibleStateProperty()
                 );
                 context.addObject(binding);
                 entry.getValue().getShape(element).visibleProperty().bind(binding);
@@ -1017,7 +1021,7 @@ public class MainController {
     private void showSourceChooser() {
         cleanUp();
         FXMLLoader loader = new FXMLLoader(getClass().getResource(
-            "sourcechooser/SourceChooser.fxml"));
+                "sourcechooser/SourceChooser.fxml"));
         loader.setResources(ResourceBundle.getBundle("bundles.localization"));
         try {
             loader.load();
@@ -1069,13 +1073,13 @@ public class MainController {
     private void exportGraph() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
-            new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
-            new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg")
+                new FileChooser.ExtensionFilter("gnuplot (*.dat)", "*.dat"),
+                new FileChooser.ExtensionFilter("PNG Image (*.png)", "*.png"),
+                new FileChooser.ExtensionFilter("JPEG Image (*.jpg)", "*.jpg")
         );
         String initDirString = ConfigFile.getInstance().getProperty(
-            ConfigKey.initialLogFileDirectory.getKey(),
-            System.getProperty("user.home")
+                ConfigKey.initialLogFileDirectory.getKey(),
+                System.getProperty("user.home")
         );
         File initDir = new File(initDirString);
         fileChooser.setInitialDirectory(initDir);

@@ -6,16 +6,21 @@ import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.moveable;
 import javafx.beans.property.BooleanProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import javax.annotation.Nonnull;
 
 import javafx.scene.Cursor;
+import javafx.util.Pair;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Optional;
 
 
 public final class Junction extends SingleGraphShapeBase<Node, Circle> implements com.github.bachelorpraktikum.visualisierbar.view.moveable {
@@ -76,7 +81,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 a.setCenterY(a.getCenterY() + a.getTranslateY());
                 //TODO Coordiantes Adapter??
                 //b.getRepresented().setCoordinates(new Coordinates(((int) a.getCenterX()), (int) a.getCenterY()));
-                b.getRepresented().setCoordinates(adapter.reverse(new Point2D (((int) a.getCenterX()), (int) a.getCenterY())));
+                b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));
 
                 a.setTranslateX(0);
                 a.setTranslateY(0);
@@ -92,13 +97,51 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         });
 
         this.getShape().setOnMousePressed((t) -> {
-            if (!moveable) return;
-            if (!selection.contains(this) && !t.isShiftDown()) {
-                clearSelection();
-
+            if (t.isPrimaryButtonDown()) {
+                if (!moveable) return;
+                if (!selection.contains(this) && !t.isShiftDown()) {
+                    clearSelection();
+                }
+                this.addToSelection();
+                t.consume();
             }
-            this.addToSelection();
-            t.consume();
+            if(t.isSecondaryButtonDown()){
+                Dialog<Pair<String, String>> dialog = new Dialog<>();
+
+                dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
+
+                dialog.setTitle("Node Editor");
+                dialog.setHeaderText(null);
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+                TextField name = new TextField();
+                name.setText(this.getRepresented().getName());
+                TextField coordinates = new TextField();
+                coordinates.setText("(" + this.getRepresented().getCoordinates().getX() +","+ this.getRepresented().getCoordinates().getY()+ ")");
+                TextField edges =new TextField();
+                edges.setEditable(false);
+                String edgesText = "";
+                Iterator it = this.getRepresented().getEdges().iterator();
+                while (it.hasNext())
+                    edgesText= edgesText + it.next().toString() + System.getProperty(System.lineSeparator());
+                edges.setText(String.format(edgesText));
+                //edges.setOnScroll();
+                //edges.setPrefWidth(3);
+
+
+                grid.add(new Label("Name"), 0, 0);
+                grid.add(name, 1, 0);
+                grid.add(new Label("Coordinates:"), 0, 1);
+                grid.add(coordinates, 1, 1);
+                grid.add(edges, 1, 2, 2, 5);
+                dialog.getDialogPane().setContent(grid);
+                dialog.show();
+                Optional<Pair<String, String>> result =null;
+
+                t.consume();
+            }
         });
 
         this.getShape().setOnMouseDragged((t) -> {
@@ -186,7 +229,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         });
         selection.clear();
     }
-    public static void emptySelection(){
+
+    public static void emptySelection() {
         selection.clear();
     }
 

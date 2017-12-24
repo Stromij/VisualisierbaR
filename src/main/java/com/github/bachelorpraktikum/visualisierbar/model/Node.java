@@ -40,7 +40,7 @@ public final class Node implements GraphObject<Circle> {
     private final Set<Element> elements;
     @Nonnull
     private final Property<VisibleState> stateProperty;
-    //Blinker that signifies change in the offsets
+
     @Nonnull
     private final BooleanProperty movedProperty;
 
