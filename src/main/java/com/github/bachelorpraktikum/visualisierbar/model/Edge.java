@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
+
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.Line;
@@ -26,15 +28,16 @@ public final class Edge implements GraphObject<Line> {
     private static final Logger log = Logger.getLogger(Edge.class.getName());
 
     @Nonnull
-    private final String name;
-    private final int length;
+    private  String name;
+    private  int length;
     @Nonnull
     private final Node node1;
     @Nonnull
     private final Node node2;
     private final Property<VisibleState> stateProperty;
+    private final Context context;
 
-    private Edge(String name, int length, Node node1, Node node2) {
+    private Edge(String name, int length, Node node1, Node node2, Context context) {
         this.name = Objects.requireNonNull(name);
         this.length = length;
 
@@ -42,6 +45,7 @@ public final class Edge implements GraphObject<Line> {
         this.node2 = Objects.requireNonNull(node2);
         node1.addEdge(this);
         node2.addEdge(this);
+        this.context=context;
 
         this.stateProperty = new SimpleObjectProperty<>();
     }
@@ -59,6 +63,7 @@ public final class Edge implements GraphObject<Line> {
         private final Map<String, Edge> edges;
         @Nonnull
         private final Factory<Node> nodeFactory;
+        private final Context context;
 
         @Nonnull
         private static EdgeFactory getInstance(Context context) {
@@ -81,6 +86,7 @@ public final class Edge implements GraphObject<Line> {
         private EdgeFactory(Context ctx) {
             this.edges = new LinkedHashMap<>(INITIAL_EDGES_CAPACITY);
             this.nodeFactory = Node.in(ctx);
+            this.context = ctx;
         }
 
         /**
@@ -104,7 +110,7 @@ public final class Edge implements GraphObject<Line> {
             }
 
             Edge result = edges.computeIfAbsent(Objects.requireNonNull(name), edgeName ->
-                new Edge(edgeName, length, node1, node2)
+                new Edge(edgeName, length, node1, node2,this.context)
             );
 
             if (result.getLength() != length
@@ -249,6 +255,30 @@ public final class Edge implements GraphObject<Line> {
     @Nonnull
     public String getName() {
         return name;
+    }
+
+    public boolean setName(String newName){
+        if(!Edge.in(context).NameExists(newName)){
+            this.name=newName;
+            Edge.in(this.getContext()).edges.remove(newName);
+            Edge.in(this.getContext()).edges.put(newName,this);
+            return true;
+        }
+        return false;
+
+    }
+
+    public boolean setLength(int length){
+        if (length<0){return false;}
+        else{
+            this.length=length;
+        }
+        return true;
+    }
+
+    @Override
+    public Context getContext() {
+        return this.context;
     }
 
     @Nonnull

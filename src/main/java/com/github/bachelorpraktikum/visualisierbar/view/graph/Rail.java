@@ -3,12 +3,18 @@ package com.github.bachelorpraktikum.visualisierbar.view.graph;
 import com.github.bachelorpraktikum.visualisierbar.model.Edge;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javax.annotation.Nonnull;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 final class Rail extends SingleGraphShapeBase<Edge, Line> {
 
@@ -16,6 +22,82 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
 
     protected Rail(Edge edge, CoordinatesAdapter adapter) {
         super(edge, adapter);
+        this.getShape().setOnMousePressed((t)->{
+            if(t.isSecondaryButtonDown()){
+
+                Dialog<LinkedList<String>> dialog = new Dialog<>();
+
+                dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
+
+                dialog.setTitle("Edge Editor");
+                dialog.setHeaderText(null);
+                GridPane grid = new GridPane();
+                grid.setHgap(10);
+                grid.setVgap(10);
+                grid.setPadding(new Insets(20, 150, 10, 10));
+                TextField name = new TextField();
+                name.setText(this.getRepresented().getName());
+                TextField length  = new TextField();
+                length.setText(Integer.toString(this.getRepresented().getLength()));
+                grid.add(new Label("Name"), 0, 0);
+                grid.add(name, 1, 0);
+                grid.add(new Label("Length:"), 0, 1);
+                grid.add(length, 1, 1);
+                dialog.getDialogPane().setContent(grid);
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == ButtonType.APPLY) {
+                        LinkedList<String> result = new LinkedList<>();
+                        //return new Pair<>(name.getText(), coordinates.getText());
+                        result.add(name.getText());
+                        result.add(length.getText());
+                        return result;
+                    }
+                    return null;
+                });
+
+                Optional<LinkedList<String>> result = dialog.showAndWait();
+                if(result.isPresent()){
+                    if (this.getRepresented().getName() != result.get().get(0) | this.getRepresented().setName(result.get().get(0))){
+
+                    }
+                    else{
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setX(t.getX());
+                        alert.setY(t.getY());
+                        alert.setGraphic(null);
+                        alert.setHeaderText(null);
+                        alert.setContentText("Name already taken");
+                        alert.showAndWait();
+                        t.consume();
+                        return;
+                    }
+                    Pattern d = Pattern.compile("\\d+");
+                    Matcher dm = d.matcher(result.get().get(1));
+                    if (dm.matches())
+                    {
+                        int x =Integer.parseInt(dm.group());
+                        this.getRepresented().setLength(x);
+                    }
+
+                    else{
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setX(t.getX());
+                        alert.setY(t.getY());
+                        alert.setGraphic(null);
+                        alert.setHeaderText(null);
+                        alert.setContentText("Invalid length");
+                        alert.showAndWait();
+                        t.consume();
+                        return;
+                    }
+                    initializedShape(this.getShape());
+                    t.consume();
+
+                }
+            }
+        });
     }
 
     @Override
@@ -42,6 +124,7 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
     protected void initializedShape(Line line) {
         TooltipUtil.install(line,
             new Tooltip(getRepresented().getName() + " " + getRepresented().getLength() + "m"));
+        if (this.getRepresented().getLength()>-1)line.setStroke(Color.BLACK);
     }
 
     @Nonnull

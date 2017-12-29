@@ -1,6 +1,7 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph;
 
 import com.github.bachelorpraktikum.visualisierbar.model.Coordinates;
+import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
@@ -18,6 +19,9 @@ import javax.annotation.Nonnull;
 import javafx.scene.Cursor;
 import javafx.util.Pair;
 
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
@@ -105,8 +109,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 this.addToSelection();
                 t.consume();
             }
-            if(t.isSecondaryButtonDown()){
-                Dialog<Pair<String, String>> dialog = new Dialog<>();
+            if(t.isSecondaryButtonDown()&& moveable){
+
+                Dialog<LinkedList<String>> dialog = new Dialog<>();
 
                 dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
 
@@ -120,6 +125,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 name.setText(this.getRepresented().getName());
                 TextField coordinates = new TextField();
                 coordinates.setText("(" + this.getRepresented().getCoordinates().getX() +","+ this.getRepresented().getCoordinates().getY()+ ")");
+                /*
                 TextField edges =new TextField();
                 edges.setEditable(false);
                 String edgesText = "";
@@ -129,16 +135,89 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 edges.setText(String.format(edgesText));
                 //edges.setOnScroll();
                 //edges.setPrefWidth(3);
+                */
+                //ChoiceBox type = new ChoiceBox("None", "")
+                int i =0;
+                LinkedList<String> c = new LinkedList<>();
+                for(Element.Type type :Element.Type.values()){
 
+                c.add(type.getName());
+                }
+
+                ChoiceBox element = new ChoiceBox();
+                //element.setConverter();
+                element.getItems().add("None");
+                element.setValue(element.getItems().get(0));
+                element.getItems().addAll(c);
+                grid.add(element,2,0);
 
                 grid.add(new Label("Name"), 0, 0);
                 grid.add(name, 1, 0);
                 grid.add(new Label("Coordinates:"), 0, 1);
                 grid.add(coordinates, 1, 1);
-                grid.add(edges, 1, 2, 2, 5);
+                //grid.add(edges, 1, 2, 2, 5);
                 dialog.getDialogPane().setContent(grid);
-                dialog.show();
-                Optional<Pair<String, String>> result =null;
+                dialog.setResultConverter(dialogButton -> {
+                    if (dialogButton == ButtonType.APPLY) {
+                        LinkedList<String> result = new LinkedList<>();
+                        //return new Pair<>(name.getText(), coordinates.getText());
+                        result.add(name.getText());
+                        result.add(coordinates.getText());
+                        result.add(((String) element.getValue()));
+                        return result;
+                    }
+                    return null;
+                });
+                Pattern p = Pattern.compile("\\(\\d+,\\d+\\)");
+                Pattern d = Pattern.compile("\\d+");
+                //dialog.show();
+                Optional<LinkedList<String>> result = dialog.showAndWait();
+                if(result.isPresent()){
+                    //this.getRepresented().getContext()//result.get().getKey()
+                    Matcher m = p.matcher(result.get().get(1));
+                    if(m.matches()){
+                        Matcher dm = d.matcher(m.group());
+                        dm.find();
+                        int x =Integer.parseInt(dm.group());
+                        dm.find();
+                        int y = Integer.parseInt(dm.group());
+                        this.getRepresented().setCoordinates(new Coordinates(x,y));
+                        this.getRepresented().moved();
+                        relocate(this.getShape());
+                    }
+                    else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setX(t.getX());
+                        alert.setY(t.getY());
+                        alert.setGraphic(null);
+                        alert.setHeaderText(null);
+                        alert.setContentText("Invalid Coordinates");
+                        alert.showAndWait();
+                        t.consume();
+                        return;
+                    }
+
+                    if (this.getRepresented().getName() != result.get().get(0) | this.getRepresented().setName(result.get().get(0))){
+                        initializedShape(this.getShape());
+                    }
+
+                    else{
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setX(t.getX());
+                        alert.setY(t.getY());
+                        alert.setGraphic(null);
+                        alert.setHeaderText(null);
+                        alert.setContentText("Name already taken");
+                        alert.showAndWait();
+                        t.consume();
+                        return;
+                    }
+
+                   //this.getRepresented().setCoordinates(result.get().getValue());
+                }
+                this.getRepresented().getElements().forEach((test)->{System.out.println(test);});
 
                 t.consume();
             }
@@ -218,6 +297,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         selection.add(this);
     }
 
+
     public void removeFromSelection() {
         this.getShape().setFill(Color.BLACK);
         selection.remove(this);
@@ -241,6 +321,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     @Override
     public boolean getMoveable() {
         return moveable;
+    }
+
+    public void updateShapePosition(){
+
     }
 
 }

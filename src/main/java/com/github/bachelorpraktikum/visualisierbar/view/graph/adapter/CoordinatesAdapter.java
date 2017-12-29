@@ -32,7 +32,7 @@ public interface CoordinatesAdapter {
 
     /**
      * Transforms the Coordinates of a Node in the Model to a Point in the Graph by applying the offsets
-     * @param node the Node to transform the Coordinates of
+     * @param node the Model Node to transform the Coordinates of
      * @return the transformed Point
      */
     @Nonnull

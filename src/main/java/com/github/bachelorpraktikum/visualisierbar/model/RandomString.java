@@ -8,7 +8,7 @@ import java.util.Random;
 public class RandomString {
 
     /**
-     * Generate a random string.
+     * Generate a random string. Used to create random names for created objects.
      */
     public String nextString() {
         for (int idx = 0; idx < buf.length; ++idx)

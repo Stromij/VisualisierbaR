@@ -31,26 +31,29 @@ public final class Node implements GraphObject<Circle> {
     private static final Logger log = Logger.getLogger(Node.class.getName());
 
     @Nonnull
-    private final String name;
+    private  String name;
     @Nonnull
     private  Coordinates coordinates;
     @Nonnull
     private  Set<Edge> edges;
     @Nonnull
-    private final Set<Element> elements;
+    private  Set<Element> elements;
     @Nonnull
     private final Property<VisibleState> stateProperty;
-
+    //indicates change in the coordinates
     @Nonnull
     private final BooleanProperty movedProperty;
 
-    private Node(String name, Coordinates coordinates) {
+    private final Context context;
+
+    private Node(String name, Coordinates coordinates, Context context) {
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);
         this.edges = new LinkedHashSet<>();
         this.elements = new HashSet<>();
         this.stateProperty = new SimpleObjectProperty<>();
         this.movedProperty = new SimpleBooleanProperty(false);
+        this.context = context;
     }
 
     @Nonnull
@@ -70,6 +73,7 @@ public final class Node implements GraphObject<Circle> {
 
         @Nonnull
         private final Map<String, Node> nodes;
+        private final Context context;
 
         @Nonnull
         private static NodeFactory getInstance(Context context) {
@@ -77,7 +81,7 @@ public final class Node implements GraphObject<Circle> {
                 throw new NullPointerException("context is null");
             }
             NodeFactory result = instances.computeIfAbsent(context, ctx -> {
-                NodeFactory factory = new NodeFactory();
+                NodeFactory factory = new NodeFactory(ctx);
                 ctx.addObject(factory);
                 return new WeakReference<>(factory);
             }).get();
@@ -88,7 +92,8 @@ public final class Node implements GraphObject<Circle> {
             return result;
         }
 
-        private NodeFactory() {
+        private NodeFactory(Context ctx) {
+            this.context=ctx;
             this.nodes = new LinkedHashMap<>(INITIAL_NODES_CAPACITY);
         }
 
@@ -106,7 +111,7 @@ public final class Node implements GraphObject<Circle> {
         @Nonnull
         public Node create(String name, Coordinates coordinates) {
             Node result = nodes.computeIfAbsent(Objects.requireNonNull(name), nodeName ->
-                new Node(nodeName, coordinates)
+                new Node(nodeName, coordinates, context)
             );
 
             if (!result.getCoordinates().equals(coordinates)) {
@@ -119,6 +124,14 @@ public final class Node implements GraphObject<Circle> {
             }
 
             return result;
+        }
+
+        public boolean NameExists (String name){
+            Node node = nodes.get(Objects.requireNonNull(name));
+            if (node == null) {
+                return false;
+            }
+            return true;
         }
 
         @Override
@@ -167,6 +180,27 @@ public final class Node implements GraphObject<Circle> {
     public String getName() {
         return name;
     }
+
+    @Override
+    public Context getContext() {
+       return this.context;
+    }
+
+    /**
+     * changes the name of a node
+     * @param newName the new Name the node will have
+     * @return true when the change was succesfull, false if it was not
+     */
+    public boolean setName(String newName){
+        if(!Node.in(context).NameExists(newName)){
+            this.name=newName;
+            Node.in(this.getContext()).nodes.remove(newName);
+            Node.in(this.getContext()).nodes.put(newName,this);
+            return true;
+        }
+      return false;
+    }
+
 
     /**
      * Gets the coordinates of this node.
@@ -226,7 +260,12 @@ public final class Node implements GraphObject<Circle> {
     public Property<VisibleState> visibleStateProperty() {
         return stateProperty;
     }
+
     public BooleanProperty movedProperty(){return movedProperty;}
+
+    public void moved(){
+        movedProperty.setValue(!movedProperty.getValue());
+    }
 
     @Override
     public String toString() {

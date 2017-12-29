@@ -59,6 +59,7 @@ public class Train implements GraphObject<Shape> {
 
     @Nonnull
     private final ObservableList<TrainEvent> events;
+    private final Context context;
 
     /**
      * Creates a new train.
@@ -68,7 +69,7 @@ public class Train implements GraphObject<Shape> {
      * @param length the length of the train
      * @throws IllegalArgumentException if length <= 0
      */
-    private Train(String name, String readableName, int length, Paint color) {
+    private Train(String name, String readableName, int length, Paint color, Context context) {
         this.name = Objects.requireNonNull(name);
         this.readableName = Objects.requireNonNull(readableName);
         if (length <= 0) {
@@ -80,6 +81,7 @@ public class Train implements GraphObject<Shape> {
         events.add(new TrainEvent.Start(this));
         stateProperty = new SimpleObjectProperty<>(VisibleState.AUTO);
         this.color = Objects.requireNonNull(color);
+        this.context=context;
     }
 
     @Nonnull
@@ -118,6 +120,7 @@ public class Train implements GraphObject<Shape> {
         @Nonnull
         private final Map<String, Train> trains;
         private int colorCounter;
+        private final Context context;
 
 
         @Nonnull
@@ -127,7 +130,7 @@ public class Train implements GraphObject<Shape> {
             }
 
             TrainFactory result = instances.computeIfAbsent(context, ctx -> {
-                TrainFactory factory = new TrainFactory();
+                TrainFactory factory = new TrainFactory(ctx);
                 ctx.addObject(factory);
                 return new WeakReference<>(factory);
             }).get();
@@ -138,9 +141,10 @@ public class Train implements GraphObject<Shape> {
             return result;
         }
 
-        private TrainFactory() {
+        private TrainFactory(Context context) {
             this.trains = new HashMap<>(INITIAL_TRAINS_CAPACITY);
             this.colorCounter = 0;
+            this.context=context;
         }
 
         /**
@@ -158,7 +162,7 @@ public class Train implements GraphObject<Shape> {
         @Nonnull
         public Train create(String name, String readableName, int length) {
             Train result = trains.computeIfAbsent(Objects.requireNonNull(name), n ->
-                new Train(n, readableName, length, nextColor())
+                new Train(n, readableName, length, nextColor(),context)
             );
 
             if (result.getLength() != length
@@ -219,6 +223,11 @@ public class Train implements GraphObject<Shape> {
     @Nonnull
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Context getContext() {
+        return context;
     }
 
     @Override

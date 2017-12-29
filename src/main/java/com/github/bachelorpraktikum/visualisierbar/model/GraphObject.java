@@ -19,6 +19,14 @@ public interface GraphObject<S extends Shape> extends Shapeable<S> {
     String getName();
 
     /**
+     * Gets the context this object is in
+     * @return the context
+     */
+    Context getContext();
+
+
+
+    /**
      * <p>Gets a human readable name for this object.</p>
      *
      * <p>The default implementation calls {@link #getName()}.</p>
@@ -29,4 +37,5 @@ public interface GraphObject<S extends Shape> extends Shapeable<S> {
     default String getReadableName() {
         return getName();
     }
+
 }

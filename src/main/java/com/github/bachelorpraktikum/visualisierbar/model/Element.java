@@ -50,6 +50,8 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     private final ReadOnlyObjectWrapper<State> stateProperty;
 
+    private final Context context;
+
     /**
      * Represents the state of an {@link Element}.
      */
@@ -191,12 +193,13 @@ public final class Element implements GraphObject<Shape> {
         }
     }
 
-    private Element(ElementFactory factory, String name, Type type, Node node, State state) {
+    private Element(ElementFactory factory, String name, Type type, Node node, State state, Context context) {
         this.factory = Objects.requireNonNull(factory);
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
         this.node = Objects.requireNonNull(node);
         this.stateProperty = new ReadOnlyObjectWrapper<>(Objects.requireNonNull(state));
+        this.context=context;
 
         node.addElement(this);
 
@@ -232,6 +235,7 @@ public final class Element implements GraphObject<Shape> {
         private final ObservableList<ElementEvent> events;
         private int currentTime;
         private int nextIndex;
+        private final Context context;
 
         @Nonnull
         private static ElementFactory getInstance(Context context) {
@@ -259,6 +263,7 @@ public final class Element implements GraphObject<Shape> {
             this.events = FXCollections.observableArrayList();
             this.currentTime = -1;
             this.nextIndex = 0;
+            this.context = context;
         }
 
         @Nonnull
@@ -286,7 +291,7 @@ public final class Element implements GraphObject<Shape> {
             }
 
             Element element = elements.computeIfAbsent(Objects.requireNonNull(name), elementName ->
-                new Element(this, elementName, type, node, state)
+                new Element(this, elementName, type, node, state, context)
             );
             State resultInitState = getStateAtTime(element, Context.INIT_STATE_TIME);
             if (!element.getName().equals(name)
@@ -442,6 +447,11 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Context getContext() {
+        return null;
     }
 
     @Nonnull
