@@ -47,6 +47,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.geometry.Side;
 import javafx.scene.Cursor;
@@ -57,11 +58,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -152,6 +149,7 @@ public class MainController {
     private ToggleButton newNodeButton;
     @FXML
     private Button fcButton;
+
 
     private Rectangle selectionRec;
     //private LinkedList<> selected;
@@ -316,6 +314,8 @@ public class MainController {
                 fcButton.setManaged(true);
                 fcButton.setVisible(true);
 
+
+
                 if (proportionalToggle.isSelected()) {
                     proportionalToggle.fire();
                 }
@@ -359,6 +359,7 @@ public class MainController {
                 disconnectButton.setVisible(false);
                 newNodeButton.setVisible(false);
                 fcButton.setVisible(false);
+
                 toolSelector.setValue(toolSelector.getItems().get(0));
             }
 
@@ -392,6 +393,10 @@ public class MainController {
         fcButton.setOnAction((t) -> {
             graph.fullyConnect(Junction.getSelection());
         });
+        /*
+        newElementButton.setOnAction((t)->{
+        });
+        */
 
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {

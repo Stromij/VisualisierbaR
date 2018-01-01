@@ -52,6 +52,7 @@ public final class Graph {
         for (Edge edge : Edge.in(context).getAll()) {
             GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
             edges.put(edge, shape);
+            edge.setGraph(this);
             group.getChildren().add(shape.getFullNode());
         }
 
@@ -59,11 +60,14 @@ public final class Graph {
             GraphShape<Node> shape = new Junction(node, coordinatesAdapter);
 
             nodes.put(node, shape);
+            node.setGraph(this);
             group.getChildren().add(shape.getFullNode());
+            node.getElements().forEach((a)->{a.setGraph(null);});
 
             for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
                 for (Element element : elementShape.getRepresentedObjects()) {
                     elements.put(element, elementShape);
+                    element.setGraph(this);
                 }
                 group.getChildren().add(elementShape.getFullNode());
             }
@@ -101,6 +105,10 @@ public final class Graph {
         return coordinatesAdapter;
     }
 
+    /**
+     * removes a {@link Node} from the Graph, the Context and the Factory mapping.
+     * @param node the Node to remove
+     */
     public void removeNode(Node node){
         LinkedList<Element> e =new LinkedList<>();
         //LinkedList<Node> n =new LinkedList();
@@ -138,6 +146,12 @@ public final class Graph {
 
 
     }
+
+    /**
+     * removes an {@link Edge} from the Graph as well as the Context and the Factory mapping.
+     * @param edge the Edge to remove
+     */
+
     public void removeEdge (Edge edge){
 
         edges.remove(edge);
@@ -145,6 +159,13 @@ public final class Graph {
         Edge.in(context).remove(edge);
     }
 
+    /**
+     * Connects every Node in the Selection with every other Node part of the Selection.
+     * Already existing Edges are not duplicated.
+     * New Edges are given a random name and length -1
+     * New Edges are added to the Graph, Context and the Factory mapping.
+     * @param selection the Selection to fully connect
+     */
     public void fullyConnect (HashSet<Junction> selection){
         HashSet<Node> NodeSet = new HashSet<>(128);
         Iterator it = Junction.getSelection().iterator();
@@ -189,6 +210,7 @@ public final class Graph {
                         if(!Edge.in(context).NameExists(name)) break;
                     }
                     Edge edge = Edge.in(context).create(name,-1, sList.get(i), sList.get(k));
+                    edge.setGraph(this);
                     context.addObject(edge);
                     GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
                     edges.put(edge, shape);
@@ -201,6 +223,11 @@ public final class Graph {
 
     }
 
+    /**
+     * Removes all Edges that are associated with this Node.
+     * Edges are removed from the Graph, the Context and the Factory mapping.
+     * @param node to disconnect
+     */
     public void disconnect (Node node){
         LinkedList<Edge> ed = new LinkedList<>();
         edges.forEach((a,b)-> {
@@ -216,8 +243,15 @@ public final class Graph {
         });
     }
 
+    /**
+     * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
+     * @param name
+     * @param coordinates
+     * @throws IllegalArgumentException
+     */
     public void addNode (String name, Coordinates coordinates) throws IllegalArgumentException {
         Node newNode =Node.in(context).create(name, coordinates);
+        newNode.setGraph(this);
         if(nodes.containsKey(newNode)) return;
         context.addObject(newNode);
         GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
@@ -226,5 +260,26 @@ public final class Graph {
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
 
+    }
+
+    public void addElement(Element elementToAdd){
+        //elementtoAdd.getNode().ge
+
+        for (GraphShape<Element> elementShape : Elements.create(elementToAdd.getNode(), coordinatesAdapter)) {
+            for (Element element : elementShape.getRepresentedObjects()) {
+                //group.getChildren().remove()
+                elements.put(element, elementShape);
+                element.setGraph(this);
+            }
+
+            group.getChildren().add(elementShape.getFullNode());
+
+            //System.out.println(group.getChildren().size());
+        }
+    }
+
+
+    public Context getContext(){
+        return this.context;
     }
 }

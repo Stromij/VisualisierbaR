@@ -8,8 +8,10 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.Coordinate
 import com.github.bachelorpraktikum.visualisierbar.view.moveable;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -17,6 +19,7 @@ import javafx.scene.shape.Circle;
 import javax.annotation.Nonnull;
 
 import javafx.scene.Cursor;
+import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
 import java.util.LinkedList;
@@ -33,11 +36,19 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     private static HashSet<Junction> selection = new HashSet<>(128);
     private static double mousePressedX = -1;
     private static double mousePressedY = -1;
-
     private boolean moveable;
+    //public Shape elements;
+    //private DropShadow highlightGlow;
 
     Junction(Node node, CoordinatesAdapter adapter) {
         super(node, adapter);
+        /*
+        highlightGlow = new DropShadow();
+        highlightGlow.setOffsetY(0f);
+        highlightGlow.setOffsetX(0f);
+        highlightGlow.setColor(Color.BLUE);
+        //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
+        */
 
         setMoveable(false);
       /*
@@ -119,7 +130,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 dialog.setHeaderText(null);
                 GridPane grid = new GridPane();
                 grid.setHgap(10);
-                grid.setVgap(10);
+                grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
                 TextField name = new TextField();
                 name.setText(this.getRepresented().getName());
@@ -136,25 +147,66 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 //edges.setOnScroll();
                 //edges.setPrefWidth(3);
                 */
-                //ChoiceBox type = new ChoiceBox("None", "")
-                int i =0;
                 LinkedList<String> c = new LinkedList<>();
                 for(Element.Type type :Element.Type.values()){
-
-                c.add(type.getName());
+                    c.add(type.getLogName()); //////////TEST///////////////////
                 }
-
                 ChoiceBox element = new ChoiceBox();
-                //element.setConverter();
-                element.getItems().add("None");
-                element.setValue(element.getItems().get(0));
                 element.getItems().addAll(c);
-                grid.add(element,2,0);
+                element.setValue(element.getItems().get(0));
+
+                c.clear();
+
+                for(Element.State state :Element.State.values()){
+                    c.add(state.name());
+                }
+                ChoiceBox sig = new ChoiceBox();
+                sig.getItems().addAll(c);
+                sig.setValue(sig.getItems().get(0));
 
                 grid.add(new Label("Name"), 0, 0);
                 grid.add(name, 1, 0);
                 grid.add(new Label("Coordinates:"), 0, 1);
                 grid.add(coordinates, 1, 1);
+
+                Separator  sep = new Separator();
+                sep.setOrientation(Orientation.HORIZONTAL);
+                grid.add(sep,0,2);
+
+                grid.add(new Label("Create new Element"),0,3);
+                TextField Ename = new TextField("Name");
+                grid.add(Ename,1,3);
+                grid.add(element,1,4);
+                grid.add(new Label("Type"),0, 4 );
+                grid.add(new Label("Signal"),0,5);
+                grid.add(sig, 1, 5);
+                Button createButton = new Button();
+                createButton.setText("create");
+                createButton.setOnAction((tt)->{
+                    String newName = Ename.getText();
+
+                    if(!Element.in(this.getRepresented().getGraph().getContext()).NameExists(newName)){
+                        Element.Type eType = Element.Type.fromName((String)element.getValue());
+
+                        this.getRepresented().getGraph().addElement(Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName((String)sig.getValue())));
+
+                    }
+                    else{
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setGraphic(null);
+                        alert.setHeaderText(null);
+                        alert.setContentText("Name already taken");
+                        alert.showAndWait();
+                        t.consume();
+                        return;
+                    }
+
+
+                });
+                grid.add(createButton,1,6);
+
+
                 //grid.add(edges, 1, 2, 2, 5);
                 dialog.getDialogPane().setContent(grid);
                 dialog.setResultConverter(dialogButton -> {
@@ -163,7 +215,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         //return new Pair<>(name.getText(), coordinates.getText());
                         result.add(name.getText());
                         result.add(coordinates.getText());
-                        result.add(((String) element.getValue()));
+                        //result.add(((String) element.getValue()));
+                        //result.add((String) sig.getValue());
                         return result;
                     }
                     return null;
@@ -188,8 +241,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     else {
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
-                        alert.setX(t.getX());
-                        alert.setY(t.getY());
                         alert.setGraphic(null);
                         alert.setHeaderText(null);
                         alert.setContentText("Invalid Coordinates");
@@ -205,8 +256,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     else{
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
-                        alert.setX(t.getX());
-                        alert.setY(t.getY());
                         alert.setGraphic(null);
                         alert.setHeaderText(null);
                         alert.setContentText("Name already taken");
@@ -216,8 +265,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     }
 
                    //this.getRepresented().setCoordinates(result.get().getValue());
+
                 }
-                this.getRepresented().getElements().forEach((test)->{System.out.println(test);});
+                //this.getRepresented().getElements().forEach((test)->{System.out.println(test);});
 
                 t.consume();
             }
@@ -268,6 +318,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     protected void resize(Circle shape) {
         double radius = getCalibrationBase() * CALIBRATION_COEFFICIENT;
         shape.setRadius(radius);
+        //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
     }
 
     @Override
@@ -278,7 +329,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     @Nonnull
     @Override
     public Circle createShape() {
-        return new Circle();
+        Circle c = new Circle();
+        return c;
+
     }
 
     @Override
@@ -286,34 +339,59 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         return createCircleHighlight(circle);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+
     public void setMoveable(boolean moveable) {
         this.moveable = moveable;
         if (moveable == true) this.getShape().setCursor(Cursor.HAND);
         else this.getShape().setCursor(Cursor.DEFAULT);
     }
 
+    /**
+     * Adds this Junction to the Selection and highlights the Shape with blue
+     */
     public void addToSelection() {
         this.getShape().setFill(Color.BLUE);
+        //this.getShape().setEffect(highlightGlow);
         selection.add(this);
     }
-
+    /**
+     * Removes this Junction from the Selection and sets the Color to standard black
+     */
 
     public void removeFromSelection() {
         this.getShape().setFill(Color.BLACK);
+        //this.getShape().setEffect(null);
         selection.remove(this);
     }
+
+    /**
+     * empties the Selection properly
+     */
 
     public static void clearSelection() {
         selection.forEach((b) -> {
             b.getShape().setFill(Color.BLACK);
+            //b.getShape().setEffect(null);
         });
         selection.clear();
     }
 
+    /**
+     * empties the selection without cleaning up, use with care
+     */
     public static void emptySelection() {
         selection.clear();
     }
 
+    /**
+     * Returns the current selection
+     * @return the static Selection variable shared among ALL Junctions
+     */
     public static HashSet<Junction> getSelection() {
         return selection;
     }
@@ -323,8 +401,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         return moveable;
     }
 
-    public void updateShapePosition(){
 
-    }
 
 }

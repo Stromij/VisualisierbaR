@@ -35,17 +35,17 @@ public final class Edge implements GraphObject<Line> {
     @Nonnull
     private final Node node2;
     private final Property<VisibleState> stateProperty;
-    private final Context context;
+    private Graph graph;
 
-    private Edge(String name, int length, Node node1, Node node2, Context context) {
+    private Edge(String name, int length, Node node1, Node node2) {
         this.name = Objects.requireNonNull(name);
         this.length = length;
-
+        this.graph=null;
         this.node1 = Objects.requireNonNull(node1);
         this.node2 = Objects.requireNonNull(node2);
         node1.addEdge(this);
         node2.addEdge(this);
-        this.context=context;
+        //this.graph=graph;
 
         this.stateProperty = new SimpleObjectProperty<>();
     }
@@ -63,7 +63,6 @@ public final class Edge implements GraphObject<Line> {
         private final Map<String, Edge> edges;
         @Nonnull
         private final Factory<Node> nodeFactory;
-        private final Context context;
 
         @Nonnull
         private static EdgeFactory getInstance(Context context) {
@@ -86,7 +85,6 @@ public final class Edge implements GraphObject<Line> {
         private EdgeFactory(Context ctx) {
             this.edges = new LinkedHashMap<>(INITIAL_EDGES_CAPACITY);
             this.nodeFactory = Node.in(ctx);
-            this.context = ctx;
         }
 
         /**
@@ -110,7 +108,7 @@ public final class Edge implements GraphObject<Line> {
             }
 
             Edge result = edges.computeIfAbsent(Objects.requireNonNull(name), edgeName ->
-                new Edge(edgeName, length, node1, node2,this.context)
+                new Edge(edgeName, length, node1, node2)
             );
 
             if (result.getLength() != length
@@ -137,6 +135,11 @@ public final class Edge implements GraphObject<Line> {
             }
             return edge;
         }
+        /**
+         * Checks the availability of a name
+         * @param name the String to check
+         * @return true if an Edge with this name exists, otherwise false
+         */
 
         public boolean NameExists (String name){
             Edge edge = edges.get(Objects.requireNonNull(name));
@@ -258,15 +261,25 @@ public final class Edge implements GraphObject<Line> {
     }
 
     public boolean setName(String newName){
-        if(!Edge.in(context).NameExists(newName)){
-            this.name=newName;
-            Edge.in(this.getContext()).edges.remove(newName);
-            Edge.in(this.getContext()).edges.put(newName,this);
-            return true;
+        if (graph!= null){
+
+            if(!Edge.in(graph.getContext()).NameExists(newName)){
+                this.name=newName;
+                Edge.in(graph.getContext()).edges.remove(newName);
+                Edge.in(graph.getContext()).edges.put(newName,this);
+                return true;
+            }
         }
         return false;
 
     }
+
+    /**
+     * Sets the length of this Edge.
+     *
+     * @param length a positive Integer
+     * @return true if the change was successful, false otherwise
+     */
 
     public boolean setLength(int length){
         if (length<0){return false;}
@@ -277,8 +290,12 @@ public final class Edge implements GraphObject<Line> {
     }
 
     @Override
-    public Context getContext() {
-        return this.context;
+    public Graph getGraph() {
+        return this.graph;
+    }
+
+    public void setGraph(Graph graph){
+        this.graph=graph;
     }
 
     @Nonnull

@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
@@ -40,7 +42,7 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     private final ElementFactory factory;
     @Nonnull
-    private final String name;
+    private String name;
     @Nonnull
     private final Node node;
     @Nonnull
@@ -50,7 +52,7 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     private final ReadOnlyObjectWrapper<State> stateProperty;
 
-    private final Context context;
+    private Graph graph;
 
     /**
      * Represents the state of an {@link Element}.
@@ -144,7 +146,7 @@ public final class Element implements GraphObject<Shape> {
             return name();
         }
 
-        String getLogName() {
+        public String getLogName() {
             return logName;
         }
 
@@ -193,13 +195,13 @@ public final class Element implements GraphObject<Shape> {
         }
     }
 
-    private Element(ElementFactory factory, String name, Type type, Node node, State state, Context context) {
+    private Element(ElementFactory factory, String name, Type type, Node node, State state) {
         this.factory = Objects.requireNonNull(factory);
         this.name = Objects.requireNonNull(name);
         this.type = Objects.requireNonNull(type);
         this.node = Objects.requireNonNull(node);
         this.stateProperty = new ReadOnlyObjectWrapper<>(Objects.requireNonNull(state));
-        this.context=context;
+        this.graph=null;
 
         node.addElement(this);
 
@@ -235,7 +237,6 @@ public final class Element implements GraphObject<Shape> {
         private final ObservableList<ElementEvent> events;
         private int currentTime;
         private int nextIndex;
-        private final Context context;
 
         @Nonnull
         private static ElementFactory getInstance(Context context) {
@@ -263,8 +264,16 @@ public final class Element implements GraphObject<Shape> {
             this.events = FXCollections.observableArrayList();
             this.currentTime = -1;
             this.nextIndex = 0;
-            this.context = context;
+
         }
+        public boolean NameExists (String name){
+            Element element = elements.get(Objects.requireNonNull(name));
+            if (element == null) {
+                return false;
+            }
+            return true;
+        }
+
 
         @Nonnull
         private Switch.Factory getSwitchFactory() {
@@ -291,7 +300,7 @@ public final class Element implements GraphObject<Shape> {
             }
 
             Element element = elements.computeIfAbsent(Objects.requireNonNull(name), elementName ->
-                new Element(this, elementName, type, node, state, context)
+                new Element(this, elementName, type, node, state)
             );
             State resultInitState = getStateAtTime(element, Context.INIT_STATE_TIME);
             if (!element.getName().equals(name)
@@ -450,8 +459,12 @@ public final class Element implements GraphObject<Shape> {
     }
 
     @Override
-    public Context getContext() {
-        return null;
+    public Graph getGraph() {
+        return graph;
+    }
+
+    public void setGraph(Graph graph){
+        this.graph=graph;
     }
 
     @Nonnull
@@ -522,6 +535,17 @@ public final class Element implements GraphObject<Shape> {
             throw new IllegalStateException();
         }
         return aSwitch;
+    }
+    public boolean setName(String newName){
+        if(graph!=null){
+            if(!Element.in(graph.getContext()).NameExists(newName)){
+                this.name=newName;
+                Element.in(graph.getContext()).elements.remove(newName);
+                Element.in(graph.getContext()).elements.put(newName,this);
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

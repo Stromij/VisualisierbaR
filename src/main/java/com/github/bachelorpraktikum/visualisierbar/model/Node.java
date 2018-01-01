@@ -13,6 +13,7 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,16 +45,16 @@ public final class Node implements GraphObject<Circle> {
     @Nonnull
     private final BooleanProperty movedProperty;
 
-    private final Context context;
+    private Graph graph;
 
-    private Node(String name, Coordinates coordinates, Context context) {
+    private Node(String name, Coordinates coordinates) {
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);
         this.edges = new LinkedHashSet<>();
         this.elements = new HashSet<>();
         this.stateProperty = new SimpleObjectProperty<>();
         this.movedProperty = new SimpleBooleanProperty(false);
-        this.context = context;
+        this.graph =null;
     }
 
     @Nonnull
@@ -73,7 +74,7 @@ public final class Node implements GraphObject<Circle> {
 
         @Nonnull
         private final Map<String, Node> nodes;
-        private final Context context;
+
 
         @Nonnull
         private static NodeFactory getInstance(Context context) {
@@ -93,7 +94,6 @@ public final class Node implements GraphObject<Circle> {
         }
 
         private NodeFactory(Context ctx) {
-            this.context=ctx;
             this.nodes = new LinkedHashMap<>(INITIAL_NODES_CAPACITY);
         }
 
@@ -111,7 +111,7 @@ public final class Node implements GraphObject<Circle> {
         @Nonnull
         public Node create(String name, Coordinates coordinates) {
             Node result = nodes.computeIfAbsent(Objects.requireNonNull(name), nodeName ->
-                new Node(nodeName, coordinates, context)
+                new Node(nodeName, coordinates)
             );
 
             if (!result.getCoordinates().equals(coordinates)) {
@@ -126,6 +126,11 @@ public final class Node implements GraphObject<Circle> {
             return result;
         }
 
+        /**
+         * Checks the availability of a name
+         * @param name the String to check
+         * @return true if a Node with this name exists, otherwise false
+         */
         public boolean NameExists (String name){
             Node node = nodes.get(Objects.requireNonNull(name));
             if (node == null) {
@@ -182,21 +187,27 @@ public final class Node implements GraphObject<Circle> {
     }
 
     @Override
-    public Context getContext() {
-       return this.context;
+    public Graph getGraph() {
+       return this.graph;
+    }
+
+    public void setGraph(Graph graph){
+        this.graph=graph;
     }
 
     /**
-     * changes the name of a node
+     * changes the name of a Node if the new name is available
      * @param newName the new Name the node will have
-     * @return true when the change was succesfull, false if it was not
+     * @return true when the change was successful, false if it was not
      */
     public boolean setName(String newName){
-        if(!Node.in(context).NameExists(newName)){
-            this.name=newName;
-            Node.in(this.getContext()).nodes.remove(newName);
-            Node.in(this.getContext()).nodes.put(newName,this);
-            return true;
+        if(graph!=null){
+            if(!Node.in(graph.getContext()).NameExists(newName)){
+                this.name=newName;
+                Node.in(graph.getContext()).nodes.remove(newName);
+                Node.in(graph.getContext()).nodes.put(newName,this);
+                return true;
+            }
         }
       return false;
     }
@@ -261,8 +272,15 @@ public final class Node implements GraphObject<Circle> {
         return stateProperty;
     }
 
+    /**
+     * Returns a property used to indicate changes in the Coordinates of the Node
+     * @return the  Property
+     */
     public BooleanProperty movedProperty(){return movedProperty;}
 
+    /**
+     * call this method if you moved the Node and need to notify the dependent Shapes
+     */
     public void moved(){
         movedProperty.setValue(!movedProperty.getValue());
     }

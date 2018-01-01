@@ -33,7 +33,7 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
                 dialog.setHeaderText(null);
                 GridPane grid = new GridPane();
                 grid.setHgap(10);
-                grid.setVgap(10);
+                grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
                 TextField name = new TextField();
                 name.setText(this.getRepresented().getName());
@@ -43,6 +43,10 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
                 grid.add(name, 1, 0);
                 grid.add(new Label("Length:"), 0, 1);
                 grid.add(length, 1, 1);
+                grid.add(new Label ("Node 1:"), 2, 0);
+                grid.add(new Label ("Node 2:"), 2, 1);
+                grid.add(new Label (this.getRepresented().getNode1().getName()), 3,0);
+                grid.add(new Label (this.getRepresented().getNode2().getName()), 3,1);
                 dialog.getDialogPane().setContent(grid);
                 dialog.setResultConverter(dialogButton -> {
                     if (dialogButton == ButtonType.APPLY) {
@@ -63,8 +67,6 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
                     else{
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
-                        alert.setX(t.getX());
-                        alert.setY(t.getY());
                         alert.setGraphic(null);
                         alert.setHeaderText(null);
                         alert.setContentText("Name already taken");
@@ -83,8 +85,6 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
                     else{
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
-                        alert.setX(t.getX());
-                        alert.setY(t.getY());
                         alert.setGraphic(null);
                         alert.setHeaderText(null);
                         alert.setContentText("Invalid length");

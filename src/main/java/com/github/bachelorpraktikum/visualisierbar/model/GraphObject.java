@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
 
@@ -22,7 +23,7 @@ public interface GraphObject<S extends Shape> extends Shapeable<S> {
      * Gets the context this object is in
      * @return the context
      */
-    Context getContext();
+    Graph getGraph();
 
 
 

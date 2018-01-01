@@ -349,7 +349,12 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
         Point2D transformVec = transformationMap.get(node);
         return startingPoint.add(transformVec);
     }
-    //dont use, doesnt work
+
+    /**
+     * dont use this
+     * @param point dont use this
+     * @return dont use this
+     */
     @Override
     public Coordinates reverse(@Nonnull Point2D point) {
         return new Coordinates(0,0);
