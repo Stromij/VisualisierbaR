@@ -51,7 +51,7 @@ public final class Element implements GraphObject<Shape> {
     private final Switch aSwitch;
     @Nonnull
     private final ReadOnlyObjectWrapper<State> stateProperty;
-
+    @Nullable
     private Graph graph;
 
     /**
@@ -266,7 +266,7 @@ public final class Element implements GraphObject<Shape> {
             this.nextIndex = 0;
 
         }
-        public boolean NameExists (String name){
+        public boolean NameExists (@Nonnull String name){
             Element element = elements.get(Objects.requireNonNull(name));
             if (element == null) {
                 return false;

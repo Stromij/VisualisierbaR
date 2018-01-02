@@ -138,7 +138,7 @@ public class MainController {
     @FXML
     private ToolBar standartTB;
     @FXML
-    private ChoiceBox toolSelector;
+    private ChoiceBox<String> toolSelector;
     @FXML
     private ChoiceBox deltas;
     @FXML
@@ -417,7 +417,7 @@ public class MainController {
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        toolSelector.setItems(FXCollections.observableArrayList("move", "select", "connect", "disconnect", "delete"));
+        toolSelector.setItems(FXCollections.observableArrayList("move", "select"));
         toolSelector.setVisible(false);
         toolSelector.setValue(toolSelector.getItems().get(0));
         toolSelector.setManaged(false);
@@ -551,7 +551,7 @@ public class MainController {
             mousePressedX = -1;
             mousePressedY = -1;
             selectionRec.setVisible(false);
-            if (toolSelector.getValue() == "select") {
+            if (toolSelector.getValue().equals("select")) {
                 //System.out.println( selectionRec.getBoundsInLocal()
                 if (!event.isShiftDown()) Junction.clearSelection();
                 if (graph.getNodes() == null) return;
@@ -582,7 +582,7 @@ public class MainController {
             if (!event.isPrimaryButtonDown()) {
                 return;
             }
-            if (toolSelector.getValue() == "move") {
+            if (toolSelector.getValue().equals("move")) {
                 if (mousePressedX == -1 && mousePressedY == -1) {
                     mousePressedX = event.getX();
                     mousePressedY = event.getY();

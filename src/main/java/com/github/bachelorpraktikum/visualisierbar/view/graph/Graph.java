@@ -278,7 +278,7 @@ public final class Graph {
         }
     }
 
-
+    @Nonnull
     public Context getContext(){
         return this.context;
     }

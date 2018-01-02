@@ -14,6 +14,7 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.Line;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 
@@ -29,12 +30,14 @@ public final class Edge implements GraphObject<Line> {
 
     @Nonnull
     private  String name;
+    @Nonnull
     private  int length;
     @Nonnull
     private final Node node1;
     @Nonnull
     private final Node node2;
     private final Property<VisibleState> stateProperty;
+    @Nullable
     private Graph graph;
 
     private Edge(String name, int length, Node node1, Node node2) {
@@ -260,7 +263,12 @@ public final class Edge implements GraphObject<Line> {
         return name;
     }
 
-    public boolean setName(String newName){
+    /**
+     * set the name of this Edge
+     * @param newName the name
+     * @return true if change was succesfull, false if name already taken
+     */
+    public boolean setName(@Nonnull String newName){
         if (graph!= null){
 
             if(!Edge.in(graph.getContext()).NameExists(newName)){

@@ -232,6 +232,11 @@ public class Train implements GraphObject<Shape> {
     }
 
     @Override
+    public void setGraph(Graph graph){
+        this.graph=graph;
+    }
+
+    @Override
     @Nonnull
     public String getReadableName() {
         return readableName;
