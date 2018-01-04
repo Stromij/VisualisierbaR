@@ -340,6 +340,8 @@ public class MainController {
                     ((Junction) b).setMoveable(false);
                 }));
 
+                graph.printToAbs();
+
                 toolSelector.setManaged(false);
                 deleteButton.setManaged(false);
                 disconnectButton.setManaged(false);

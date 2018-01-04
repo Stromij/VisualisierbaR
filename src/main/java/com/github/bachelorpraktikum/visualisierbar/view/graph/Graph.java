@@ -282,4 +282,33 @@ public final class Graph {
     public Context getContext(){
         return this.context;
     }
+
+    /**
+     * Printing the nodes to ABS-Code to the console
+     * If there are some negative nodes this function translate the
+     * whole graph to a positive graph
+     * @return a String of all Nodes in ABS-Code-Format
+     */
+    @Nonnull
+    public String printToAbs()
+         {String response = "";
+          String nameOfNode;
+          String abs;
+          System.out.println("----- ABS start -----");
+
+          //TODO Translating negative nodes to positive ones
+
+          for(Map.Entry<Node, GraphShape<Node>> entry : nodes.entrySet())
+             {Node node = entry.getKey();
+              nameOfNode = node.getName();
+              abs = String.format("[HTTPName: \"%s\"]Node %s = new local NodeImpl(%s,%s);\n",
+                         nameOfNode, nameOfNode, node.getCoordinates().getX(), node.getCoordinates().getY());
+              System.out.print(abs);
+              response = response.concat(abs);
+             }
+
+          System.out.println("----- ABS end -----");
+
+          return response;
+         }
 }

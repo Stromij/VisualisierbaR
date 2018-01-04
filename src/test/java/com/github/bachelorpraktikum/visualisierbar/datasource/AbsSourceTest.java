@@ -37,8 +37,6 @@ public class AbsSourceTest {
          File path = new File("src/test/resources/ABS/Main/");
          AbsSource source = new AbsSource(command, path, products.get(0));
          ArrayList foundedDeltas = source.getDeltas();
-         System.out.println(foundedDeltas);
-
          assertArrayEquals(expected.get(0), foundedDeltas.toArray());
         }
 
@@ -49,7 +47,6 @@ public class AbsSourceTest {
          File path = new File("src/test/resources/ABS/Main/");
          AbsSource source = new AbsSource(command, path, products.get(1));
          ArrayList foundedDeltas = source.getDeltas();
-         System.out.println(foundedDeltas);
 
          assertArrayEquals(expected.get(1), foundedDeltas.toArray());
         }
