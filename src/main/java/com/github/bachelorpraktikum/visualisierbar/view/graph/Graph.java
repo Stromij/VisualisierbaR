@@ -264,6 +264,16 @@ public final class Graph {
 
     public void addElement(Element elementToAdd){
         //elementtoAdd.getNode().ge
+        if(elementToAdd.getType().isComposite()){
+            for( Element element : elementToAdd.getNode().getElements()){
+                if (element.getType().isComposite()){
+                    if(element.getGraph()==this){
+                        this.getGroup().getChildren().remove(elements.get(element).getFullNode());
+                        element.setGraph(null);
+                    }
+                }
+            }
+        }
 
         for (GraphShape<Element> elementShape : Elements.create(elementToAdd.getNode(), coordinatesAdapter)) {
             for (Element element : elementShape.getRepresentedObjects()) {

@@ -130,6 +130,15 @@ public final class Element implements GraphObject<Shape> {
             this.shapeSupplier = () -> Shapeable.createShape(imageUrls);
         }
 
+         public boolean isComposite(){
+
+            if((this == Element.Type.GeschwindigkeitsAnzeiger) ||
+                    (this== Element.Type.GeschwindigkeitsVoranzeiger)||
+                    (this== Element.Type.VorSignal)||
+                    (this== Element.Type.HauptSignal)) return true;
+            return false;
+        }
+
         Type(String logName, Supplier<Shape> shapeSupplier) {
             this.logName = logName;
             this.stateProperty = new SimpleObjectProperty<>(VisibleState.AUTO);
