@@ -301,8 +301,8 @@ public class MainController {
                 resetButton.setVisible(true);
                 editorToggle.setVisible(true);
                 closeButton.setVisible(true);
-
-
+                //////////////////////////////////
+                proportionalToggle.setVisible(true);
                 toolSelector.setVisible(true);
                 toolSelector.setManaged(true);
                 deleteButton.setVisible(true);
@@ -316,9 +316,10 @@ public class MainController {
 
 
 
-                if (proportionalToggle.isSelected()) {
+                /*if (proportionalToggle.isSelected()) {
+
                     proportionalToggle.fire();
-                }
+                }*/
                 if (eventTraversal.isSelected()) {
                     eventTraversal.fire();
                 }
