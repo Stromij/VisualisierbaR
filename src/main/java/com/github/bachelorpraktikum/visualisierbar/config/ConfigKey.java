@@ -19,7 +19,8 @@ public enum ConfigKey {
     databasePassword("database_password"),
     absExportPath("abs_export_path"),
     absToolchain("abs_toolchain"),
-    experimentalAbsExportForAttributes("experimental_attributes_abs_export");
+    experimentalAbsExportForAttributes("experimental_attributes_abs_export"),
+    simulationStoppedDoNotShowAgain("simulation_stopped_do_not_show_again");
 
     private final String key;
 

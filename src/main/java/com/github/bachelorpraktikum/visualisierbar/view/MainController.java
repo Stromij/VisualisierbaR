@@ -289,6 +289,14 @@ public class MainController {
 
             if (graph.getNodes() == null) return;
             if (newValue) {
+
+                if(!simulationStopWarning())
+                    {editorToggle.setSelected(false);
+                     return;
+                    }
+
+
+
                 /*
                 proportionalToggle.setVisible(false);
                 playToggle.setVisible(false);
@@ -1099,4 +1107,34 @@ public class MainController {
             Exporter.exportGraph(this.getGraph(), file);
         }
     }
+
+    private boolean simulationStopWarning()
+        {if(ConfigKey.simulationStoppedDoNotShowAgain.get().equals("true"))
+            {return true;}
+
+         ButtonType buttonDoNotShowAgain = new ButtonType("Do not show Again");
+         ButtonType buttonOK = new ButtonType("Okay");
+         ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+         Alert simulationInfo = new Alert(Alert.AlertType.WARNING);
+         simulationInfo.setTitle("Simulation stopped");
+         simulationInfo.setHeaderText("Simulation will be stopped!");
+         simulationInfo.setContentText("Attention!\n" +
+                                       "By opening the editor simulations will be stopped.\n" +
+                                       "After opening the editor there will be no simulations possible!");
+         simulationInfo.getDialogPane().setPrefWidth(525);
+         simulationInfo.getDialogPane().setMaxWidth(Double.MAX_VALUE);
+         simulationInfo.getButtonTypes().setAll(buttonDoNotShowAgain, buttonOK, buttonCancel);
+         Optional<ButtonType> result = simulationInfo.showAndWait();
+
+         System.out.println(result);
+         if (result.get() == buttonDoNotShowAgain)
+            {ConfigKey.simulationStoppedDoNotShowAgain.set("true");
+             return true;
+            }
+         else if(result.get() == buttonOK)
+            {return true;}
+         else
+            {return false;}
+        }
 }
