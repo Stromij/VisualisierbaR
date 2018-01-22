@@ -48,7 +48,7 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
                 grid.add(new Label (this.getRepresented().getNode1().getName()), 3,0);
                 grid.add(new Label (this.getRepresented().getNode2().getName()), 3,1);
                 dialog.getDialogPane().setContent(grid);
-                dialog.setResultConverter(dialogButton -> {
+                dialog.setResultConverter(dialogButton -> {                                //get User input
                     if (dialogButton == ButtonType.APPLY) {
                         LinkedList<String> result = new LinkedList<>();
                         //return new Pair<>(name.getText(), coordinates.getText());

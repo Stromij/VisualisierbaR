@@ -546,6 +546,7 @@ public final class Element implements GraphObject<Shape> {
         return aSwitch;
     }
     public boolean setName(String newName){
+        if(newName==null) return false;
         if(graph!=null){
             if(!Element.in(graph.getContext()).NameExists(newName)){
                 this.name=newName;

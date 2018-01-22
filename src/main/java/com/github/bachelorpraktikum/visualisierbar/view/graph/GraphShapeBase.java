@@ -73,6 +73,8 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
         return highlighted;
     }
 
+    public Node getHighlight() {return highlight;}
+
     protected final CoordinatesAdapter getCoordinatesAdapter() {
         return adapter;
     }

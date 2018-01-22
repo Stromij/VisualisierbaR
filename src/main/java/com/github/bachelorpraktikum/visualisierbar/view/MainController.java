@@ -286,8 +286,8 @@ public class MainController {
 
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
-
-            if (graph.getNodes() == null) return;
+            //TODO log error
+            if (graph == null) return;
             if (newValue) {
 
                 if(!simulationStopWarning())
@@ -322,12 +322,6 @@ public class MainController {
                 fcButton.setManaged(true);
                 fcButton.setVisible(true);
 
-
-
-                /*if (proportionalToggle.isSelected()) {
-
-                    proportionalToggle.fire();
-                }*/
                 if (eventTraversal.isSelected()) {
                     eventTraversal.fire();
                 }
@@ -379,7 +373,8 @@ public class MainController {
 
         deleteButton.setOnAction((t) -> {
             Junction.getSelection().forEach((a) -> {
-
+                //TODO log error
+                if (graph == null) return;
                 graph.removeNode(a.getRepresentedObjects().get(0));
 
             });
@@ -388,6 +383,8 @@ public class MainController {
 
         disconnectButton.setOnAction((t) -> {
             Junction.getSelection().forEach((a) -> {
+                //TODO log error
+                if (graph==null) return;
                 graph.disconnect(a.getRepresentedObjects().get(0));
             });
         });
@@ -402,6 +399,8 @@ public class MainController {
         });
 
         fcButton.setOnAction((t) -> {
+            //TODO log error
+            if (graph==null) return;
             graph.fullyConnect(Junction.getSelection());
         });
         /*
@@ -489,11 +488,14 @@ public class MainController {
         graphPane.widthProperty().addListener(boundsListener);
 
         graphPane.setOnMouseClicked((event) -> {
+            //if (!event.isShiftDown()){Junction.clearSelection();}
             if (newNodeButton.isSelected()) {
+                //TODO log error
+                if(graph==null) return;
                 TextInputDialog dialog = new TextInputDialog();
                 dialog.setTitle("Enter Node Name");
-                dialog.setX(event.getX());
-                dialog.setY(event.getY());
+                //dialog.setX(event.getX());
+                //dialog.setY(event.getY());
                 dialog.setGraphic(null);
                 dialog.setHeaderText(null);
                 dialog.showAndWait();
@@ -565,7 +567,8 @@ public class MainController {
             if (toolSelector.getValue().equals("select")) {
                 //System.out.println( selectionRec.getBoundsInLocal()
                 if (!event.isShiftDown()) Junction.clearSelection();
-                if (graph.getNodes() == null) return;
+                //TODO Log Error
+                if (graph == null) return;
                 graph.getNodes().forEach((node, shape) -> {
 
                     Circle c = (Circle) shape.getShape();
@@ -579,7 +582,10 @@ public class MainController {
                         ((Junction) shape).addToSelection();
                         //selected.getChildren().add(shape.getShape());
                     }
+
                 });
+                selectionRec.setHeight(0);
+                selectionRec.setWidth(0);
             }
             //if (selected.getChildren().size()>0)
         });
@@ -955,7 +961,6 @@ public class MainController {
         if (graph == null) {
             Context context = DataSourceHolder.getInstance().getContext();
             if (proportionalToggle.isSelected()) {
-                //TODO: carry over edited Context? Context History for undo?
                 graph = new Graph(context, new ProportionalCoordinatesAdapter(context));
             } else {
                 graph = new Graph(context, new SimpleCoordinatesAdapter());

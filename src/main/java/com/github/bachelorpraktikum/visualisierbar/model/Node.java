@@ -201,6 +201,7 @@ public final class Node implements GraphObject<Circle> {
      * @return true when the change was successful, false if it was not
      */
     public boolean setName(String newName){
+        if(newName==null) return false;
         if(graph!=null){
             if(!Node.in(graph.getContext()).NameExists(newName)){
                 this.name=newName;
@@ -248,9 +249,7 @@ public final class Node implements GraphObject<Circle> {
      * @return the edges
      */
     @Nonnull
-    public Set<Edge> getEdges() {
-        return Collections.unmodifiableSet(edges);
-    }
+    public Set<Edge> getEdges() { return edges;}
 
     /**
      * Gets all elements at this node.
@@ -259,7 +258,7 @@ public final class Node implements GraphObject<Circle> {
      */
     @Nonnull
     public Set<Element> getElements() {
-        return Collections.unmodifiableSet(elements);
+        return elements;
     }
 
     void addElement(Element element) {

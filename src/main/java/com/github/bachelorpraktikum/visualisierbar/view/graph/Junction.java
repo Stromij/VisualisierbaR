@@ -79,10 +79,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             mousePressedY = -1;
             selection.forEach((b) -> {
                 Circle a = b.getShape();
-                //Circle c = (Circle)event.getSource();
-                a.setTranslateX(Math.round(a.getTranslateX()));
+                a.setTranslateX(Math.round(a.getTranslateX()));     //snap to valid coordinates
                 a.setTranslateY(Math.round(a.getTranslateY()));
-
 
                 if (a.getCenterX() + a.getTranslateX() < 0 || a.getCenterY() + a.getTranslateY() < 0) {
                     System.out.println("Coordiantes invalid");
@@ -93,19 +91,12 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                 a.setCenterX(a.getCenterX() + a.getTranslateX());
                 a.setCenterY(a.getCenterY() + a.getTranslateY());
-                //TODO Coordiantes Adapter??
-                //b.getRepresented().setCoordinates(new Coordinates(((int) a.getCenterX()), (int) a.getCenterY()));
-                b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));
+                b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));  //update coordinates in the model
 
                 a.setTranslateX(0);
                 a.setTranslateY(0);
-                b.getRepresented().movedProperty().setValue(!b.getRepresented().movedProperty().getValue());
-                ////////////
-                //this.getRepresented().getElements().forEach((a)->{a.});
-                //TooltipUtil.install(c,this.getRepresented().getName());
-                //Tooltip.
-                //System.out.println(("Node X:" + b.getRepresented().getCoordinates().toPoint2D().getX() + " " + "Node Y:" + b.getRepresented().getCoordinates().toPoint2D().getY()));
-                //System.out.println("X:" + (a.getCenterX() + a.getTranslateX()) + " " + "Y:" + (a.getCenterY() + a.getTranslateY()));
+                b.getRepresented().moved();                   //indicate that the node has moved to notify edges and elements
+
                 event.consume();
             });
         });
@@ -121,7 +112,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             }
             if(t.isSecondaryButtonDown()&& moveable){
 
-                Alert alert = new Alert(Alert.AlertType.ERROR);
+                Alert alert = new Alert(Alert.AlertType.ERROR);     //prepare Error dialog for later use
                 alert.setTitle("Error");
                 alert.setGraphic(null);
                 alert.setHeaderText(null);
@@ -136,35 +127,26 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.setHgap(10);
                 grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
+
                 TextField name = new TextField();
                 name.setText(this.getRepresented().getName());
+
                 TextField coordinates = new TextField();
                 coordinates.setText("(" + this.getRepresented().getCoordinates().getX() +","+ this.getRepresented().getCoordinates().getY()+ ")");
-                /*
-                TextField edges =new TextField();
-                edges.setEditable(false);
-                String edgesText = "";
-                Iterator it = this.getRepresented().getEdges().iterator();
-                while (it.hasNext())
-                    edgesText= edgesText + it.next().toString() + System.getProperty(System.lineSeparator());
-                edges.setText(String.format(edgesText));
-                //edges.setOnScroll();
-                //edges.setPrefWidth(3);
-                */
+
                 LinkedList<String> c = new LinkedList<>();
                 for(Element.Type type :Element.Type.values()){
-                    c.add(type.getLogName()); //////////TEST///////////////////
+                    c.add(type.getLogName());
                 }
-                ChoiceBox<String> element = new ChoiceBox<>();
+                ChoiceBox<String> element = new ChoiceBox<>();      //element Type choice box
                 element.getItems().addAll(c);
                 element.setValue(element.getItems().get(0));
-
                 c.clear();
 
                 for(Element.State state :Element.State.values()){
                     c.add(state.name());
                 }
-                ChoiceBox<String> sig = new ChoiceBox<>();
+                ChoiceBox<String> sig = new ChoiceBox<>();              //signal choice box
                 sig.getItems().addAll(c);
                 sig.setValue(sig.getItems().get(0));
 
@@ -186,7 +168,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.add(sig, 1, 5);
                 Button createButton = new Button();
                 createButton.setText("create");
-                createButton.setOnAction((tt)->{
+                createButton.setOnAction((tt)->{                    //add Element procedure
                     String newName = Ename.getText();
 
                     //TODO Log something went wrong
@@ -194,11 +176,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     if (this.getRepresented().getGraph()==null){return;}
                     if(!Element.in(this.getRepresented().getGraph().getContext()).NameExists(newName)){
                         Element.Type eType = Element.Type.fromName(element.getValue());
-                        if (eType==Element.Type.WeichenPunkt){
-
+                        if (eType==Element.Type.WeichenPunkt){                                  //Weichen are treated seperately
                             Node node1=null;
                             Node node2=null;
-                            if(this.getRepresented().getEdges().size()!=3){
+                            if(this.getRepresented().getEdges().size()!=3 || !selection.contains(this)){
                                 alert.setContentText("Main Point needs to have 3 edges, this one has "+ this.getRepresented().getEdges().size());
                                 alert.showAndWait();
                                 t.consume();
@@ -234,7 +215,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             //something went horribly wrong and we abandon ship
                             if(node1==null|| node2==null || node1.getGraph()==null || node2.getGraph()==null){return;}
 
-                            RandomString gen = new RandomString(4, ThreadLocalRandom.current());
+                            RandomString gen = new RandomString(4, ThreadLocalRandom.current()); //generate random names for the other 2 elements
                             for (int i=0; i<10000; i++){
                                  name1= gen.nextString();
                                  name2= gen.nextString();
@@ -249,25 +230,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             node2.getGraph().addElement(e3);
                         }
                         else{
-                            this.getRepresented().getGraph().addElement(Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue())));
+                            this.getRepresented().getGraph().addElement(Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue())));       //normal elements are simply added
                         }
-                        /*
-                        if (eType==Element.Type.WeichenPunkt){
-
-                            Dialog<LinkedList<String>> WPdialog = new Dialog<>();
-
-                            WPdialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
-
-                            WPdialog.setTitle("Node Editor");
-                            WPdialog.setHeaderText(null);
-                            GridPane WPgrid = new GridPane();
-                            WPgrid.setHgap(10);
-                            WPgrid.setVgap(5);
-                            WPgrid.setPadding(new Insets(20, 150, 10, 10));
-                            Button [] a;
-                            a[0]=new Button();
-                        }
-                        */
                     }
                     else{
                         alert.setContentText("Name already taken");
@@ -279,16 +243,12 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                 });
                 grid.add(createButton,1,6);
-                //grid.add(edges, 1, 2, 2, 5);
                 dialog.getDialogPane().setContent(grid);
-                dialog.setResultConverter(dialogButton -> {
+                dialog.setResultConverter(dialogButton -> {             //get user Input
                     if (dialogButton == ButtonType.APPLY) {
                         LinkedList<String> result = new LinkedList<>();
-                        //return new Pair<>(name.getText(), coordinates.getText());
                         result.add(name.getText());
                         result.add(coordinates.getText());
-                        //result.add(((String) element.getValue()));
-                        //result.add((String) sig.getValue());
                         return result;
                     }
                     return null;
@@ -298,8 +258,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 //dialog.show();
                 Optional<LinkedList<String>> result = dialog.showAndWait();
                 if(result.isPresent()){
-                    //this.getRepresented().getContext()//result.get().getKey()
-                    Matcher m = p.matcher(result.get().get(1));
+                    Matcher m = p.matcher(result.get().get(1));     //check if input for coordinates matches (x,y) format
                     if(m.matches()){
                         Matcher dm = d.matcher(m.group());
                         dm.find();
@@ -317,7 +276,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         return;
                     }
 
-                    if (this.getRepresented().getName().equals(result.get().get(0)) | this.getRepresented().setName(result.get().get(0))){
+                    if (this.getRepresented().getName().equals(result.get().get(0)) | this.getRepresented().setName(result.get().get(0))){      //set new Name
                         initializedShape(this.getShape());
                     }
 
@@ -328,12 +287,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         return;
                     }
 
-                   //this.getRepresented().setCoordinates(result.get().getValue());
-
                 }
                 /////DEBUG////
-                this.getRepresented().getElements().forEach((test)->{System.out.println(test+ " " + test.getType());});
-
+                //this.getRepresented().getElements().forEach((test)->{System.out.println(test+ " " + test.getType());});
                 t.consume();
             }
         });
@@ -354,15 +310,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
             selection.forEach((b) -> {
                 Circle a = b.getShape();
-                //Circle c = (Circle) (t.getSource());
-                //Tooltip tc = new Tooltip("("+(Math.round(c.getTranslateX()+offsetX) + "," + Math.round(c.getTranslateY()+offsetY)+ ")"));
-                //Tooltip.install(c,tc);
-
                 a.setTranslateX(a.getTranslateX() + offsetX);
                 a.setTranslateY(a.getTranslateY() + offsetY);
-                //System.out.println("X:"+ (c.getCenterX()+c.getTranslateX())+" "+"Y:"+ (c.getCenterY()+c.getTranslateY()));
-
-                //this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
             });
 
             t.consume();

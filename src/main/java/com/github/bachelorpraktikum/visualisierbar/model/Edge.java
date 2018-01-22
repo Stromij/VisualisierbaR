@@ -268,7 +268,8 @@ public final class Edge implements GraphObject<Line> {
      * @param newName the name
      * @return true if change was succesfull, false if name already taken
      */
-    public boolean setName(@Nonnull String newName){
+    public boolean setName(String newName){
+        if(newName==null) return false;
         if (graph!= null){
 
             if(!Edge.in(graph.getContext()).NameExists(newName)){
