@@ -49,6 +49,7 @@ public final class Graph {
         this.elements = new LinkedHashMap<>(256);
         this.group = new Group();
         this.edges = new LinkedHashMap<>(256);
+        Junction.clearSelection();      //TEST//
         for (Edge edge : Edge.in(context).getAll()) {
             GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
             edges.put(edge, shape);
