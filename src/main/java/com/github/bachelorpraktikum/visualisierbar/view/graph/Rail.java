@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.visualisierbar.view.graph;
 import com.github.bachelorpraktikum.visualisierbar.model.Edge;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
@@ -12,7 +13,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,9 +23,11 @@ import java.util.regex.Pattern;
 final class Rail extends SingleGraphShapeBase<Edge, Line> {
 
     private static final double CALIBRATION_COEFFICIENT = 0.05;
+    private final List<ChangeListener> listeners;
 
     protected Rail(Edge edge, CoordinatesAdapter adapter) {
         super(edge, adapter);
+        listeners = new ArrayList<>(2);
         this.getShape().setOnMousePressed((t)->{
             if(t.isSecondaryButtonDown()){
 
@@ -135,20 +140,23 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
         getRepresented().getNode1().movedProperty().addListener((observable, oldValue, newValue) -> {
             relocate(this.getShape());
         });
-        */
 
-        getRepresented().getNode1().movedProperty().addListener(new WeakChangeListener<>((observable, oldValue, newValue) -> {
-            relocate(this.getShape());
-        }));
-        /*
         getRepresented().getNode2().movedProperty().addListener((observable, oldValue, newValue) -> {
             relocate(this.getShape());
         });
-        return new Line();
         */
-        getRepresented().getNode2().movedProperty().addListener(new WeakChangeListener<>((observable, oldValue, newValue) -> {
+
+        ChangeListener Node1Listener = ((observable, oldValue, newValue) -> {
             relocate(this.getShape());
-        }));
+        });
+        listeners.add(Node1Listener);
+        ChangeListener Node2Listener = ((observable, oldValue, newValue) -> {
+            relocate(this.getShape());
+        });
+        listeners.add(Node2Listener);
+        getRepresented().getNode1().movedProperty().addListener(new WeakChangeListener(Node1Listener));
+        getRepresented().getNode2().movedProperty().addListener(new WeakChangeListener(Node2Listener));
+
         return new Line();
     }
 

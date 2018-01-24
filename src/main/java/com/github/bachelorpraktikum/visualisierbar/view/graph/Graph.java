@@ -148,12 +148,12 @@ public final class Graph {
         context.removeObject(node);
 
     }
-
-    /**
-     * removes an {@link Edge} from the Graph as well as the Context and the Factory mapping.
-     * @param edge the Edge to remove
-     */
-
+    /*
+        /**
+         * removes an {@link Edge} from the Graph as well as the Context and the Factory mapping.
+         * @param edge the Edge to remove
+         */
+    /*
     public void removeEdge (Edge edge){
         edge.getNode1().getEdges().remove(edge);
         edge.getNode2().getEdges().remove(edge);
@@ -161,6 +161,7 @@ public final class Graph {
         context.removeObject(edge);
         Edge.in(context).remove(edge);
     }
+    */
 
     /**
      * Connects every Node in the Selection with every other Node part of the Selection.

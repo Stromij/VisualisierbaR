@@ -14,6 +14,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
+import javax.xml.bind.Marshaller;
 
 abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
 
@@ -21,7 +22,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
 
     private final List<Element> elements;
     private final com.github.bachelorpraktikum.visualisierbar.model.Node node;
-    private final List<ChangeListener<Element.State>> listeners;
+    private final List<ChangeListener> listeners;
 
     ElementBase(List<Element> elements,
         com.github.bachelorpraktikum.visualisierbar.model.Node node, CoordinatesAdapter adapter) {
@@ -92,9 +93,12 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
             TooltipUtil.install(elementShape, new Tooltip(element.getName()));
-            this.node.movedProperty().addListener(new WeakChangeListener<>((observable, oldValue, newValue) -> {
+            ChangeListener NodeListener = ((observable, oldValue, newValue) -> {
                 relocate(this.getShape());
-            }));
+            });
+            listeners.add(NodeListener);
+
+            this.node.movedProperty().addListener(new WeakChangeListener<>(NodeListener));
             displayState(element);
         }
     }

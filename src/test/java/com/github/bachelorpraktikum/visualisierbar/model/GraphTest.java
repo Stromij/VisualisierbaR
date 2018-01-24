@@ -175,7 +175,7 @@ public class GraphTest   {
         System.gc();
         if (weakEdge!=null){
             assertNull(weakEdge.get());
-            assertNull(weakEdge.get());
+            assertNull(EdgeShape.get());
         }
     }
 

@@ -92,7 +92,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 a.setCenterX(a.getCenterX() + a.getTranslateX());
                 a.setCenterY(a.getCenterY() + a.getTranslateY());
                 b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));  //update coordinates in the model
-
+                //System.out.println(b.getRepresented().getCoordinates());
                 a.setTranslateX(0);
                 a.setTranslateY(0);
                 b.getRepresented().moved();                   //indicate that the node has moved to notify edges and elements
