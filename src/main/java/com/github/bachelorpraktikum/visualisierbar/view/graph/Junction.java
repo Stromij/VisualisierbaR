@@ -212,6 +212,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             }
                             String name1=null;
                             String name2=null;
+                            //TODO log error
                             //something went horribly wrong and we abandon ship
                             if(node1==null|| node2==null || node1.getGraph()==null || node2.getGraph()==null){return;}
 
@@ -359,7 +360,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
     public void setMoveable(boolean moveable) {
         this.moveable = moveable;
-        if (moveable == true) this.getShape().setCursor(Cursor.HAND);
+        if (moveable) this.getShape().setCursor(Cursor.HAND);
         else this.getShape().setCursor(Cursor.DEFAULT);
     }
 

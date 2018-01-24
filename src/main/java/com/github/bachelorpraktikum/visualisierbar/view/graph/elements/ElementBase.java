@@ -92,13 +92,9 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
             TooltipUtil.install(elementShape, new Tooltip(element.getName()));
-            this.node.movedProperty().addListener((observable, oldValue, newValue) -> {
+            this.node.movedProperty().addListener(new WeakChangeListener<>((observable, oldValue, newValue) -> {
                 relocate(this.getShape());
-/*                this.setHighlight(createHighlight(this.getShape()));
-                this.getHighlight().visibleProperty().bind(highlightedProperty());
-                //createHighlight(this.getShape());
-*/
-            });
+            }));
             displayState(element);
         }
     }

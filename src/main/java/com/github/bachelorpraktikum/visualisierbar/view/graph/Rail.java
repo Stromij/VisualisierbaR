@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.visualisierbar.view.graph;
 import com.github.bachelorpraktikum.visualisierbar.model.Edge;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
+import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -130,14 +131,24 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
     @Nonnull
     @Override
     public Line createShape() {
+        /*
         getRepresented().getNode1().movedProperty().addListener((observable, oldValue, newValue) -> {
             relocate(this.getShape());
-
         });
+        */
+
+        getRepresented().getNode1().movedProperty().addListener(new WeakChangeListener<>((observable, oldValue, newValue) -> {
+            relocate(this.getShape());
+        }));
+        /*
         getRepresented().getNode2().movedProperty().addListener((observable, oldValue, newValue) -> {
             relocate(this.getShape());
-
         });
+        return new Line();
+        */
+        getRepresented().getNode2().movedProperty().addListener(new WeakChangeListener<>((observable, oldValue, newValue) -> {
+            relocate(this.getShape());
+        }));
         return new Line();
     }
 

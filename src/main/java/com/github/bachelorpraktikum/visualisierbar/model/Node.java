@@ -131,7 +131,7 @@ public final class Node implements GraphObject<Circle> {
          * @param name the String to check
          * @return true if a Node with this name exists, otherwise false
          */
-        public boolean NameExists (String name){
+        public boolean NameExists (@Nonnull String name){
             Node node = nodes.get(Objects.requireNonNull(name));
             if (node == null) {
                 return false;

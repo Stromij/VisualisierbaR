@@ -206,6 +206,15 @@ public class Train implements GraphObject<Shape> {
         public boolean checkAffiliated(@Nonnull Train train) {
             return trains.get(train.getName()) == train;
         }
+
+        @Override
+        public boolean NameExists(@Nonnull String name) {
+            Train train = trains.get(Objects.requireNonNull(name));
+            if (train == null) {
+                return false;
+            }
+            return true;
+        }
     }
 
     /**

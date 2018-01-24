@@ -32,8 +32,8 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
     private HashMap<Node, Point2D> transformationMap = new HashMap<>();
     private LinkedList<GraphSegment> segments = new LinkedList<>();
     private final static double MOVING_DISTANCE = 1.5;
-    private int OffsetX;
-    private int OffsetY;
+    //private int OffsetX;
+    //private int OffsetY;
 
 
 
@@ -50,8 +50,7 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
                 shortestEdgeLength = edgeLength;
             }
         }
-        OffsetX=0;
-        OffsetY=0;
+
         int x = Integer.MAX_VALUE;
         int y = Integer.MAX_VALUE;
 

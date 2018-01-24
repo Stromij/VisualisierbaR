@@ -40,4 +40,11 @@ public interface Factory<T extends GraphObject<?>> {
      * @return whether the given object was created by this factory
      */
     boolean checkAffiliated(@Nonnull T t);
+
+    /**
+     * Check whether a name is already taken
+     * @param name the Name to check
+     * @return  true if name is already taken, false otherwise
+     */
+    boolean NameExists(@Nonnull String name);
 }

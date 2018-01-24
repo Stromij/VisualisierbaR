@@ -125,10 +125,13 @@ public final class Graph {
         edges.forEach((a,b)->{
             if(a.getNode1()==node || a.getNode2()==node) {
                 ed.add(a);
+                a.getOtherNode(node).getEdges().remove(a);
+
                 group.getChildren().remove(b.getFullNode());    //remove edges from graph pane
                 //edges.remove(a);
             }
         });
+
         e.forEach((a)->{
             elements.remove(a);
             Element.in(context).remove(a);                      //remove elements from context, factory and graph
@@ -143,8 +146,6 @@ public final class Graph {
         nodes.remove(node);                                     //remove node from graph, factory context and graph pane
         Node.in(context).remove(node);
         context.removeObject(node);
-
-
 
     }
 
@@ -181,8 +182,8 @@ public final class Graph {
 
         for (int i=0; i<l; i++){
             for (int k=0; k<l ; k++ ){
-                if (i==k) existingEdges[i][k]=true;     //init array
-                else existingEdges[i][k]=false;
+                //init array
+                existingEdges[i][k] = i == k;
             }
         }
         edges.forEach((a,b)->{
@@ -204,7 +205,7 @@ public final class Graph {
         RandomString gen = new RandomString(8, ThreadLocalRandom.current());
         for (int i=0; i<l; i++){
             for (int k=i; k<l ; k++ ){
-                if (existingEdges[i][k]==false){
+                if (!existingEdges[i][k]){
                     String name=null;
 
                     for (int j=0; j<1000; j++) {               //generate missing edges with random names
@@ -217,8 +218,6 @@ public final class Graph {
                     GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
                     edges.put(edge, shape);
                     group.getChildren().add(shape.getFullNode());
-                    //System.out.println("created edge");
-
                 }
             }
         }
@@ -234,6 +233,8 @@ public final class Graph {
         LinkedList<Edge> ed = new LinkedList<>();
         edges.forEach((a,b)-> {
             if (a.getNode1() == node || a.getNode2() == node) {
+                Node otherNode=a.getOtherNode(node);
+                otherNode.getEdges().remove(a);
                 ed.add(a);
                 group.getChildren().remove(b.getFullNode());        //remove from graph pane
             }
@@ -250,7 +251,7 @@ public final class Graph {
      * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
      * @param name the Name
      * @param coordinates   the coordinates
-     * @throws IllegalArgumentException    if coordinates are negative
+     * @throws IllegalArgumentException    if coordinates are negative or name is taken
      */
     public void addNode (String name, Coordinates coordinates) throws IllegalArgumentException {
         Node newNode =Node.in(context).create(name, coordinates);
@@ -265,8 +266,13 @@ public final class Graph {
 
     }
 
+    /**
+     * Adds am Element to the Graph
+     * @param elementToAdd
+     */
     public void addElement(Element elementToAdd){
         //elementtoAdd.getNode().ge
+
         if(elementToAdd.getType().isComposite()){
             for( Element element : elementToAdd.getNode().getElements()){
                 if (element.getType().isComposite()){                       //remove composite Elements to rebuild them with the new element if necessary
@@ -277,7 +283,7 @@ public final class Graph {
                 }
             }
         }
-
+        context.addObject(elementToAdd);
         for (GraphShape<Element> elementShape : Elements.create(elementToAdd.getNode(), coordinatesAdapter)) {
             for (Element element : elementShape.getRepresentedObjects()) {
                 //group.getChildren().remove()
@@ -286,7 +292,6 @@ public final class Graph {
             }
 
             group.getChildren().add(elementShape.getFullNode());
-
             //System.out.println(group.getChildren().size());
         }
     }

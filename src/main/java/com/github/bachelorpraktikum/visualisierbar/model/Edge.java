@@ -144,7 +144,7 @@ public final class Edge implements GraphObject<Line> {
          * @return true if an Edge with this name exists, otherwise false
          */
 
-        public boolean NameExists (String name){
+        public boolean NameExists (@Nonnull String name){
             Edge edge = edges.get(Objects.requireNonNull(name));
             if (edge == null) {
                 return false;

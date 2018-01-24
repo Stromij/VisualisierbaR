@@ -328,6 +328,11 @@ public final class Element implements GraphObject<Shape> {
         }
 
         public void remove (Element element){
+            LinkedList<Event>eList = new LinkedList<>();
+            for (Event event :element.getFactory().getEvents()){
+                eList.add(event);
+            }
+            events.removeAll(eList);
             elements.remove(element.getName());
         }
 

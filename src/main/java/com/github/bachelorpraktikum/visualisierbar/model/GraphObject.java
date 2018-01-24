@@ -36,6 +36,8 @@ public interface GraphObject<S extends Shape> extends Shapeable<S> {
 
 
 
+
+
     /**
      * <p>Gets a human readable name for this object.</p>
      *
