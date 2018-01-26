@@ -149,6 +149,8 @@ public class MainController {
     private ToggleButton newNodeButton;
     @FXML
     private Button fcButton;
+    @FXML
+    private Slider NodeSizeSlider;
 
 
     private Rectangle selectionRec;
@@ -321,6 +323,8 @@ public class MainController {
                 newNodeButton.setVisible(true);
                 fcButton.setManaged(true);
                 fcButton.setVisible(true);
+                NodeSizeSlider.setManaged(true);
+                NodeSizeSlider.setVisible(true);
 
                 if (eventTraversal.isSelected()) {
                     eventTraversal.fire();
@@ -403,11 +407,8 @@ public class MainController {
             if (graph==null) return;
             graph.fullyConnect(Junction.getSelection());
         });
-        /*
-        newElementButton.setOnAction((t)->{
-        });
-        */
 
+        NodeSizeSlider.valueProperty().bindBidirectional(Junction.getCALIBRATION_COEFFICIENT_prop());
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             legend.setVisible(newValue);
@@ -524,7 +525,6 @@ public class MainController {
                 event.consume();
                 //graph.addNode(name, new Coordinates(0,0));
             }
-
 
         });
         graphPane.setOnScroll(event -> {

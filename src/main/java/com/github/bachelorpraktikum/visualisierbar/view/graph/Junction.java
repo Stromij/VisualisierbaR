@@ -5,6 +5,10 @@ import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.moveable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableDoubleValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
@@ -15,27 +19,26 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import javax.annotation.Nonnull;
+import javafx.beans.value.*;
 
 import javafx.scene.Cursor;
 import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
-import java.util.LinkedList;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
 
 
 public final class Junction extends SingleGraphShapeBase<Node, Circle> implements com.github.bachelorpraktikum.visualisierbar.view.moveable {
 
-    private static final double CALIBRATION_COEFFICIENT = 0.1;
+    private static DoubleProperty CALIBRATION_COEFFICIENT= new SimpleDoubleProperty(0.1d);
     private static HashSet<Junction> selection = new HashSet<>(128);
     private static double mousePressedX = -1;
     private static double mousePressedY = -1;
     private boolean moveable;
+    private List<ChangeListener> listeners= new ArrayList<>(1);;
     //public Shape elements;
     //private DropShadow highlightGlow;
 
@@ -48,7 +51,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         highlightGlow.setColor(Color.BLUE);
         //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
         */
-
         setMoveable(false);
       /*
         adapter.OffsetXproperty().addListener((a)->{
@@ -331,7 +333,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
     @Override
     protected void resize(Circle shape) {
-        double radius = getCalibrationBase() * CALIBRATION_COEFFICIENT;
+        double radius = getCalibrationBase() * CALIBRATION_COEFFICIENT.getValue();
         shape.setRadius(radius);
         //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
     }
@@ -344,6 +346,13 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     @Nonnull
     @Override
     public Circle createShape() {
+
+        ChangeListener sizeListener = ((observable, oldValue, newValue) -> {
+            resize(this.getShape());
+        });
+        listeners.add(sizeListener);
+        CALIBRATION_COEFFICIENT.addListener(new WeakChangeListener<>(sizeListener));
+
         return new Circle();
     }
 
@@ -407,6 +416,13 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
      */
     public static HashSet<Junction> getSelection() {
         return selection;
+    }
+
+    public static void setCalibrationCoefficient(double c){
+        CALIBRATION_COEFFICIENT.setValue(c);
+    }
+    public static DoubleProperty getCALIBRATION_COEFFICIENT_prop(){
+        return CALIBRATION_COEFFICIENT;
     }
 
     @Override
