@@ -101,6 +101,9 @@ public class GraphTest   {
            }
            checkedNodes.clear();
         });
+        k=graph.getEdges().size();
+        graph.fullyConnect(Junction.getSelection());
+        assertTrue(k==graph.getEdges().size());
 
     }
     //TODO

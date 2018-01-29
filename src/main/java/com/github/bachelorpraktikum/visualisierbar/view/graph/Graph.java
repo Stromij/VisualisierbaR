@@ -119,6 +119,7 @@ public final class Graph {
             if (a.getNode()==node){
                 e.add(a);
                 group.getChildren().remove(b.getFullNode());    //remove elements from graph pane
+                a.setGraph(null);
             }
         });
 
@@ -129,6 +130,7 @@ public final class Graph {
 
                 group.getChildren().remove(b.getFullNode());    //remove edges from graph pane
                 //edges.remove(a);
+                a.setGraph(null);
             }
         });
 
@@ -143,6 +145,7 @@ public final class Graph {
             context.removeObject(a);
         });
         group.getChildren().remove(nodes.get(node).getFullNode());
+        node.setGraph(null);
         nodes.remove(node);                                     //remove node from graph, factory context and graph pane
         Node.in(context).remove(node);
         context.removeObject(node);
@@ -237,7 +240,8 @@ public final class Graph {
                 Node otherNode=a.getOtherNode(node);
                 otherNode.getEdges().remove(a);
                 ed.add(a);
-                group.getChildren().remove(b.getFullNode());        //remove from graph pane
+                group.getChildren().remove(b.getFullNode());    //remove from graph pane
+                a.setGraph(null);
             }
         });
         ed.forEach((a)->{               //remove from graph, factory, context and node
