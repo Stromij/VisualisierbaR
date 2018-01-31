@@ -103,6 +103,8 @@ public class MainController {
     @FXML
     private Button closeButton;
     @FXML
+    private Button printToABSButton;
+    @FXML
     private BorderPane rootPane;
 
     @FXML
@@ -272,6 +274,7 @@ public class MainController {
         fireOnEnterPress(logToggle);
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
+        printToABSButton.setOnAction(event -> graph.printToAbs());
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
