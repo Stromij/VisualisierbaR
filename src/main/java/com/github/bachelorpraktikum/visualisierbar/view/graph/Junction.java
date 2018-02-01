@@ -38,7 +38,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     private static double mousePressedX = -1;
     private static double mousePressedY = -1;
     private boolean moveable;
-    private List<ChangeListener> listeners= new ArrayList<>(1);;
+    private List<ChangeListener> listeners= new ArrayList<>(1);
+    private Tooltip tooltip;
     //public Shape elements;
     //private DropShadow highlightGlow;
 
@@ -120,7 +121,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 alert.setHeaderText(null);
 
                 Dialog<LinkedList<String>> dialog = new Dialog<>();
-
+                tooltip.hide();
                 dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
 
                 dialog.setTitle("Node Editor");
@@ -338,9 +339,13 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
     }
 
+
+
+
     @Override
     protected void initializedShape(Circle circle) {
-        TooltipUtil.install(circle, new Tooltip(getRepresented().getName()));
+        tooltip = new Tooltip(getRepresented().getName());
+        TooltipUtil.install(circle, tooltip);
     }
 
     @Nonnull
