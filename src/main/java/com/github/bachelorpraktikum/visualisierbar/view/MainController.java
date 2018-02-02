@@ -311,11 +311,10 @@ public class MainController {
                 standartTB.getItems().forEach((a) -> {
                     a.setVisible(false);
                 });
-                resetButton.setVisible(true);
                 editorToggle.setVisible(true);
                 closeButton.setVisible(true);
                 //////////////////////////////////
-                proportionalToggle.setVisible(true);
+                //proportionalToggle.setVisible(true);
                 toolSelector.setVisible(true);
                 toolSelector.setManaged(true);
                 deleteButton.setVisible(true);
@@ -336,7 +335,9 @@ public class MainController {
                 if (playToggle.isSelected()) {
                     playToggle.fire();
                     resetButton.fire();
-
+                }
+                if (proportionalToggle.isSelected()){
+                    proportionalToggle.fire();
                 }
                 resetButton.fire();
                 //coordinatesField.setVisible(true);
@@ -380,7 +381,6 @@ public class MainController {
 
         deleteButton.setOnAction((t) -> {
             Junction.getSelection().forEach((a) -> {
-                //TODO log error
                 if (graph == null) return;
                 graph.removeNode(a.getRepresentedObjects().get(0));
 
@@ -390,7 +390,6 @@ public class MainController {
 
         disconnectButton.setOnAction((t) -> {
             Junction.getSelection().forEach((a) -> {
-                //TODO log error
                 if (graph==null) return;
                 graph.disconnect(a.getRepresentedObjects().get(0));
             });
@@ -406,11 +405,47 @@ public class MainController {
         });
 
         fcButton.setOnAction((t) -> {
-            //TODO log error
             if (graph==null) return;
             graph.fullyConnect(Junction.getSelection());
         });
-
+        // add Shortcut Handler
+        rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event->{
+            //editor shortcuts
+            if(editorToggle.isSelected()){
+                if(event.getCode()== KeyCode.C && event.isControlDown()){
+                    fcButton.fire();
+                }
+                if(event.getCode()== KeyCode.N && event.isControlDown()){
+                    newNodeButton.fire();
+                }
+                if(event.getCode()== KeyCode.R && event.isControlDown()){
+                    deleteButton.fire();
+                }
+                if(event.getCode()== KeyCode.C && event.isAltDown()){
+                    disconnectButton.fire();
+                }
+                if(event.getCode().isDigitKey()){
+                    if(event.getCode() == KeyCode.DIGIT1){
+                        toolSelector.setValue(toolSelector.getItems().get(0));
+                    }
+                    if(event.getCode() == KeyCode.DIGIT2){
+                        toolSelector.setValue(toolSelector.getItems().get(1));
+                    }
+                }
+                if(event.getCode()== KeyCode.A && event.isControlDown()){
+                    if (graph!=null){
+                        graph.getNodes().forEach((a,b)-> ((Junction)b).addToSelection());
+                    }
+                }
+            }
+            if(event.getCode()== KeyCode.ESCAPE){
+                Junction.clearSelection();
+            }
+        });
+        TooltipUtil.install(fcButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.C.getName()));
+        TooltipUtil.install(newNodeButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.N.getName()));
+        TooltipUtil.install(disconnectButton, new Tooltip(KeyCode.ALT.getName() + " + " + KeyCode.C.getName()));
+        TooltipUtil.install(deleteButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName()));
         NodeSizeSlider.valueProperty().bindBidirectional(Junction.getCALIBRATION_COEFFICIENT_prop());
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -579,13 +614,14 @@ public class MainController {
                     //graph.getGroup().get
                     double srx = selectionRec.getX();
                     double sry = selectionRec.getY();
-                    //if(shape.getShape()!=null && (selectionRec.getX()<shape.getShape()) && (selectionRec.getX()+selectionRec.getWidth()>shape.getShape().getLayoutX()) && (selectionRec.getY()<shape.getShape().getLayoutY())&&(selectionRec.getY()+selectionRec.getHeight()>shape.getShape().getLayoutX()))
                     if (srx < sb.getMaxX() && srx + selectionRec.getWidth() > sb.getMinX() && sry < sb.getMaxY() && sry + selectionRec.getHeight() > sb.getMinY()) {
                         //System.out.println("things are happening");
-                        ((Junction) shape).addToSelection();
-                        //selected.getChildren().add(shape.getShape());
+                        if(event.isControlDown()){
+                            ((Junction) shape).removeFromSelection();
+                        }
+                        else
+                            ((Junction) shape).addToSelection();
                     }
-
                 });
                 selectionRec.setHeight(0);
                 selectionRec.setWidth(0);
