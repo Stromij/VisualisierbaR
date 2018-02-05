@@ -29,8 +29,6 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -47,13 +45,10 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
-import javafx.geometry.Side;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
@@ -65,7 +60,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -138,11 +132,21 @@ public class MainController {
     private Pane graphPane;
 
     @FXML
+    private ChoiceBox deltas;
+    @FXML
+    private Slider NodeSizeSlider;
+    @FXML
     private ToolBar standartTB;
     @FXML
-    private ChoiceBox<String> toolSelector;
+    private Pane topPane;
+    //EDITOR BUTTONS
     @FXML
-    private ChoiceBox deltas;
+    private ToolBar editorToolbar;
+    @FXML
+    private HBox rightSpacerET;
+
+    @FXML
+    private ChoiceBox<String> toolSelector;
     @FXML
     private Button deleteButton;
     @FXML
@@ -152,7 +156,10 @@ public class MainController {
     @FXML
     private Button fcButton;
     @FXML
-    private Slider NodeSizeSlider;
+    private Button closeButtonET;
+
+
+
 
 
     private Rectangle selectionRec;
@@ -193,6 +200,8 @@ public class MainController {
         timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
         trains = new WeakHashMap<>();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
+        HBox.setHgrow(rightSpacerET, Priority.ALWAYS);
+
 
 
         // START OF TIME RELATED INIT
@@ -274,7 +283,8 @@ public class MainController {
         fireOnEnterPress(logToggle);
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
-        printToABSButton.setOnAction(event -> graph.printToAbs());
+        closeButtonET.setOnAction(event -> showSourceChooser());
+        printToABSButton.setOnAction(event -> {if(graph!=null)graph.printToAbs();});
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
@@ -295,38 +305,14 @@ public class MainController {
             if (graph == null) return;
             if (newValue) {
 
-                if(!simulationStopWarning())
-                    {editorToggle.setSelected(false);
-                     return;
-                    }
-
-
-
-                /*
-                proportionalToggle.setVisible(false);
-                playToggle.setVisible(false);
-                resetButton.setVisible(false);
-                modelTime.setVisible(false);
-                */
-                standartTB.getItems().forEach((a) -> {
-                    a.setVisible(false);
-                });
-                editorToggle.setVisible(true);
-                closeButton.setVisible(true);
-                //////////////////////////////////
-                //proportionalToggle.setVisible(true);
-                toolSelector.setVisible(true);
-                toolSelector.setManaged(true);
-                deleteButton.setVisible(true);
-                deleteButton.setManaged(true);
-                disconnectButton.setManaged(true);
-                disconnectButton.setVisible(true);
-                newNodeButton.setManaged(true);
-                newNodeButton.setVisible(true);
-                fcButton.setManaged(true);
-                fcButton.setVisible(true);
-                NodeSizeSlider.setManaged(true);
-                NodeSizeSlider.setVisible(true);
+                if(!simulationStopWarning()) {
+                    editorToggle.setSelected(false);
+                    return;
+                }
+                topPane.getChildren().get(0).setVisible(false);
+                topPane.getChildren().get(0).setManaged(false);
+                topPane.getChildren().get(1).setVisible(true);
+                topPane.getChildren().get(1).setManaged(true);
 
                 if (eventTraversal.isSelected()) {
                     eventTraversal.fire();
@@ -340,43 +326,12 @@ public class MainController {
                     proportionalToggle.fire();
                 }
                 resetButton.fire();
-                //coordinatesField.setVisible(true);
-                graph.getNodes().forEach(((a, b) -> {
-                    ((Junction) b).setMoveable(true);
-                }));
-                //logToggle.setVisible(false);
+                graph.getNodes().forEach(((a, b) -> ((Junction) b).setMoveable(true)));
                 rootPane.setLeft(null);
             } else {
-                graph.getNodes().forEach(((a, b) -> {
-                    ((Junction) b).setMoveable(false);
-                }));
-
-                graph.printToAbs();
-
-                toolSelector.setManaged(false);
-                deleteButton.setManaged(false);
-                disconnectButton.setManaged(false);
-                newNodeButton.setManaged(false);
-                fcButton.setManaged(false);
-                /*
-                proportionalToggle.setVisible(true);
-                playToggle.setVisible(true);
-                logToggle.setVisible(true);
-                //coordinatesField.setVisible(false);
-                */
-                standartTB.getItems().forEach((a) -> {
-                    a.setVisible(true);
-                });
-                toolSelector.setVisible(false);
-                deleteButton.setVisible(false);
-                disconnectButton.setVisible(false);
-                newNodeButton.setVisible(false);
-                fcButton.setVisible(false);
-
+                graph.getNodes().forEach(((a, b) -> ((Junction) b).setMoveable(false)));
                 toolSelector.setValue(toolSelector.getItems().get(0));
             }
-
-
         });
 
         deleteButton.setOnAction((t) -> {
@@ -388,12 +343,10 @@ public class MainController {
             Junction.emptySelection();
         });
 
-        disconnectButton.setOnAction((t) -> {
-            Junction.getSelection().forEach((a) -> {
-                if (graph==null) return;
-                graph.disconnect(a.getRepresentedObjects().get(0));
-            });
-        });
+        disconnectButton.setOnAction((t) -> Junction.getSelection().forEach((a) -> {
+            if (graph==null) return;
+            graph.disconnect(a.getRepresentedObjects().get(0));
+        }));
 
         newNodeButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -412,6 +365,9 @@ public class MainController {
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event->{
             //editor shortcuts
             if(editorToggle.isSelected()){
+                if(event.getCode()==KeyCode.P && event.isControlDown()){
+                    printToABSButton.fire();
+                }
                 if(event.getCode()== KeyCode.C && event.isControlDown()){
                     fcButton.fire();
                 }
@@ -446,6 +402,7 @@ public class MainController {
         TooltipUtil.install(newNodeButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.N.getName()));
         TooltipUtil.install(disconnectButton, new Tooltip(KeyCode.ALT.getName() + " + " + KeyCode.C.getName()));
         TooltipUtil.install(deleteButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName()));
+        TooltipUtil.install(printToABSButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.P.getName()));
         NodeSizeSlider.valueProperty().bindBidirectional(Junction.getCALIBRATION_COEFFICIENT_prop());
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
@@ -464,12 +421,8 @@ public class MainController {
                 rootPane.setLeft(newValue ? leftPane : null)
         );
 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        toolSelector.setItems(FXCollections.observableArrayList("move", "select"));
-        toolSelector.setVisible(false);
         toolSelector.setValue(toolSelector.getItems().get(0));
-        toolSelector.setManaged(false);
+
 
 
         initializeElementList();
