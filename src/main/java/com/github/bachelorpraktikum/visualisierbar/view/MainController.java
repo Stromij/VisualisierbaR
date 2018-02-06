@@ -512,8 +512,29 @@ public class MainController {
                 Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
                 //System.out.println(c.getX()+" "+ c.getY());
                 try {
-                    graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
+                   if(Math.round(c.getX())<0 || Math.round(c.getY())<0){
+                        if(Math.round(c.getX())<0 && Math.round(c.getY())>= 0){
+                            double x= 0 - Math.round(c.getX());
+                            Map<Node, GraphShape<Node> > nodes = graph.getNodes();
+                            for(Node n : nodes.keySet()){
+                                    n.setCoordinates(new SimpleCoordinatesAdapter().reverse(new Point2D(((int) n.getCoordinates().getX()+x),(  (int) n.getCoordinates().getY()))));
+                            }
 
+                            graph.addNode(name, new Coordinates(0, (int) Math.round(c.getY())));
+                        }
+                        if(Math.round(c.getX())>=0 && Math.round(c.getY())< 0){
+                            int y= 0 - (int)Math.round(c.getY());
+                            Map<Node, GraphShape<Node> > nodes = graph.getNodes();
+                            for(Node n : nodes.keySet()){
+                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX(),  (int) n.getCoordinates().getY()+y));
+                            }
+
+                            graph.addNode(name, new Coordinates((int) Math.round(c.getX()), 0));
+                        }
+                    }
+                    else {
+                        graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
+                    }
                 } catch (IllegalArgumentException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");

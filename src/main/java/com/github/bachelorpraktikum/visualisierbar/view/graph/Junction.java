@@ -84,14 +84,41 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 Circle a = b.getShape();
                 a.setTranslateX(Math.round(a.getTranslateX()));     //snap to valid coordinates
                 a.setTranslateY(Math.round(a.getTranslateY()));
+                double xx = a.getCenterX() + a.getTranslateX();
+                double yy = a.getCenterY() + a.getTranslateY();
+                if (xx < 0 || yy < 0) {
+                    Map<Node, GraphShape<Node> > nodes= this.getRepresented().getGraph().getNodes();
+                    if(xx >= 0 && yy<0 ){
+                       yy= 0 - yy;
+                        for(Node n : nodes.keySet()){
+                            if(n != b.getRepresented() ){
+                                n.setCoordinates(adapter.reverse(new Point2D(((int) n.getCoordinates().getX()),(  (int) n.getCoordinates().getY()+yy))));
+                            }
+                        }
 
-                if (a.getCenterX() + a.getTranslateX() < 0 || a.getCenterY() + a.getTranslateY() < 0) {
-                    System.out.println("Coordiantes invalid");
+                    }
+                    else if(xx<0 && yy>= 0) {
+                        xx = 0 - xx;
+                        for (Node n : nodes.keySet()) {
+                            if (n != b.getRepresented()) {
+                                n.setCoordinates(adapter.reverse(new Point2D(((int) n.getCoordinates().getX() + xx), ((int) n.getCoordinates().getY()))));
+                            }
+                        }
+                    }
+                   else{
+                        xx= 0 - xx;
+                        yy= 0 - yy;
+                        for (Node n : nodes.keySet()) {
+                            if (n != b.getRepresented()) {
+                                n.setCoordinates(adapter.reverse(new Point2D(((int) n.getCoordinates().getX() + xx), ((int) n.getCoordinates().getY()+yy))));
+                            }
+                        }
+                    }
+                    /*System.out.println("Coordiantes invalid");
                     a.setTranslateY(0);
                     a.setTranslateX(0);
-                    return;
+                    return;*/
                 }
-
                 a.setCenterX(a.getCenterX() + a.getTranslateX());
                 a.setCenterY(a.getCenterY() + a.getTranslateY());
                 b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));  //update coordinates in the model
