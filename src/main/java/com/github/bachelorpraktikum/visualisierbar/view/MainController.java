@@ -640,6 +640,7 @@ public class MainController {
         MenuItem exportItem = new MenuItem("Export");
         exportItem.setOnAction(event -> exportGraph());
         ContextMenuUtil.attach(centerPane, Collections.singletonList(exportItem));
+
     }
 
     private void initializeLogList() {
