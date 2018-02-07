@@ -24,6 +24,7 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
 
     private static final double CALIBRATION_COEFFICIENT = 0.05;
     private final List<ChangeListener> listeners;
+    private Tooltip tooltip;
 
     protected Rail(Edge edge, CoordinatesAdapter adapter) {
         super(edge, adapter);
@@ -32,8 +33,11 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
             if(t.isSecondaryButtonDown()){
 
                 Dialog<LinkedList<String>> dialog = new Dialog<>();
+                tooltip.hide();
 
                 dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
+                //dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
+                ((Button) dialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
 
                 dialog.setTitle("Edge Editor");
                 dialog.setHeaderText(null);
@@ -128,8 +132,9 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
 
     @Override
     protected void initializedShape(Line line) {
-        TooltipUtil.install(line,
-            new Tooltip(getRepresented().getName() + " " + getRepresented().getLength() + "m"));
+        tooltip=new Tooltip(getRepresented().getName() + " " + getRepresented().getLength() + "m");
+        TooltipUtil.install(line,tooltip);
+
         if (this.getRepresented().getLength()>-1)line.setStroke(Color.BLACK);
     }
 

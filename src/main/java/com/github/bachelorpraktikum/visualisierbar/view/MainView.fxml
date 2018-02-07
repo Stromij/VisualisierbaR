@@ -17,6 +17,9 @@
 <?import javafx.scene.layout.StackPane?>
 
 <?import javafx.scene.control.Slider?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<?import javafx.scene.control.Separator?>
 <BorderPane fx:id="rootPane" prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.bachelorpraktikum.visualisierbar.view.MainController">
   <center>
     <StackPane fx:id="centerPane">
@@ -24,17 +27,11 @@
     </StackPane>
   </center>
   <top>
-    <StackPane>
+    <StackPane fx:id="topPane">
       <children>
         <ToolBar fx:id="standartTB" prefHeight="71.0" prefWidth="852.0">
           <items>
             <ToggleButton fx:id="logToggle" text="%show_hide_logs" />
-            <ChoiceBox fx:id="toolSelector" prefWidth="150.0" visible="false" />
-            <Button fx:id="deleteButton" text="delete" visible="false" />
-            <Button fx:id="disconnectButton" text="disconnect" visible="false" />
-            <ToggleButton fx:id="newNodeButton" text="new Node" visible="false"/>
-            <Button fx:id="fcButton" text="fully connect" visible="false"/>
-            <Slider fx:id="NodeSizeSlider" min="0.1" max="0.2" orientation="HORIZONTAL" showTickLabels="false"/>
             <Label text="%current_simulation_time" />
             <TextField fx:id="timeText" prefHeight="25.0" prefWidth="100.0" text="-1ms" />
             <Button fx:id="resetButton" text="%reset" />
@@ -50,11 +47,32 @@
             <Button fx:id="resetViewButton" text="%reset_view" />
             <ToggleButton fx:id="proportionalToggle" mnemonicParsing="false" text="%layout" />
             <ToggleButton fx:id="legendButton" text="%legend" />
-            <Button fx:id="printToABSButton" text="%printtoabs" />
-            <Button fx:id="closeButton" text="%close_data_source" />
-            <Button fx:id="infoButton" text="%info" />
+              <Button fx:id="infoButton" text="%info" />
+              <Button fx:id="closeButton" text="%close_data_source" />
           </items>
         </ToolBar>
+          <ToolBar fx:id="editorToolbar" prefHeight="71.0" prefWidth="852.0" visible="false" managed="false">
+              <items>
+                  <ChoiceBox fx:id="toolSelector" prefWidth="150.0">
+                      <items>
+                          <FXCollections fx:factory="observableArrayList">
+                              <String fx:value="move"/>
+                              <String fx:value="select"/>
+                          </FXCollections>
+                      </items>
+                  </ChoiceBox>
+                  <Separator orientation="VERTICAL"/>
+                  <Button fx:id="deleteButton" text="delete"/>
+                  <Button fx:id="disconnectButton" text="disconnect"  />
+                  <ToggleButton fx:id="newNodeButton" text="new Node" />
+                  <Button fx:id="fcButton" text="fully connect" />
+                  <Separator orientation="VERTICAL"/>
+                  <Slider fx:id="NodeSizeSlider" min="0.1" max="0.2" orientation="HORIZONTAL" showTickLabels="false"/>
+                  <Button fx:id="printToABSButton" text="%printtoabs" />
+                  <HBox fx:id="rightSpacerET" alignment="CENTER_RIGHT" />
+                  <Button fx:id="closeButtonET" text="%close_data_source" alignment="CENTER_RIGHT"/>
+              </items>
+          </ToolBar>
       </children>
     </StackPane>
   </top>

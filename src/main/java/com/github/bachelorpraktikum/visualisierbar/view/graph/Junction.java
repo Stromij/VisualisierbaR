@@ -9,11 +9,14 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableDoubleValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -25,8 +28,11 @@ import javafx.scene.Cursor;
 import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 
+
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +43,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     private static HashSet<Junction> selection = new HashSet<>(128);
     private static double mousePressedX = -1;
     private static double mousePressedY = -1;
+    private static Logger logger = Logger.getLogger(Junction.class.getName());
     private boolean moveable;
     private List<ChangeListener> listeners= new ArrayList<>(1);
     private Tooltip tooltip;
@@ -146,11 +153,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 alert.setTitle("Error");
                 alert.setGraphic(null);
                 alert.setHeaderText(null);
+                tooltip.hide();
 
                 Dialog<LinkedList<String>> dialog = new Dialog<>();
-                tooltip.hide();
                 dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
-
+                ((Button) dialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
                 dialog.setTitle("Node Editor");
                 dialog.setHeaderText(null);
                 GridPane grid = new GridPane();
@@ -201,9 +208,13 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 createButton.setOnAction((tt)->{                    //add Element procedure
                     String newName = Ename.getText();
 
-                    //TODO Log something went wrong
                     //something went horribly wrong and we abandon ship
-                    if (this.getRepresented().getGraph()==null){return;}
+                    if (this.getRepresented().getGraph()==null){
+                        alert.setContentText("Internal Error! Check Log.");
+                        alert.showAndWait();
+                        t.consume();
+                        logger.log(Level.SEVERE, this.getRepresented().getName()+ "attached Graph is null");
+                        return;}
                     if(!Element.in(this.getRepresented().getGraph().getContext()).NameExists(newName)){
                         Element.Type eType = Element.Type.fromName(element.getValue());
                         if (eType==Element.Type.WeichenPunkt){                                  //Weichen are treated seperately
@@ -242,9 +253,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             }
                             String name1=null;
                             String name2=null;
-                            //TODO log error
+
                             //something went horribly wrong and we abandon ship
-                            if(node1==null|| node2==null || node1.getGraph()==null || node2.getGraph()==null){return;}
+                            if(node1==null|| node2==null || node1.getGraph()==null || node2.getGraph()==null){
+                                alert.setContentText("Internal Error! Check Log.");
+                                alert.showAndWait();
+                                t.consume();
+                                logger.log(Level.SEVERE, "some Nodes in this Junction have no Graph attached")
+                                ;return;}
 
                             RandomString gen = new RandomString(4, ThreadLocalRandom.current()); //generate random names for the other 2 elements
                             for (int i=0; i<10000; i++){
