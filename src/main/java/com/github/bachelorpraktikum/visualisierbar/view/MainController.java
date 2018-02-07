@@ -522,7 +522,7 @@ public class MainController {
 
                             graph.addNode(name, new Coordinates(0, (int) Math.round(c.getY())));
                         }
-                        if(Math.round(c.getX())>=0 && Math.round(c.getY())< 0){
+                        else  if(Math.round(c.getX())>=0 && Math.round(c.getY())< 0){
                             int y= 0 - (int)Math.round(c.getY());
                             Map<Node, GraphShape<Node> > nodes = graph.getNodes();
                             for(Node n : nodes.keySet()){
@@ -530,6 +530,15 @@ public class MainController {
                             }
 
                             graph.addNode(name, new Coordinates((int) Math.round(c.getX()), 0));
+                        }
+                        else{
+                            int x= 0-(int) Math.round(c.getX());
+                            int y= 0-(int) Math.round(c.getY());
+                            Map<Node, GraphShape<Node> > nodes = graph.getNodes();
+                            for(Node n : nodes.keySet()){
+                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX()+x,  (int) n.getCoordinates().getY()+y));
+                            }
+                            graph.addNode(name, new Coordinates(0, 0));
                         }
                     }
                     else {
