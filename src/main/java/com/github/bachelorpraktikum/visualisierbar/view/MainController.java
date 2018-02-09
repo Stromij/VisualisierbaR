@@ -142,8 +142,7 @@ public class MainController {
     //EDITOR BUTTONS
     @FXML
     private ToolBar editorToolbar;
-    @FXML
-    private HBox rightSpacerET;
+
 
     @FXML
     private ChoiceBox<String> toolSelector;
@@ -155,8 +154,8 @@ public class MainController {
     private ToggleButton newNodeButton;
     @FXML
     private Button fcButton;
-    @FXML
-    private Button closeButtonET;
+
+
 
 
 
@@ -200,7 +199,7 @@ public class MainController {
         timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
         trains = new WeakHashMap<>();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
-        HBox.setHgrow(rightSpacerET, Priority.ALWAYS);
+        //HBox.setHgrow(rightSpacerET, Priority.ALWAYS);
 
 
 
@@ -283,7 +282,6 @@ public class MainController {
         fireOnEnterPress(logToggle);
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
-        closeButtonET.setOnAction(event -> showSourceChooser());
         printToABSButton.setOnAction(event -> {if(graph!=null)graph.printToAbs();});
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
@@ -297,6 +295,15 @@ public class MainController {
 
         deltas.setVisible(false);
         deltas.setManaged(false);
+        //add Items that need to be in both Toolbars
+        editorToolbar.getItems().add(resetViewButton);
+        editorToolbar.getItems().add(legendButton);
+        editorToolbar.getItems().add(printToABSButton);
+        editorToolbar.getItems().add(deltas);
+        HBox spacer = new HBox();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        editorToolbar.getItems().add(spacer);
+        editorToolbar.getItems().add(closeButton);
 
 
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {

@@ -47,6 +47,7 @@
             <Button fx:id="resetViewButton" text="%reset_view" />
             <ToggleButton fx:id="proportionalToggle" mnemonicParsing="false" text="%layout" />
             <ToggleButton fx:id="legendButton" text="%legend" />
+              <Button fx:id="printToABSButton" text="%printtoabs" />
               <Button fx:id="infoButton" text="%info" />
               <Button fx:id="closeButton" text="%close_data_source" />
           </items>
@@ -68,9 +69,6 @@
                   <Button fx:id="fcButton" text="fully connect" />
                   <Separator orientation="VERTICAL"/>
                   <Slider fx:id="NodeSizeSlider" min="0.1" max="0.2" orientation="HORIZONTAL" showTickLabels="false"/>
-                  <Button fx:id="printToABSButton" text="%printtoabs" />
-                  <HBox fx:id="rightSpacerET" alignment="CENTER_RIGHT" />
-                  <Button fx:id="closeButtonET" text="%close_data_source" alignment="CENTER_RIGHT"/>
               </items>
           </ToolBar>
       </children>
