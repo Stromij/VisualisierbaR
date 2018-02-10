@@ -14,12 +14,14 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.sun.istack.internal.NotNull;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.Circle;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
@@ -33,6 +35,8 @@ public final class Node implements GraphObject<Circle> {
 
     @Nonnull
     private  String name;
+    @Nullable
+    private String absName;
     @Nonnull
     private  Coordinates coordinates;
     @Nonnull
@@ -47,7 +51,20 @@ public final class Node implements GraphObject<Circle> {
 
     private Graph graph;
 
+
     private Node(String name, Coordinates coordinates) {
+        this.absName = null;
+        this.name = Objects.requireNonNull(name);
+        this.coordinates = Objects.requireNonNull(coordinates);
+        this.edges = new LinkedHashSet<>();
+        this.elements = new HashSet<>();
+        this.stateProperty = new SimpleObjectProperty<>();
+        this.movedProperty = new SimpleBooleanProperty(false);
+        this.graph =null;
+    }
+
+    private Node(String name, Coordinates coordinates, String absName) {
+        this.absName = absName;
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);
         this.edges = new LinkedHashSet<>();
@@ -97,6 +114,7 @@ public final class Node implements GraphObject<Circle> {
             this.nodes = new LinkedHashMap<>(INITIAL_NODES_CAPACITY);
         }
 
+
         /**
          * Potentially creates a new instance of {@link Node}.<br>
          * If an node with the same name already exists, it is returned.
@@ -111,7 +129,37 @@ public final class Node implements GraphObject<Circle> {
         @Nonnull
         public Node create(String name, Coordinates coordinates) {
             Node result = nodes.computeIfAbsent(Objects.requireNonNull(name), nodeName ->
-                new Node(nodeName, coordinates)
+                    new Node(nodeName, coordinates)
+            );
+
+            if (!result.getCoordinates().equals(coordinates)) {
+                String nodeFormat = "(Coordinates: %s)";
+                String message = "Node with name: %s already exists:\n"
+                        + nodeFormat + ", tried to recreate with following arguments:\n"
+                        + nodeFormat;
+                message = String.format(message, name, coordinates, result.getCoordinates());
+                throw new IllegalArgumentException(message);
+            }
+
+            return result;
+        }
+
+        /**
+         * Potentially creates a new instance of {@link Node}.<br>
+         * If an node with the same name already exists, it is returned.
+         *
+         * @param name the unique name of this node
+         * @param coordinates the {@link Coordinates} of this node
+         * @param absName the ABS Name
+         * @return an element
+         * @throws NullPointerException if either of the arguments is null
+         * @throws IllegalArgumentException if a node with the same name but different coordinates
+         * already exists
+         */
+        @Nonnull
+        public Node create(String name, Coordinates coordinates, String absName) {
+            Node result = nodes.computeIfAbsent(Objects.requireNonNull(name), nodeName ->
+                new Node(nodeName, coordinates, absName)
             );
 
             if (!result.getCoordinates().equals(coordinates)) {
@@ -133,10 +181,22 @@ public final class Node implements GraphObject<Circle> {
          */
         public boolean NameExists (@Nonnull String name){
             Node node = nodes.get(Objects.requireNonNull(name));
-            if (node == null) {
-                return false;
+            return node != null;
+        }
+
+        /**
+         * Checks the availability of a ABS name
+         * @param name the String to check
+         * @return true, if an Edge with this name exists, otherwise false
+         */
+        @Nullable
+        private String AbsNameExists(@Nonnull String name)
+        {for(Map.Entry<String, Node> entry : nodes.entrySet()) {
+            if (Objects.equals(name, Objects.requireNonNull(entry.getValue().getAbsName()))) {
+                return entry.getKey();
             }
-            return true;
+         }
+         return null;
         }
 
         @Override
@@ -191,6 +251,29 @@ public final class Node implements GraphObject<Circle> {
        return this.graph;
     }
 
+    @Nullable
+    public String getAbsName()
+        {return absName;}
+
+    /**
+     * changes the ABS name of a Node if the new name is available
+     * @param newAbsName the new ABS name the node will have
+     * @return true if the change was successful, false if the name is already taken or null
+     */
+    public boolean setAbsName(@Nullable String newAbsName)
+        {if(newAbsName == null) {return false;}
+         if(graph != null)
+            {String name = Node.in(graph.getContext()).AbsNameExists(newAbsName);
+             if(name != null)
+                {this.absName = newAbsName;
+                 Node.in(graph.getContext()).nodes.remove(name);
+                 Node.in(graph.getContext()).nodes.put(name, this);
+                 return true;
+                }
+            }
+        return false;
+        }
+
     public void setGraph(Graph graph){
         this.graph=graph;
     }
@@ -201,7 +284,6 @@ public final class Node implements GraphObject<Circle> {
      * @return true when the change was successful, false if it was not
      */
     public boolean setName(String newName){
-        if(newName==null) return false;
         if(graph!=null){
             if(!Node.in(graph.getContext()).NameExists(newName)){
                 this.name=newName;
@@ -290,5 +372,20 @@ public final class Node implements GraphObject<Circle> {
             + "name='" + name + '\''
             + ", coordinates=" + coordinates
             + '}';
+    }
+
+
+    /**
+     * Returns a String of the ABS representation of this Node.
+     * If there is no ABS-Name compiled, it will use the Erlang-Name
+     *
+     * @return the ABS-Code
+     */
+    @Nonnull
+    public String toABS() {
+        String nameOfNode = absName == null ? name : absName;
+
+        return String.format("[HTTPName: \"%s\"]Node %s = new local NodeImpl(%s,%s,\"%s\");\n",
+                nameOfNode, nameOfNode, this.getCoordinates().getX(), this.getCoordinates().getY(), nameOfNode);
     }
 }

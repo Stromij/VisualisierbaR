@@ -16,9 +16,9 @@ elements:         node
                 | msg
                 | data;
 
-node: 'NODE' SEP node_name SEP coord;
+node: 'NODE' SEP node_name SEP coord (SEP node_abs_name)?;
 
-edge: 'EDGE' SEP edge_name SEP node_name SEP node_name SEP INT;
+edge: 'EDGE' SEP edge_name SEP node_name SEP node_name SEP INT (SEP edge_abs_name)?;
 
 elem: 'ELEM' SEP elem_name SEP node_name SEP STATE;
 
@@ -43,7 +43,9 @@ data: 'DATA' SEP train_readable_name SEP time WHITESPACE speed SEP time_with_wra
 MV_IND: 'MV';
 
 node_name: name;
+node_abs_name: name;
 edge_name: name;
+edge_abs_name: name;
 train_name: name;
 speed: INT;
 distance: INT;

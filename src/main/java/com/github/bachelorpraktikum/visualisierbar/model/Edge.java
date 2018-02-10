@@ -10,6 +10,8 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
+import com.sun.istack.internal.NotNull;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.Line;
@@ -30,6 +32,8 @@ public final class Edge implements GraphObject<Line> {
 
     @Nonnull
     private  String name;
+    @Nullable
+    private String absName;
     @Nonnull
     private  int length;
     @Nonnull
@@ -40,7 +44,21 @@ public final class Edge implements GraphObject<Line> {
     @Nullable
     private Graph graph;
 
-    private Edge(String name, int length, Node node1, Node node2) {
+   private Edge(String name, int length, Node node1, Node node2) {
+        this.name = Objects.requireNonNull(name);
+        this.length = length;
+        this.graph=null;
+        this.node1 = Objects.requireNonNull(node1);
+        this.node2 = Objects.requireNonNull(node2);
+        node1.addEdge(this);
+        node2.addEdge(this);
+        //this.graph=graph;
+
+        this.stateProperty = new SimpleObjectProperty<>();
+    }
+
+    private Edge(String name, int length, Node node1, Node node2, String absName) {
+        this.absName = absName;
         this.name = Objects.requireNonNull(name);
         this.length = length;
         this.graph=null;
@@ -111,7 +129,47 @@ public final class Edge implements GraphObject<Line> {
             }
 
             Edge result = edges.computeIfAbsent(Objects.requireNonNull(name), edgeName ->
-                new Edge(edgeName, length, node1, node2)
+                    new Edge(edgeName, length, node1, node2)
+            );
+
+            if (result.getLength() != length
+                    || !result.getNode1().equals(node1)
+                    || !result.getNode2().equals(node2)) {
+                String edgeFormat = "(length: %d, node1: %s, node2: %s)";
+                String message = "Edge with name: %s already exists:\n"
+                        + edgeFormat + ", tried to recreate with following arguments:\n"
+                        + edgeFormat;
+                message = String.format(message, name, length, node1, node2,
+                        result.getLength(), result.getNode1(), result.getNode2());
+                throw new IllegalArgumentException(message);
+            }
+
+            return result;
+        }
+
+        /**
+         * Potentially creates a new instance of {@link Edge}.
+         *
+         * @param name the unique name of the edge
+         * @param length the length in meters
+         * @param node1 the first declared node at the end of the edge
+         * @param node2 the second declared node at the end of the edge
+         * @param absName the ABS name of the edge
+         * @return an instance of Edge
+         * @throws NullPointerException if at least one of the arguments is null
+         * @throws IllegalArgumentException if an edge with the same name but different parameters
+         * already exists
+         * @throws IllegalArgumentException if either of the given nodes are not from within the
+         * same context
+         */
+        @Nonnull
+        public Edge create(String name, int length, Node node1, Node node2, String absName) {
+            if (!nodeFactory.checkAffiliated(node1) || !nodeFactory.checkAffiliated(node2)) {
+                throw new IllegalArgumentException("at least one node is from the wrong context");
+            }
+
+            Edge result = edges.computeIfAbsent(Objects.requireNonNull(name), edgeName ->
+                new Edge(edgeName, length, node1, node2, absName)
             );
 
             if (result.getLength() != length
@@ -138,12 +196,12 @@ public final class Edge implements GraphObject<Line> {
             }
             return edge;
         }
+
         /**
          * Checks the availability of a name
          * @param name the String to check
          * @return true if an Edge with this name exists, otherwise false
          */
-
         public boolean NameExists (@Nonnull String name){
             Edge edge = edges.get(Objects.requireNonNull(name));
             if (edge == null) {
@@ -151,6 +209,18 @@ public final class Edge implements GraphObject<Line> {
             }
             return true;
         }
+
+        /**
+         * Checks the availability of a ABS name
+         * @param name the String to check
+         * @return true, if an Edge with this name exists, otherwise false
+         */
+        @Nullable
+        public String AbsNameExists (@Nonnull String name)
+            {for(Map.Entry<String, Edge> entry : edges.entrySet())
+                {if(entry.getValue().getAbsName() == name) {return entry.getKey();}}
+             return null;
+            }
 
         public void remove(Edge edge){
             edges.remove(edge.getName());
@@ -263,6 +333,28 @@ public final class Edge implements GraphObject<Line> {
         return name;
     }
 
+    @Nullable
+    public String getAbsName() {return absName;}
+
+    /**
+     * set the ABS name of this edge
+     * @param newAbsName the new ABS name
+     * @return true if the changes was successfull, false if name already taken or null
+     */
+    public boolean setAbsName(String newAbsName)
+        {if(newAbsName == null) {return false;}
+         if(graph != null) {
+             String name = Edge.in(graph.getContext()).AbsNameExists(newAbsName);
+             if (name != null) {
+                 this.absName = newAbsName;
+                 Edge.in(graph.getContext()).edges.remove(name);
+                 Edge.in(graph.getContext()).edges.put(name, this);
+                 return true;
+             }
+         }
+         return false;
+        }
+
     /**
      * set the name of this Edge
      * @param newName the name
@@ -327,5 +419,23 @@ public final class Edge implements GraphObject<Line> {
             + ", node1=" + node1
             + ", node2=" + node2
             + '}';
+    }
+
+
+    /**
+     * Returns a String of the ABS representation of this Node.
+     * If there is no ABS-Name compiled, it will use the Erlang-Name
+     *
+     * @return the ABS-Code
+     */
+    @Nonnull
+    public String toABS(){
+        String nameOfEdge = absName == null ? name : absName;
+        String nameOfNode1 = getNode1().getAbsName() == null ? getNode1().getName() : getNode1().getAbsName();
+        String nameOfNode2 = getNode2().getAbsName() == null ? getNode2().getName() : getNode2().getAbsName();
+
+        return String.format("[HTTPName: \"%s\"]Edge %s = new local EdgeImpl(%s,%s,%s,%s,\"%s\");\n",
+                nameOfEdge, nameOfEdge, "app", nameOfNode1, nameOfNode2, length, nameOfEdge);
+
     }
 }

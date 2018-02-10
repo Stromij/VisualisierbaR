@@ -116,8 +116,11 @@ public final class GraphParser {
         public void enterNode(LogParser.NodeContext ctx) {
             try {
                 String nodeName = ctx.node_name().getText();
+                String nodeAbsName;
+                try {nodeAbsName = ctx.node_abs_name().getText();}
+                catch (NullPointerException e){nodeAbsName = null;}
                 Coordinates coordinates = createCoordinates(ctx.coord());
-                Node.in(context).create(nodeName, coordinates);
+                Node.in(context).create(nodeName, coordinates, nodeAbsName);
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
@@ -151,7 +154,10 @@ public final class GraphParser {
 
                 Node node1 = Node.in(context).get(node1Name);
                 Node node2 = Node.in(context).get(node2Name);
-                Edge.in(context).create(edgeName, length, node1, node2);
+                String absName;
+                try {absName = ctx.edge_abs_name().getText();}
+                catch (NullPointerException e){absName = null;}
+                Edge.in(context).create(edgeName, length, node1, node2, absName);
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()

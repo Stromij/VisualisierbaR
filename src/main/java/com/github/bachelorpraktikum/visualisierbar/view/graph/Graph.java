@@ -268,7 +268,25 @@ public final class Graph {
 
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
+    }
 
+    /**
+     * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
+     * @param name the Name
+     * @param coordinates   the coordinates
+     * @param absName the ABS Name
+     * @throws IllegalArgumentException    if coordinates are negative or name is taken
+     */
+    public void addNode (String name, Coordinates coordinates, String absName) throws IllegalArgumentException {
+        Node newNode =Node.in(context).create(name, coordinates, absName);
+        newNode.setGraph(this);
+        if(nodes.containsKey(newNode)) return;
+        context.addObject(newNode);
+        GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
+        ((Junction) shape).setMoveable(true);
+
+        nodes.put(newNode, shape);
+        group.getChildren().add(shape.getFullNode());
     }
 
     /**
@@ -315,21 +333,27 @@ public final class Graph {
     @Nonnull
     public String printToAbs()
          {String response = "";
-          String nameOfNode;
-          String abs;
-          System.out.println("----- ABS start -----");
 
-          //TODO Translating negative nodes to positive ones
-
+          // Generating ABS-Code for all nodes
           for(Map.Entry<Node, GraphShape<Node>> entry : nodes.entrySet())
-             {Node node = entry.getKey();
-              nameOfNode = node.getName();
-              abs = String.format("[HTTPName: \"%s\"]Node %s = new local NodeImpl(%s,%s);\n",
-                         nameOfNode, nameOfNode, node.getCoordinates().getX(), node.getCoordinates().getY());
-              System.out.print(abs);
-              response = response.concat(abs);
-             }
+             {response = response.concat(entry.getKey().toABS());}
 
+          response = response.concat("\n");
+
+          // Generating ABS-Code for all edges
+          for(Map.Entry<Edge, GraphShape<Edge>> entry : edges.entrySet())
+             {response = response.concat(entry.getKey().toABS());}
+
+          response = response.concat("\n");
+
+          // Generating ABS-Code for all trackelements
+          for(Map.Entry<Element, GraphShape<Element>> entry : elements.entrySet())
+             {response = response.concat(entry.getKey().toABS());}
+
+
+          // Print it!
+          System.out.println("----- ABS start -----");
+          System.out.println(response);
           System.out.println("----- ABS end -----");
 
           return response;

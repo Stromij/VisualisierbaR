@@ -571,6 +571,37 @@ public final class Element implements GraphObject<Shape> {
             + '}';
     }
 
+
+    /**
+     * Returns a String of the ABS representation of this Element.
+     *
+     * @return the ABS-Code
+     */
+    @Nonnull
+    public String toABS()
+        {System.out.println(this.getType());
+         //TODO
+         if(getType() == Type.WeichenPunkt)
+            {}
+         else if(getType() == Type.HauptSignal)
+            {}
+         else if(getType() == Type.GefahrenPunkt)
+            {}
+         else if(getType() == Type.GeschwindigkeitsAnzeiger)
+            {}
+         else if(getType() == Type.GeschwindigkeitsVoranzeiger)
+            {}
+         else if(getType() == Type.SwWechsel)
+            {}
+         else if(getType() == Type.VorSignal)
+            {}
+         else if(getType() == Type.Magnet)
+            {}
+         else if(getType() == Type.SichtbarkeitsPunkt)
+            {}
+         return "";
+        }
+
     @ParametersAreNonnullByDefault
     private static class ElementEvent implements Event {
 

@@ -14,7 +14,10 @@ public final class ContextMenuUtil {
         ContextMenu contextMenu = new ContextMenu();
         contextMenu.getItems().addAll(menuItems);
         node.setOnContextMenuRequested(event -> {
-            contextMenu.show(node, event.getScreenX(), event.getScreenY());
+            if(contextMenu.isShowing())
+                {contextMenu.hide();}
+            else
+            {contextMenu.show(node, event.getScreenX(), event.getScreenY());}
         });
     }
 }
