@@ -261,14 +261,45 @@ public final class Graph {
      * @param element
      */
     public void removeElement (Element element){
+
+        //if(element.getType()== Element.Type.WeichenPunkt) element.getSwitch().getElements().remove(element);
+        if(element.getType()== Element.Type.WeichenPunkt){
+            for(Element we : element.getSwitch().getElements()){
+                rE(we);
+            }
+        }
+        else
+            rE(element);
+
+    }
+
+    private void rE(Element element){
         element.getNode().getElements().remove(element);
-        if(element.getType()== Element.Type.WeichenPunkt) element.getSwitch().getElements().remove(element);
         elements.get(element).getRepresentedObjects().remove(element);
         group.getChildren().remove(elements.get(element).getFullNode());
         elements.remove(element);
         Element.in(context).remove(element);                      //remove elements from context, factory and graph
         context.removeObject(element);
         element.setGraph(null);
+        if(element.getType().isComposite()){
+            for( Element CompositeElement : element.getNode().getElements()){
+                if (CompositeElement.getType().isComposite()){                       //remove composite Elements to rebuild them with the new element if necessary
+                    if(CompositeElement.getGraph()==this){
+                        this.getGroup().getChildren().remove(elements.get(CompositeElement).getFullNode());
+                        CompositeElement.setGraph(null);
+                    }
+                }
+            }
+        }
+        for (GraphShape<Element> elementShape : Elements.create(element.getNode(), coordinatesAdapter)) {           //recreate composite Elements
+            for (Element Celement : elementShape.getRepresentedObjects()) {
+                //group.getChildren().remove()
+                elements.put(Celement, elementShape);
+                Celement.setGraph(this);
+            }
+            group.getChildren().add(elementShape.getFullNode());
+            //System.out.println(group.getChildren().size());
+        }
     }
 
     /**

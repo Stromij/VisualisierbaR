@@ -47,6 +47,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     private boolean moveable;
     private List<ChangeListener> listeners= new ArrayList<>(1);
     private Tooltip tooltip;
+    private int i=7;  //for grid layout
     //public Shape elements;
     //private DropShadow highlightGlow;
 
@@ -156,6 +157,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 tooltip.hide();
 
                 Dialog<LinkedList<String>> dialog = new Dialog<>();
+                dialog.setResizable(true);
                 dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
                 ((Button) dialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
                 dialog.setTitle("Node Editor");
@@ -214,7 +216,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         alert.showAndWait();
                         t.consume();
                         logger.log(Level.SEVERE, this.getRepresented().getName()+ "attached Graph is null");
-                        return;}
+                        return;
+                    }
+                    Element newElement;
                     if(!Element.in(this.getRepresented().getGraph().getContext()).NameExists(newName)){
                         Element.Type eType = Element.Type.fromName(element.getValue());
                         if (eType==Element.Type.WeichenPunkt){                                  //Weichen are treated seperately
@@ -269,16 +273,39 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                  if(name1.equals(name2)) continue;
                                  if(!Element.in(node1.getGraph().getContext()).NameExists(newName+name1) && !Element.in(node2.getGraph().getContext()).NameExists(newName+name2)) break;
                             }
-                            Element e1=Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue()));
+                            newElement=Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue()));
                             Element e2=Element.in(node1.getGraph().getContext()).create(newName+name1, eType, node1, Element.State.fromName(sig.getValue()));
                             Element e3=Element.in(node2.getGraph().getContext()).create(newName+name2, eType, node2, Element.State.fromName(sig.getValue()));
-                            this.getRepresented().getGraph().addElement(e1);
+                            this.getRepresented().getGraph().addElement(newElement);
                             node1.getGraph().addElement(e2);
                             node2.getGraph().addElement(e3);
                         }
                         else{
-                            this.getRepresented().getGraph().addElement(Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue())));       //normal elements are simply added
+                            newElement=Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue()));
+                            this.getRepresented().getGraph().addElement(newElement);       //normal elements are simply added
                         }
+                        Label eName= new Label(newElement.getReadableName());
+                        Label type = new Label(newElement.getType().getName());
+
+                        grid.add(eName,1,i);
+                        grid.add(type,2,i);
+                        if(newElement.getType().isComposite())grid.add(new Label("Direction will go here"),3,i);
+                        Button deleteButton = new Button();
+                        deleteButton.setText("X");
+                        deleteButton.setTextFill(Color.RED);
+                        deleteButton.setOnAction((event)->{
+                            //TODO LOG ERROR
+                            if (newElement.getGraph()==null) return;
+                            newElement.getGraph().removeElement(newElement);
+                            grid.getChildren().remove(eName);
+                            grid.getChildren().remove(type);
+                            grid.getChildren().remove(deleteButton);
+
+                        });
+                        grid.add(deleteButton,4,i);
+                        i++;
+                        dialog.getDialogPane().getScene().getWindow().sizeToScene();
+
                     }
                     else{
                         alert.setContentText("Name already taken");
@@ -291,13 +318,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 });
                 grid.add(createButton,1,6);
                 //TODO add element to this list  after creation
-                int i=7;
+
                 for(Element elements : this.getRepresented().getElements()){
                     Label eName= new Label(elements.getReadableName());
                     Label type = new Label(elements.getType().getName());
 
                     grid.add(eName,1,i);
                     grid.add(type,2,i);
+                    if(elements.getType().isComposite())grid.add(new Label("Direction will go here"),3,i);
                     Button deleteButton = new Button();
                     deleteButton.setText("X");
                     deleteButton.setTextFill(Color.RED);
@@ -308,8 +336,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         grid.getChildren().remove(eName);
                         grid.getChildren().remove(type);
                         grid.getChildren().remove(deleteButton);
+
                     });
-                    grid.add(deleteButton,3,i);
+                    grid.add(deleteButton,4,i);
                     i++;
 
                 }

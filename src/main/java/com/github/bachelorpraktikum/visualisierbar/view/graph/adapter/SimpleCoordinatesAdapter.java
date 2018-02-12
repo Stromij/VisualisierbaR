@@ -18,25 +18,8 @@ import javafx.beans.property.SimpleObjectProperty;
  */
 public final class SimpleCoordinatesAdapter implements CoordinatesAdapter {
 
-
-    // Offsets that get applied to the model in order to keep all coordinates positive  i.e. if a node gets dragged to -1
-    // every node adds 1 to its coordinates
-    private int OffsetX;
-    private int OffsetY;
-    //Blinker that signifies change in the offsets
-    //private BooleanProperty movedProperty;
-
-
     public SimpleCoordinatesAdapter(){
         super();
-        //OffsetX=new SimpleIntegerProperty();
-        //OffsetY=new SimpleIntegerProperty();
-        //OffsetX.setValue(0);
-        //OffsetY.setValue(0);
-        OffsetX=0;
-        OffsetY=0;
-        //movedProperty = new SimpleBooleanProperty(false);
-
     }
 
     @Override
@@ -50,37 +33,14 @@ public final class SimpleCoordinatesAdapter implements CoordinatesAdapter {
         Coordinates coordinates = node.getCoordinates();
         //if (coordinates.getX()<0) OffsetX = coordinates.getX();
         //if (coordinates.getY()<0) OffsetY = coordinates.getY();
-        return new Point2D(coordinates.getX()+ OffsetX, coordinates.getY()+OffsetY);
+        return new Point2D(coordinates.getX(), coordinates.getY());
         //return new Point2D(coordinates.getX(), coordinates.getY());
     }
 
     @Override
     public Coordinates reverse(@Nonnull Point2D point) {
-        if (point.getX()<0) OffsetX=(int)point.getX();
-        if (point.getY()<0) OffsetY=(int)point.getY();
-        //if( (point.getX()<0) ||  (point.getY()<0)) this.movedProperty.setValue(!movedProperty.getValue());
 
-        //return new Coordinates((int) point.getX()-OffsetX.getValue(), (int) point.getY()-OffsetY.getValue());
-        return new Coordinates((int) point.getX()-OffsetX, (int) point.getY()-OffsetY);
+        return new Coordinates((int) point.getX(), (int) point.getY());
     }
 
-    @Override
-    public void setOffsetX(int x) {
-        OffsetX=x;
-    }
-
-    @Override
-    public void setOffsetY(int y) {
-        OffsetY=y;
-    }
-/*
-    public BooleanProperty movedProperty() {
-        return movedProperty;
-    }
-/*
-    @Override
-    public IntegerProperty OffsetYproperty() {
-        return OffsetY;
-    }
-*/
 }

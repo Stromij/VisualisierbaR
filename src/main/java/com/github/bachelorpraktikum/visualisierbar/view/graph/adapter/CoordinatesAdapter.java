@@ -15,11 +15,6 @@ import javax.annotation.Nonnull;
  */
 public interface CoordinatesAdapter {
 
-   //IntegerProperty OffsetXproperty();
-   //IntegerProperty OffsetYproperty();
-
-   void setOffsetX(int x);
-   void setOffsetY(int y);
     /**
      * Gets the length of the shortest edge in the graph. Should be used to determine the size of
      * elements in the graph, like the size of nodes or the width of edges.<br> The length returned
