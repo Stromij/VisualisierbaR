@@ -579,8 +579,7 @@ public final class Element implements GraphObject<Shape> {
      */
     @Nonnull
     public String toABS()
-        {System.out.println(this.getType());
-         //TODO
+        {//TODO
          if(getType() == Type.WeichenPunkt)
             {}
          else if(getType() == Type.HauptSignal)
@@ -598,7 +597,9 @@ public final class Element implements GraphObject<Shape> {
          else if(getType() == Type.Magnet)
             {}
          else if(getType() == Type.SichtbarkeitsPunkt)
-            {}
+            {return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n",
+                        " + ", " + ", " * ");
+            }
          return "";
         }
 

@@ -187,16 +187,16 @@ public final class Node implements GraphObject<Circle> {
         /**
          * Checks the availability of a ABS name
          * @param name the String to check
-         * @return true, if an Edge with this name exists, otherwise false
+         * @return true, if an Node with this name exists, otherwise false
          */
         @Nullable
-        private String AbsNameExists(@Nonnull String name)
+        private boolean absNameExists(@Nonnull String name)
         {for(Map.Entry<String, Node> entry : nodes.entrySet()) {
-            if (Objects.equals(name, Objects.requireNonNull(entry.getValue().getAbsName()))) {
-                return entry.getKey();
+            if (Objects.equals(name, entry.getValue().getAbsName())) {
+                return true;
             }
          }
-         return null;
+         return false;
         }
 
         @Override
@@ -263,15 +263,15 @@ public final class Node implements GraphObject<Circle> {
     public boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null)
-            {String name = Node.in(graph.getContext()).AbsNameExists(newAbsName);
-             if(name != null)
+            {Boolean exit = Node.in(graph.getContext()).absNameExists(newAbsName);
+             if(!exit)
                 {this.absName = newAbsName;
                  Node.in(graph.getContext()).nodes.remove(name);
                  Node.in(graph.getContext()).nodes.put(name, this);
                  return true;
                 }
             }
-        return false;
+         return false;
         }
 
     public void setGraph(Graph graph){
@@ -383,9 +383,19 @@ public final class Node implements GraphObject<Circle> {
      */
     @Nonnull
     public String toABS() {
-        String nameOfNode = absName == null ? name : absName;
+        String nameOfNode = higherName();
 
         return String.format("[HTTPName: \"%s\"]Node %s = new local NodeImpl(%s,%s,\"%s\");\n",
                 nameOfNode, nameOfNode, this.getCoordinates().getX(), this.getCoordinates().getY(), nameOfNode);
     }
+
+    /**
+     * Returns the highest rated, available name of this Node.
+     * Rating: ABSName > ErlangName
+     *
+     * @return the higher rated, available name
+     */
+    @Nonnull
+    public String higherName()
+        {return absName == null ? name : absName;}
 }

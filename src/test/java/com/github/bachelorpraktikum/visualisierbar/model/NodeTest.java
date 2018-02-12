@@ -1,16 +1,16 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import com.github.bachelorpraktikum.visualisierbar.model.Node.NodeFactory;
 import java.util.Collection;
+
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.*;
 
 public class NodeTest extends FactoryTest<Node> {
 
@@ -115,6 +115,50 @@ public class NodeTest extends FactoryTest<Node> {
         expected.expect(NullPointerException.class);
         node1.otherEdges(null);
     }
+
+    @Test
+    public void testToABS()
+        {Node node0 = Node.in(context).create("node0", new Coordinates(0, 0));
+         Node node1 = Node.in(context).create("node1", new Coordinates(3, 6));
+         Node node2 = Node.in(context).create("node2", new Coordinates(4, 5), "n2");
+         Node node3 = Node.in(context).create("node3", new Coordinates(8, 12), "n3");
+
+         String result0 = "[HTTPName: \"node0\"]Node node0 = new local NodeImpl(0,0,\"node0\");\n";
+         String result1 = "[HTTPName: \"node1\"]Node node1 = new local NodeImpl(3,6,\"node1\");\n";
+         String result2 = "[HTTPName: \"n2\"]Node n2 = new local NodeImpl(4,5,\"n2\");\n";
+         String result3 = "[HTTPName: \"n3\"]Node n3 = new local NodeImpl(8,12,\"n3\");\n";
+
+         assertEquals(result0, node0.toABS());
+         assertEquals(result1, node1.toABS());
+         assertEquals(result2, node2.toABS());
+         assertEquals(result3, node3.toABS());
+        }
+
+    @Test
+    public void testSetAbsName()
+        {Graph graph= new Graph(new Context(), new SimpleCoordinatesAdapter());
+
+         Node node0 = Node.in(graph.getContext()).create("node0", new Coordinates(0, 0));
+         Node node1 = Node.in(graph.getContext()).create("node1", new Coordinates(3, 6));
+
+         node0.setGraph(graph);
+         node1.setGraph(graph);
+
+         assertNull(node0.getAbsName());
+         assertNull(node1.getAbsName());
+
+         assertFalse(node0.setAbsName(null));
+         assertTrue(node0.setAbsName("n1"));
+         assertEquals("n1", node0.getAbsName());
+
+         assertFalse(node1.setAbsName("n1"));
+         assertTrue(node1.setAbsName("n2"));
+         assertEquals("n2", node1.getAbsName());
+
+         assertFalse(node0.setAbsName("n2"));
+         assertTrue(node0.setAbsName("n3"));
+         assertEquals("n3", node0.getAbsName());
+        }
 
     @Override
     protected NodeFactory getFactory(Context context) {
