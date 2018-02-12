@@ -290,6 +290,32 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                 });
                 grid.add(createButton,1,6);
+                //TODO add element to this list  after creation
+                int i=7;
+                for(Element elements : this.getRepresented().getElements()){
+                    Label eName= new Label(elements.getReadableName());
+                    Label type = new Label(elements.getType().getName());
+
+                    grid.add(eName,1,i);
+                    grid.add(type,2,i);
+                    Button deleteButton = new Button();
+                    deleteButton.setText("X");
+                    deleteButton.setTextFill(Color.RED);
+                    deleteButton.setOnAction((tt)->{
+                        //TODO LOG ERROR
+                        if (elements.getGraph()==null) return;
+                        elements.getGraph().removeElement(elements);
+                        grid.getChildren().remove(eName);
+                        grid.getChildren().remove(type);
+                        grid.getChildren().remove(deleteButton);
+                    });
+                    grid.add(deleteButton,3,i);
+                    i++;
+
+                }
+
+
+
                 dialog.getDialogPane().setContent(grid);
                 dialog.setResultConverter(dialogButton -> {             //get user Input
                     if (dialogButton == ButtonType.APPLY) {

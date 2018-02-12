@@ -122,6 +122,29 @@ public class GraphTest   {
             assertTrue(graph.getGroup().getChildren().contains(graph.getElements().get(e).getFullNode()));
         }
     }
+
+    @Test
+    public void removeElementTest(){
+        addNodes(5);
+        addEdges(5);
+        LinkedList<Node> nodes= new LinkedList<>();
+        nodes.addAll(graph.getNodes().keySet());
+        Element e;
+        if (nodes.size() > 0) {
+            e = Element.in(graph.getContext()).create("Test", Element.Type.SwWechsel, nodes.get(0), Element.State.NOSIG);
+            WeakReference<Element> eR= new WeakReference<Element>(e);
+            graph.addElement(e);
+            graph.removeElement(e);
+            Junction.clearSelection();
+            e=null;
+            System.gc();
+            assertNull(eR.get());
+
+        }
+
+
+    }
+
 //TODO
     @Test
     public void removeNodeTest(){
