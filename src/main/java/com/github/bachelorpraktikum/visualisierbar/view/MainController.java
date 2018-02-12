@@ -592,7 +592,7 @@ public class MainController {
             mousePressedX = -1;
             mousePressedY = -1;
             selectionRec.setVisible(false);
-            if (toolSelector.getValue().equals("select")) {
+            if (toolSelector.getSelectionModel().getSelectedIndex()==1) {       //select selected
                 //System.out.println( selectionRec.getBoundsInLocal()
                 if (!event.isShiftDown()) Junction.clearSelection();
                 //TODO Log Error
@@ -628,7 +628,8 @@ public class MainController {
             if (!event.isPrimaryButtonDown()) {
                 return;
             }
-            if (toolSelector.getValue().equals("move")) {
+            //if (toolSelector.getValue().equals("move")) {
+            if (toolSelector.getSelectionModel().getSelectedIndex()==0) {           //move selected
                 if (mousePressedX == -1 && mousePressedY == -1) {
                     mousePressedX = event.getX();
                     mousePressedY = event.getY();

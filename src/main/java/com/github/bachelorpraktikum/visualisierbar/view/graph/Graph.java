@@ -118,8 +118,10 @@ public final class Graph {
         elements.forEach((a,b)->{
             if (a.getNode()==node){
                 e.add(a);
+                /*
                 group.getChildren().remove(b.getFullNode());    //remove elements from graph pane
                 a.setGraph(null);
+                */
             }
         });
 
@@ -135,10 +137,12 @@ public final class Graph {
         });
 
         e.forEach((a)->{
-            elements.remove(a);
-            Element.in(context).remove(a);                      //remove elements from context, factory and graph
-            context.removeObject(a);
+            //elements.remove(a);
+            //Element.in(context).remove(a);                      //remove elements from context, factory and graph
+            //context.removeObject(a);
+            this.removeElement(a);
         });
+
         ed.forEach((a)->{
             Edge.in(context).remove(a);
             edges.remove(a);                                    //remove edges from  context, factory and graph
@@ -253,6 +257,21 @@ public final class Graph {
     }
 
     /**
+     * Removes an element from the Graph
+     * @param element
+     */
+    public void removeElement (Element element){
+        element.getNode().getElements().remove(element);
+        if(element.getType()== Element.Type.WeichenPunkt) element.getSwitch().getElements().remove(element);
+        elements.get(element).getRepresentedObjects().remove(element);
+        group.getChildren().remove(elements.get(element).getFullNode());
+        elements.remove(element);
+        Element.in(context).remove(element);                      //remove elements from context, factory and graph
+        context.removeObject(element);
+        element.setGraph(null);
+    }
+
+    /**
      * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
      * @param name the Name
      * @param coordinates   the coordinates
@@ -288,6 +307,7 @@ public final class Graph {
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
     }
+
 
     /**
      * Adds am Element to the Graph
