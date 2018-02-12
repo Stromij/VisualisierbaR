@@ -132,7 +132,10 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
 
     @Override
     protected void initializedShape(Line line) {
-        tooltip=new Tooltip(getRepresented().getName() + " " + getRepresented().getLength() + "m");
+        String abs = "";
+        if(getRepresented().getAbsName() != null)
+            {abs = " | " + getRepresented().getAbsName();}
+        tooltip=new Tooltip(getRepresented().getName() + " " + getRepresented().getLength() + "m" + abs);
         TooltipUtil.install(line,tooltip);
 
         if (this.getRepresented().getLength()>-1)line.setStroke(Color.BLACK);
