@@ -216,10 +216,10 @@ public final class Edge implements GraphObject<Line> {
          * @return true, if an Edge with this name exists, otherwise false
          */
         @Nullable
-        public String AbsNameExists (@Nonnull String name)
+        public Boolean AbsNameExists (@Nonnull String name)
             {for(Map.Entry<String, Edge> entry : edges.entrySet())
-                {if(entry.getValue().getAbsName() == name) {return entry.getKey();}}
-             return null;
+                {if(entry.getValue().getAbsName() == name) {return true;}}
+             return false;
             }
 
         public void remove(Edge edge){
@@ -344,8 +344,8 @@ public final class Edge implements GraphObject<Line> {
     public boolean setAbsName(String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null) {
-             String name = Edge.in(graph.getContext()).AbsNameExists(newAbsName);
-             if (name != null) {
+             Boolean exit = Edge.in(graph.getContext()).AbsNameExists(newAbsName);
+             if (!exit) {
                  this.absName = newAbsName;
                  Edge.in(graph.getContext()).edges.remove(name);
                  Edge.in(graph.getContext()).edges.put(name, this);
@@ -430,12 +430,21 @@ public final class Edge implements GraphObject<Line> {
      */
     @Nonnull
     public String toABS(){
-        String nameOfEdge = absName == null ? name : absName;
-        String nameOfNode1 = getNode1().getAbsName() == null ? getNode1().getName() : getNode1().getAbsName();
-        String nameOfNode2 = getNode2().getAbsName() == null ? getNode2().getName() : getNode2().getAbsName();
+        String nameOfEdge = higherName();
+        String nameOfNode1 = getNode1().higherName();
+        String nameOfNode2 = getNode2().higherName();
 
         return String.format("[HTTPName: \"%s\"]Edge %s = new local EdgeImpl(%s,%s,%s,%s,\"%s\");\n",
                 nameOfEdge, nameOfEdge, "app", nameOfNode1, nameOfNode2, length, nameOfEdge);
-
     }
+
+    /**
+     * Returns the highest rated, available name of this Edge.
+     * Rating: ABSName > ErlangName
+     *
+     * @return the higher rated, available name
+     */
+    @Nonnull
+    public String higherName()
+        {return absName == null ? name : absName;}
 }

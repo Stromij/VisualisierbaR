@@ -579,26 +579,54 @@ public final class Element implements GraphObject<Shape> {
      */
     @Nonnull
     public String toABS()
-        {System.out.println(this.getType());
-         //TODO
+        {//TODO Weichenpunkt, GeschwindigkeitsAnzeiger, GeschwindigkeitsVoranzeiger, Magnet
+         String addElem = String.format("%s.addElement(%s);\n", node.higherName(), name);
          if(getType() == Type.WeichenPunkt)
             {}
          else if(getType() == Type.HauptSignal)
-            {}
+            {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33);
+             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s);\n%s",
+                        name, name, node.higherName(), null, addElem);
+                      //name, name, Nodename, Kantenname, addElem
+            }
          else if(getType() == Type.GefahrenPunkt)
-            {}
+            {// [HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl( e54);
+             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n%s",
+                        name, name, null, addElem);
+                      //name, name, Kantenname, addElem
+            }
          else if(getType() == Type.GeschwindigkeitsAnzeiger)
-            {}
+            {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21);
+             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new local GeschwindigkeitsAnzeigerImpl(%s);\n%s",
+                        name, name, null, addElem);
+                //name, name, Kantenname, addElem
+            }
          else if(getType() == Type.GeschwindigkeitsVoranzeiger)
-            {}
+            {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21);
+                return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVoranzeiger %s = new local GeschwindigkeitsVoranzeiger(%s);\n%s",
+                        name, name, null, addElem);
+                //name, name, Kantenname, addElem
+            }
          else if(getType() == Type.SwWechsel)
-            {}
+            {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1);
+             return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s);\n%s",
+                        name, name, null, addElem);
+                      //name, name, ???, addElem
+            }
          else if(getType() == Type.VorSignal)
-            {}
+            {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21);
+             return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s);\n%s",
+                        name, name, null, addElem);
+                      //name, name, Kantenname, addElem
+            }
          else if(getType() == Type.Magnet)
             {}
          else if(getType() == Type.SichtbarkeitsPunkt)
-            {}
+            {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15);
+             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n%s",
+                        name, name, null, addElem);
+                      //name, name, Kantenname, addElem
+            }
          return "";
         }
 

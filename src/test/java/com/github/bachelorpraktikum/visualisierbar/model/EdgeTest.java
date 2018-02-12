@@ -1,14 +1,16 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
 import com.github.bachelorpraktikum.visualisierbar.model.Edge.EdgeFactory;
 import java.util.Random;
+
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import static org.junit.Assert.*;
 
 public class EdgeTest extends FactoryTest<Edge> {
 
@@ -88,7 +90,7 @@ public class EdgeTest extends FactoryTest<Edge> {
 
     @Test
     public void testNullNodes() {
-        expected.expect(NullPointerException.class);
+        expected.expect(IllegalArgumentException.class);
         Edge edge = Edge.in(context).create("Edge", 50, null, null);
     }
 
@@ -165,6 +167,77 @@ public class EdgeTest extends FactoryTest<Edge> {
         expected.expect(NullPointerException.class);
         edge.getOtherNode(null);
     }
+
+    @Test
+    public void testToABS()
+        {Graph graph= new Graph(new Context(), new SimpleCoordinatesAdapter());
+
+         Node n1 = Node.in(context).create("node1", new Coordinates(0, 0));
+         Node n2 = Node.in(context).create("node2", new Coordinates(0, 0));
+         Node n3 = Node.in(context).create("node3", new Coordinates(0, 0), "n3");
+         Node n4 = Node.in(context).create("node4", new Coordinates(0, 0), "n4");
+
+         Edge edge1 = Edge.in(context).create("edge1", 60, n1, n2);
+         Edge edge2 = Edge.in(context).create("edge2", 90, n1, n3);
+         Edge edge3 = Edge.in(context).create("edge3", 145, n3, n2);
+         Edge edge4 = Edge.in(context).create("edge4", 153, n3, n4);
+
+         Edge edge5 = Edge.in(context).create("edge5", 60, n1, n2, "e5");
+         Edge edge6 = Edge.in(context).create("edge6", 90, n1, n3, "e6");
+         Edge edge7 = Edge.in(context).create("edge7", 145, n3, n2, "e7");
+         Edge edge8 = Edge.in(context).create("edge8", 153, n3, n4, "e8");
+
+         String result1 = "[HTTPName: \"edge1\"]Edge edge1 = new local EdgeImpl(app,node1,node2,60,\"edge1\");\n";
+         String result2 = "[HTTPName: \"edge2\"]Edge edge2 = new local EdgeImpl(app,node1,n3,90,\"edge2\");\n";
+         String result3 = "[HTTPName: \"edge3\"]Edge edge3 = new local EdgeImpl(app,n3,node2,145,\"edge3\");\n";
+         String result4 = "[HTTPName: \"edge4\"]Edge edge4 = new local EdgeImpl(app,n3,n4,153,\"edge4\");\n";
+
+         String result5 = "[HTTPName: \"e5\"]Edge e5 = new local EdgeImpl(app,node1,node2,60,\"e5\");\n";
+         String result6 = "[HTTPName: \"e6\"]Edge e6 = new local EdgeImpl(app,node1,n3,90,\"e6\");\n";
+         String result7 = "[HTTPName: \"e7\"]Edge e7 = new local EdgeImpl(app,n3,node2,145,\"e7\");\n";
+         String result8 = "[HTTPName: \"e8\"]Edge e8 = new local EdgeImpl(app,n3,n4,153,\"e8\");\n";
+
+         assertEquals(result1, edge1.toABS());
+         assertEquals(result2, edge2.toABS());
+         assertEquals(result3, edge3.toABS());
+         assertEquals(result4, edge4.toABS());
+         assertEquals(result5, edge5.toABS());
+         assertEquals(result6, edge6.toABS());
+         assertEquals(result7, edge7.toABS());
+         assertEquals(result8, edge8.toABS());
+        }
+
+    @Test
+    public void testSetAbsName()
+        {Graph graph= new Graph(new Context(), new SimpleCoordinatesAdapter());
+
+         Node n1 = Node.in(context).create("node1", new Coordinates(0, 0));
+         Node n2 = Node.in(context).create("node2", new Coordinates(10, 10));
+
+         Edge edge1 = Edge.in(context).create("edge1", 60, n1, n2);
+         Edge edge2 = Edge.in(context).create("edge2", 70, n2, n1);
+
+         n1.setGraph(graph);
+         n2.setGraph(graph);
+         edge1.setGraph(graph);
+         edge2.setGraph(graph);
+
+         assertNull(edge1.getAbsName());
+         assertNull(edge2.getAbsName());
+
+         assertFalse(edge1.setAbsName(null));
+         assertTrue(edge1.setAbsName("e1"));
+         assertEquals("e1", edge1.getAbsName());
+
+         assertFalse(edge2.setAbsName("e1"));
+         assertTrue(edge2.setAbsName("e2"));
+         assertEquals("e2", edge2.getAbsName());
+
+         assertFalse(edge1.setAbsName("e2"));
+         assertTrue(edge1.setAbsName("e3"));
+         assertEquals("e3",edge1.getAbsName());
+
+        }
 
     @Override
     protected EdgeFactory getFactory(Context context) {

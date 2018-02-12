@@ -442,7 +442,12 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
     @Override
     protected void initializedShape(Circle circle) {
-        tooltip = new Tooltip(getRepresented().getName());
+        String tooltipName = getRepresented().getName();
+        if(getRepresented().getAbsName() != null)
+            {tooltipName = tooltipName.concat(" | ");
+                tooltipName = tooltipName.concat(getRepresented().getAbsName());
+            }
+        tooltip = new Tooltip(tooltipName);
         TooltipUtil.install(circle, tooltip);
     }
 
