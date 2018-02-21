@@ -1,14 +1,13 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph;
 
 import com.github.bachelorpraktikum.visualisierbar.model.*;
+import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 
 
 import java.util.*;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -63,16 +62,19 @@ public final class Graph {
             nodes.put(node, shape);
             node.setGraph(this);
             group.getChildren().add(shape.getFullNode());
-            node.getElements().forEach((a)->{a.setGraph(null);});
+            //node.getElements().forEach((a)->{a.setGraph(null);});
 
             for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
+
                 for (Element element : elementShape.getRepresentedObjects()) {
                     elements.put(element, elementShape);
                     element.setGraph(this);
                 }
                 group.getChildren().add(elementShape.getFullNode());
+
             }
         }
+
     }
 
     public void scale(double factor) {
@@ -118,10 +120,6 @@ public final class Graph {
         elements.forEach((a,b)->{
             if (a.getNode()==node){
                 e.add(a);
-                /*
-                group.getChildren().remove(b.getFullNode());    //remove elements from graph pane
-                a.setGraph(null);
-                */
             }
         });
 
@@ -136,12 +134,7 @@ public final class Graph {
             }
         });
 
-        e.forEach((a)->{
-            //elements.remove(a);
-            //Element.in(context).remove(a);                      //remove elements from context, factory and graph
-            //context.removeObject(a);
-            this.removeElement(a);
-        });
+        e.forEach(this::removeElement);
 
         ed.forEach((a)->{
             Edge.in(context).remove(a);
@@ -204,7 +197,6 @@ public final class Graph {
                 for ( j = 0; j < l; j++) {
                     if(a.getNode2()== sList.get(j)) break;
                 }
-                //System.out.println("found edge");
                 existingEdges[i][j]=true;               //mark the existing edge
                 existingEdges[j][i]=true;
             }
@@ -258,25 +250,29 @@ public final class Graph {
 
     /**
      * Removes an element from the Graph
-     * @param element
+     * @param element Element to remove
      */
     public void removeElement (Element element){
 
-        //if(element.getType()== Element.Type.WeichenPunkt) element.getSwitch().getElements().remove(element);
         if(element.getType()== Element.Type.WeichenPunkt){
-            for(Element we : element.getSwitch().getElements()){
+            if (element== element.getSwitch().getMainElement()){
+                for(Element we : element.getSwitch().getElements()){
                 rE(we);
+                }
             }
+            else
+                removeElement(element.getSwitch().getMainElement());
         }
         else
             rE(element);
+
 
     }
 
     private void rE(Element element){
         element.getNode().getElements().remove(element);
         elements.get(element).getRepresentedObjects().remove(element);
-        group.getChildren().remove(elements.get(element).getFullNode());
+        group.getChildren().remove(elements.get(element).getFullNode());        //TODO only remove when no other represented Objects?
         elements.remove(element);
         Element.in(context).remove(element);                      //remove elements from context, factory and graph
         context.removeObject(element);
@@ -293,12 +289,10 @@ public final class Graph {
         }
         for (GraphShape<Element> elementShape : Elements.create(element.getNode(), coordinatesAdapter)) {           //recreate composite Elements
             for (Element Celement : elementShape.getRepresentedObjects()) {
-                //group.getChildren().remove()
                 elements.put(Celement, elementShape);
                 Celement.setGraph(this);
             }
             group.getChildren().add(elementShape.getFullNode());
-            //System.out.println(group.getChildren().size());
         }
     }
 
@@ -360,13 +354,11 @@ public final class Graph {
         context.addObject(elementToAdd);
         for (GraphShape<Element> elementShape : Elements.create(elementToAdd.getNode(), coordinatesAdapter)) {
             for (Element element : elementShape.getRepresentedObjects()) {
-                //group.getChildren().remove()
                 elements.put(element, elementShape);
                 element.setGraph(this);
             }
-
             group.getChildren().add(elementShape.getFullNode());
-            //System.out.println(group.getChildren().size());
+
         }
     }
 

@@ -5,14 +5,12 @@ import com.github.bachelorpraktikum.visualisierbar.model.Node;
 import com.github.bachelorpraktikum.visualisierbar.model.Switch;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 public final class Elements {
+
+    static Map<Switch, GraphShape<Element>> switches = new WeakHashMap<>();
 
     private Elements() {
     }
@@ -23,7 +21,6 @@ public final class Elements {
         int count = 0;
 
         List<Element> compositeElements = new LinkedList<>();
-        Map<Switch, GraphShape<Element>> switches = new HashMap<>();
 
         for (Element element : node.getElements()) {
 

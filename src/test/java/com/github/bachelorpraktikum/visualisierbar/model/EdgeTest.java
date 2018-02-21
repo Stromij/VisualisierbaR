@@ -287,6 +287,7 @@ public class EdgeTest extends FactoryTest<Edge> {
                     getNode(context)
                 );
                 break;
+            case 4: throw new IllegalArgumentException();
             default:
                 throw new IllegalStateException();
         }

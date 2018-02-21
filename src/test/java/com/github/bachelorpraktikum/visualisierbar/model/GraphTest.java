@@ -63,7 +63,7 @@ public class GraphTest   {
     }
 
     @Test
-    public void fullyconnectTest(){
+    public void SimpleFullyConnectTest(){
         LinkedList<Junction> j = new LinkedList<>();
         //LinkedList<Node> nodes = new LinkedList<>();
         HashSet<Node> nodes = new HashSet<>(128);
@@ -104,11 +104,10 @@ public class GraphTest   {
         k=graph.getEdges().size();
         graph.fullyConnect(Junction.getSelection());
         assertTrue(k==graph.getEdges().size());
-
     }
     //TODO
     @Test
-    public void addElementTest(){
+    public void SimpleAddElementTest(){
         addNodes(5);
         addEdges(5);
         LinkedList<Node> nodes= new LinkedList<>();
@@ -124,7 +123,7 @@ public class GraphTest   {
     }
 
     @Test
-    public void removeElementTest(){
+    public void SimpleRemoveElementTest(){
         addNodes(5);
         addEdges(5);
         LinkedList<Node> nodes= new LinkedList<>();
@@ -138,6 +137,7 @@ public class GraphTest   {
             Junction.clearSelection();
             e=null;
             System.gc();
+
             assertNull(eR.get());
 
         }
@@ -147,7 +147,7 @@ public class GraphTest   {
 
 //TODO
     @Test
-    public void removeNodeTest(){
+    public void SimpleRemoveNodeTest(){
         LinkedList<Node> nodes= new LinkedList<>();
         LinkedList<Edge> edges= new LinkedList<>();
         addNodes(5);

@@ -22,7 +22,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
 
     private final List<Element> elements;
     private final com.github.bachelorpraktikum.visualisierbar.model.Node node;
-    private final List<ChangeListener> listeners;
+    private List<ChangeListener> listeners;
 
     ElementBase(List<Element> elements,
         com.github.bachelorpraktikum.visualisierbar.model.Node node, CoordinatesAdapter adapter) {
@@ -93,13 +93,20 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
             TooltipUtil.install(elementShape, new Tooltip(element.getName()));
+/////////////////////////////////////TODO
+
+
+                //if(element.getType()== Element.Type.WeichenPunkt)System.out.println(elements);
             ChangeListener NodeListener = ((observable, oldValue, newValue) -> {
                 relocate(this.getShape());
+                //relocate(getShape(element));
             });
             listeners.add(NodeListener);
 
-            this.node.movedProperty().addListener(new WeakChangeListener<>(NodeListener));
+            element.getNode().movedProperty().addListener(new WeakChangeListener<>(NodeListener));
+            //element.getNode().movedProperty().addListener((NodeListener));      //TODO Memory Leak
             displayState(element);
+
         }
     }
 
