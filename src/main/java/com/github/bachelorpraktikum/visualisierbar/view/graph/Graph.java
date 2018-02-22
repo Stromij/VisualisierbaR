@@ -1,7 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph;
 
 import com.github.bachelorpraktikum.visualisierbar.model.*;
-import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 
@@ -49,6 +48,11 @@ public final class Graph {
         this.group = new Group();
         this.edges = new LinkedHashMap<>(256);
         Junction.clearSelection();      //TEST//
+        for (Node node : Node.in(context).getAll()) {
+            node.setGraph(null);
+            node.getEdges().forEach(a->{a.setGraph(null);});
+            node.getElements().forEach(a->{a.setGraph(null);});
+        }
         for (Edge edge : Edge.in(context).getAll()) {
             GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
             edges.put(edge, shape);
@@ -278,6 +282,7 @@ public final class Graph {
         context.removeObject(element);
         element.setGraph(null);
         if(element.getType().isComposite()){
+            /*
             for( Element CompositeElement : element.getNode().getElements()){
                 if (CompositeElement.getType().isComposite()){                       //remove composite Elements to rebuild them with the new element if necessary
                     if(CompositeElement.getGraph()==this){
@@ -291,6 +296,27 @@ public final class Graph {
             for (Element Celement : elementShape.getRepresentedObjects()) {
                 elements.put(Celement, elementShape);
                 Celement.setGraph(this);
+            }
+            group.getChildren().add(elementShape.getFullNode());
+            */
+            rebuildComposite(element.getNode());
+        }
+
+    }
+
+    public void rebuildComposite (Node node){
+        for( Element CompositeElement : node.getElements()){
+            if (CompositeElement.getType().isComposite()){                       //remove composite Elements to rebuild them
+                if(CompositeElement.getGraph()==this){
+                    this.getGroup().getChildren().remove(elements.get(CompositeElement).getFullNode());
+                    CompositeElement.setGraph(null);
+                }
+            }
+        }
+        for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
+            for (Element Celement : elementShape.getRepresentedObjects()) {
+            elements.put(Celement, elementShape);
+            Celement.setGraph(this);
             }
             group.getChildren().add(elementShape.getFullNode());
         }

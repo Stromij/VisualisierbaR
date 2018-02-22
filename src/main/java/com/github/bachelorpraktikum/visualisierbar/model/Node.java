@@ -284,6 +284,7 @@ public final class Node implements GraphObject<Circle> {
      * @return true when the change was successful, false if it was not
      */
     public boolean setName(String newName){
+        if(newName==null) return false;
         if(graph!=null){
             if(!Node.in(graph.getContext()).NameExists(newName)){
                 this.name=newName;

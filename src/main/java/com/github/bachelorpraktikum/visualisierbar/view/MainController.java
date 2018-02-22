@@ -335,6 +335,7 @@ public class MainController {
                 resetButton.fire();
                 graph.getNodes().forEach(((a, b) -> ((Junction) b).setMoveable(true)));
                 rootPane.setLeft(null);
+
             } else {
                 graph.getNodes().forEach(((a, b) -> ((Junction) b).setMoveable(false)));
                 toolSelector.setValue(toolSelector.getItems().get(0));
@@ -1018,19 +1019,7 @@ public class MainController {
                 trains.put(train, trainView);
                 trainView.setOnMouseClicked(e -> elementList.getSelectionModel().select(train));
             }
-            /*
-            Bounds graphBounds = graph.getGroup().getBoundsInParent();
-            yAxis=new NumberAxis(0,graphBounds.getHeight(),1);
-            yAxis.setSide(Side.LEFT);
-            yAxis.setPrefHeight(graphPane.getHeight());
-            yAxis.setMinorTickVisible(false);
-            yAxis.setLayoutY(graph.getGroup().getLayoutY());
-            //graph.getGroup().getChildren().add(yAxis);
-            graphPane.getChildren().add(yAxis);
-            */
         }
-
-
         return graph;
     }
 

@@ -68,7 +68,21 @@ final class CompositeElement extends ElementBase<Group> {
         double y = nodePos.getY() - bounds.getHeight() / 2;
 
         group.relocate(x, y);
+
         rotateAccordingToOffset(group);
+        shapes.forEach((a,b)->{
+            if(a.getDirection()!=null) {
+
+                Point2D p = new Point2D(1, 0);
+                Point2D p2 = this.getCoordinatesAdapter().apply(a.getNode());
+                Point2D p3 = this.getCoordinatesAdapter().apply(a.getDirection());
+                p2= new Point2D(p2.getX()-p3.getX(), p2.getY()-p3.getY());
+                double angle = p.angle(p2);
+                if(angle>180) angle -=180;
+                if(a.getType()== Element.Type.VorSignal)angle += 180;
+                b.setRotate(angle-getAngle());
+            }
+        });
     }
 
     @Override

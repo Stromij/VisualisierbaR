@@ -53,6 +53,8 @@ public final class Element implements GraphObject<Shape> {
     private final ReadOnlyObjectWrapper<State> stateProperty;
     @Nullable
     private Graph graph;
+    @Nullable
+    private Node direction;
 
     /**
      * Represents the state of an {@link Element}.
@@ -211,6 +213,7 @@ public final class Element implements GraphObject<Shape> {
         this.node = Objects.requireNonNull(node);
         this.stateProperty = new ReadOnlyObjectWrapper<>(Objects.requireNonNull(state));
         this.graph=null;
+        this.direction=null;
 
         node.addElement(this);
 
@@ -466,19 +469,30 @@ public final class Element implements GraphObject<Shape> {
         getFactory().addEvent(this, Objects.requireNonNull(state), warnings, time);
     }
 
-    @Override
+
     @Nonnull
     public String getName() {
         return name;
     }
 
-    @Override
+
+    @Nullable
     public Graph getGraph() {
         return graph;
     }
 
-    public void setGraph(Graph graph){
+    public void setGraph(@Nullable Graph graph){
         this.graph=graph;
+    }
+
+
+    @Nullable
+    public Node getDirection() {
+        return direction;
+    }
+
+    public void setDirection(@Nullable Node direction) {
+        this.direction = direction;
     }
 
     @Nonnull
@@ -551,8 +565,8 @@ public final class Element implements GraphObject<Shape> {
         return aSwitch;
     }
     public boolean setName(String newName){
-        if(newName==null) return false;
         if(graph!=null){
+            if(newName==null) return false;
             if(!Element.in(graph.getContext()).NameExists(newName)){
                 this.name=newName;
                 Element.in(graph.getContext()).elements.remove(newName);

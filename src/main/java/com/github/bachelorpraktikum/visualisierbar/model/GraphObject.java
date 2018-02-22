@@ -29,10 +29,10 @@ public interface GraphObject<S extends Shape> extends Shapeable<S> {
 
     /**
      * sets the graph of this object
-     * @param graph the graph this object is in
+     * @param graph the graph this object is in (important
      */
     @Nullable
-    void setGraph(Graph graph);
+    void setGraph(@Nullable Graph graph);
 
 
 

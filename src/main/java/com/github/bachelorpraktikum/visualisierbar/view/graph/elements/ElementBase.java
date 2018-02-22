@@ -23,6 +23,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
     private final List<Element> elements;
     private final com.github.bachelorpraktikum.visualisierbar.model.Node node;
     private List<ChangeListener> listeners;
+    private double angle;
 
     ElementBase(List<Element> elements,
         com.github.bachelorpraktikum.visualisierbar.model.Node node, CoordinatesAdapter adapter) {
@@ -40,6 +41,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
 
 
         }
+        angle=0.0;
     }
 
     @Nonnull
@@ -93,20 +95,13 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
             TooltipUtil.install(elementShape, new Tooltip(element.getName()));
-/////////////////////////////////////TODO
-
-
-                //if(element.getType()== Element.Type.WeichenPunkt)System.out.println(elements);
             ChangeListener NodeListener = ((observable, oldValue, newValue) -> {
                 relocate(this.getShape());
-                //relocate(getShape(element));
             });
             listeners.add(NodeListener);
 
             element.getNode().movedProperty().addListener(new WeakChangeListener<>(NodeListener));
-            //element.getNode().movedProperty().addListener((NodeListener));      //TODO Memory Leak
             displayState(element);
-
         }
     }
 
@@ -119,7 +114,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
     }
 
     protected final void rotateAccordingToOffset(T node, Point2D offset) {
-        double angle = new Point2D(0, 1).angle(offset);
+        angle = new Point2D(0, 1).angle(offset);
         if (offset.getX() > 0) {
             angle = -angle;
         }
@@ -130,5 +125,9 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
     @Override
     protected Node createHighlight(T node) {
         return createCircleHighlight(node);
+    }
+
+    public double getAngle() {
+        return angle;
     }
 }

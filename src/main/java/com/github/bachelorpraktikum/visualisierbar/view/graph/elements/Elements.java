@@ -10,7 +10,7 @@ import java.util.*;
 
 public final class Elements {
 
-    static Map<Switch, GraphShape<Element>> switches = new WeakHashMap<>();
+    //static Map<Switch, GraphShape<Element>> switches = new WeakHashMap<>();
 
     private Elements() {
     }
@@ -21,6 +21,7 @@ public final class Elements {
         int count = 0;
 
         List<Element> compositeElements = new LinkedList<>();
+        Map<Switch, GraphShape<Element>> switches = new WeakHashMap<>();
 
         for (Element element : node.getElements()) {
 
@@ -35,6 +36,7 @@ public final class Elements {
                     shapes.add(new RotatedDefaultOffsetElement(element, node, adapter, count++));
                     break;
                 case WeichenPunkt:
+                    if(element.getGraph()!=null) break;
                     Switch aSwitch = element.getSwitch();
                     if (!switches.containsKey(aSwitch)) {
                         GraphShape<Element> switchShape = new WeichenpunktElement(aSwitch, node,

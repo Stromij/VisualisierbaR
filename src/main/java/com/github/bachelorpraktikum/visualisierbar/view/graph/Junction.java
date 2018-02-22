@@ -3,8 +3,6 @@ package com.github.bachelorpraktikum.visualisierbar.view.graph;
 import com.github.bachelorpraktikum.visualisierbar.model.*;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
-import com.github.bachelorpraktikum.visualisierbar.view.moveable;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableDoubleValue;
@@ -86,6 +84,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         */
         this.getShape().setOnMouseReleased((event) -> {
             if (!moveable) return;
+
             mousePressedX = -1;
             mousePressedY = -1;
             selection.forEach((b) -> {
@@ -100,7 +99,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                        yy= 0 - yy;
                         for(Node n : nodes.keySet()){
                             if(n != b.getRepresented() ){
-                                n.setCoordinates(adapter.reverse(new Point2D(((int) n.getCoordinates().getX()),(  (int) n.getCoordinates().getY()+yy))));
+                                n.setCoordinates(adapter.reverse(new Point2D(( n.getCoordinates().getX()),(n.getCoordinates().getY()+yy))));
                             }
                         }
 
@@ -166,6 +165,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.setHgap(10);
                 grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
+
 
                 TextField name = new TextField();
                 name.setText(this.getRepresented().getName());
@@ -286,10 +286,25 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         }
                         Label eName= new Label(newElement.getReadableName());
                         Label type = new Label(newElement.getType().getName());
+                        //Label direction = new Label("Direction");
+                        ChoiceBox<String> direction = new ChoiceBox<>();      //direction choice box
+                        direction.setOnAction(directionEvent->{
+
+                            String NodeName = direction.getValue();
+                            Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
+                            newElement.setDirection(otherNode);
+                            this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
+
+
+                        });
+                        for(Edge e : this.getRepresented().getEdges()){
+                            Node otherNode = e.getOtherNode(this.getRepresented());
+                            direction.getItems().addAll(otherNode.getName());
+                        }
 
                         grid.add(eName,1,i);
                         grid.add(type,2,i);
-                        if(newElement.getType().isComposite())grid.add(new Label("Direction will go here"),3,i);
+                        if(newElement.getType().isComposite())grid.add(direction,3,i);
                         Button deleteButton = new Button();
                         deleteButton.setText("X");
                         deleteButton.setTextFill(Color.RED);
@@ -300,6 +315,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             grid.getChildren().remove(eName);
                             grid.getChildren().remove(type);
                             grid.getChildren().remove(deleteButton);
+                            grid.getChildren().remove(direction);
 
                         });
                         grid.add(deleteButton,4,i);
@@ -322,20 +338,35 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 for(Element elements : this.getRepresented().getElements()){
                     Label eName= new Label(elements.getReadableName());
                     Label type = new Label(elements.getType().getName());
+                    ChoiceBox<String> direction = new ChoiceBox<>();      //direction Type choice box
+                    direction.setOnAction(directionEvent->{
+                        String NodeName = direction.getValue();
+                        Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
+                        elements.setDirection(otherNode);
+                        this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
+
+
+                    });
+                    for(Edge e : this.getRepresented().getEdges()){
+                        Node otherNode = e.getOtherNode(this.getRepresented());
+                        direction.getItems().addAll(otherNode.getName());
+                    }
+
 
                     grid.add(eName,1,i);
                     grid.add(type,2,i);
-                    if(elements.getType().isComposite())grid.add(new Label("Direction will go here"),3,i);
+                    if(elements.getType().isComposite())grid.add(direction,3,i);
                     Button deleteButton = new Button();
                     deleteButton.setText("X");
                     deleteButton.setTextFill(Color.RED);
                     deleteButton.setOnAction((tt)->{
                         //TODO LOG ERROR
-                        if (elements.getGraph()==null) return;
+                        if (elements.getGraph()==null) { System.out.println("Error element not in Graph");return;}
                         elements.getGraph().removeElement(elements);
                         grid.getChildren().remove(eName);
                         grid.getChildren().remove(type);
                         grid.getChildren().remove(deleteButton);
+                        grid.getChildren().remove(direction);
 
                     });
                     grid.add(deleteButton,4,i);
@@ -388,7 +419,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         t.consume();
                         return;
                     }
-
                 }
                 /////DEBUG////
                 //this.getRepresented().getElements().forEach((test)->{System.out.println(test+ " " + test.getType());});
