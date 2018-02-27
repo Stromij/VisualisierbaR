@@ -6,6 +6,8 @@ element_line: elements NEWLINE;
 elements:         node
                 | edge
                 | elem
+                | view
+                | group
                 | train
                 | mv_init
                 | mv_leaves
@@ -21,6 +23,10 @@ node: 'NODE' SEP node_name SEP coord (SEP node_abs_name)?;
 edge: 'EDGE' SEP edge_name SEP node_name SEP node_name SEP INT (SEP edge_abs_name)?;
 
 elem: 'ELEM' SEP elem_name SEP node_name SEP STATE;
+
+view: 'TOWARDS' SEP elem_name SEP edge_name;
+
+group: 'GROUP' SEP KIND SEP elem_name SEP (elem_name)*;
 
 train: 'ZUG' SEP train_name SEP train_readable_name SEP INT;
 
@@ -82,3 +88,5 @@ COLON: ':';
 UNDERSCORE: '_';
 NEWLINE: '\n' | '\r' | '\r\n';
 WHITESPACE: ' ' | '\t';
+KIND: SIGNAL;
+SIGNAL : 'SIGNAL';

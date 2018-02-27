@@ -12,6 +12,7 @@ import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -91,6 +92,8 @@ public final class GraphParser {
         private final Context context;
         private final BigInteger thousandInt;
 
+        private HashMap<String, Edge> elemViewTracker = new HashMap();
+
         Listener(Context context) {
             this.context = context;
             this.thousandInt = BigInteger.valueOf(1000);
@@ -136,7 +139,14 @@ public final class GraphParser {
                 Node node = Node.in(context).get(nodeName);
                 Element.State state = Element.State.fromName(ctx.STATE().getText());
                 Element.Type type = Element.Type.fromName(elementName);
-                Element.in(context).create(elementName, type, node, state);
+                Element elemNew = Element.in(context).create(elementName, type, node, state);
+
+                if(elemViewTracker.get(elementName) != null)
+                    {Edge view = elemViewTracker.get(elementName);
+                     elemNew.setViewDirection(view);
+                     elemViewTracker.remove(elementName);
+                     System.out.println(view.getName());
+                    }
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
@@ -164,6 +174,24 @@ public final class GraphParser {
                 );
             }
         }
+
+        @Override
+        public void enterView(LogParser.ViewContext ctx)
+            {try {String edgeName = ctx.edge_name().getText();
+                  String elemName = ctx.elem_name().getText();
+                  Edge edge1 = Edge.in(context).get(edgeName);
+                  // Versuche die Edge zu finden - falls nicht vorhanden, schiebe sie in die HashMap
+                  try{Element elem1 = Element.in(context).get(elemName);
+                      elem1.setViewDirection(edge1);
+                     }
+                  catch (IllegalArgumentException e)
+                     {elemViewTracker.put(elemName, edge1);}
+                 }
+             catch (IllegalArgumentException e){
+                log.warning("Could not parse line: " + ctx.getText()
+                    + "\nReason: " + e.getMessage());
+             }
+            }
 
         @Override
         public void enterTrain(LogParser.TrainContext ctx) {
