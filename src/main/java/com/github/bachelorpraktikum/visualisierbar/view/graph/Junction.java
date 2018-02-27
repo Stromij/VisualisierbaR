@@ -165,6 +165,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.setHgap(10);
                 grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
+                HashMap<Element, TextField> ElementNameTextFields= new HashMap<>(3);
 
 
                 TextField name = new TextField();
@@ -214,7 +215,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     if (this.getRepresented().getGraph()==null){
                         alert.setContentText("Internal Error! Check Log.");
                         alert.showAndWait();
-                        t.consume();
+                        tt.consume();
                         logger.log(Level.SEVERE, this.getRepresented().getName()+ "attached Graph is null");
                         return;
                     }
@@ -227,14 +228,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             if(this.getRepresented().getEdges().size()!=3 || !selection.contains(this)){
                                 alert.setContentText("Main Point needs to have 3 edges, this one has "+ this.getRepresented().getEdges().size());
                                 alert.showAndWait();
-                                t.consume();
+                                tt.consume();
                                 return;
                             }
 
                             if(getSelection().size()!= 3){
                                 alert.setContentText("Select 3 properly connected Nodes");
                                 alert.showAndWait();
-                                t.consume();
+                                tt.consume();
                                 return;
                             }
                             boolean error = true;
@@ -252,7 +253,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             if (error){
                                 alert.setContentText("Nodes not properly connected");
                                 alert.showAndWait();
-                                t.consume();
+                                tt.consume();
                                 return;
                             }
                             String name1=null;
@@ -262,7 +263,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             if(node1==null|| node2==null || node1.getGraph()==null || node2.getGraph()==null){
                                 alert.setContentText("Internal Error! Check Log.");
                                 alert.showAndWait();
-                                t.consume();
+                                tt.consume();
                                 logger.log(Level.SEVERE, "some Nodes in this Junction have no Graph attached")
                                 ;return;}
 
@@ -284,7 +285,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             newElement=Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue()));
                             this.getRepresented().getGraph().addElement(newElement);       //normal elements are simply added
                         }
-                        Label eName= new Label(newElement.getReadableName());
+                        //Label eName= new Label(newElement.getReadableName());
+                        TextField eName= new TextField(newElement.getName());
+                        ElementNameTextFields.put(newElement, eName);
                         Label type = new Label(newElement.getType().getName());
                         //Label direction = new Label("Direction");
                         ChoiceBox<String> direction = new ChoiceBox<>();      //direction choice box
@@ -313,6 +316,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             if (newElement.getGraph()==null) return;
                             newElement.getGraph().removeElement(newElement);
                             grid.getChildren().remove(eName);
+                            ElementNameTextFields.remove(newElement);
                             grid.getChildren().remove(type);
                             grid.getChildren().remove(deleteButton);
                             grid.getChildren().remove(direction);
@@ -326,17 +330,18 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     else{
                         alert.setContentText("Name already taken");
                         alert.showAndWait();
-                        t.consume();
+                        tt.consume();
                         return;
                     }
 
 
                 });
                 grid.add(createButton,1,6);
-                //TODO add element to this list  after creation
 
                 for(Element elements : this.getRepresented().getElements()){
-                    Label eName= new Label(elements.getReadableName());
+                    //Label eName= new Label(elements.getReadableName());
+                    TextField eName= new TextField(elements.getName());
+                    ElementNameTextFields.put(elements, eName);
                     Label type = new Label(elements.getType().getName());
                     ChoiceBox<String> direction = new ChoiceBox<>();      //direction Type choice box
                     direction.setOnAction(directionEvent->{
@@ -364,6 +369,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         if (elements.getGraph()==null) { System.out.println("Error element not in Graph");return;}
                         elements.getGraph().removeElement(elements);
                         grid.getChildren().remove(eName);
+                        ElementNameTextFields.remove(elements);
                         grid.getChildren().remove(type);
                         grid.getChildren().remove(deleteButton);
                         grid.getChildren().remove(direction);
@@ -382,6 +388,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         LinkedList<String> result = new LinkedList<>();
                         result.add(name.getText());
                         result.add(coordinates.getText());
+                        //grid.getChildren()
+                        ElementNameTextFields.forEach((a,b)->{
+
+                        });
                         return result;
                     }
                     return null;
@@ -405,7 +415,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     else {
                         alert.setContentText("Invalid Coordinates");
                         alert.showAndWait();
-                        t.consume();
+                        //t.consume();
                         return;
                     }
 
@@ -416,9 +426,29 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     else{
                         alert.setContentText("Name already taken");
                         alert.showAndWait();
-                        t.consume();
+                        //t.consume();
                         return;
                     }
+
+                    ElementNameTextFields.forEach((a,b)->{
+                        if(a.getGraph()!=null){
+                            if(a.getName().equals(b.getText()) | a.setName(b.getText())){
+                                //initializedShape(a.getGraph().getElements().get(a));
+                                //TooltipUtil.install(a.getGraph().getElements().get(a), new Tooltip(a.getName()));
+                            }
+                            else {
+                                alert.setContentText("Name already taken");
+                                alert.showAndWait();
+                                return;
+                            }
+                        }
+                        else{
+                            alert.setContentText("Internal Error Element not in Graph");
+                            alert.showAndWait();
+                            return;
+                        }
+                    });
+
                 }
                 /////DEBUG////
                 //this.getRepresented().getElements().forEach((test)->{System.out.println(test+ " " + test.getType());});
