@@ -147,7 +147,6 @@ public final class GraphParser {
                      elemViewTracker.remove(elementName);
                      System.out.println(view.getName());
                     }
-                    
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
