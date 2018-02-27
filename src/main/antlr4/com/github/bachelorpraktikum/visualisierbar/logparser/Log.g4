@@ -6,6 +6,7 @@ element_line: elements NEWLINE;
 elements:         node
                 | edge
                 | elem
+                | view
                 | train
                 | mv_init
                 | mv_leaves
@@ -21,6 +22,8 @@ node: 'NODE' SEP node_name SEP coord (SEP node_abs_name)?;
 edge: 'EDGE' SEP edge_name SEP node_name SEP node_name SEP INT (SEP edge_abs_name)?;
 
 elem: 'ELEM' SEP elem_name SEP node_name SEP STATE;
+
+view: 'TOWARDS' SEP elem_name SEP edge_name;
 
 train: 'ZUG' SEP train_name SEP train_readable_name SEP INT;
 

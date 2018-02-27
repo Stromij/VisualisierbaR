@@ -593,7 +593,7 @@ public final class Element implements GraphObject<Shape> {
      */
     @Nonnull
     public String toABS()
-        {//TODO Weichenpunkt, GeschwindigkeitsAnzeiger, GeschwindigkeitsVoranzeiger, Magnet
+        {//TODO Weichenpunkt, Magnet
          String addElem = String.format("%s.addElement(%s);\n", node.higherName(), name);
          if(getType() == Type.WeichenPunkt)
             {}
