@@ -344,7 +344,7 @@ public final class Node implements GraphObject<Circle> {
         return elements;
     }
 
-    void addElement(Element element) {
+    public void addElement(Element element) {
         elements.add(Objects.requireNonNull(element));
     }
 

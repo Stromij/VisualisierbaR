@@ -9,6 +9,7 @@ import com.github.bachelorpraktikum.visualisierbar.datasource.AbsSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.DataSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.*;
+import com.github.bachelorpraktikum.visualisierbar.model.Event;
 import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsBase;
 import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsController;
@@ -21,9 +22,12 @@ import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceCont
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -50,9 +54,12 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -64,6 +71,9 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
+
+import java.awt.datatransfer.*;
+//import javafx.scene.input.Clipboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -154,6 +164,8 @@ public class MainController {
     private ToggleButton newNodeButton;
     @FXML
     private Button fcButton;
+
+
 
 
 
@@ -376,7 +388,7 @@ public class MainController {
                 if(event.getCode()==KeyCode.P && event.isControlDown()){
                     printToABSButton.fire();
                 }
-                if(event.getCode()== KeyCode.C && event.isControlDown()){
+                if(event.getCode()== KeyCode.D && event.isControlDown()){
                     fcButton.fire();
                 }
                 if(event.getCode()== KeyCode.N && event.isControlDown()){
@@ -401,12 +413,90 @@ public class MainController {
                         graph.getNodes().forEach((a,b)-> ((Junction)b).addToSelection());
                     }
                 }
-            }
+                java.awt.datatransfer.Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                if(event.getCode()== KeyCode.C && event.isControlDown()){
+                    /*HashMap<Node, LinkedList<Element>> nodeMap= new HashMap<>();
+
+                    Junction.getSelection().forEach(a->{
+                        Node copyNode = a.getRepresentedObjects().get(0);
+                        LinkedList<Element> elements=new LinkedList<>();
+                        copyNode.getElements().forEach(b->elements.add(b));
+                        nodeMap.put(copyNode,elements);
+
+
+                    });
+                    NodeTransforable contents = new NodeTransforable(nodeMap);
+                    cb.setContents(contents,null);*/
+
+                }
+                if(event.getCode()== KeyCode.X && event.isControlDown()){
+                     //int x=1;
+                    HashMap<Node, LinkedList<Element>> nodeMap= new HashMap<>();
+                    HashMap<HashMap<Node,LinkedList<Element>>,LinkedList<Edge>> nodeEdgeElement = new HashMap<>();
+                    Junction.getSelection().forEach(a->{
+                        int x=1;
+
+                        Node copyNode;
+                        System.out.println(Junction.getSelection().size());
+
+                          copyNode=a.getRepresentedObjects().get(0);
+                            LinkedList<Element> elements = new LinkedList<>();
+                            copyNode.getElements().forEach(b-> elements.add(b));
+                            nodeMap.put(copyNode,elements);
+                       if(Junction.getSelection().size()>1){
+                           LinkedList<Edge> edges = new LinkedList<>();
+                           copyNode.getEdges().forEach(c->{
+                               if(Junction.getSelection().contains(c.getNode1()) && Junction.getSelection().contains(c.getNode2())){
+                                   edges.add(c);
+                               }
+                           });
+                        nodeEdgeElement.put(nodeMap,edges);
+                       }
+                        else{
+                           nodeEdgeElement.put(nodeMap,null);
+                       }
+
+                        graph.removeNode(a.getRepresentedObjects().get(0));
+
+
+
+
+                    });
+                    NodeTransforable contents = new NodeTransforable(nodeEdgeElement);
+
+                    cb.setContents(contents,null);
+
+
+                    //deleteButton.fire();
+
+
+                }
+                if(event.getCode()== KeyCode.V && event.isControlDown()){
+                        Transferable clipboardcontent = cb.getContents(null);
+                        HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> cloneNodeMap;
+                        if((clipboardcontent!=null)&&
+                                (clipboardcontent.isDataFlavorSupported(NodeTransforable.NodeFlavor))){
+                            try{
+                                NodeTransforable tmpNT = (NodeTransforable)(clipboardcontent.getTransferData(NodeTransforable.NodeFlavor));
+                                cloneNodeMap= tmpNT.setNodeEdge;
+
+                                cloneNodeMap.forEach((a,b)-> {
+                                    a.forEach((c,d)->graph.addNode(c,d,b));
+                                });
+
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
+                       }}
+                }
+
             if(event.getCode()== KeyCode.ESCAPE){
                 Junction.clearSelection();
             }
         });
-        TooltipUtil.install(fcButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.C.getName()));
+
+        TooltipUtil.install(fcButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.D.getName()));
         TooltipUtil.install(newNodeButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.N.getName()));
         TooltipUtil.install(disconnectButton, new Tooltip(KeyCode.ALT.getName() + " + " + KeyCode.C.getName()));
         TooltipUtil.install(deleteButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName()));
@@ -476,7 +566,45 @@ public class MainController {
         });
 
 
+
     }
+   public static class  NodeTransforable implements Transferable{
+        public static DataFlavor NodeFlavor;
+        private DataFlavor [] supportedFlavor ={NodeFlavor};
+        public HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> setNodeEdge;
+        public HashMap<Node, LinkedList<Element>> setNode;
+
+        public NodeTransforable (HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> paraNode) {
+            setNodeEdge= paraNode;
+            try {
+                NodeFlavor = new DataFlavor (Class.forName ("com.github.bachelorpraktikum.visualisierbar.model.Node"), "Node");
+            }
+            catch (ClassNotFoundException e) {
+                e.printStackTrace ();
+            }
+        }
+
+
+        @Override
+        public DataFlavor[] getTransferDataFlavors() {
+            return supportedFlavor;
+        }
+
+        @Override
+        public boolean isDataFlavorSupported(DataFlavor nodeFlavor) {
+            return (nodeFlavor.equals (NodeFlavor));
+        }
+
+        @Override
+        public Object getTransferData(DataFlavor nFlavor) throws UnsupportedFlavorException {
+            if (nFlavor.equals (NodeFlavor))
+                return (this);
+            else
+                throw new UnsupportedFlavorException (nFlavor);
+        }
+
+    }
+
 
     private void initializeCenterPane() {
         ChangeListener<Number> boundsListener = (observable, oldValue, newValue) -> {
@@ -679,6 +807,7 @@ public class MainController {
         MenuItem exportItem = new MenuItem("Export");
         exportItem.setOnAction(event -> exportGraph());
         ContextMenuUtil.attach(centerPane, Collections.singletonList(exportItem));
+
 
     }
 

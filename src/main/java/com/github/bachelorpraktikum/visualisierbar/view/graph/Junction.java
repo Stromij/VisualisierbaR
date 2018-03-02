@@ -94,40 +94,48 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 double xx = a.getCenterX() + a.getTranslateX();
                 double yy = a.getCenterY() + a.getTranslateY();
                 if (xx < 0 || yy < 0) {
+                    System.out.println(a.getTranslateY());
                     Map<Node, GraphShape<Node> > nodes= this.getRepresented().getGraph().getNodes();
                     if(xx >= 0 && yy<0 ){
                        yy= 0 - yy;
                         for(Node n : nodes.keySet()){
                             if(n != b.getRepresented() ){
-                                n.setCoordinates(adapter.reverse(new Point2D(( n.getCoordinates().getX()),(n.getCoordinates().getY()+yy))));
+                                n.setCoordinates(adapter.reverse(new Point2D((int)( n.getCoordinates().getX()),(int)(n.getCoordinates().getY()+yy))));
+                                n.moved();
                             }
                         }
+                        yy=0;
 
                     }
                     else if(xx<0 && yy>= 0) {
                         xx = 0 - xx;
                         for (Node n : nodes.keySet()) {
                             if (n != b.getRepresented()) {
-                                n.setCoordinates(adapter.reverse(new Point2D(((int) n.getCoordinates().getX() + xx), ((int) n.getCoordinates().getY()))));
+                                n.setCoordinates(adapter.reverse(new Point2D((int)( n.getCoordinates().getX() + xx), ((int) n.getCoordinates().getY()))));
+                                n.moved();
                             }
                         }
+                        xx=0;
                     }
                    else{
                         xx= 0 - xx;
                         yy= 0 - yy;
                         for (Node n : nodes.keySet()) {
                             if (n != b.getRepresented()) {
-                                n.setCoordinates(adapter.reverse(new Point2D(((int) n.getCoordinates().getX() + xx), ((int) n.getCoordinates().getY()+yy))));
+                                n.setCoordinates(adapter.reverse(new Point2D((int)( n.getCoordinates().getX() + xx), (int)( n.getCoordinates().getY()+yy))));
+                                n.moved();
                             }
                         }
+                        xx=0;
+                        yy=0;
                     }
                     /*System.out.println("Coordiantes invalid");
                     a.setTranslateY(0);
                     a.setTranslateX(0);
                     return;*/
                 }
-                a.setCenterX(a.getCenterX() + a.getTranslateX());
-                a.setCenterY(a.getCenterY() + a.getTranslateY());
+                a.setCenterX(xx);
+                a.setCenterY(yy);
                 b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));  //update coordinates in the model
                 //System.out.println(b.getRepresented().getCoordinates());
                 a.setTranslateX(0);

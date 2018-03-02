@@ -339,6 +339,30 @@ public final class Graph {
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
     }
+    public void addNode(Node node, LinkedList<Element> elements,LinkedList<Edge> edges){
+        Node newNode = Node.in(context).create(node.getName(),node.getCoordinates(),node.getAbsName());
+        elements.forEach(a-> {
+            //Element newElement= Element.in(context).create(a.getName(),a.getType(),newNode,a.getState());
+            a.setGraph(this);
+            this.addElement(a);
+            newNode.addElement(a);
+
+        });
+        if(edges!=null){
+        edges.forEach(b->{
+            Edge edge = Edge.in(context).create(b.getName(),b.getLength(),b.getNode1(),b.getNode2(),b.getAbsName());
+            edge.setGraph(this);
+        });}
+        newNode.setGraph(this);
+        //if(nodes.containsKey(newNode)) return;
+        context.addObject(newNode);
+        GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
+        ((Junction) shape).setMoveable(true);
+       // System.out.println(node.getElements().size());
+        nodes.put(newNode, shape);
+        group.getChildren().add(shape.getFullNode());
+
+    }
 
     /**
      * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
