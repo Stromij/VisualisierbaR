@@ -56,8 +56,6 @@ public final class Element implements GraphObject<Shape> {
     private Graph graph;
     @Nullable
     private Node direction;
-    @Nullable
-    private Edge viewDirection;
 
     /**
      * Represents the state of an {@link Element}.
@@ -217,7 +215,6 @@ public final class Element implements GraphObject<Shape> {
         this.stateProperty = new ReadOnlyObjectWrapper<>(Objects.requireNonNull(state));
         this.graph=null;
         this.direction=null;
-        this.viewDirection=null;
 
         node.addElement(this);
 
@@ -497,15 +494,6 @@ public final class Element implements GraphObject<Shape> {
 
     public void setDirection(@Nullable Node direction) {
         this.direction = direction;
-    }
-
-    @Nullable
-    public Edge getViewDirection() {
-        return viewDirection;
-    }
-
-    public void setViewDirection(@Nullable Edge direction) {
-        this.viewDirection = direction;
     }
 
     @Nonnull

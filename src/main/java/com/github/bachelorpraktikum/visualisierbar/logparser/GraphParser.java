@@ -143,9 +143,9 @@ public final class GraphParser {
 
                 if(elemViewTracker.get(elementName) != null)
                     {Edge view = elemViewTracker.get(elementName);
-                     elemNew.setViewDirection(view);
+                     Node viewNode = view.getNode1().equals(node) ? view.getNode2() : view.getNode1();
+                     elemNew.setDirection(viewNode);
                      elemViewTracker.remove(elementName);
-                     System.out.println(view.getName());
                     }
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
@@ -182,7 +182,8 @@ public final class GraphParser {
                   Edge edge1 = Edge.in(context).get(edgeName);
                   // Versuche die Edge zu finden - falls nicht vorhanden, schiebe sie in die HashMap
                   try{Element elem1 = Element.in(context).get(elemName);
-                      elem1.setViewDirection(edge1);
+                      Node viewNode = elem1.getNode().equals(edge1.getNode1()) ? edge1.getNode2() : edge1.getNode1();
+                      elem1.setDirection(viewNode);
                      }
                   catch (IllegalArgumentException e)
                      {elemViewTracker.put(elemName, edge1);}
