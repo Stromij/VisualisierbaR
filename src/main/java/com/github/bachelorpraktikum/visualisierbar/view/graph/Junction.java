@@ -363,6 +363,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     for(Edge e : this.getRepresented().getEdges()){
                         Node otherNode = e.getOtherNode(this.getRepresented());
                         direction.getItems().addAll(otherNode.getName());
+                        if(otherNode==elements.getDirection()) direction.setValue(otherNode.getName());
                     }
 
 

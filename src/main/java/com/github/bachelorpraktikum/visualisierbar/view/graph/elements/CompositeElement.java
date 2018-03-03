@@ -69,7 +69,7 @@ final class CompositeElement extends ElementBase<Group> {
 
         group.relocate(x, y);
 
-        rotateAccordingToOffset(group);
+        /*
         shapes.forEach((a,b)->{
             if(a.getDirection()!=null) {
 
@@ -83,7 +83,42 @@ final class CompositeElement extends ElementBase<Group> {
                 b.setRotate(angle-getAngle());
             }
         });
+        */
+
+        rotateAccordingToOffset(group);
+
     }
+
+    @Override
+    protected final void rotateAccordingToOffset(Group node, Point2D offset) {
+
+        double angle = new Point2D(0, 1).angle(offset);
+        if (offset.getX() > 0) {
+            angle = -angle;
+        }
+        angle += 180;
+        node.setRotate(angle);
+
+        Node dir =null;
+        for (Element e : shapes.keySet()){
+           if(dir == null) dir = e.getDirection();
+           if(dir != e.getDirection()) return;
+        }
+
+        if(dir !=null) {
+
+            Point2D p = new Point2D(1, 0);
+            Point2D p2 = this.getNodePosition();
+            Point2D p3 = this.getCoordinatesAdapter().apply(dir);
+            p2= new Point2D(p2.getX()-p3.getX(), p2.getY()-p3.getY());
+            angle = p.angle(p2);
+            if (new Point2D(0,1).dotProduct(p2)<0) angle = - angle;
+            angle += 90;
+        }
+        node.setRotate(angle);
+    }
+
+
 
     @Override
     protected void resize(Group shape) {

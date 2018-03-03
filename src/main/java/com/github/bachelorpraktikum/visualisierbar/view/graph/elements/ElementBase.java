@@ -113,7 +113,7 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         rotateAccordingToOffset(node, getOffset());
     }
 
-    protected final void rotateAccordingToOffset(T node, Point2D offset) {
+    protected void rotateAccordingToOffset(T node, Point2D offset) {
         angle = new Point2D(0, 1).angle(offset);
         if (offset.getX() > 0) {
             angle = -angle;
