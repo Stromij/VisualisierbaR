@@ -26,7 +26,7 @@ elem: 'ELEM' SEP elem_name SEP node_name SEP STATE;
 
 view: 'TOWARDS' SEP elem_name SEP edge_name;
 
-group: 'GROUP' SEP KIND SEP elem_name SEP (elem_name)*;
+group: 'GROUP' SEP kind SEP log_name SEP (elem_name SEP)*;
 
 train: 'ZUG' SEP train_name SEP train_readable_name SEP INT;
 
@@ -49,10 +49,12 @@ data: 'DATA' SEP train_readable_name SEP time WHITESPACE speed SEP time_with_wra
 MV_IND: 'MV';
 
 node_name: name;
+log_name: name;
 node_abs_name: name;
 edge_name: name;
 edge_abs_name: name;
 train_name: name;
+kind: name;
 speed: INT;
 distance: INT;
 train_readable_name: (WORD | INT)+;
@@ -88,5 +90,4 @@ COLON: ':';
 UNDERSCORE: '_';
 NEWLINE: '\n' | '\r' | '\r\n';
 WHITESPACE: ' ' | '\t';
-KIND: SIGNAL;
 SIGNAL : 'SIGNAL';

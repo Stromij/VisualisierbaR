@@ -78,7 +78,7 @@ final class CompositeElement extends ElementBase<Group> {
                 Point2D p3 = this.getCoordinatesAdapter().apply(a.getDirection());
                 p2= new Point2D(p2.getX()-p3.getX(), p2.getY()-p3.getY());
                 double angle = p.angle(p2);
-                if(angle>180) angle -=180;
+                //if(angle>180) angle -=180;
                 if(a.getType()== Element.Type.VorSignal)angle += 180;
                 b.setRotate(angle-getAngle());
             }

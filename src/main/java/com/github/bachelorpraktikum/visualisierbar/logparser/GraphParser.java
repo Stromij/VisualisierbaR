@@ -2,12 +2,7 @@ package com.github.bachelorpraktikum.visualisierbar.logparser;
 
 import com.github.bachelorpraktikum.visualisierbar.logparser.LogParser.MsgContext;
 import com.github.bachelorpraktikum.visualisierbar.logparser.LogParser.RatContext;
-import com.github.bachelorpraktikum.visualisierbar.model.Context;
-import com.github.bachelorpraktikum.visualisierbar.model.Coordinates;
-import com.github.bachelorpraktikum.visualisierbar.model.Edge;
-import com.github.bachelorpraktikum.visualisierbar.model.Element;
-import com.github.bachelorpraktikum.visualisierbar.model.Messages;
-import com.github.bachelorpraktikum.visualisierbar.model.Node;
+import com.github.bachelorpraktikum.visualisierbar.model.*;
 import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,6 +88,7 @@ public final class GraphParser {
         private final BigInteger thousandInt;
 
         private HashMap<String, Edge> elemViewTracker = new HashMap();
+        private HashMap<String, Group> elemGroupTracker = new HashMap();
 
         Listener(Context context) {
             this.context = context;
@@ -147,6 +143,13 @@ public final class GraphParser {
                      elemNew.setDirection(viewNode);
                      elemViewTracker.remove(elementName);
                     }
+
+                if(elemGroupTracker.get(elementName) != null)
+                    {Group group = elemGroupTracker.get(elementName);
+                     elemNew.setGroup(group);
+                     group.addElement(elemNew);
+                     elemGroupTracker.remove(elementName);
+                    }
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
@@ -193,6 +196,24 @@ public final class GraphParser {
                     + "\nReason: " + e.getMessage());
              }
             }
+
+        @Override
+        public void enterGroup(LogParser.GroupContext ctx)
+            {try {String groupName = ctx.log_name().getText();
+                  String kind = ctx.kind().getText();
+                  Group group = new Group(groupName, kind);
+
+                  for(int i = 0; ctx.elem_name(i) != null; i++)
+                    {if(ctx.elem_name(i).getText().equals("null")) continue;
+                     elemGroupTracker.put(ctx.elem_name(i).getText(), group);
+                    }
+            }
+            catch (IllegalArgumentException e){
+                log.warning("Could not parse line: " + ctx.getText()
+                        + "\nReason: " + e.getMessage());
+            }
+            }
+
 
         @Override
         public void enterTrain(LogParser.TrainContext ctx) {

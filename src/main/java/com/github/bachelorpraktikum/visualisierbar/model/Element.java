@@ -56,6 +56,8 @@ public final class Element implements GraphObject<Shape> {
     private Graph graph;
     @Nullable
     private Node direction;
+    @Nullable
+    private Group group;
 
     /**
      * Represents the state of an {@link Element}.
@@ -215,6 +217,7 @@ public final class Element implements GraphObject<Shape> {
         this.stateProperty = new ReadOnlyObjectWrapper<>(Objects.requireNonNull(state));
         this.graph=null;
         this.direction=null;
+        this.group=null;
 
         node.addElement(this);
 
@@ -495,6 +498,11 @@ public final class Element implements GraphObject<Shape> {
     public void setDirection(@Nullable Node direction) {
         this.direction = direction;
     }
+
+    @Nullable
+    public Group getGroup() {return group;}
+
+    public void setGroup(@Nullable Group group) {this.group = group;}
 
     @Nonnull
     @Override
