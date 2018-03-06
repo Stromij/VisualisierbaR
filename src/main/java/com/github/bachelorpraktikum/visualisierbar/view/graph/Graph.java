@@ -7,6 +7,8 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -14,6 +16,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public final class Graph {
 
+    @Nonnull
+    private SimpleBooleanProperty change;
     @Nonnull
     private final Context context;
     @Nonnull
@@ -28,6 +32,8 @@ public final class Graph {
     private  Map<Edge, GraphShape<Edge>> edges;
     @Nonnull
     private Map<Element, GraphShape<Element>> elements;
+    @Nonnull
+    private Map<String, logicalGroup> logicalGroups;
 
 
     /**
@@ -41,12 +47,14 @@ public final class Graph {
      * @throws IllegalStateException if there is nothing for this context to show
      */
     public Graph(Context context, CoordinatesAdapter coordinatesAdapter) {
+        this.change = new SimpleBooleanProperty(false);
         this.context = Objects.requireNonNull(context);
         this.coordinatesAdapter = Objects.requireNonNull(coordinatesAdapter);
         this.nodes = new LinkedHashMap<>(128);
         this.elements = new LinkedHashMap<>(256);
         this.group = new Group();
         this.edges = new LinkedHashMap<>(256);
+
         Junction.clearSelection();      //TEST//
         for (Node node : Node.in(context).getAll()) {
             node.setGraph(null);
@@ -96,6 +104,8 @@ public final class Graph {
         return group;
     }
 
+
+
     public Map<Node, GraphShape<Node>> getNodes() {
         return nodes;
     }
@@ -129,6 +139,15 @@ public final class Graph {
 
         edges.forEach((a,b)->{
             if(a.getNode1()==node || a.getNode2()==node) {
+                for( Element element : a.getNode1().getElements()){
+                    if(element.getDirection()==node)
+                        element.setDirection(null);
+                }
+                for( Element element : a.getNode2().getElements()){
+                    if(element.getDirection()==node)
+                        element.setDirection(null);
+                }
+
                 ed.add(a);
                 a.getOtherNode(node).getEdges().remove(a);
 
@@ -150,6 +169,7 @@ public final class Graph {
         nodes.remove(node);                                     //remove node from graph, factory context and graph pane
         Node.in(context).remove(node);
         context.removeObject(node);
+        changed();
 
     }
     /*
@@ -225,6 +245,7 @@ public final class Graph {
                 }
             }
         }
+        changed();
 
     }
 
@@ -250,6 +271,7 @@ public final class Graph {
             Edge.in(context).remove(a);
         });
         node.getEdges().clear();
+        changed();
     }
 
     /**
@@ -270,10 +292,13 @@ public final class Graph {
         else
             rE(element);
 
-
+        changed();
     }
 
     private void rE(Element element){
+        if(element.getLogicalGroup()!= null){
+            element.getLogicalGroup().removeElement(element);           //remove from group
+        }
         element.getNode().getElements().remove(element);
         elements.get(element).getRepresentedObjects().remove(element);
         group.getChildren().remove(elements.get(element).getFullNode());        //TODO only remove when no other represented Objects?
@@ -286,7 +311,7 @@ public final class Graph {
             for( Element CompositeElement : element.getNode().getElements()){
                 if (CompositeElement.getType().isComposite()){                       //remove composite Elements to rebuild them with the new element if necessary
                     if(CompositeElement.getGraph()==this){
-                        this.getGroup().getChildren().remove(elements.get(CompositeElement).getFullNode());
+                        this.getLogicalGroup().getChildren().remove(elements.get(CompositeElement).getFullNode());
                         CompositeElement.setGraph(null);
                     }
                 }
@@ -320,6 +345,7 @@ public final class Graph {
             }
             group.getChildren().add(elementShape.getFullNode());
         }
+        changed();
     }
 
     /**
@@ -338,6 +364,7 @@ public final class Graph {
 
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
+        changed();
     }
     public void addNode(Node node, LinkedList<Element> elements,LinkedList<Edge> edges){
         Node newNode = Node.in(context).create(node.getName(),node.getCoordinates(),node.getAbsName());
@@ -361,6 +388,7 @@ public final class Graph {
        // System.out.println(node.getElements().size());
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
+        changed();
 
     }
 
@@ -381,6 +409,7 @@ public final class Graph {
 
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
+        changed();
     }
 
 
@@ -410,6 +439,7 @@ public final class Graph {
             group.getChildren().add(elementShape.getFullNode());
 
         }
+        changed();
     }
 
     @Nonnull
@@ -425,7 +455,7 @@ public final class Graph {
      */
     @Nonnull
     public String printToAbs()
-         {String response = "";
+    {String response = "";
 
           // Generating ABS-Code for all nodes
           for(Map.Entry<Node, GraphShape<Node>> entry : nodes.entrySet())
@@ -450,5 +480,14 @@ public final class Graph {
           System.out.println("----- ABS end -----");
 
           return response;
-         }
+    }
+
+    public void changed(){
+        change.setValue(!change.getValue());
+    }
+
+    @Nonnull
+    public SimpleBooleanProperty changeProperty() {
+        return change;
+    }
 }

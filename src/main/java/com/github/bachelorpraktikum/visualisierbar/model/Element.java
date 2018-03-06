@@ -15,7 +15,6 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
-import com.sun.istack.internal.NotNull;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
@@ -57,7 +56,7 @@ public final class Element implements GraphObject<Shape> {
     @Nullable
     private Node direction;
     @Nullable
-    private Group group;
+    private logicalGroup logicalGroup;
 
     /**
      * Represents the state of an {@link Element}.
@@ -217,7 +216,7 @@ public final class Element implements GraphObject<Shape> {
         this.stateProperty = new ReadOnlyObjectWrapper<>(Objects.requireNonNull(state));
         this.graph=null;
         this.direction=null;
-        this.group=null;
+        this.logicalGroup =null;
 
         node.addElement(this);
 
@@ -495,14 +494,25 @@ public final class Element implements GraphObject<Shape> {
         return direction;
     }
 
-    public void setDirection(@Nullable Node direction) {
-        this.direction = direction;
+    /**
+     * Sets the direction of the element if allowed
+     * @param direction the direction
+     * @return true if it was a legal element, false if not
+     */
+    public boolean setDirection(@Nullable Node direction) {
+        for (Edge edge : this.getNode().getEdges()){
+            if((edge.getNode1()== direction && edge.getOtherNode(edge.getNode1())== this.getNode()) || (edge.getNode2()==direction && edge.getOtherNode(edge.getNode2())== this.getNode())){
+                this.direction=direction;
+                return true;
+            }
+        }
+        return false;
     }
 
     @Nullable
-    public Group getGroup() {return group;}
+    public logicalGroup getLogicalGroup() {return logicalGroup;}
 
-    public void setGroup(@Nullable Group group) {this.group = group;}
+    public void setLogicalGroup(@Nullable logicalGroup logicalGroup) {this.logicalGroup = logicalGroup;}
 
     @Nonnull
     @Override
@@ -548,6 +558,13 @@ public final class Element implements GraphObject<Shape> {
     public State getState() {
         return stateProperty.getValue();
     }
+    /*
+    public void setState(@Nonnull State state){
+        stateProperty.setValue(state);
+    }
+    */
+
+
 
     /**
      * Gets the {@link Type} of this {@link Element}.
@@ -573,6 +590,7 @@ public final class Element implements GraphObject<Shape> {
         }
         return aSwitch;
     }
+
     public boolean setName(String newName){
         if(graph!=null){
             if(newName==null) return false;

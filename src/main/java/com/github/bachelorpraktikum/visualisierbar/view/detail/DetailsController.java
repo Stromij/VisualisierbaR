@@ -31,6 +31,7 @@ public class DetailsController {
     @FXML
     private Button closeButton;
 
+
     private ObjectProperty<DetailsBase<?>> details;
 
     public DetailsController() {

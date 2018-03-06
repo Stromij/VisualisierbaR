@@ -88,7 +88,7 @@ public final class GraphParser {
         private final BigInteger thousandInt;
 
         private HashMap<String, Edge> elemViewTracker = new HashMap();
-        private HashMap<String, Group> elemGroupTracker = new HashMap();
+        private HashMap<String, logicalGroup> elemGroupTracker = new HashMap();
 
         Listener(Context context) {
             this.context = context;
@@ -145,9 +145,9 @@ public final class GraphParser {
                     }
 
                 if(elemGroupTracker.get(elementName) != null)
-                    {Group group = elemGroupTracker.get(elementName);
-                     elemNew.setGroup(group);
-                     group.addElement(elemNew);
+                    {logicalGroup logicalGroup = elemGroupTracker.get(elementName);
+                     elemNew.setLogicalGroup(logicalGroup);
+                     logicalGroup.addElement(elemNew);
                      elemGroupTracker.remove(elementName);
                     }
             } catch (IllegalArgumentException e) {
@@ -201,11 +201,12 @@ public final class GraphParser {
         public void enterGroup(LogParser.GroupContext ctx)
             {try {String groupName = ctx.log_name().getText();
                   String kind = ctx.kind().getText();
-                  Group group = new Group(groupName, kind);
+
+                  logicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
 
                   for(int i = 0; ctx.elem_name(i) != null; i++)
                     {if(ctx.elem_name(i).getText().equals("null")) continue;
-                     elemGroupTracker.put(ctx.elem_name(i).getText(), group);
+                     elemGroupTracker.put(ctx.elem_name(i).getText(), logicalGroup);
                     }
             }
             catch (IllegalArgumentException e){

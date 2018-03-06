@@ -293,12 +293,25 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             newElement=Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue()));
                             this.getRepresented().getGraph().addElement(newElement);       //normal elements are simply added
                         }
-                        //Label eName= new Label(newElement.getReadableName());
+
                         TextField eName= new TextField(newElement.getName());
                         ElementNameTextFields.put(newElement, eName);
                         Label type = new Label(newElement.getType().getName());
-                        //Label direction = new Label("Direction");
-                        ChoiceBox<String> direction = new ChoiceBox<>();      //direction choice box
+
+                        ChoiceBox<String> direction = new ChoiceBox<>();    //direction choice box
+                        ChoiceBox<String> logicalGroup = new ChoiceBox<>();
+                        /*
+                        ChoiceBox<String> currentSignal = new ChoiceBox<>();        //TODO state edit?
+                        for(Element.State state :Element.State.values()){
+                            currentSignal.getItems().add(state.name());x
+                            if(state.equals(newElement.getState()))
+                                currentSignal.setValue(state.name());
+                        }
+                        currentSignal.setOnAction((a)->{
+                            newElement.scurrentSignal.getValue()
+                        });
+                        */
+
                         direction.setOnAction(directionEvent->{
 
                             String NodeName = direction.getValue();
@@ -313,9 +326,74 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             direction.getItems().addAll(otherNode.getName());
                         }
 
+                        logicalGroup.getItems().add("new Group");
+                        logicalGroup.getItems().add("");
+                        com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.getAll().forEach((a)->{
+                            logicalGroup.getItems().add(a.getName());
+                        });
+                        if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);
+                        else
+                            logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
+
+                        logicalGroup.setOnAction(lgEvent->{
+                            if(logicalGroup.getSelectionModel().getSelectedIndex()==0){
+                                Dialog<String> groupCreationDialog = new Dialog<>();
+
+                                groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
+                                ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
+                                groupCreationDialog.setTitle("Create new Group");
+                                groupCreationDialog.setHeaderText(null);
+                                TextField GroupCreationName = new TextField();
+                                groupCreationDialog.getDialogPane().setContent(GroupCreationName);
+                                groupCreationDialog.setResultConverter((dialogButton)->{
+                                    if(dialogButton == ButtonType.APPLY){
+                                        return GroupCreationName.getText();
+                                    }
+                                    else
+                                        return null;
+                                });
+
+                                Optional<String> result = groupCreationDialog.showAndWait();
+                                if(result.isPresent()){
+                                    if(com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.NameExists(result.get())){
+                                        alert.setContentText("Group already exists");
+                                        alert.showAndWait();
+                                        if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);      //select empty string because element is in no group
+                                        else
+                                            logicalGroup.setValue(newElement.getLogicalGroup().getName());
+                                        return;
+                                    }
+                                    else {
+                                        logicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(result.get(), "????");
+                                        if (newElement.getLogicalGroup()!=null){
+                                        newElement.getLogicalGroup().removeElement(newElement);
+                                        }
+                                        newGroup.addElement(newElement);
+                                        newElement.setLogicalGroup(newGroup);
+                                        logicalGroup.getItems().add(newGroup.getName());
+                                        logicalGroup.getSelectionModel().select(newGroup.getName());
+                                    }
+                                }
+                                else{
+                                    if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);
+                                    else
+                                        logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
+                                }
+                            }
+                            else{
+                                if (newElement.getLogicalGroup()!=null){
+                                    newElement.getLogicalGroup().removeElement(newElement);
+                                }
+                                newElement.setLogicalGroup(com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.get(logicalGroup.getValue()));
+                            }
+                        });
+
+
                         grid.add(eName,1,i);
                         grid.add(type,2,i);
-                        if(newElement.getType().isComposite())grid.add(direction,3,i);
+                        //grid.add(currentSignal,3,i);      //TODO state edit?
+                        grid.add(logicalGroup, 3, i);
+                        if(newElement.getType().isComposite())grid.add(direction,4,i);
                         Button deleteButton = new Button();
                         deleteButton.setText("X");
                         deleteButton.setTextFill(Color.RED);
@@ -328,9 +406,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             grid.getChildren().remove(type);
                             grid.getChildren().remove(deleteButton);
                             grid.getChildren().remove(direction);
+                            grid.getChildren().remove(logicalGroup);
+                            // grid.getChildren().remove(currentSignal);         //TODO state edit?
 
                         });
-                        grid.add(deleteButton,4,i);
+                        grid.add(deleteButton,5,i);
                         i++;
                         dialog.getDialogPane().getScene().getWindow().sizeToScene();
 
@@ -352,6 +432,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     ElementNameTextFields.put(elements, eName);
                     Label type = new Label(elements.getType().getName());
                     ChoiceBox<String> direction = new ChoiceBox<>();      //direction Type choice box
+                    ChoiceBox<String> logicalGroup = new ChoiceBox<>();
                     direction.setOnAction(directionEvent->{
                         String NodeName = direction.getValue();
                         Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
@@ -366,10 +447,76 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         if(otherNode==elements.getDirection()) direction.setValue(otherNode.getName());
                     }
 
+                    logicalGroup.getItems().add("new Group");
+                    logicalGroup.getItems().add("");
+                    com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.getAll().forEach((a)->{
+                        logicalGroup.getItems().add(a.getName());
+                    });
+                    if(elements.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);
+                    else
+                        logicalGroup.getSelectionModel().select(elements.getLogicalGroup().getName());
+
+                    logicalGroup.setOnAction(lgEvent->{
+                        if(logicalGroup.getSelectionModel().getSelectedIndex()==0){
+                            Dialog<String> groupCreationDialog = new Dialog<>();
+
+                            groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
+                            ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
+                            groupCreationDialog.setTitle("Create new Group");
+                            groupCreationDialog.setHeaderText(null);
+                            TextField GroupCreationName = new TextField();
+                            groupCreationDialog.getDialogPane().setContent(GroupCreationName);
+                            groupCreationDialog.setResultConverter((dialogButton)->{
+                                if(dialogButton == ButtonType.APPLY){
+                                    return GroupCreationName.getText();
+                                }
+                                else
+                                    return null;
+                            });
+
+                            Optional<String> result = groupCreationDialog.showAndWait();
+                            if(result.isPresent()){
+                                if(com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.NameExists(result.get())){
+                                    alert.setContentText("Group already exists");
+                                    alert.showAndWait();
+                                    if(elements.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);      //select empty string because element is in no group
+                                    else
+                                        logicalGroup.setValue(elements.getLogicalGroup().getName());
+                                    return;
+                                }
+                                else {
+                                    logicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(result.get(), "????");
+                                    if (elements.getLogicalGroup()!=null){
+                                        elements.getLogicalGroup().removeElement(elements);
+                                    }
+                                    newGroup.addElement(elements);
+                                    elements.setLogicalGroup(newGroup);
+                                    logicalGroup.getItems().add(newGroup.getName());
+                                    logicalGroup.getSelectionModel().select(newGroup.getName());
+                                }
+                            }
+                            else{
+                                if(elements.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);
+                                else
+                                    logicalGroup.getSelectionModel().select(elements.getLogicalGroup().getName());
+                            }
+                        }
+                        else{
+                            if (elements.getLogicalGroup()!=null){
+                                elements.getLogicalGroup().removeElement(elements);
+                            }
+                            elements.setLogicalGroup(com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.get(logicalGroup.getValue()));
+                        }
+                    });
+
+
+
+
 
                     grid.add(eName,1,i);
                     grid.add(type,2,i);
-                    if(elements.getType().isComposite())grid.add(direction,3,i);
+                    grid.add(logicalGroup,3, i );
+                    if(elements.getType().isComposite())grid.add(direction,4,i);
                     Button deleteButton = new Button();
                     deleteButton.setText("X");
                     deleteButton.setTextFill(Color.RED);
@@ -382,14 +529,13 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         grid.getChildren().remove(type);
                         grid.getChildren().remove(deleteButton);
                         grid.getChildren().remove(direction);
+                        grid.getChildren().remove(logicalGroup);
 
                     });
-                    grid.add(deleteButton,4,i);
+                    grid.add(deleteButton,5,i);
                     i++;
 
                 }
-
-
 
                 dialog.getDialogPane().setContent(grid);
                 dialog.setResultConverter(dialogButton -> {             //get user Input

@@ -3,7 +3,9 @@ package com.github.bachelorpraktikum.visualisierbar.view.graph;
 import com.github.bachelorpraktikum.visualisierbar.model.GraphObject;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -13,6 +15,9 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.swing.event.ChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
     implements GraphShape<R> {
@@ -21,6 +26,8 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
     protected static final double HIGHLIGHT_STROKE_WIDTH = 0.05;
     private final CoordinatesAdapter adapter;
     private final BooleanProperty highlighted = new SimpleBooleanProperty();
+    private List<javafx.beans.value.ChangeListener> listeners=new ArrayList<>(1);
+
 
     @Nullable
     private S shape;
@@ -108,6 +115,31 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
             Math.max(nodeBounds.getWidth(), nodeBounds.getHeight()) * HIGHLIGHT_FACTOR
         );
 
+        javafx.beans.value.ChangeListener XlocationListener = ((observable, oldValue, newValue) -> {
+            Bounds nodeBounds2 = node.getBoundsInParent();
+            circle.setCenterY(nodeBounds2.getMinY() + nodeBounds2.getHeight() / 2);
+            circle.setCenterX(nodeBounds2.getMinX() + nodeBounds2.getWidth() / 2);
+            circle.setRadius(
+                    Math.max(nodeBounds2.getWidth(), nodeBounds2.getHeight()) * HIGHLIGHT_FACTOR
+            );
+        });
+        listeners.add(XlocationListener);
+        node.layoutXProperty().addListener(new WeakChangeListener<>(XlocationListener));
+
+
+
+        javafx.beans.value.ChangeListener YlocationListener = ((observable, oldValue, newValue) -> {
+            Bounds nodeBounds2 = node.getBoundsInParent();
+            circle.setCenterY(nodeBounds2.getMinY() + nodeBounds2.getHeight() / 2);
+            circle.setCenterX(nodeBounds2.getMinX() + nodeBounds2.getWidth() / 2);
+            circle.setRadius(
+                    Math.max(nodeBounds2.getWidth(), nodeBounds2.getHeight()) * HIGHLIGHT_FACTOR
+            );
+        });
+        node.layoutYProperty().addListener(new WeakChangeListener<>(YlocationListener));
+        listeners.add(YlocationListener);
+
+
         circle.setFill(Color.TRANSPARENT);
         circle.setStroke(Color.BLUE);
         circle.setStrokeWidth(
@@ -129,6 +161,33 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
         rectangle.setY(nodeBounds.getMinY() - (height - nodeBounds.getHeight()) / 2);
         rectangle.setWidth(width);
         rectangle.setHeight(height);
+
+        javafx.beans.value.ChangeListener XlocationListener = ((observable, oldValue, newValue) -> {
+            Bounds nodeBounds2 = node.getBoundsInParent();
+            double width2 = nodeBounds2.getWidth() * HIGHLIGHT_FACTOR;
+            double height2 = nodeBounds2.getHeight() * HIGHLIGHT_FACTOR;
+            rectangle.setX(nodeBounds2.getMinX() - (width2 - nodeBounds2.getWidth()) / 2);
+            rectangle.setY(nodeBounds2.getMinY() - (height2 - nodeBounds2.getHeight()) / 2);
+            rectangle.setWidth(width2);
+            rectangle.setHeight(height2);
+        });
+        node.layoutXProperty().addListener(new WeakChangeListener<>(XlocationListener));
+        listeners.add(XlocationListener);
+
+        javafx.beans.value.ChangeListener YlocationListener = ((observable, oldValue, newValue) -> {
+            Bounds nodeBounds2 = node.getBoundsInParent();
+            double width2 = nodeBounds2.getWidth() * HIGHLIGHT_FACTOR;
+            double height2 = nodeBounds2.getHeight() * HIGHLIGHT_FACTOR;
+            rectangle.setX(nodeBounds2.getMinX() - (width2 - nodeBounds2.getWidth()) / 2);
+            rectangle.setY(nodeBounds2.getMinY() - (height2 - nodeBounds2.getHeight()) / 2);
+            rectangle.setWidth(width2);
+            rectangle.setHeight(height2);
+        });
+        node.layoutYProperty().addListener(new WeakChangeListener<>(YlocationListener));
+        listeners.add(YlocationListener);
+
+
+
         return rectangle;
     }
 }

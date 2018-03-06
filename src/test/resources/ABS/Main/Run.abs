@@ -1782,7 +1782,7 @@ product ETCS2 (ETCS2Demo);
 
 
 root Scenarios {
-  group oneof {
+  logicalGroup oneof {
     Demo2, ETCS1Demo, ETCS2Demo
   }
 }

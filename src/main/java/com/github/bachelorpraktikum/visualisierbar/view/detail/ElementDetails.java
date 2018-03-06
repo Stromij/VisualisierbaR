@@ -1,6 +1,5 @@
 package com.github.bachelorpraktikum.visualisierbar.view.detail;
 
-import com.github.bachelorpraktikum.visualisierbar.datasource.DataSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
@@ -13,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+
 import javax.annotation.Nonnull;
 
 
@@ -21,7 +22,7 @@ class ElementDetails extends DetailsBase<Element> {
     private static final String FXML_LOCATION = "ElementDetails.fxml";
 
     @FXML
-    private Node elementDetails;
+    private GridPane elementDetails;
     @FXML
     private Label coordinates;
     @FXML
@@ -29,16 +30,33 @@ class ElementDetails extends DetailsBase<Element> {
     @FXML
     private Label stateValue;
     @FXML
+    private Label GroupName;
+    @FXML
     private Button breakButton;
 
     ElementDetails(Element element, ObservableIntegerValue time) {
         // this is executed first
         super(element, time, FXML_LOCATION);
         // this is executed AFTER initialize()
+
     }
 
     @FXML
     private void initialize() {
+        //int i=5;
+        /*
+        if(this.getObject().getLogicalGroup()!=null) {
+            for (Element element : this.getObject().getLogicalGroup().getElements()) {
+            elementDetails.add(new Label(element.getName()) ,0,i);
+            i++;
+            }
+        }
+
+        if(this.getObject().getLogicalGroup()==null)
+            GroupName.setText("Not in a Group");
+        else
+            GroupName.setText(this.getObject().getLogicalGroup().getName());
+        */
         coordinates.setText(
             getCoordinatesString(getObject().getNode().getCoordinates().toPoint2D())
         );

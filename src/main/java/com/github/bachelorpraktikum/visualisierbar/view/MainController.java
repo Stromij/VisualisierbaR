@@ -43,6 +43,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableIntegerValue;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -198,6 +199,7 @@ public class MainController {
     private Pattern timePattern;
 
     private IntegerProperty simulationTime;
+    private LinkedList<ChangeListener> listeners;
     /**
      * Is updated when simulationTime changes, but AFTER the model state has been updated
      */
@@ -212,6 +214,7 @@ public class MainController {
         trains = new WeakHashMap<>();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
         //HBox.setHgrow(rightSpacerET, Priority.ALWAYS);
+        listeners=new LinkedList<>();
 
 
 
@@ -730,7 +733,7 @@ public class MainController {
 
                     Circle c = (Circle) shape.getShape();
                     Bounds sb = graph.getGroup().localToParent(c.getBoundsInParent());
-                    //graph.getGroup().get
+                    //graph.getLogicalGroup().get
                     double srx = selectionRec.getX();
                     double sry = selectionRec.getY();
                     if (srx < sb.getMaxX() && srx + selectionRec.getWidth() > sb.getMinX() && sry < sb.getMaxY() && sry + selectionRec.getHeight() > sb.getMinY()) {
@@ -752,7 +755,7 @@ public class MainController {
         selectionRec.setVisible(false);
         selectionRec.setFill(Color.BLUE);
         selectionRec.setOpacity(0.2);
-        //selected=new Group();
+        //selected=new logicalGroup();
         graphPane.setOnMouseDragged(event -> {
             if (!event.isPrimaryButtonDown()) {
                 return;
@@ -771,7 +774,7 @@ public class MainController {
                 graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
                 if (graph != null) {
                     graph.getGroup().getScaleY();
-                    //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getGroup().getScaleY());
+                    //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getLogicalGroup().getScaleY());
                     //yAxis.setTranslateX(yAxis.getTranslateX() - xOffset);
                 }
             } else {
@@ -1129,19 +1132,31 @@ public class MainController {
             graphPane.getChildren().add(graph.getGroup());
             showLegend();
 
-            for (Map.Entry<Element, GraphShape<Element>> entry : graph.getElements().entrySet()) {
-                Element element = entry.getKey();
-                Shape elementShape = entry.getValue().getShape(element);
-                Binding<Boolean> binding = Bindings.createBooleanBinding(() ->
-                                element.getType().isVisible(elementShape.getBoundsInParent()),
-                        element.getType().visibleStateProperty()
-                );
-                context.addObject(binding);
-                entry.getValue().getShape(element).visibleProperty().bind(binding);
-                elementShape.setOnMouseClicked(event -> {
-                    elementList.getSelectionModel().select(element);
-                });
-            }
+            listeners.clear();
+            ChangeListener<Boolean> GraphListener = ((observable, oldValue, newValue) -> {
+                for (Map.Entry<Element, GraphShape<Element>> entry : graph.getElements().entrySet()) {
+                    Element element = entry.getKey();
+                    Shape elementShape = entry.getValue().getShape(element);
+                    Binding<Boolean> binding = Bindings.createBooleanBinding(() ->
+                                    element.getType().isVisible(elementShape.getBoundsInParent()),
+                            element.getType().visibleStateProperty()
+                    );
+                    context.addObject(binding);
+                    entry.getValue().getShape(element).visibleProperty().bind(binding);
+                    elementShape.setOnMouseClicked(event -> {
+                        elementList.getSelectionModel().select(element);
+                    });
+
+                }
+                //initializeElementList();
+            });
+            graph.changeProperty().addListener(GraphListener);
+            listeners.add(new WeakChangeListener(GraphListener));
+
+            graph.changed();
+
+
+
             for (Train train : Train.in(context).getAll()) {
                 TrainView trainView = new TrainView(train, graph);
                 trainView.timeProperty().bind(simulationTime);
