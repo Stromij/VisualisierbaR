@@ -494,16 +494,14 @@ public final class Element implements GraphObject<Shape> {
      * @return true if it was a legal element, false if not
      */
     public boolean setDirection(@Nullable Node direction) {
-        for (Edge edge : this.getNode().getEdges()){
-            if((edge.getNode1()== direction && edge.getOtherNode(edge.getNode1())== this.getNode()) || (edge.getNode2()==direction && edge.getOtherNode(edge.getNode2())== this.getNode())){
-                this.direction=direction;
+        for (Edge edge : this.getNode().getEdges()) {
+            if ((edge.getNode1() == direction && edge.getOtherNode(edge.getNode1()) == this.getNode()) || (edge.getNode2() == direction && edge.getOtherNode(edge.getNode2()) == this.getNode())) {
+                this.direction = direction;
                 return true;
             }
         }
         return false;
     }
-
-    public void setEdgeDirection(@Nullable Edge direction) {this.edgeDirection = direction;}
 
     @Nullable
     public logicalGroup getLogicalGroup() {return logicalGroup;}
@@ -618,6 +616,13 @@ public final class Element implements GraphObject<Shape> {
     public String toABS()
         {//TODO Weichenpunkt, Magnet
          String addElem = String.format("%s.addElement(%s);\n", node.higherName(), name);
+            Edge edgeDirection = null;
+            for (Edge edge : this.getNode().getEdges()) {
+                if ((edge.getNode1() == direction && edge.getOtherNode(edge.getNode1()) == this.getNode()) || (edge.getNode2() == direction && edge.getOtherNode(edge.getNode2()) == this.getNode())) {
+                    edgeDirection = edge;
+                }
+            }
+
          if(getType() == Type.WeichenPunkt)
             {// [HTTPName: "w1_wa"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10);
              return String.format("[HTTPName: \"%s\"]WeichenPunkt %s = new local WeichenPunktImpl(%s);\n%s",

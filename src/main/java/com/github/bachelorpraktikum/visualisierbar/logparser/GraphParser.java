@@ -141,7 +141,6 @@ public final class GraphParser {
                     {Edge view = elemViewTracker.get(elementName);
                      Node viewNode = view.getNode1().equals(node) ? view.getNode2() : view.getNode1();
                      elemNew.setDirection(viewNode);
-                     elemNew.setEdgeDirection(view);
                      elemViewTracker.remove(elementName);
                     }
 
@@ -188,7 +187,6 @@ public final class GraphParser {
                   try{Element elem1 = Element.in(context).get(elemName);
                       Node viewNode = elem1.getNode().equals(edge1.getNode1()) ? edge1.getNode2() : edge1.getNode1();
                       elem1.setDirection(viewNode);
-                      elem1.setEdgeDirection(edge1);
                      }
                   catch (IllegalArgumentException e)
                      {elemViewTracker.put(elemName, edge1);}
