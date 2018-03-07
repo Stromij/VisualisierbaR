@@ -2,19 +2,13 @@ package com.github.bachelorpraktikum.visualisierbar.model;
 
 import java.lang.ref.WeakReference;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
+import com.sun.istack.internal.NotNull;
 import javafx.beans.property.Property;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyProperty;
@@ -509,6 +503,8 @@ public final class Element implements GraphObject<Shape> {
         return false;
     }
 
+    public void setEdgeDirection(@Nullable Edge direction) {this.edgeDirection = direction;}
+
     @Nullable
     public logicalGroup getLogicalGroup() {return logicalGroup;}
 
@@ -623,7 +619,10 @@ public final class Element implements GraphObject<Shape> {
         {//TODO Weichenpunkt, Magnet
          String addElem = String.format("%s.addElement(%s);\n", node.higherName(), name);
          if(getType() == Type.WeichenPunkt)
-            {}
+            {// [HTTPName: "w1_wa"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10);
+             return String.format("[HTTPName: \"%s\"]WeichenPunkt %s = new local WeichenPunktImpl(%s);\n%s",
+                     name, name, node.higherName(), addElem);
+            }
          else if(getType() == Type.HauptSignal)
             {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33);
              return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s);\n%s",
@@ -633,19 +632,19 @@ public final class Element implements GraphObject<Shape> {
          else if(getType() == Type.GefahrenPunkt)
             {// [HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl( e54);
              return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n%s",
-                        name, name, null, addElem);
+                        name, name, edgeDirection.higherName(), addElem);
                       //name, name, Kantenname, addElem
             }
          else if(getType() == Type.GeschwindigkeitsAnzeiger)
             {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21);
              return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new local GeschwindigkeitsAnzeigerImpl(%s);\n%s",
-                        name, name, null, addElem);
+                        name, name, edgeDirection.higherName(), addElem);
                 //name, name, Kantenname, addElem
             }
          else if(getType() == Type.GeschwindigkeitsVoranzeiger)
             {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21);
                 return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVoranzeiger %s = new local GeschwindigkeitsVoranzeiger(%s);\n%s",
-                        name, name, null, addElem);
+                        name, name, edgeDirection.higherName(), addElem);
                 //name, name, Kantenname, addElem
             }
          else if(getType() == Type.SwWechsel)
@@ -657,15 +656,26 @@ public final class Element implements GraphObject<Shape> {
          else if(getType() == Type.VorSignal)
             {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21);
              return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s);\n%s",
-                        name, name, null, addElem);
+                        name, name, edgeDirection.higherName(), addElem);
                       //name, name, Kantenname, addElem
             }
          else if(getType() == Type.Magnet)
-            {}
+            {if(name.contains("PZBMagnetImpl"))
+                {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000,e02);
+                 return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s,%s);\n%s",
+                        name, name, null, edgeDirection.higherName(), addElem);
+                      //name, name, MHz, Kantenname, addElem
+                }
+             if(name.contains("ContactMagnetImpl"))
+                {//[HTTPName: "mv1"]ContactMagnet mv1 = new ContactMagnetImpl();
+                 return String.format("[HTTPName: \"%s\"]ContactMagnet %s = new ContactMagnetImpl();\n%s",
+                         name, name, addElem);
+                }
+            }
          else if(getType() == Type.SichtbarkeitsPunkt)
             {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15);
              return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n%s",
-                        name, name, null, addElem);
+                        name, name, edgeDirection.higherName(), addElem);
                       //name, name, Kantenname, addElem
             }
          return "";
