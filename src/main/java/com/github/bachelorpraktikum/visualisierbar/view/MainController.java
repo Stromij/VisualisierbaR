@@ -433,67 +433,60 @@ public class MainController {
 
                 }
                 if(event.getCode()== KeyCode.X && event.isControlDown()){
-                     //int x=1;
                     HashMap<Node, LinkedList<Element>> nodeMap= new HashMap<>();
                     HashMap<HashMap<Node,LinkedList<Element>>,LinkedList<Edge>> nodeEdgeElement = new HashMap<>();
                     Junction.getSelection().forEach(a->{
-                        int x=1;
-
                         Node copyNode;
-                        System.out.println(Junction.getSelection().size());
-
-                          copyNode=a.getRepresentedObjects().get(0);
-                            LinkedList<Element> elements = new LinkedList<>();
-                            copyNode.getElements().forEach(b-> elements.add(b));
-                            nodeMap.put(copyNode,elements);
-                       if(Junction.getSelection().size()>1){
-                           LinkedList<Edge> edges = new LinkedList<>();
-                           copyNode.getEdges().forEach(c->{
-                               if(Junction.getSelection().contains(c.getNode1()) && Junction.getSelection().contains(c.getNode2())){
+                        copyNode=a.getRepresentedObjects().get(0);
+                        LinkedList<Element> elements = new LinkedList<>();
+                        copyNode.getElements().forEach(b-> {
+                            elements.add(b);
+                        });
+                        nodeMap.put(copyNode,elements);
+                        if(Junction.getSelection().size()>1){
+                            LinkedList<Edge> edges = new LinkedList<>();
+                            copyNode.getEdges().forEach(c->{
                                    edges.add(c);
-                               }
-                           });
-                        nodeEdgeElement.put(nodeMap,edges);
-                       }
+                            });
+                            nodeEdgeElement.put(nodeMap,edges);
+                        }
                         else{
                            nodeEdgeElement.put(nodeMap,null);
-                       }
-
+                        }
                         graph.removeNode(a.getRepresentedObjects().get(0));
-
-
-
-
+                    });
+                    nodeEdgeElement.forEach((a,b)->{
+                        if(b!=null) {
+                            b.forEach(c -> {
+                                if (!a.containsKey(c.getNode1()) || !a.containsKey(c.getNode2())) {
+                                    b.remove(c);
+                                }
+                            });
+                        }
                     });
                     NodeTransforable contents = new NodeTransforable(nodeEdgeElement);
-
                     cb.setContents(contents,null);
-
-
-                    //deleteButton.fire();
-
-
                 }
                 if(event.getCode()== KeyCode.V && event.isControlDown()){
-                        Transferable clipboardcontent = cb.getContents(null);
-                        HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> cloneNodeMap;
-                        if((clipboardcontent!=null)&&
-                                (clipboardcontent.isDataFlavorSupported(NodeTransforable.NodeFlavor))){
-                            try{
-                                NodeTransforable tmpNT = (NodeTransforable)(clipboardcontent.getTransferData(NodeTransforable.NodeFlavor));
-                                cloneNodeMap= tmpNT.setNodeEdge;
-
-                                cloneNodeMap.forEach((a,b)-> {
-                                    a.forEach((c,d)->graph.addNode(c,d,b));
+                    Transferable clipboardcontent = cb.getContents(null);
+                    HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> cloneNodeMap;
+                    if((clipboardcontent!=null)&&
+                            (clipboardcontent.isDataFlavorSupported(NodeTransforable.NodeFlavor))) {
+                        try {
+                            NodeTransforable tmpNT = (NodeTransforable) (clipboardcontent.getTransferData(NodeTransforable.NodeFlavor));
+                            cloneNodeMap = tmpNT.setNodeEdge;
+                            cloneNodeMap.forEach((a, b) -> {
+                                a.forEach((c, d) -> {
+                                    graph.addNode(c, d, b);
                                 });
 
-                            }catch (Exception e){
-                                e.printStackTrace();
-                            }
-
-                       }}
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
-
+            }
             if(event.getCode()== KeyCode.ESCAPE){
                 Junction.clearSelection();
             }

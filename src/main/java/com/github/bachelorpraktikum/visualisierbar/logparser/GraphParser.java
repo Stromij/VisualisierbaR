@@ -197,7 +197,7 @@ public final class GraphParser {
              }
             }
 
-        @Override
+      /*  @Override
         public void enterGroup(LogParser.GroupContext ctx)
             {try {String groupName = ctx.log_name().getText();
                   String kind = ctx.kind().getText();
@@ -213,7 +213,7 @@ public final class GraphParser {
                 log.warning("Could not parse line: " + ctx.getText()
                         + "\nReason: " + e.getMessage());
             }
-            }
+            }*/
 
 
         @Override

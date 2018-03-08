@@ -368,28 +368,29 @@ public final class Graph {
     }
     public void addNode(Node node, LinkedList<Element> elements,LinkedList<Edge> edges){
         Node newNode = Node.in(context).create(node.getName(),node.getCoordinates(),node.getAbsName());
+        if(edges!=null) {
+            edges.forEach(edge -> {
+                GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
+                this.edges.put(edge, shape);
+                edge.setGraph(this);
+                group.getChildren().add(shape.getFullNode());
+            });
+        }
         elements.forEach(a-> {
             //Element newElement= Element.in(context).create(a.getName(),a.getType(),newNode,a.getState());
-            a.setGraph(this);
+            System.out.println(a.getNode().getName());
             this.addElement(a);
             newNode.addElement(a);
-
         });
-        if(edges!=null){
-        edges.forEach(b->{
-            Edge edge = Edge.in(context).create(b.getName(),b.getLength(),b.getNode1(),b.getNode2(),b.getAbsName());
-            edge.setGraph(this);
-        });}
         newNode.setGraph(this);
         //if(nodes.containsKey(newNode)) return;
         context.addObject(newNode);
         GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
         ((Junction) shape).setMoveable(true);
-       // System.out.println(node.getElements().size());
+
         nodes.put(newNode, shape);
         group.getChildren().add(shape.getFullNode());
         changed();
-
     }
 
     /**
