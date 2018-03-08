@@ -10,8 +10,6 @@ import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
-import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
-import com.sun.istack.internal.NotNull;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.shape.Line;
@@ -34,7 +32,7 @@ public final class Edge implements GraphObject<Line> {
     private  String name;
     @Nullable
     private String absName;
-    @Nonnull
+
     private  int length;
     @Nonnull
     private final Node node1;
@@ -57,7 +55,7 @@ public final class Edge implements GraphObject<Line> {
         this.stateProperty = new SimpleObjectProperty<>();
     }
 
-    private Edge(String name, int length, Node node1, Node node2, String absName) {
+    private Edge(String name, int length, Node node1, Node node2,@Nullable String absName) {
         this.absName = absName;
         this.name = Objects.requireNonNull(name);
         this.length = length;
@@ -87,9 +85,6 @@ public final class Edge implements GraphObject<Line> {
 
         @Nonnull
         private static EdgeFactory getInstance(Context context) {
-            if (context == null) {
-                throw new NullPointerException("context is null");
-            }
 
             EdgeFactory result = instances.computeIfAbsent(context, ctx -> {
                 EdgeFactory factory = new EdgeFactory(ctx);
@@ -163,7 +158,7 @@ public final class Edge implements GraphObject<Line> {
          * same context
          */
         @Nonnull
-        public Edge create(String name, int length, Node node1, Node node2, String absName) {
+        public Edge create(String name, int length, Node node1, Node node2, @Nullable String absName) {
             if (!nodeFactory.checkAffiliated(node1) || !nodeFactory.checkAffiliated(node2)) {
                 throw new IllegalArgumentException("at least one node is from the wrong context");
             }
@@ -204,10 +199,7 @@ public final class Edge implements GraphObject<Line> {
          */
         public boolean NameExists (@Nonnull String name){
             Edge edge = edges.get(Objects.requireNonNull(name));
-            if (edge == null) {
-                return false;
-            }
-            return true;
+            return edge != null;
         }
 
         /**
@@ -215,10 +207,9 @@ public final class Edge implements GraphObject<Line> {
          * @param name the String to check
          * @return true, if an Edge with this name exists, otherwise false
          */
-        @Nullable
-        public Boolean AbsNameExists (@Nonnull String name)
+        Boolean AbsNameExists(@Nonnull String name)
             {for(Map.Entry<String, Edge> entry : edges.entrySet())
-                {if(entry.getValue().getAbsName() == name) {return true;}}
+                {if(Objects.equals(entry.getValue().getAbsName(), name)) {return true;}}
              return false;
             }
 
@@ -341,10 +332,10 @@ public final class Edge implements GraphObject<Line> {
      * @param newAbsName the new ABS name
      * @return true if the changes was successfull, false if name already taken or null
      */
-    public boolean setAbsName(String newAbsName)
+    boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null) {
-             Boolean exit = Edge.in(graph.getContext()).AbsNameExists(newAbsName);
+             boolean exit = Edge.in(graph.getContext()).AbsNameExists(newAbsName);
              if (!exit) {
                  this.absName = newAbsName;
                  Edge.in(graph.getContext()).edges.remove(name);
@@ -360,8 +351,7 @@ public final class Edge implements GraphObject<Line> {
      * @param newName the name
      * @return true if change was succesfull, false if name already taken
      */
-    public boolean setName(String newName){
-        if(newName==null) return false;
+    public boolean setName(@Nonnull String newName){
         if (graph!= null){
 
             if(!Edge.in(graph.getContext()).NameExists(newName)){
@@ -390,12 +380,13 @@ public final class Edge implements GraphObject<Line> {
         return true;
     }
 
+    @Nullable
     @Override
     public Graph getGraph() {
         return this.graph;
     }
 
-    public void setGraph(Graph graph){
+    public void setGraph(@Nullable Graph graph){
         this.graph=graph;
     }
 
@@ -445,6 +436,6 @@ public final class Edge implements GraphObject<Line> {
      * @return the higher rated, available name
      */
     @Nonnull
-    public String higherName()
+    String higherName()
         {return absName == null ? name : absName;}
 }

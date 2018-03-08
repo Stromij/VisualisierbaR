@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.regex.Pattern.compile;
+
 public class AbsSource implements DataSource {
 
     private final File fileToAbs;
@@ -29,7 +31,7 @@ public class AbsSource implements DataSource {
         this.product = product;
 
         this.context = parseFile();
-        this.delta = new ArrayList();
+        this.delta = new ArrayList<>();
     }
 
     /**
@@ -79,13 +81,13 @@ public class AbsSource implements DataSource {
      */
 
     public ArrayList getDeltas(){
-        ArrayList<Matcher> foundedDeltaLines = new ArrayList();
+        ArrayList<Matcher> foundedDeltaLines = new ArrayList<>();
         ArrayList<String> productNames = new ArrayList<>();
         Matcher matcherProduct;
         Matcher matcherDelta;
 
-        Pattern patternDeltaLines = Pattern.compile("(delta )(.*?)(( after .*?)?)( when )(.*?)(;)");
-        Pattern patternProduct = Pattern.compile("(product "+this.product+" \\()(.*?)(\\);)");
+        Pattern patternDeltaLines = compile("(delta )(.*?)(( after .*?)?)( when )(.*?)(;)");
+        Pattern patternProduct = compile("(product "+this.product+" \\()(.*?)(\\);)");
 
         try {
             String aktLine;
@@ -103,15 +105,17 @@ public class AbsSource implements DataSource {
 
             // Suchen der Deltas
 
-            for(int i=0; i<productNames.size(); i++)
-                {for(int n=0; n<foundedDeltaLines.size(); n++)
-                    {if(foundedDeltaLines.get(n).group(6).matches("(|.*? )" + productNames.get(i) + "(| .*?)"))
-                        {this.delta.add(foundedDeltaLines.get(n).group(2));}
+            for (String productName : productNames) {
+                for (Matcher foundedDeltaLine : foundedDeltaLines) {
+                    if (foundedDeltaLine.group(6).matches("(|.*? )" + productName + "(| .*?)")) {
+                        this.delta.add(foundedDeltaLine.group(2));
                     }
                 }
+            }
         }
-        catch (FileNotFoundException e) {e.printStackTrace();}
-        catch (IOException e) {e.printStackTrace();}
+        catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return this.delta;
     }

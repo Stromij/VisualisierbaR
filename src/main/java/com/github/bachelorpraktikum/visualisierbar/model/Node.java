@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
-import com.sun.istack.internal.NotNull;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -48,7 +47,7 @@ public final class Node implements GraphObject<Circle> {
     //indicates change in the coordinates
     @Nonnull
     private final BooleanProperty movedProperty;
-
+    @Nullable
     private Graph graph;
 
 
@@ -63,7 +62,7 @@ public final class Node implements GraphObject<Circle> {
         this.graph =null;
     }
 
-    private Node(String name, Coordinates coordinates, String absName) {
+    private Node(String name, Coordinates coordinates, @Nullable String absName) {
         this.absName = absName;
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);
@@ -95,9 +94,7 @@ public final class Node implements GraphObject<Circle> {
 
         @Nonnull
         private static NodeFactory getInstance(Context context) {
-            if (context == null) {
-                throw new NullPointerException("context is null");
-            }
+
             NodeFactory result = instances.computeIfAbsent(context, ctx -> {
                 NodeFactory factory = new NodeFactory(ctx);
                 ctx.addObject(factory);
@@ -157,7 +154,7 @@ public final class Node implements GraphObject<Circle> {
          * already exists
          */
         @Nonnull
-        public Node create(String name, Coordinates coordinates, String absName) {
+        public Node create(String name, Coordinates coordinates, @Nullable String absName) {
             Node result = nodes.computeIfAbsent(Objects.requireNonNull(name), nodeName ->
                 new Node(nodeName, coordinates, absName)
             );
@@ -189,7 +186,6 @@ public final class Node implements GraphObject<Circle> {
          * @param name the String to check
          * @return true, if an Node with this name exists, otherwise false
          */
-        @Nullable
         private boolean absNameExists(@Nonnull String name)
         {for(Map.Entry<String, Node> entry : nodes.entrySet()) {
             if (Objects.equals(name, entry.getValue().getAbsName())) {
@@ -247,6 +243,7 @@ public final class Node implements GraphObject<Circle> {
     }
 
     @Override
+    @Nullable
     public Graph getGraph() {
        return this.graph;
     }
@@ -260,7 +257,7 @@ public final class Node implements GraphObject<Circle> {
      * @param newAbsName the new ABS name the node will have
      * @return true if the change was successful, false if the name is already taken or null
      */
-    public boolean setAbsName(@Nullable String newAbsName)
+    boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null)
             {Boolean exit = Node.in(graph.getContext()).absNameExists(newAbsName);
@@ -274,7 +271,7 @@ public final class Node implements GraphObject<Circle> {
          return false;
         }
 
-    public void setGraph(Graph graph){
+    public void setGraph(@Nullable Graph graph){
         this.graph=graph;
     }
 
@@ -283,8 +280,7 @@ public final class Node implements GraphObject<Circle> {
      * @param newName the new Name the node will have
      * @return true when the change was successful, false if it was not
      */
-    public boolean setName(String newName){
-        if(newName==null) return false;
+    public boolean setName(@Nonnull String newName){
         if(graph!=null){
             if(!Node.in(graph.getContext()).NameExists(newName)){
                 this.name=newName;
@@ -317,7 +313,7 @@ public final class Node implements GraphObject<Circle> {
      * @throws NullPointerException if edge is null
      */
     @Nonnull
-    public Set<Edge> otherEdges(Edge edge) {
+    Set<Edge> otherEdges(@Nullable Edge edge) {
         if (edge == null) {
             throw new NullPointerException("edge is null");
         }
@@ -397,6 +393,6 @@ public final class Node implements GraphObject<Circle> {
      * @return the higher rated, available name
      */
     @Nonnull
-    public String higherName()
+    String higherName()
         {return absName == null ? name : absName;}
 }

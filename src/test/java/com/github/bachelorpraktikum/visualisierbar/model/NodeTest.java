@@ -185,6 +185,9 @@ public class NodeTest extends FactoryTest<Node> {
             case 1:
                 getFactory(context).create(node.getName(), createCoordinates());
                 break;
+            case 2:
+                getFactory(context).create(node.getName(), createCoordinates(),"gg");
+                break;
             default:
                 throw new IllegalStateException();
         }
