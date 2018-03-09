@@ -378,7 +378,7 @@ public final class Graph {
         }
         elements.forEach(a-> {
             //Element newElement= Element.in(context).create(a.getName(),a.getType(),newNode,a.getState());
-            System.out.println(a.getNode().getName());
+            //System.out.println(a.getNode().getName());
             this.addElement(a);
             newNode.addElement(a);
         });
