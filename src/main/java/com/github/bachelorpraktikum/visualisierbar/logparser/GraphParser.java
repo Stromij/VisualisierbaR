@@ -198,7 +198,7 @@ public final class GraphParser {
             }
 
         @Override
-        public void enterGroup(LogParser.GroupContext ctx) {
+        public void enterLogicalGroup(LogParser.LogicalGroupContext ctx) {
             try {
                 String groupName = ctx.log_name().getText();
                 String kind = ctx.kind().getText();
