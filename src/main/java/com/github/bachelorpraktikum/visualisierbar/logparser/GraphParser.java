@@ -197,23 +197,23 @@ public final class GraphParser {
              }
             }
 
-      /*  @Override
-        public void enterGroup(LogParser.GroupContext ctx)
-            {try {String groupName = ctx.log_name().getText();
-                  String kind = ctx.kind().getText();
+        @Override
+        public void enterGroup(LogParser.GroupContext ctx) {
+            try {
+                String groupName = ctx.log_name().getText();
+                String kind = ctx.kind().getText();
 
-                  logicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
+                logicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
 
-                  for(int i = 0; ctx.elem_name(i) != null; i++)
-                    {if(ctx.elem_name(i).getText().equals("null")) continue;
-                     elemGroupTracker.put(ctx.elem_name(i).getText(), logicalGroup);
-                    }
-            }
-            catch (IllegalArgumentException e){
+                for (int i = 0; ctx.elem_name(i) != null; i++) {
+                    if (ctx.elem_name(i).getText().equals("null")) continue;
+                    elemGroupTracker.put(ctx.elem_name(i).getText(), logicalGroup);
+                }
+            } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                         + "\nReason: " + e.getMessage());
             }
-            }*/
+        }
 
 
         @Override
