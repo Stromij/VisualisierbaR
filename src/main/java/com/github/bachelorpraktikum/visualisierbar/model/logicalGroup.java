@@ -97,7 +97,6 @@ public class logicalGroup {
      */
     public boolean addElement(@Nonnull Element elem)
         {if(elements.contains(elem)) return false;
-
          elements.add(elem);
          return true;
         }

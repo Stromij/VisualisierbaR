@@ -172,20 +172,24 @@ public final class Graph {
         changed();
 
     }
-    /*
+
         /**
          * removes an {@link Edge} from the Graph as well as the Context and the Factory mapping.
+         *
          * @param edge the Edge to remove
          */
-    /*
+
     public void removeEdge (Edge edge){
         edge.getNode1().getEdges().remove(edge);
         edge.getNode2().getEdges().remove(edge);
+        group.getChildren().remove(edges.get(edge).getFullNode());
         edges.remove(edge);
+        edge.setGraph(null);
         context.removeObject(edge);
         Edge.in(context).remove(edge);
+
     }
-    */
+
 
     /**
      * Connects every Node in the Selection with every other Node part of the Selection.
@@ -307,23 +311,6 @@ public final class Graph {
         context.removeObject(element);
         element.setGraph(null);
         if(element.getType().isComposite()){
-            /*
-            for( Element CompositeElement : element.getNode().getElements()){
-                if (CompositeElement.getType().isComposite()){                       //remove composite Elements to rebuild them with the new element if necessary
-                    if(CompositeElement.getGraph()==this){
-                        this.getLogicalGroup().getChildren().remove(elements.get(CompositeElement).getFullNode());
-                        CompositeElement.setGraph(null);
-                    }
-                }
-            }
-        }
-        for (GraphShape<Element> elementShape : Elements.create(element.getNode(), coordinatesAdapter)) {           //recreate composite Elements
-            for (Element Celement : elementShape.getRepresentedObjects()) {
-                elements.put(Celement, elementShape);
-                Celement.setGraph(this);
-            }
-            group.getChildren().add(elementShape.getFullNode());
-            */
             rebuildComposite(element.getNode());
         }
 
@@ -347,6 +334,43 @@ public final class Graph {
         }
         changed();
     }
+
+    /**
+     * Enter a node, its edges and elements into the graph
+     * @param node the node to enter
+     */
+
+    public void enterNode (Node node){
+        for (Edge edge : node.getEdges()){
+            if(edge.getGraph()==null){
+                GraphShape<Edge> EdgeShape = new Rail(edge, coordinatesAdapter);
+                edges.put(edge, EdgeShape);
+                edge.setGraph(this);
+                group.getChildren().add(EdgeShape.getFullNode());
+
+            }
+        }
+
+        GraphShape<Node> shape = new Junction(node, coordinatesAdapter);
+
+        nodes.put(node, shape);
+        node.setGraph(this);
+        group.getChildren().add(shape.getFullNode());
+        //node.getElements().forEach((a)->{a.setGraph(null);});
+
+        for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
+
+            for (Element element : elementShape.getRepresentedObjects()) {
+                elements.put(element, elementShape);
+                element.setGraph(this);
+            }
+            group.getChildren().add(elementShape.getFullNode());
+        }
+
+        changed();
+    }
+
+
 
     /**
      * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
