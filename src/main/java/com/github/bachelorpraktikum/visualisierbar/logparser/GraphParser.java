@@ -87,12 +87,14 @@ public final class GraphParser {
         private final Context context;
         private final BigInteger thousandInt;
 
-        private HashMap<String, Edge> elemViewTracker = new HashMap();
-        private HashMap<String, logicalGroup> elemGroupTracker = new HashMap();
+        private HashMap<String, Edge> elemViewTracker;
+        private HashMap<String, logicalGroup> elemGroupTracker;
 
         Listener(Context context) {
             this.context = context;
             this.thousandInt = BigInteger.valueOf(1000);
+            elemViewTracker = new HashMap<>();
+            elemGroupTracker = new HashMap<>();
         }
 
         private int createTime(LogParser.TimeContext ctx) {
