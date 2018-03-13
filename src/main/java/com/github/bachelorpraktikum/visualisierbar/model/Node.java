@@ -232,7 +232,7 @@ public final class Node implements GraphObject<Circle> {
         return NodeFactory.getInstance(context);
     }
 
-    void addEdge(Edge edge) {
+    public void addEdge(Edge edge) {
         edges.add(Objects.requireNonNull(edge));
     }
 

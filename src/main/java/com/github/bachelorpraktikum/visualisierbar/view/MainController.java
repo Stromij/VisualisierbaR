@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -72,9 +73,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-
-import java.awt.datatransfer.*;
-//import javafx.scene.input.Clipboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -173,7 +171,7 @@ public class MainController {
 
 
 
-
+    static private HashSet<Node> nodeClipboard = new HashSet<>();
     private Rectangle selectionRec;
     //private LinkedList<> selected;
     /*
@@ -194,6 +192,9 @@ public class MainController {
 
     private double mousePressedX = -1;
     private double mousePressedY = -1;
+
+    private double MousePositionX= 0;
+    private double MousePositionY=0;
 
     private boolean autoChange = false;
     private Pattern timePattern;
@@ -416,7 +417,8 @@ public class MainController {
                         graph.getNodes().forEach((a,b)-> ((Junction)b).addToSelection());
                     }
                 }
-                java.awt.datatransfer.Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                //java.awt.datatransfer.Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+                Clipboard clipboard = Clipboard.getSystemClipboard();
                 if(event.getCode()== KeyCode.C && event.isControlDown()){
                     /*HashMap<Node, LinkedList<Element>> nodeMap= new HashMap<>();
 
@@ -433,57 +435,118 @@ public class MainController {
 
                 }
                 if(event.getCode()== KeyCode.X && event.isControlDown()){
-                    HashMap<Node, LinkedList<Element>> nodeMap= new HashMap<>();
-                    HashMap<HashMap<Node,LinkedList<Element>>,LinkedList<Edge>> nodeEdgeElement = new HashMap<>();
-                    Junction.getSelection().forEach(a->{
-                        Node copyNode;
-                        copyNode=a.getRepresentedObjects().get(0);
-                        LinkedList<Element> elements = new LinkedList<>();
-                        copyNode.getElements().forEach(b-> {
-                            elements.add(b);
-                        });
-                        nodeMap.put(copyNode,elements);
-                        if(Junction.getSelection().size()>1){
-                            LinkedList<Edge> edges = new LinkedList<>();
-                            copyNode.getEdges().forEach(c->{
-                                   edges.add(c);
-                            });
-                            nodeEdgeElement.put(nodeMap,edges);
+                    nodeClipboard.clear();
+                    HashSet<Node> selectedNodes = new HashSet<>();
+                    for (Junction junction: Junction.getSelection()){
+                        selectedNodes.add(junction.getRepresentedObjects().get(0));
+                    }
+                    LinkedList<Node> nodeList= new LinkedList<>();
+                    for (Junction a : Junction.getSelection()){
+                       Node copy = a.getRepresentedObjects().get(0);
+                       LinkedList<Edge> edgesToRemove = new LinkedList<>();
+
+                       /*
+                       for(Edge edge : copy.getEdges()){
+                           if(copy.getGraph()!= null)
+                               if(!selectedNodes.contains(edge.getOtherNode(a.getRepresentedObjects().get(0))))
+                                   edgesToRemove.add(edge);
+                               //copy.getGraph().removeEdge(edge);
+                       }
+                       edgesToRemove.forEach((edge)->{
+                           copy.getGraph().removeEdge(edge);
+                       });
+                       */
+                       nodeList.add(copy);
+                        if(copy.getGraph()!= null){
+                            //copy.getGraph().removeNode(copy);
                         }
-                        else{
-                           nodeEdgeElement.put(nodeMap,null);
-                        }
-                        graph.removeNode(a.getRepresentedObjects().get(0));
-                    });
-                    nodeEdgeElement.forEach((a,b)->{
-                        if(b!=null) {
-                            b.forEach(c -> {
-                                if (!a.containsKey(c.getNode1()) || !a.containsKey(c.getNode2())) {
-                                    b.remove(c);
-                                }
-                            });
-                        }
-                    });
-                    NodeTransforable contents = new NodeTransforable(nodeEdgeElement);
-                    cb.setContents(contents,null);
+                    }
+                    //Junction.clearSelection();
+
+                    nodeClipboard.addAll(nodeList);
+
                 }
                 if(event.getCode()== KeyCode.V && event.isControlDown()){
-                    Transferable clipboardcontent = cb.getContents(null);
-                    HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> cloneNodeMap;
-                    if((clipboardcontent!=null)&&
-                            (clipboardcontent.isDataFlavorSupported(NodeTransforable.NodeFlavor))) {
-                        try {
-                            NodeTransforable tmpNT = (NodeTransforable) (clipboardcontent.getTransferData(NodeTransforable.NodeFlavor));
-                            cloneNodeMap = tmpNT.setNodeEdge;
-                            cloneNodeMap.forEach((a, b) -> {
-                                a.forEach((c, d) -> {
-                                    graph.addNode(c, d, b);
-                                });
-
-                            });
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                    Node mostLeftNode = null;
+                    for(Node node : nodeClipboard){
+                        if (mostLeftNode==null){
+                            mostLeftNode=node;
                         }
+                        else{
+                            if(node.getCoordinates().getX()<mostLeftNode.getCoordinates().getX())
+                                mostLeftNode=node;
+                        }
+                    }
+                    if(mostLeftNode!=null){
+
+                        Coordinates cord = graph.getCoordinatesAdapter().reverse(new Point2D(MousePositionX, MousePositionY));
+                        Coordinates mostLeftCord = mostLeftNode.getCoordinates();
+                        //System.out.println(new Point2D(MousePositionX, MousePositionY));
+                        //System.out.println(mostLeftCord);
+
+                        RandomString gen = new RandomString(8, ThreadLocalRandom.current());
+                        String name=null;
+
+                        HashMap<Node, Node> copyNodes = new HashMap<>(Junction.getSelection().size());
+
+                        for(Node node : nodeClipboard){
+
+                            int x = node.getCoordinates().getX()- mostLeftCord.getX();
+                            int y = node.getCoordinates().getY()- mostLeftCord.getY();
+
+                            for (int j=0; j<10000; j++) {               //generate random name
+                                name = gen.nextString();
+                                if(!Node.in(graph.getContext()).NameExists(node.getName()+ "_copy_" +name)) break;
+                            }
+
+                            Node copy = Node.in(graph.getContext()).create(node.getName()+ "_copy_" +name,new Coordinates(x+cord.getX(), y+cord.getY()));
+                            //node.setCoordinates(new Coordinates(x+cord.getX(), y+cord.getY()));
+                            copyNodes.put(node, copy);
+                            //graph.enterNode(node);
+
+                            ((Junction) graph.getNodes().get(node)).setMoveable(true);
+                            //node.moved();
+                        }
+                        for(Node node : copyNodes.keySet()){
+                            for (Edge edge : node.getEdges()) {
+                                if(copyNodes.containsKey(edge.getNode1()) && copyNodes.containsKey(edge.getNode2())){
+                                    for (int j=0; j<10000; j++) {               //generate missing edges with random names
+                                        name = gen.nextString();
+                                        if(!Edge.in(graph.getContext()).NameExists(edge.getName()+ "_copy_" +name)) break;
+                                    }
+                                    Edge copyEdge = Edge.in(graph.getContext()).create(edge.getName()+ "_copy_" +name, edge.getLength(),copyNodes.get(edge.getNode1()), copyNodes.get(edge.getNode2()));
+                                    copyNodes.get(node).addEdge(copyEdge);
+                                }
+                            }
+                        }
+                        for(Node node : copyNodes.keySet()){
+                            for(Element element : node.getElements()){
+                                if(element.getType() == Element.Type.WeichenPunkt){
+                                    boolean test = true;
+                                    for(Element switchEle: element.getSwitch().getElements()){
+                                        if(!copyNodes.containsKey(switchEle.getNode()))
+                                            test=false;
+                                    }
+                                    if(!test){ continue;}
+                                }
+                                for (int j=0; j<10000; j++) {               //generate missing edges with random names
+                                    name = gen.nextString();
+                                    if(!Element.in(graph.getContext()).NameExists(element.getName()+ "_copy_" +name)) break;
+                                }
+                                Element newElem = Element.in(graph.getContext()).create(element.getName()+ "_copy_" +name, element.getType(), copyNodes.get(node), element.getState());
+                                if(copyNodes.containsKey(element.getDirection()))
+                                    newElem.setDirection(copyNodes.get(element.getDirection()));
+                                if (element.getLogicalGroup()!=null) {
+                                    element.getLogicalGroup().addElement(newElem);
+                                    newElem.setLogicalGroup(element.getLogicalGroup());
+                                }
+                                copyNodes.get(node).addElement(newElem);
+                            }
+                            graph.enterNode(copyNodes.get(node));
+                            ((Junction)graph.getNodes().get(copyNodes.get(node))).setMoveable(true);
+                        }
+
+
                     }
                 }
             }
@@ -564,6 +627,7 @@ public class MainController {
 
 
     }
+    /*
    public static class  NodeTransforable implements Transferable{
         public static DataFlavor NodeFlavor;
         private DataFlavor [] supportedFlavor ={NodeFlavor};
@@ -600,6 +664,7 @@ public class MainController {
         }
 
     }
+    */
 
 
     private void initializeCenterPane() {
@@ -608,6 +673,13 @@ public class MainController {
                 fitGraphToCenter(getGraph());
             }
         };
+
+        graphPane.setOnMouseMoved((event -> {
+            Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
+            MousePositionX=c.getX();
+            MousePositionY=c.getY();
+        }));
+
         graphPane.heightProperty().addListener(boundsListener);
         graphPane.widthProperty().addListener(boundsListener);
 
@@ -1115,6 +1187,7 @@ public class MainController {
      */
     @Nonnull
     private Graph getGraph() {
+        nodeClipboard.clear();
         if (graph == null) {
             Context context = DataSourceHolder.getInstance().getContext();
             if (proportionalToggle.isSelected()) {
@@ -1141,6 +1214,7 @@ public class MainController {
                     });
 
                 }
+                showElements();
                 //initializeElementList();
             });
             graph.changeProperty().addListener(GraphListener);
