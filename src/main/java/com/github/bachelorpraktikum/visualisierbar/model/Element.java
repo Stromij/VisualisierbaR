@@ -48,7 +48,7 @@ public final class Element implements GraphObject<Shape> {
     @Nullable
     private Node direction;
     @Nullable
-    private logicalGroup logicalGroup;
+    private LogicalGroup logicalGroup;
     @Nullable
     private String absName;
 
@@ -492,9 +492,9 @@ public final class Element implements GraphObject<Shape> {
     }
 
     @Nullable
-    public logicalGroup getLogicalGroup() {return logicalGroup;}
+    public LogicalGroup getLogicalGroup() {return logicalGroup;}
 
-    public void setLogicalGroup(@Nullable logicalGroup logicalGroup) {this.logicalGroup = logicalGroup;}
+    public void setLogicalGroup(@Nullable LogicalGroup logicalGroup) {this.logicalGroup = logicalGroup;}
 
     public void setAbsName(@Nullable String absName) {this.absName = absName;}
 

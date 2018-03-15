@@ -33,7 +33,7 @@ public final class Graph {
     @Nonnull
     private Map<Element, GraphShape<Element>> elements;
     @Nonnull
-    private Map<String, logicalGroup> logicalGroups;
+    private Map<String, LogicalGroup> logicalGroups;
 
 
     /**

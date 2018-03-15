@@ -88,7 +88,7 @@ public final class GraphParser {
         private final BigInteger thousandInt;
 
         private HashMap<String, Edge> elemViewTracker;
-        private HashMap<String, logicalGroup> elemGroupTracker;
+        private HashMap<String, LogicalGroup> elemGroupTracker;
 
         Listener(Context context) {
             this.context = context;
@@ -154,7 +154,7 @@ public final class GraphParser {
                     }
 
                 if(elemGroupTracker.get(elementName) != null)
-                    {logicalGroup logicalGroup = elemGroupTracker.get(elementName);
+                    {LogicalGroup logicalGroup = elemGroupTracker.get(elementName);
                      elemNew.setLogicalGroup(logicalGroup);
                      logicalGroup.addElement(elemNew);
                      elemGroupTracker.remove(elementName);
@@ -212,7 +212,7 @@ public final class GraphParser {
                 String groupName = ctx.log_name().getText();
                 String kind = ctx.kind().getText();
 
-                logicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
+                LogicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
 
                 for (int i = 0; ctx.elem_name(i) != null; i++) {
                     if (ctx.elem_name(i).getText().equals("null")) continue;
