@@ -5,27 +5,17 @@ import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ObservableDoubleValue;
 import javafx.beans.value.WeakChangeListener;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
 import javax.annotation.Nonnull;
 import javafx.beans.value.*;
-
 import javafx.scene.Cursor;
-import javafx.scene.shape.Shape;
-import javafx.util.Pair;
-
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -45,43 +35,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     private boolean moveable;
     private List<ChangeListener> listeners= new ArrayList<>(1);
     private Tooltip tooltip;
-    private int i=7;  //for grid layout
-    //public Shape elements;
-    //private DropShadow highlightGlow;
+    private int i=7;                                                                                                        //for grid layout
+
 
     Junction(Node node, CoordinatesAdapter adapter) {
         super(node, adapter);
-        /*
-        highlightGlow = new DropShadow();
-        highlightGlow.setOffsetY(0f);
-        highlightGlow.setOffsetX(0f);
-        highlightGlow.setColor(Color.BLUE);
-        //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
-        */
+
         setMoveable(false);
-      /*
-        adapter.OffsetXproperty().addListener((a)->{
-            Point2D position = adapter.apply(node);
-            this.getShape().setCenterX(position.getX());
-            //this.getShape().setCenterY(position.getY());
-            this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
 
-        });
-
-        adapter.OffsetYproperty().addListener((a)->{
-            Point2D position = adapter.apply(node);
-            this.getShape().setCenterY(position.getY());
-            //this.getShape().setCenterY(position.getY());
-            this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
-
-        });
-
-        adapter.movedProperty().addListener((t)->{
-            this.getRepresented().setCoordinates(adapter.reverse(new Point2D (((int) this.getShape().getCenterX()), (int) this.getShape().getCenterY())));
-            //this.getRepresented().movedProperty().setValue(!this.getRepresented().movedProperty().getValue());
-
-        });
-        */
         this.getShape().setOnMouseReleased((event) -> {
             if (!moveable) return;
 
@@ -89,18 +50,18 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             mousePressedY = -1;
             selection.forEach((b) -> {
                 Circle a = b.getShape();
-                a.setTranslateX(Math.round(a.getTranslateX()));     //snap to valid coordinates
-                a.setTranslateY(Math.round(a.getTranslateY()));
-                double xx = a.getCenterX() + a.getTranslateX();
-                double yy = a.getCenterY() + a.getTranslateY();
+                a.setTranslateX(Math.round(a.getTranslateX()));                                                             //snap to valid coordinates
+                a.setTranslateY(Math.round(a.getTranslateY()));                                                             //technically you would want to move the full Node here
+                double xx = a.getCenterX() + a.getTranslateX();                                                             //but we move only the circle and let the rest adjust itself through
+                double yy = a.getCenterY() + a.getTranslateY();                                                             //listeners
                 if (xx < 0 || yy < 0) {
                     System.out.println(a.getTranslateY());
                     Map<Node, GraphShape<Node> > nodes= this.getRepresented().getGraph().getNodes();
-                    if(xx >= 0 && yy<0 ){
-                       yy= 0 - yy;
+                    if(xx >= 0 && yy<0 ){                                                                                   //whole bunch of code for handling negative coordinates that currently
+                       yy= 0 - yy;                                                                                          //does not work
                         for(Node n : nodes.keySet()){
                             if(n != b.getRepresented() ){
-                                n.setCoordinates(adapter.reverse(new Point2D((int)( n.getCoordinates().getX()),(int)(n.getCoordinates().getY()+yy))));
+                                n.setCoordinates(adapter.reverse(new Point2D(n.getCoordinates().getX(),(int)(n.getCoordinates().getY()+yy))));
                                 n.moved();
                             }
                         }
@@ -111,7 +72,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         xx = 0 - xx;
                         for (Node n : nodes.keySet()) {
                             if (n != b.getRepresented()) {
-                                n.setCoordinates(adapter.reverse(new Point2D((int)( n.getCoordinates().getX() + xx), ((int) n.getCoordinates().getY()))));
+                                n.setCoordinates(adapter.reverse(new Point2D((int)( n.getCoordinates().getX() + xx), n.getCoordinates().getY())));
                                 n.moved();
                             }
                         }
@@ -137,10 +98,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 a.setCenterX(xx);
                 a.setCenterY(yy);
                 b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));  //update coordinates in the model
-                //System.out.println(b.getRepresented().getCoordinates());
+
                 a.setTranslateX(0);
                 a.setTranslateY(0);
-                b.getRepresented().moved();                   //indicate that the node has moved to notify edges and elements
+                b.getRepresented().moved();                                                                                 //indicate that the node has moved to notify edges and elements
 
                 event.consume();
             });
@@ -157,13 +118,13 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             }
             if(t.isSecondaryButtonDown()&& moveable){
 
-                Alert alert = new Alert(Alert.AlertType.ERROR);     //prepare Error dialog for later use
+                Alert alert = new Alert(Alert.AlertType.ERROR);                                                             //prepare Error dialog for later use
                 alert.setTitle("Error");
                 alert.setGraphic(null);
                 alert.setHeaderText(null);
                 tooltip.hide();
 
-                Dialog<LinkedList<String>> dialog = new Dialog<>();
+                Dialog<LinkedList<String>> dialog = new Dialog<>();                                                         //prepare Dialog Pane
                 dialog.setResizable(true);
                 dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
                 ((Button) dialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
@@ -173,10 +134,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.setHgap(10);
                 grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
-                HashMap<Element, TextField> ElementNameTextFields= new HashMap<>(3);
+                HashMap<Element, TextField> ElementNameTextFields= new HashMap<>(3);                            //Holds the TextFields of the Elements of the Node
 
 
-                TextField name = new TextField();
+                TextField name = new TextField();                                                                          //TextField for the Node name
                 name.setText(this.getRepresented().getName());
 
                 TextField coordinates = new TextField();
@@ -186,7 +147,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 for(Element.Type type :Element.Type.values()){
                     c.add(type.getLogName());
                 }
-                ChoiceBox<String> element = new ChoiceBox<>();      //element Type choice box
+                ChoiceBox<String> element = new ChoiceBox<>();                                                              //element Type choice box
                 element.getItems().addAll(c);
                 element.setValue(element.getItems().get(0));
                 c.clear();
@@ -194,11 +155,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 for(Element.State state :Element.State.values()){
                     c.add(state.name());
                 }
-                ChoiceBox<String> sig = new ChoiceBox<>();              //signal choice box
+                ChoiceBox<String> sig = new ChoiceBox<>();                                                                  //signal choice box
                 sig.getItems().addAll(c);
                 sig.setValue(sig.getItems().get(0));
 
-                grid.add(new Label("Name"), 0, 0);
+                grid.add(new Label("Name"), 0, 0);                                                  //Labels for UI
                 grid.add(name, 1, 0);
                 grid.add(new Label("Coordinates:"), 0, 1);
                 grid.add(coordinates, 1, 1);
@@ -216,11 +177,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.add(sig, 1, 5);
                 Button createButton = new Button();
                 createButton.setText("create");
-                createButton.setOnAction((tt)->{                    //add Element procedure
+                createButton.setOnAction((tt)->{                                                                            //add Element procedure
                     String newName = Ename.getText();
 
                     //something went horribly wrong and we abandon ship
-                    if (this.getRepresented().getGraph()==null){
+                    if (this.getRepresented().getGraph()==null){                                                            //this shouldnt happen if you dont mess up the Graph procedures
                         alert.setContentText("Internal Error! Check Log.");
                         alert.showAndWait();
                         tt.consume();
@@ -230,10 +191,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     Element newElement;
                     if(!Element.in(this.getRepresented().getGraph().getContext()).NameExists(newName)){
                         Element.Type eType = Element.Type.fromName(element.getValue());
-                        if (eType==Element.Type.WeichenPunkt){                                  //Weichen are treated seperately
+                        if (eType==Element.Type.WeichenPunkt){                                                              //Weichen are treated seperately
                             Node node1=null;
-                            Node node2=null;
-                            if(this.getRepresented().getEdges().size()!=3 || !selection.contains(this)){
+                            Node node2=null;                                                                                //checking wether Input by the user is valid
+                            if(this.getRepresented().getEdges().size()!=3 || !selection.contains(this)){                    //meaning 3 correctly connected Nodes are selected
                                 alert.setContentText("Main Point needs to have 3 edges, this one has "+ this.getRepresented().getEdges().size());
                                 alert.showAndWait();
                                 tt.consume();
@@ -275,8 +236,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                 logger.log(Level.SEVERE, "some Nodes in this Junction have no Graph attached")
                                 ;return;}
 
-                            RandomString gen = new RandomString(4, ThreadLocalRandom.current()); //generate random names for the other 2 elements
-                            for (int i=0; i<10000; i++){
+                            RandomString gen = new RandomString(4, ThreadLocalRandom.current());                        //generate random names for the other 2 elements
+                            for (int i=0; i<10000; i++){                                                                      //
+                                if(i==9999) throw new IllegalStateException("Namespace for new Elements is not large enough");
                                  name1= gen.nextString();
                                  name2= gen.nextString();
                                  if(name1.equals(name2)) continue;
@@ -291,53 +253,40 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         }
                         else{
                             newElement=Element.in(this.getRepresented().getGraph().getContext()).create(newName, eType, this.getRepresented(), Element.State.fromName(sig.getValue()));
-                            this.getRepresented().getGraph().addElement(newElement);       //normal elements are simply added
-                        }
+                            this.getRepresented().getGraph().addElement(newElement);                                            //normal elements are simply added
+                        }                                                                                                       //end of special treatment for Weichen
 
-                        TextField eName= new TextField(newElement.getName());
+                        TextField eName= new TextField(newElement.getName());                                                   //Add UI for the editing of the new Element
                         ElementNameTextFields.put(newElement, eName);
                         Label type = new Label(newElement.getType().getName());
 
-                        ChoiceBox<String> direction = new ChoiceBox<>();    //direction choice box
-                        ChoiceBox<String> logicalGroup = new ChoiceBox<>();
-                        /*
-                        ChoiceBox<String> currentSignal = new ChoiceBox<>();        //TODO state edit?
-                        for(Element.State state :Element.State.values()){
-                            currentSignal.getItems().add(state.name());x
-                            if(state.equals(newElement.getState()))
-                                currentSignal.setValue(state.name());
-                        }
-                        currentSignal.setOnAction((a)->{
-                            newElement.scurrentSignal.getValue()
-                        });
-                        */
-
-                        direction.setOnAction(directionEvent->{
+                        ChoiceBox<String> direction = new ChoiceBox<>();                                                        //direction choice box
+                        direction.setOnAction(directionEvent->{                                                                 //when Direction changes redraw element to indicate direction
 
                             String NodeName = direction.getValue();
                             Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
                             newElement.setDirection(otherNode);
                             this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
 
-
                         });
                         for(Edge e : this.getRepresented().getEdges()){
                             Node otherNode = e.getOtherNode(this.getRepresented());
-                            direction.getItems().addAll(otherNode.getName());
+                            direction.getItems().addAll(otherNode.getName());                                                   //set direction choice box Items
                         }
 
-                        logicalGroup.getItems().add("new Group");
-                        logicalGroup.getItems().add("");
-                        com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.getAll().forEach((a)->{
+                        ChoiceBox<String> logicalGroup = new ChoiceBox<>();                                                     //logical Group choice box
+                        logicalGroup.getItems().add("new Group");                                                               //0 is newGroup
+                        logicalGroup.getItems().add("no Group");                                                                        //1 is no Group
+                        com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.getAll().forEach((a)->{     //add all existing groups as options
                             logicalGroup.getItems().add(a.getName());
                         });
-                        if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);
+                        if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);                 //select no Group as default
                         else
                             logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
 
                         logicalGroup.setOnAction(lgEvent->{
                             if(logicalGroup.getSelectionModel().getSelectedIndex()==0){
-                                Dialog<String> groupCreationDialog = new Dialog<>();
+                                Dialog<String> groupCreationDialog = new Dialog<>();                                            //Dialog for new Group creation set up
 
                                 groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL,ButtonType.APPLY);
                                 ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
@@ -353,18 +302,18 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                         return null;
                                 });
 
-                                Optional<String> result = groupCreationDialog.showAndWait();
+                                Optional<String> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
                                 if(result.isPresent()){
                                     if(com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.NameExists(result.get())){
                                         alert.setContentText("Group already exists");
                                         alert.showAndWait();
-                                        if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);      //select empty string because element is in no group
+                                        if(newElement.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);      //select noGroup string because element is in no group since name is taken
                                         else
                                             logicalGroup.setValue(newElement.getLogicalGroup().getName());
-                                        return;
+
                                     }
                                     else {
-                                        logicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(result.get(), "????");
+                                        logicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(result.get(), "????");   //TODO Kind
                                         if (newElement.getLogicalGroup()!=null){
                                         newElement.getLogicalGroup().removeElement(newElement);
                                         }
@@ -381,7 +330,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                 }
                             }
                             else{
-                                if (newElement.getLogicalGroup()!=null){
+                                if (newElement.getLogicalGroup()!=null){                                                       //code for switching Group
                                     newElement.getLogicalGroup().removeElement(newElement);
                                 }
                                 newElement.setLogicalGroup(com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.get(logicalGroup.getValue()));
@@ -389,17 +338,15 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         });
 
 
-                        grid.add(eName,1,i);
+                        grid.add(eName,1,i);                                                                        //Editor layout code for new Elements
                         grid.add(type,2,i);
-                        //grid.add(currentSignal,3,i);      //TODO state edit?
                         grid.add(logicalGroup, 3, i);
                         if(newElement.getType().isComposite())grid.add(direction,4,i);
                         Button deleteButton = new Button();
                         deleteButton.setText("X");
                         deleteButton.setTextFill(Color.RED);
                         deleteButton.setOnAction((event)->{
-                            //TODO LOG ERROR
-                            if (newElement.getGraph()==null) return;
+                            if (newElement.getGraph()==null) return;                                                        //should never happen
                             newElement.getGraph().removeElement(newElement);
                             grid.getChildren().remove(eName);
                             ElementNameTextFields.remove(newElement);
@@ -407,7 +354,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             grid.getChildren().remove(deleteButton);
                             grid.getChildren().remove(direction);
                             grid.getChildren().remove(logicalGroup);
-                            // grid.getChildren().remove(currentSignal);         //TODO state edit?
+
 
                         });
                         grid.add(deleteButton,5,i);
@@ -419,26 +366,24 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         alert.setContentText("Name already taken");
                         alert.showAndWait();
                         tt.consume();
-                        return;
+
                     }
-
-
-                });
+                });                                                                                                         //end for Elemente creation Code
                 grid.add(createButton,1,6);
 
-                for(Element elements : this.getRepresented().getElements()){
-                    //Label eName= new Label(elements.getReadableName());
-                    TextField eName= new TextField(elements.getName());
-                    ElementNameTextFields.put(elements, eName);
+                for(Element elements : this.getRepresented().getElements()){                                                //Code for Elements that are already there
+                    TextField eName= new TextField(elements.getName());                                                     //quite a bit of code duplication, you could probably change this to be
+                    ElementNameTextFields.put(elements, eName);                                                             //much more elegant
                     Label type = new Label(elements.getType().getName());
                     ChoiceBox<String> direction = new ChoiceBox<>();      //direction Type choice box
                     ChoiceBox<String> logicalGroup = new ChoiceBox<>();
                     direction.setOnAction(directionEvent->{
                         String NodeName = direction.getValue();
-                        Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
-                        elements.setDirection(otherNode);
-                        this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
-
+                        if(this.getRepresented().getGraph()!=null) {                                                        //should never be null
+                            Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
+                            elements.setDirection(otherNode);
+                            this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
+                        }
 
                     });
                     for(Edge e : this.getRepresented().getEdges()){
@@ -448,10 +393,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     }
 
                     logicalGroup.getItems().add("new Group");
-                    logicalGroup.getItems().add("");
-                    com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.getAll().forEach((a)->{
-                        logicalGroup.getItems().add(a.getName());
-                    });
+                    logicalGroup.getItems().add("no Group");
+                    com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.getAll().forEach((a)-> logicalGroup.getItems().add(a.getName()));
                     if(elements.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);
                     else
                         logicalGroup.getSelectionModel().select(elements.getLogicalGroup().getName());
@@ -482,7 +425,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                     if(elements.getLogicalGroup()==null) logicalGroup.getSelectionModel().select(1);      //select empty string because element is in no group
                                     else
                                         logicalGroup.setValue(elements.getLogicalGroup().getName());
-                                    return;
                                 }
                                 else {
                                     logicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(result.get(), "????");
@@ -521,7 +463,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     deleteButton.setText("X");
                     deleteButton.setTextFill(Color.RED);
                     deleteButton.setOnAction((tt)->{
-                        //TODO LOG ERROR
                         if (elements.getGraph()==null) { System.out.println("Error element not in Graph");return;}
                         elements.getGraph().removeElement(elements);
                         grid.getChildren().remove(eName);
@@ -535,15 +476,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     grid.add(deleteButton,5,i);
                     i++;
 
-                }
+                }                                                                                                           //end of duplicate Code
 
                 dialog.getDialogPane().setContent(grid);
-                dialog.setResultConverter(dialogButton -> {             //get user Input
+                dialog.setResultConverter(dialogButton -> {                                                                 //get user Input for the entire Dialog
                     if (dialogButton == ButtonType.APPLY) {
                         LinkedList<String> result = new LinkedList<>();
                         result.add(name.getText());
                         result.add(coordinates.getText());
-                        //grid.getChildren()
                         ElementNameTextFields.forEach((a,b)->{
 
                         });
@@ -553,24 +493,22 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 });
                 Pattern p = Pattern.compile("\\(\\d+,\\d+\\)");
                 Pattern d = Pattern.compile("\\d+");
-                //dialog.show();
                 Optional<LinkedList<String>> result = dialog.showAndWait();
                 if(result.isPresent()){
-                    Matcher m = p.matcher(result.get().get(1));     //check if input for coordinates matches (x,y) format
+                    Matcher m = p.matcher(result.get().get(1));                                                             //check if input for coordinates matches (x,y) format
                     if(m.matches()){
                         Matcher dm = d.matcher(m.group());
                         dm.find();
                         int x =Integer.parseInt(dm.group());
                         dm.find();
                         int y = Integer.parseInt(dm.group());
-                        this.getRepresented().setCoordinates(new Coordinates(x,y));
+                        this.getRepresented().setCoordinates(new Coordinates(x,y));                                        //set new Coordinates
                         this.getRepresented().moved();
                         relocate(this.getShape());
                     }
                     else {
                         alert.setContentText("Invalid Coordinates");
                         alert.showAndWait();
-                        //t.consume();
                         return;
                     }
 
@@ -581,32 +519,27 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     else{
                         alert.setContentText("Name already taken");
                         alert.showAndWait();
-                        //t.consume();
                         return;
                     }
 
-                    ElementNameTextFields.forEach((a,b)->{
+                    ElementNameTextFields.forEach((a,b)->{                                                                          //set Element names
                         if(a.getGraph()!=null){
-                            if(a.getName().equals(b.getText()) | a.setName(b.getText())){
+                            if(a.getName().equals(b.getText()) | a.setName(b.getText())){                                           //TODO Tooltip updates for Elements
                                 //initializedShape(a.getGraph().getElements().get(a));
                                 //TooltipUtil.install(a.getGraph().getElements().get(a), new Tooltip(a.getName()));
                             }
                             else {
                                 alert.setContentText("Name already taken");
                                 alert.showAndWait();
-                                return;
                             }
                         }
                         else{
                             alert.setContentText("Internal Error Element not in Graph");
                             alert.showAndWait();
-                            return;
                         }
                     });
 
                 }
-                /////DEBUG////
-                //this.getRepresented().getElements().forEach((test)->{System.out.println(test+ " " + test.getType());});
                 t.consume();
             }
         });
@@ -649,7 +582,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     protected void resize(Circle shape) {
         double radius = getCalibrationBase() * CALIBRATION_COEFFICIENT.getValue();
         shape.setRadius(radius);
-        //highlightGlow.setRadius(getCalibrationBase() * CALIBRATION_COEFFICIENT * 1.5);
     }
 
 
@@ -670,9 +602,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     @Override
     public Circle createShape() {
 
-        ChangeListener sizeListener = ((observable, oldValue, newValue) -> {
-            resize(this.getShape());
-        });
+        ChangeListener sizeListener = ((observable, oldValue, newValue) -> resize(this.getShape()));
         listeners.add(sizeListener);
         CALIBRATION_COEFFICIENT.addListener(new WeakChangeListener<>(sizeListener));
 
@@ -689,7 +619,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         return super.equals(obj);
     }
 
-
+    /**
+     * Sets wether the Node can be moved in the Editor
+     *
+     * @param moveable  true if the Node should be able to be moved
+     */
     public void setMoveable(boolean moveable) {
         this.moveable = moveable;
         if (moveable) this.getShape().setCursor(Cursor.HAND);

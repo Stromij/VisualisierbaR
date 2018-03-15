@@ -361,6 +361,8 @@ public class MainController {
         deleteButton.setOnAction((t) -> {
             Junction.getSelection().forEach((a) -> {
                 if (graph == null) return;
+                if(nodeClipboard.contains(a.getRepresentedObjects().get(0)))
+                    nodeClipboard.remove(a.getRepresentedObjects().get(0));
                 graph.removeNode(a.getRepresentedObjects().get(0));
 
             });
@@ -445,17 +447,6 @@ public class MainController {
                        Node copy = a.getRepresentedObjects().get(0);
                        LinkedList<Edge> edgesToRemove = new LinkedList<>();
 
-                       /*
-                       for(Edge edge : copy.getEdges()){
-                           if(copy.getGraph()!= null)
-                               if(!selectedNodes.contains(edge.getOtherNode(a.getRepresentedObjects().get(0))))
-                                   edgesToRemove.add(edge);
-                               //copy.getGraph().removeEdge(edge);
-                       }
-                       edgesToRemove.forEach((edge)->{
-                           copy.getGraph().removeEdge(edge);
-                       });
-                       */
                        nodeList.add(copy);
                         if(copy.getGraph()!= null){
                             //copy.getGraph().removeNode(copy);
