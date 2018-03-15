@@ -169,7 +169,7 @@ public class EdgeTest extends FactoryTest<Edge> {
     }
 
     @Test
-    public void testToABS()
+    public void testToABSSimple()
         {Graph graph= new Graph(new Context(), new SimpleCoordinatesAdapter());
 
          Node n1 = Node.in(context).create("node1", new Coordinates(0, 0));

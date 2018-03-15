@@ -49,4 +49,28 @@ public class GraphParserTest {
         Context context = new GraphParser().parse("src/test/resources/test6MSG.zug");
         assertNotNull(context);
     }
+
+    @Test
+    public void testLog7() throws IOException {
+        Context context = new GraphParser().parse("src/test/resources/test7.zug.clean");
+        assertNotNull(context);
+    }
+
+    @Test
+    public void testLog8() throws IOException {
+        Context context = new GraphParser().parse("src/test/resources/test8.zug.clean");
+        assertNotNull(context);
+    }
+
+    @Test
+    public void testLog9() throws IOException {
+        Context context = new GraphParser().parse("src/test/resources/test9.zug.clean");
+        assertNotNull(context);
+    }
+
+    @Test
+    public void testLog10() throws IOException {
+        Context context = new GraphParser().parse("src/test/resources/test10.zug.clean");
+        assertNotNull(context);
+    }
 }
