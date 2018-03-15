@@ -7,7 +7,7 @@ import java.util.*;
 public class LogicalGroup {
 
     @Nonnull
-    private ArrayList<Element> elements;
+    private LinkedHashSet<Element> elements;
     @Nonnull
     private String name;
     @Nonnull
@@ -22,7 +22,7 @@ public class LogicalGroup {
 
 
         @Nonnull
-        public static LogicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull ArrayList<Element> elements){
+        public static LogicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
                 LogicalGroup g= new  LogicalGroup(name, kind, elements);
@@ -69,17 +69,17 @@ public class LogicalGroup {
     }
 
 
-    private LogicalGroup(@Nonnull String name, @Nonnull String kind, @Nonnull ArrayList<Element> elements)
+    private LogicalGroup(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements)
         {this.name = name;
          this.kind = kind;
-         this.elements = new ArrayList<>();
+         this.elements = new LinkedHashSet<>();
          this.elements.addAll(elements);
         }
 
     private LogicalGroup(@Nonnull String name, @Nonnull String kind)
         {this.name = name;
          this.kind = kind;
-         this.elements = new ArrayList<>();
+         this.elements = new LinkedHashSet<>();
         }
 
     @Nonnull
@@ -102,7 +102,7 @@ public class LogicalGroup {
         }
 
     @Nonnull
-    public ArrayList<Element> getElements(){
+    public LinkedHashSet<Element> getElements(){
         return elements;
     }
 
