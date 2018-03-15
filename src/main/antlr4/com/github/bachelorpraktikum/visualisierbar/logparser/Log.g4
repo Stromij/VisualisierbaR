@@ -22,7 +22,7 @@ node: 'NODE' SEP node_name SEP coord (SEP node_abs_name)?;
 
 edge: 'EDGE' SEP edge_name SEP node_name SEP node_name SEP INT (SEP edge_abs_name)?;
 
-elem: 'ELEM' SEP elem_name SEP node_name SEP STATE;
+elem: 'ELEM' SEP elem_name SEP node_name SEP STATE (SEP elem_abs_name)?;
 
 view: 'TOWARDS' SEP elem_name SEP edge_name;
 
@@ -59,6 +59,7 @@ speed: INT;
 distance: INT;
 train_readable_name: (WORD | INT)+;
 elem_name: name;
+elem_abs_name: name;
 name: any+;
 coord: INT SEP INT;
 name_prefix: '<' INT DOT INT DOT INT '>' COLON;

@@ -134,10 +134,17 @@ public final class GraphParser {
             try {
                 String elementName = ctx.elem_name().getText();
                 String nodeName = ctx.node_name().getText();
+                String absName = null;
                 Node node = Node.in(context).get(nodeName);
                 Element.State state = Element.State.fromName(ctx.STATE().getText());
                 Element.Type type = Element.Type.fromName(elementName);
                 Element elemNew = Element.in(context).create(elementName, type, node, state);
+
+                try {absName = ctx.elem_abs_name().getText();
+                     elemNew.setAbsName(absName);
+                    }
+                catch (NullPointerException e){}
+
 
                 if(elemViewTracker.get(elementName) != null)
                     {Edge view = elemViewTracker.get(elementName);
