@@ -9,31 +9,17 @@ import com.github.bachelorpraktikum.visualisierbar.datasource.AbsSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.DataSource;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.*;
-import com.github.bachelorpraktikum.visualisierbar.model.Event;
 import com.github.bachelorpraktikum.visualisierbar.model.train.Train;
 import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsBase;
 import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsController;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.ProportionalCoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
-import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
-
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -56,12 +42,10 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -76,14 +60,24 @@ import javafx.util.StringConverter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class MainController {
 
+    private static final double SCALE_DELTA = 1.1;
+    static private HashSet<Node> nodeClipboard = new HashSet<>();
     @FXML
     private AnchorPane detail;
     @FXML
     private ToggleButton eventTraversal;
-
     @FXML
     private ListView<GraphObject> elementList;
     @FXML
@@ -94,7 +88,6 @@ public class MainController {
     private TextField filterText;
     @FXML
     private ToggleButton proportionalToggle;
-
     @FXML
     private ListView<Shapeable<?>> legend;
     @FXML
@@ -109,7 +102,6 @@ public class MainController {
     private Button printToABSButton;
     @FXML
     private BorderPane rootPane;
-
     @FXML
     private DetailsController detailBoxController;
     @FXML
@@ -134,12 +126,10 @@ public class MainController {
     private Label modelTime;
     @FXML
     private HBox rightSpacer;
-
     @FXML
     private Pane centerPane;
     @FXML
     private Pane graphPane;
-
     @FXML
     private ChoiceBox deltas;
     @FXML
@@ -151,8 +141,6 @@ public class MainController {
     //EDITOR BUTTONS
     @FXML
     private ToolBar editorToolbar;
-
-
     @FXML
     private ChoiceBox<String> toolSelector;
     @FXML
@@ -163,38 +151,19 @@ public class MainController {
     private ToggleButton newNodeButton;
     @FXML
     private Button fcButton;
-
-
-
-
-
-
-
-
-    static private HashSet<Node> nodeClipboard = new HashSet<>();
     private Rectangle selectionRec;
-    //private LinkedList<> selected;
-    /*
-    @FXML
-    private ToolBar editorTB;
-*/
+
     @Nullable
     private Graph graph;
-    //private NumberAxis xAxis;
-    //private NumberAxis yAxis;
     private Map<Train, TrainView> trains;
     @Nullable
     private Highlightable lastHighlighted = null;
-
     private Stage stage;
-
-    private static final double SCALE_DELTA = 1.1;
-
     private double mousePressedX = -1;
     private double mousePressedY = -1;
 
-    private double MousePositionX= 0;
-    private double MousePositionY=0;
+    private double MousePositionX = 0;
+    private double MousePositionY = 0;
 
     private boolean autoChange = false;
     private Pattern timePattern;
@@ -214,9 +183,7 @@ public class MainController {
         timePattern = Pattern.compile("(\\d+)(m?s?|h)?$");
         trains = new WeakHashMap<>();
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
-        //HBox.setHgrow(rightSpacerET, Priority.ALWAYS);
-        listeners=new LinkedList<>();
-
+        listeners = new LinkedList<>();
 
 
         // START OF TIME RELATED INIT
@@ -298,7 +265,9 @@ public class MainController {
         fireOnEnterPress(logToggle);
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
-        printToABSButton.setOnAction(event -> {if(graph!=null)graph.printToAbs();});
+        printToABSButton.setOnAction(event -> {
+            if (graph != null) graph.printToAbs();
+        });
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
@@ -324,11 +293,10 @@ public class MainController {
 
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
 
-            //TODO log error
             if (graph == null) return;
             if (newValue) {
 
-                if(!simulationStopWarning()) {
+                if (!simulationStopWarning()) {
                     editorToggle.setSelected(false);
                     return;
                 }
@@ -345,7 +313,7 @@ public class MainController {
                     playToggle.fire();
                     resetButton.fire();
                 }
-                if (proportionalToggle.isSelected()){
+                if (proportionalToggle.isSelected()) {
                     proportionalToggle.fire();
                 }
                 resetButton.fire();
@@ -361,6 +329,8 @@ public class MainController {
         deleteButton.setOnAction((t) -> {
             Junction.getSelection().forEach((a) -> {
                 if (graph == null) return;
+                if (nodeClipboard.contains(a.getRepresentedObjects().get(0)))
+                    nodeClipboard.remove(a.getRepresentedObjects().get(0));
                 graph.removeNode(a.getRepresentedObjects().get(0));
 
             });
@@ -368,7 +338,7 @@ public class MainController {
         });
 
         disconnectButton.setOnAction((t) -> Junction.getSelection().forEach((a) -> {
-            if (graph==null) return;
+            if (graph == null) return;
             graph.disconnect(a.getRepresentedObjects().get(0));
         }));
 
@@ -382,175 +352,141 @@ public class MainController {
         });
 
         fcButton.setOnAction((t) -> {
-            if (graph==null) return;
+            if (graph == null) return;
             graph.fullyConnect(Junction.getSelection());
         });
         // add Shortcut Handler
-        rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event->{
+        rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             //editor shortcuts
-            if(editorToggle.isSelected()){
-                if(event.getCode()==KeyCode.P && event.isControlDown()){
+            if (editorToggle.isSelected()) {
+                if (event.getCode() == KeyCode.P && event.isControlDown()) {
                     printToABSButton.fire();
                 }
-                if(event.getCode()== KeyCode.D && event.isControlDown()){
+                if (event.getCode() == KeyCode.D && event.isControlDown()) {
                     fcButton.fire();
                 }
-                if(event.getCode()== KeyCode.N && event.isControlDown()){
+                if (event.getCode() == KeyCode.N && event.isControlDown()) {
                     newNodeButton.fire();
                 }
-                if(event.getCode()== KeyCode.R && event.isControlDown()){
+                if (event.getCode() == KeyCode.R && event.isControlDown()) {
                     deleteButton.fire();
                 }
-                if(event.getCode()== KeyCode.C && event.isAltDown()){
+                if (event.getCode() == KeyCode.C && event.isAltDown()) {
                     disconnectButton.fire();
                 }
-                if(event.getCode().isDigitKey()){
-                    if(event.getCode() == KeyCode.DIGIT1){
+                if (event.getCode().isDigitKey()) {
+                    if (event.getCode() == KeyCode.DIGIT1) {
                         toolSelector.setValue(toolSelector.getItems().get(0));
                     }
-                    if(event.getCode() == KeyCode.DIGIT2){
+                    if (event.getCode() == KeyCode.DIGIT2) {
                         toolSelector.setValue(toolSelector.getItems().get(1));
                     }
                 }
-                if(event.getCode()== KeyCode.A && event.isControlDown()){
-                    if (graph!=null){
-                        graph.getNodes().forEach((a,b)-> ((Junction)b).addToSelection());
+                if (event.getCode() == KeyCode.A && event.isControlDown()) {
+                    if (graph != null) {
+                        graph.getNodes().forEach((a, b) -> ((Junction) b).addToSelection());
                     }
                 }
-                //java.awt.datatransfer.Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
                 Clipboard clipboard = Clipboard.getSystemClipboard();
-                if(event.getCode()== KeyCode.C && event.isControlDown()){
-                    /*HashMap<Node, LinkedList<Element>> nodeMap= new HashMap<>();
-
-                    Junction.getSelection().forEach(a->{
-                        Node copyNode = a.getRepresentedObjects().get(0);
-                        LinkedList<Element> elements=new LinkedList<>();
-                        copyNode.getElements().forEach(b->elements.add(b));
-                        nodeMap.put(copyNode,elements);
-
-
-                    });
-                    NodeTransforable contents = new NodeTransforable(nodeMap);
-                    cb.setContents(contents,null);*/
+                if (event.getCode() == KeyCode.C && event.isControlDown()) {
 
                 }
-                if(event.getCode()== KeyCode.X && event.isControlDown()){
+                if (event.getCode() == KeyCode.X && event.isControlDown()) {
                     nodeClipboard.clear();
                     HashSet<Node> selectedNodes = new HashSet<>();
-                    for (Junction junction: Junction.getSelection()){
+                    for (Junction junction : Junction.getSelection()) {
                         selectedNodes.add(junction.getRepresentedObjects().get(0));
                     }
-                    LinkedList<Node> nodeList= new LinkedList<>();
-                    for (Junction a : Junction.getSelection()){
-                       Node copy = a.getRepresentedObjects().get(0);
-                       LinkedList<Edge> edgesToRemove = new LinkedList<>();
-
-                       /*
-                       for(Edge edge : copy.getEdges()){
-                           if(copy.getGraph()!= null)
-                               if(!selectedNodes.contains(edge.getOtherNode(a.getRepresentedObjects().get(0))))
-                                   edgesToRemove.add(edge);
-                               //copy.getGraph().removeEdge(edge);
-                       }
-                       edgesToRemove.forEach((edge)->{
-                           copy.getGraph().removeEdge(edge);
-                       });
-                       */
-                       nodeList.add(copy);
-                        if(copy.getGraph()!= null){
-                            //copy.getGraph().removeNode(copy);
-                        }
+                    LinkedList<Node> nodeList = new LinkedList<>();
+                    for (Junction a : Junction.getSelection()) {
+                        Node copy = a.getRepresentedObjects().get(0);
+                        nodeList.add(copy);
                     }
-                    //Junction.clearSelection();
-
                     nodeClipboard.addAll(nodeList);
 
                 }
-                if(event.getCode()== KeyCode.V && event.isControlDown()){
+                if (event.getCode() == KeyCode.V && event.isControlDown()) {
                     Node mostLeftNode = null;
-                    for(Node node : nodeClipboard){
-                        if (mostLeftNode==null){
-                            mostLeftNode=node;
-                        }
-                        else{
-                            if(node.getCoordinates().getX()<mostLeftNode.getCoordinates().getX())
-                                mostLeftNode=node;
+                    for (Node node : nodeClipboard) {
+                        if (mostLeftNode == null) {
+                            mostLeftNode = node;
+                        } else {
+                            if (node.getCoordinates().getX() < mostLeftNode.getCoordinates().getX())
+                                mostLeftNode = node;
                         }
                     }
-                    if(mostLeftNode!=null){
-
+                    if (mostLeftNode != null) {
                         Coordinates cord = graph.getCoordinatesAdapter().reverse(new Point2D(MousePositionX, MousePositionY));
                         Coordinates mostLeftCord = mostLeftNode.getCoordinates();
-                        //System.out.println(new Point2D(MousePositionX, MousePositionY));
-                        //System.out.println(mostLeftCord);
+
 
                         RandomString gen = new RandomString(8, ThreadLocalRandom.current());
-                        String name=null;
-
+                        String name = null;
                         HashMap<Node, Node> copyNodes = new HashMap<>(Junction.getSelection().size());
 
-                        for(Node node : nodeClipboard){
+                        for (Node node : nodeClipboard) {
 
-                            int x = node.getCoordinates().getX()- mostLeftCord.getX();
-                            int y = node.getCoordinates().getY()- mostLeftCord.getY();
+                            int x = node.getCoordinates().getX() - mostLeftCord.getX();
+                            int y = node.getCoordinates().getY() - mostLeftCord.getY();
 
-                            for (int j=0; j<10000; j++) {               //generate random name
+                            for (int j = 0; j < 10000; j++) {               //generate random name
                                 name = gen.nextString();
-                                if(!Node.in(graph.getContext()).NameExists(node.getName()+ "_copy_" +name)) break;
+                                if (!Node.in(graph.getContext()).NameExists(node.getName() + "_copy_" + name)) break;
                             }
 
-                            Node copy = Node.in(graph.getContext()).create(node.getName()+ "_copy_" +name,new Coordinates(x+cord.getX(), y+cord.getY()));
-                            //node.setCoordinates(new Coordinates(x+cord.getX(), y+cord.getY()));
+                            Node copy = Node.in(graph.getContext()).create(node.getName() + "_copy_" + name, new Coordinates(x + cord.getX(), y + cord.getY()));
                             copyNodes.put(node, copy);
-                            //graph.enterNode(node);
-
                             ((Junction) graph.getNodes().get(node)).setMoveable(true);
-                            //node.moved();
+
                         }
-                        for(Node node : copyNodes.keySet()){
+                        for (Node node : copyNodes.keySet()) {
                             for (Edge edge : node.getEdges()) {
-                                if(copyNodes.containsKey(edge.getNode1()) && copyNodes.containsKey(edge.getNode2())){
-                                    for (int j=0; j<10000; j++) {               //generate missing edges with random names
+                                if (copyNodes.containsKey(edge.getNode1()) && copyNodes.containsKey(edge.getNode2())) {
+                                    for (int j = 0; j < 10000; j++) {
                                         name = gen.nextString();
-                                        if(!Edge.in(graph.getContext()).NameExists(edge.getName()+ "_copy_" +name)) break;
+                                        if (!Edge.in(graph.getContext()).NameExists(edge.getName() + "_copy_" + name))
+                                            break;
                                     }
-                                    Edge copyEdge = Edge.in(graph.getContext()).create(edge.getName()+ "_copy_" +name, edge.getLength(),copyNodes.get(edge.getNode1()), copyNodes.get(edge.getNode2()));
+                                    Edge copyEdge = Edge.in(graph.getContext()).create(edge.getName() + "_copy_" + name, edge.getLength(), copyNodes.get(edge.getNode1()), copyNodes.get(edge.getNode2()));
                                     copyNodes.get(node).addEdge(copyEdge);
                                 }
                             }
                         }
-                        for(Node node : copyNodes.keySet()){
-                            for(Element element : node.getElements()){
-                                if(element.getType() == Element.Type.WeichenPunkt){
+                        for (Node node : copyNodes.keySet()) {
+                            for (Element element : node.getElements()) {
+                                if (element.getType() == Element.Type.WeichenPunkt) {
                                     boolean test = true;
-                                    for(Element switchEle: element.getSwitch().getElements()){
-                                        if(!copyNodes.containsKey(switchEle.getNode()))
-                                            test=false;
+                                    for (Element switchEle : element.getSwitch().getElements()) {
+                                        if (!copyNodes.containsKey(switchEle.getNode()))
+                                            test = false;
                                     }
-                                    if(!test){ continue;}
+                                    if (!test) {
+                                        continue;
+                                    }
                                 }
-                                for (int j=0; j<10000; j++) {               //generate missing edges with random names
+                                for (int j = 0; j < 10000; j++) {
                                     name = gen.nextString();
-                                    if(!Element.in(graph.getContext()).NameExists(element.getName()+ "_copy_" +name)) break;
+                                    if (!Element.in(graph.getContext()).NameExists(element.getName() + "_copy_" + name))
+                                        break;
                                 }
-                                Element newElem = Element.in(graph.getContext()).create(element.getName()+ "_copy_" +name, element.getType(), copyNodes.get(node), element.getState());
-                                if(copyNodes.containsKey(element.getDirection()))
+                                Element newElem = Element.in(graph.getContext()).create(element.getName() + "_copy_" + name, element.getType(), copyNodes.get(node), element.getState());
+                                if (copyNodes.containsKey(element.getDirection()))
                                     newElem.setDirection(copyNodes.get(element.getDirection()));
-                                if (element.getLogicalGroup()!=null) {
+                                if (element.getLogicalGroup() != null) {
                                     element.getLogicalGroup().addElement(newElem);
                                     newElem.setLogicalGroup(element.getLogicalGroup());
                                 }
                                 copyNodes.get(node).addElement(newElem);
                             }
                             graph.enterNode(copyNodes.get(node));
-                            ((Junction)graph.getNodes().get(copyNodes.get(node))).setMoveable(true);
+                            ((Junction) graph.getNodes().get(copyNodes.get(node))).setMoveable(true);
                         }
 
 
                     }
                 }
             }
-            if(event.getCode()== KeyCode.ESCAPE){
+            if (event.getCode() == KeyCode.ESCAPE) {
                 Junction.clearSelection();
             }
         });
@@ -579,7 +515,6 @@ public class MainController {
         );
 
         toolSelector.setValue(toolSelector.getItems().get(0));
-
 
 
         initializeElementList();
@@ -625,46 +560,7 @@ public class MainController {
         });
 
 
-
     }
-    /*
-   public static class  NodeTransforable implements Transferable{
-        public static DataFlavor NodeFlavor;
-        private DataFlavor [] supportedFlavor ={NodeFlavor};
-        public HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> setNodeEdge;
-        public HashMap<Node, LinkedList<Element>> setNode;
-
-        public NodeTransforable (HashMap<HashMap<Node, LinkedList<Element>>,LinkedList<Edge>> paraNode) {
-            setNodeEdge= paraNode;
-            try {
-                NodeFlavor = new DataFlavor (Class.forName ("com.github.bachelorpraktikum.visualisierbar.model.Node"), "Node");
-            }
-            catch (ClassNotFoundException e) {
-                e.printStackTrace ();
-            }
-        }
-
-
-        @Override
-        public DataFlavor[] getTransferDataFlavors() {
-            return supportedFlavor;
-        }
-
-        @Override
-        public boolean isDataFlavorSupported(DataFlavor nodeFlavor) {
-            return (nodeFlavor.equals (NodeFlavor));
-        }
-
-        @Override
-        public Object getTransferData(DataFlavor nFlavor) throws UnsupportedFlavorException {
-            if (nFlavor.equals (NodeFlavor))
-                return (this);
-            else
-                throw new UnsupportedFlavorException (nFlavor);
-        }
-
-    }
-    */
 
 
     private void initializeCenterPane() {
@@ -676,64 +572,52 @@ public class MainController {
 
         graphPane.setOnMouseMoved((event -> {
             Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
-            MousePositionX=c.getX();
-            MousePositionY=c.getY();
+            MousePositionX = c.getX();
+            MousePositionY = c.getY();
         }));
 
         graphPane.heightProperty().addListener(boundsListener);
         graphPane.widthProperty().addListener(boundsListener);
 
         graphPane.setOnMouseClicked((event) -> {
-            //if (!event.isShiftDown()){Junction.clearSelection();}
             if (newNodeButton.isSelected()) {
-                //TODO log error
-                if(graph==null) return;
+                if (graph == null) return;
                 TextInputDialog dialog = new TextInputDialog();
                 dialog.setTitle("Enter Node Name");
-                //dialog.setX(event.getX());
-                //dialog.setY(event.getY());
                 dialog.setGraphic(null);
                 dialog.setHeaderText(null);
                 dialog.showAndWait();
                 String name = dialog.getResult();
                 if (name == null) return;
-                //String name = dialog.getContentText();
-                //System.out.println(name);
-                //System.out.println(event.getX()+" "+ event.getY());
-                //System.out.println(event.getSceneX()+" "+ event.getSceneY());
                 Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
-                //System.out.println(c.getX()+" "+ c.getY());
                 try {
-                   if(Math.round(c.getX())<0 || Math.round(c.getY())<0){
-                        if(Math.round(c.getX())<0 && Math.round(c.getY())>= 0){
-                            double x= 0 - Math.round(c.getX());
-                            Map<Node, GraphShape<Node> > nodes = graph.getNodes();
-                            for(Node n : nodes.keySet()){
-                                    n.setCoordinates(new SimpleCoordinatesAdapter().reverse(new Point2D(((int) n.getCoordinates().getX()+x),(  (int) n.getCoordinates().getY()))));
+                    if (Math.round(c.getX()) < 0 || Math.round(c.getY()) < 0) {
+                        if (Math.round(c.getX()) < 0 && Math.round(c.getY()) >= 0) {
+                            double x = 0 - Math.round(c.getX());
+                            Map<Node, GraphShape<Node>> nodes = graph.getNodes();
+                            for (Node n : nodes.keySet()) {
+                                n.setCoordinates(new SimpleCoordinatesAdapter().reverse(new Point2D(((int) n.getCoordinates().getX() + x), ((int) n.getCoordinates().getY()))));
                             }
 
                             graph.addNode(name, new Coordinates(0, (int) Math.round(c.getY())));
-                        }
-                        else  if(Math.round(c.getX())>=0 && Math.round(c.getY())< 0){
-                            int y= 0 - (int)Math.round(c.getY());
-                            Map<Node, GraphShape<Node> > nodes = graph.getNodes();
-                            for(Node n : nodes.keySet()){
-                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX(),  (int) n.getCoordinates().getY()+y));
+                        } else if (Math.round(c.getX()) >= 0 && Math.round(c.getY()) < 0) {
+                            int y = 0 - (int) Math.round(c.getY());
+                            Map<Node, GraphShape<Node>> nodes = graph.getNodes();
+                            for (Node n : nodes.keySet()) {
+                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX(), (int) n.getCoordinates().getY() + y));
                             }
 
                             graph.addNode(name, new Coordinates((int) Math.round(c.getX()), 0));
-                        }
-                        else{
-                            int x= 0-(int) Math.round(c.getX());
-                            int y= 0-(int) Math.round(c.getY());
-                            Map<Node, GraphShape<Node> > nodes = graph.getNodes();
-                            for(Node n : nodes.keySet()){
-                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX()+x,  (int) n.getCoordinates().getY()+y));
+                        } else {
+                            int x = 0 - (int) Math.round(c.getX());
+                            int y = 0 - (int) Math.round(c.getY());
+                            Map<Node, GraphShape<Node>> nodes = graph.getNodes();
+                            for (Node n : nodes.keySet()) {
+                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX() + x, (int) n.getCoordinates().getY() + y));
                             }
                             graph.addNode(name, new Coordinates(0, 0));
                         }
-                    }
-                    else {
+                    } else {
                         graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
                     }
                 } catch (IllegalArgumentException e) {
@@ -748,7 +632,6 @@ public class MainController {
                 }
                 newNodeButton.setSelected(false);
                 event.consume();
-                //graph.addNode(name, new Coordinates(0,0));
             }
 
         });
@@ -771,15 +654,6 @@ public class MainController {
                 group.setScaleY(scaleFactor);
                 group.setTranslateX(group.getTranslateX() - factor * translateX);
                 group.setTranslateY(group.getTranslateY() - factor * translateY);
-                //yAxis.setScaleX(scaleFactor);
-                //yAxis.setScaleY(scaleFactor);
-                //yAxis.setTranslateX(yAxis.getTranslateX() - factor * translateX);
-                //yAxis.setTranslateY(yAxis.getTranslateY() - factor/4 * translateY);
-
-                //yAxis.setLayoutX(yAxis.getLayoutX() * 1+(scaleFactor-oldScale)/2 );
-                //yAxis.setLayoutY(yAxis.getLayoutY() * 1+(scaleFactor-oldScale)/2 );
-                //yAxis.setUpperBound(yAxis.getUpperBound()*scaleFactor);
-
             }
 
         });
@@ -789,44 +663,36 @@ public class MainController {
             mousePressedX = -1;
             mousePressedY = -1;
             selectionRec.setVisible(false);
-            if (toolSelector.getSelectionModel().getSelectedIndex()==1) {       //select selected
-                //System.out.println( selectionRec.getBoundsInLocal()
+            if (toolSelector.getSelectionModel().getSelectedIndex() == 1) {       //select selected
                 if (!event.isShiftDown()) Junction.clearSelection();
-                //TODO Log Error
                 if (graph == null) return;
                 graph.getNodes().forEach((node, shape) -> {
 
                     Circle c = (Circle) shape.getShape();
                     Bounds sb = graph.getGroup().localToParent(c.getBoundsInParent());
-                    //graph.getLogicalGroup().get
                     double srx = selectionRec.getX();
                     double sry = selectionRec.getY();
                     if (srx < sb.getMaxX() && srx + selectionRec.getWidth() > sb.getMinX() && sry < sb.getMaxY() && sry + selectionRec.getHeight() > sb.getMinY()) {
-                        //System.out.println("things are happening");
-                        if(event.isControlDown()){
+                        if (event.isControlDown()) {
                             ((Junction) shape).removeFromSelection();
-                        }
-                        else
+                        } else
                             ((Junction) shape).addToSelection();
                     }
                 });
                 selectionRec.setHeight(0);
                 selectionRec.setWidth(0);
             }
-            //if (selected.getChildren().size()>0)
         });
 
         selectionRec = new Rectangle();
         selectionRec.setVisible(false);
         selectionRec.setFill(Color.BLUE);
         selectionRec.setOpacity(0.2);
-        //selected=new logicalGroup();
         graphPane.setOnMouseDragged(event -> {
             if (!event.isPrimaryButtonDown()) {
                 return;
             }
-            //if (toolSelector.getValue().equals("move")) {
-            if (toolSelector.getSelectionModel().getSelectedIndex()==0) {           //move selected
+            if (toolSelector.getSelectionModel().getSelectedIndex() == 0) {           //move selected
                 if (mousePressedX == -1 && mousePressedY == -1) {
                     mousePressedX = event.getX();
                     mousePressedY = event.getY();
@@ -839,18 +705,14 @@ public class MainController {
                 graphPane.setTranslateY(graphPane.getTranslateY() + yOffset);
                 if (graph != null) {
                     graph.getGroup().getScaleY();
-                    //yAxis.setTranslateY(yAxis.getTranslateY() - yOffset / graph.getLogicalGroup().getScaleY());
-                    //yAxis.setTranslateX(yAxis.getTranslateX() - xOffset);
                 }
             } else {
                 if (mousePressedX == -1 && mousePressedY == -1) {
-                    //System.out.println("CLICK");
                     selectionRec.setVisible(true);
                     mousePressedX = event.getX();
                     mousePressedY = event.getY();
                     selectionRec.setX(mousePressedX);
                     selectionRec.setY(mousePressedY);
-                    //selected.getChildren().removeAll();
                 }
                 double xOffset = (event.getX() - mousePressedX);
                 double yOffset = (event.getY() - mousePressedY);
@@ -871,7 +733,6 @@ public class MainController {
             }
             event.consume();
         });
-        //graphPane.getChildren().add(selectionRec);
         MenuItem exportItem = new MenuItem("Export");
         exportItem.setOnAction(event -> exportGraph());
         ContextMenuUtil.attach(centerPane, Collections.singletonList(exportItem));
@@ -1215,13 +1076,11 @@ public class MainController {
 
                 }
                 showElements();
-                //initializeElementList();
             });
             graph.changeProperty().addListener(GraphListener);
             listeners.add(new WeakChangeListener(GraphListener));
 
             graph.changed();
-
 
 
             for (Train train : Train.in(context).getAll()) {
@@ -1344,33 +1203,34 @@ public class MainController {
         }
     }
 
-    private boolean simulationStopWarning()
-        {if(ConfigKey.simulationStoppedDoNotShowAgain.get().equals("true"))
-            {return true;}
-
-         ButtonType buttonDoNotShowAgain = new ButtonType("Do not show Again");
-         ButtonType buttonOK = new ButtonType("Okay");
-         ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-         Alert simulationInfo = new Alert(Alert.AlertType.WARNING);
-         simulationInfo.setTitle("Simulation stopped");
-         simulationInfo.setHeaderText("Simulation will be stopped!");
-         simulationInfo.setContentText("Attention!\n" +
-                                       "By opening the editor simulations will be stopped.\n" +
-                                       "After opening the editor there will be no simulations possible!");
-         simulationInfo.getDialogPane().setPrefWidth(525);
-         simulationInfo.getDialogPane().setMaxWidth(Double.MAX_VALUE);
-         simulationInfo.getButtonTypes().setAll(buttonDoNotShowAgain, buttonOK, buttonCancel);
-         Optional<ButtonType> result = simulationInfo.showAndWait();
-
-         System.out.println(result);
-         if (result.get() == buttonDoNotShowAgain)
-            {ConfigKey.simulationStoppedDoNotShowAgain.set("true");
-             return true;
-            }
-         else if(result.get() == buttonOK)
-            {return true;}
-         else
-            {return false;}
+    private boolean simulationStopWarning() {
+        if (ConfigKey.simulationStoppedDoNotShowAgain.get().equals("true")) {
+            return true;
         }
+
+        ButtonType buttonDoNotShowAgain = new ButtonType("Do not show Again");
+        ButtonType buttonOK = new ButtonType("Okay");
+        ButtonType buttonCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Alert simulationInfo = new Alert(Alert.AlertType.WARNING);
+        simulationInfo.setTitle("Simulation stopped");
+        simulationInfo.setHeaderText("Simulation will be stopped!");
+        simulationInfo.setContentText("Attention!\n" +
+                "By opening the editor simulations will be stopped.\n" +
+                "After opening the editor there will be no simulations possible!");
+        simulationInfo.getDialogPane().setPrefWidth(525);
+        simulationInfo.getDialogPane().setMaxWidth(Double.MAX_VALUE);
+        simulationInfo.getButtonTypes().setAll(buttonDoNotShowAgain, buttonOK, buttonCancel);
+        Optional<ButtonType> result = simulationInfo.showAndWait();
+
+        System.out.println(result);
+        if (result.get() == buttonDoNotShowAgain) {
+            ConfigKey.simulationStoppedDoNotShowAgain.set("true");
+            return true;
+        } else if (result.get() == buttonOK) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

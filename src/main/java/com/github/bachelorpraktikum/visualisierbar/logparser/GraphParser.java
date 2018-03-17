@@ -87,12 +87,14 @@ public final class GraphParser {
         private final Context context;
         private final BigInteger thousandInt;
 
-        private HashMap<String, Edge> elemViewTracker = new HashMap();
-        private HashMap<String, logicalGroup> elemGroupTracker = new HashMap();
+        private HashMap<String, Edge> elemViewTracker;
+        private HashMap<String, LogicalGroup> elemGroupTracker;
 
         Listener(Context context) {
             this.context = context;
             this.thousandInt = BigInteger.valueOf(1000);
+            elemViewTracker = new HashMap<>();
+            elemGroupTracker = new HashMap<>();
         }
 
         private int createTime(LogParser.TimeContext ctx) {
@@ -132,10 +134,17 @@ public final class GraphParser {
             try {
                 String elementName = ctx.elem_name().getText();
                 String nodeName = ctx.node_name().getText();
+                String absName = null;
                 Node node = Node.in(context).get(nodeName);
                 Element.State state = Element.State.fromName(ctx.STATE().getText());
                 Element.Type type = Element.Type.fromName(elementName);
                 Element elemNew = Element.in(context).create(elementName, type, node, state);
+
+                try {absName = ctx.elem_abs_name().getText();
+                     elemNew.setAbsName(absName);
+                    }
+                catch (NullPointerException e){}
+
 
                 if(elemViewTracker.get(elementName) != null)
                     {Edge view = elemViewTracker.get(elementName);
@@ -145,7 +154,7 @@ public final class GraphParser {
                     }
 
                 if(elemGroupTracker.get(elementName) != null)
-                    {logicalGroup logicalGroup = elemGroupTracker.get(elementName);
+                    {LogicalGroup logicalGroup = elemGroupTracker.get(elementName);
                      elemNew.setLogicalGroup(logicalGroup);
                      logicalGroup.addElement(elemNew);
                      elemGroupTracker.remove(elementName);
@@ -203,7 +212,7 @@ public final class GraphParser {
                 String groupName = ctx.log_name().getText();
                 String kind = ctx.kind().getText();
 
-                logicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.logicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
+                LogicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
 
                 for (int i = 0; ctx.elem_name(i) != null; i++) {
                     if (ctx.elem_name(i).getText().equals("null")) continue;

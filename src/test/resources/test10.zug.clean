@@ -1,0 +1,1690 @@
+Parsing file noch_newer/ETCS.abs
+Parsing file noch_newer/Generator.abs
+Parsing file noch_newer/Graph.abs
+Parsing file noch_newer/Rbc.abs
+Parsing file noch_newer/Run.abs
+Parsing file noch_newer/Stellwerk.abs
+Parsing file noch_newer/SwElements.abs
+Parsing file noch_newer/TrackElements.abs
+Parsing file noch_newer/Train.abs
+Parsing file noch_newer/Util.abs
+Analyzing Model...
+--- configuring product: Small
+--- applying deltas to core << SmallEx .
+Typechecking Model...
+Generating Erlang code in gen/erlang
+==> cowlib (compile)
+==> ranch (compile)
+==> cowboy (compile)
+==> jsx (compile)
+==> absmodel (compile)
+src/gc.erl:51: Warning: gen_fsm:start_link/4 is deprecated and will be removed in a future release; use gen_statem:start_link/4
+src/gc.erl:54: Warning: gen_fsm:stop/1 is deprecated and will be removed in a future release; use gen_statem:stop/1
+src/gc.erl:65: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:69: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:73: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/gc.erl:77: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:80: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:84: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:87: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:89: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/gc.erl:92: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/gc.erl:244: Warning: the result of the expression is ignored (suppress the warning by assigning the expression to the _ variable)
+src/gc.erl:244: Warning: the call to min/2 has no effect
+src/gc.erl:245: Warning: the result of the expression is ignored (suppress the warning by assigning the expression to the _ variable)
+Compiled src/gc.erl
+src/task.erl:15: Warning: undefined callback function get_references/1 (behaviour 'gc')
+src/task.erl:44: Warning: random:seed/3: the 'random' module is deprecated; use the 'rand' module instead
+Compiled src/task.erl
+src/object.erl:60: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/object.erl:65: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/object.erl:77: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/object.erl:84: Warning: gen_fsm:sync_send_all_state_event/3 is deprecated and will be removed in a future release; use gen_statem:call/3
+src/object.erl:86: Warning: gen_fsm:sync_send_all_state_event/3 is deprecated and will be removed in a future release; use gen_statem:call/3
+src/object.erl:89: Warning: gen_fsm:sync_send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/object.erl:92: Warning: gen_fsm:sync_send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/object.erl:95: Warning: gen_fsm:send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/object.erl:98: Warning: gen_fsm:sync_send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/object.erl:101: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/object.erl:104: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/object.erl:130: Warning: gen_fsm:start_link/3 is deprecated and will be removed in a future release; use gen_statem:start_link/3
+Compiled src/object.erl
+src/m_ABS_JUnit_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_ABS_JUnit_funs.erl
+src/m_Train_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_Train_funs.erl
+src/m_Stellwerk_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_Stellwerk_funs.erl
+src/class_Stellwerk_ZfstState.erl:4: Warning: export_all flag enabled - all functions will be exported
+src/class_Stellwerk_ZfstState.erl:12: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Stellwerk_ZfstState.erl:15: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Stellwerk_ZfstState.erl
+src/class_Graph_NodeImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Graph_NodeImpl.erl:260: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Graph_NodeImpl.erl:263: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Graph_NodeImpl.erl
+src/class_SwElements_SpeedLimiterImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_SwElements_SpeedLimiterImpl.erl:111: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_SwElements_SpeedLimiterImpl.erl:114: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_SwElements_SpeedLimiterImpl.erl
+src/class_TrackElements_PrellbockImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_PrellbockImpl.erl:68: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_PrellbockImpl.erl:71: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_PrellbockImpl.erl
+Compiled src/runtime.erl
+Compiled src/main_task.erl
+src/intar.erl:187: Warning: random:uniform/1: the 'random' module is deprecated; use the 'rand' module instead
+Compiled src/intar.erl
+src/m_ABS_Productline_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_ABS_Productline_funs.erl
+Compiled src/init_task.erl
+Compiled src/async_call_task.erl
+src/class_ABS_DC_CloudProvider.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_ABS_DC_CloudProvider.erl:47: Warning: this clause cannot match because of different types/sizes
+src/class_ABS_DC_CloudProvider.erl:197: Warning: this clause cannot match because of different types/sizes
+src/class_ABS_DC_CloudProvider.erl:244: Warning: this clause cannot match because of different types/sizes
+src/class_ABS_DC_CloudProvider.erl:285: Warning: this clause cannot match because of different types/sizes
+src/class_ABS_DC_CloudProvider.erl:316: Warning: this clause cannot match because of different types/sizes
+src/class_ABS_DC_CloudProvider.erl:511: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_ABS_DC_CloudProvider.erl:514: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_ABS_DC_CloudProvider.erl
+src/cog.erl:69: Warning: gen_fsm:start/3 is deprecated and will be removed in a future release; use gen_statem:start/3
+src/cog.erl:75: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:80: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:85: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/cog.erl:88: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:91: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:94: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/cog.erl:103: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:105: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:110: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:113: Warning: gen_fsm:send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:116: Warning: gen_fsm:send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:119: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:123: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:127: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:131: Warning: gen_fsm:send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/cog.erl:449: Warning: gen_fsm:reply/2 is deprecated and will be removed in a future release; use gen_statem:reply/2
+src/cog.erl:552: Warning: gen_fsm:reply/2 is deprecated and will be removed in a future release; use gen_statem:reply/2
+Compiled src/cog.erl
+src/class_SwElements_SwitchImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_SwElements_SwitchImpl.erl:210: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_SwElements_SwitchImpl.erl:213: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_SwElements_SwitchImpl.erl
+src/abs_constructor_info.erl:3: Warning: export_all flag enabled - all functions will be exported
+Compiled src/abs_constructor_info.erl
+Compiled src/modelapi_v2.erl
+src/builtin.erl:49: Warning: random:uniform/1: the 'random' module is deprecated; use the 'rand' module instead
+Compiled src/builtin.erl
+Compiled src/active_object_task.erl
+Compiled src/main_app.erl
+src/class_TrackElements_HauptSignalImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_HauptSignalImpl.erl:168: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_HauptSignalImpl.erl:171: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_HauptSignalImpl.erl
+Compiled src/cmp.erl
+src/future.erl:37: Warning: gen_fsm:start/3 is deprecated and will be removed in a future release; use gen_statem:start/3
+src/future.erl:57: Warning: gen_fsm:start/3 is deprecated and will be removed in a future release; use gen_statem:start/3
+src/future.erl:63: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/future.erl:74: Warning: gen_fsm:sync_send_all_state_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/future.erl:112: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/future.erl:138: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/future.erl:150: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/future.erl:153: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/future.erl:160: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/future.erl:163: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/future.erl:169: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/future.erl:172: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+Compiled src/future.erl
+src/class_TrackElements_GeschwindigkeitsVorAnzeigerImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_GeschwindigkeitsVorAnzeigerImpl.erl:95: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_GeschwindigkeitsVorAnzeigerImpl.erl:98: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_GeschwindigkeitsVorAnzeigerImpl.erl
+src/m_ABS_DC_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_ABS_DC_funs.erl
+src/class_Generator_PZBGenerator.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Generator_PZBGenerator.erl:391: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Generator_PZBGenerator.erl:394: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Generator_PZBGenerator.erl
+src/class_ABS_Meta_Runtime.erl:4: Warning: export_all flag enabled - all functions will be exported
+src/class_ABS_Meta_Runtime.erl:24: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_ABS_Meta_Runtime.erl:27: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_ABS_Meta_Runtime.erl
+src/class_TrackElements_GeschwindigkeitsAnzeigerImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_GeschwindigkeitsAnzeigerImpl.erl:95: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_GeschwindigkeitsAnzeigerImpl.erl:98: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_GeschwindigkeitsAnzeigerImpl.erl
+src/class_SwElements_SignalImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_SwElements_SignalImpl.erl:236: Warning: this clause cannot match because of different types/sizes
+src/class_SwElements_SignalImpl.erl:253: Warning: this clause cannot match because of different types/sizes
+src/class_SwElements_SignalImpl.erl:759: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_SwElements_SignalImpl.erl:762: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_SwElements_SignalImpl.erl
+src/class_TrackElements_SichtbarkeitsPunktImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_SichtbarkeitsPunktImpl.erl:131: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_SichtbarkeitsPunktImpl.erl:134: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_SichtbarkeitsPunktImpl.erl
+src/class_Train_TrainImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Train_TrainImpl.erl:52: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:299: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:320: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:425: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:441: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:510: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:565: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:598: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:684: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:702: Warning: this clause cannot match because a previous clause at line 699 always matches
+src/class_Train_TrainImpl.erl:742: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:762: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:780: Warning: this clause cannot match because a previous clause at line 777 always matches
+src/class_Train_TrainImpl.erl:799: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:847: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:927: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:973: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1019: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1095: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1118: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1153: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1183: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1202: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1284: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1332: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1589: Warning: this clause cannot match because of different types/sizes
+src/class_Train_TrainImpl.erl:1607: Warning: this clause cannot match because a previous clause at line 1604 always matches
+src/class_Train_TrainImpl.erl:1617: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Train_TrainImpl.erl:1620: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Train_TrainImpl.erl
+src/class_ABS_DC_DeploymentComponent.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_ABS_DC_DeploymentComponent.erl:173: Warning: this clause cannot match because of different types/sizes
+src/class_ABS_DC_DeploymentComponent.erl:488: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_ABS_DC_DeploymentComponent.erl:491: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_ABS_DC_DeploymentComponent.erl
+src/m_Graph_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_Graph_funs.erl
+src/class_TrackElements_ContactMagnetImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_ContactMagnetImpl.erl:124: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_ContactMagnetImpl.erl:127: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_ContactMagnetImpl.erl
+src/class_Graph_EdgeImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Graph_EdgeImpl.erl:123: Warning: this clause cannot match because of different types/sizes
+src/class_Graph_EdgeImpl.erl:256: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Graph_EdgeImpl.erl:259: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Graph_EdgeImpl.erl
+Compiled src/clock.erl
+src/influxdb.erl:24: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/influxdb.erl:58: Warning: gen_fsm:start_link/4 is deprecated and will be removed in a future release; use gen_statem:start_link/4
+src/influxdb.erl:61: Warning: gen_fsm:stop/1 is deprecated and will be removed in a future release; use gen_statem:stop/1
+src/influxdb.erl:64: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/influxdb.erl:68: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+Compiled src/influxdb.erl
+Compiled src/getopt.erl
+src/m_ABS_Meta_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_ABS_Meta_funs.erl
+src/m_ABS_Scheduler_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_ABS_Scheduler_funs.erl
+src/class_Generator_PhysicsGenerator.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Generator_PhysicsGenerator.erl:204: Warning: this clause cannot match because a previous clause at line 203 always matches
+src/class_Generator_PhysicsGenerator.erl:240: Warning: this clause cannot match because a previous clause at line 239 always matches
+src/class_Generator_PhysicsGenerator.erl:253: Warning: this clause cannot match because a previous clause at line 252 always matches
+src/class_Generator_PhysicsGenerator.erl:367: Warning: this clause cannot match because of different types/sizes
+src/class_Generator_PhysicsGenerator.erl:387: Warning: this clause cannot match because of different types/sizes
+src/class_Generator_PhysicsGenerator.erl:407: Warning: this clause cannot match because of different types/sizes
+src/class_Generator_PhysicsGenerator.erl:427: Warning: this clause cannot match because of different types/sizes
+src/class_Generator_PhysicsGenerator.erl:845: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Generator_PhysicsGenerator.erl:848: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Generator_PhysicsGenerator.erl
+src/class_SwElements_StreckeImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_SwElements_StreckeImpl.erl:30: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_SwElements_StreckeImpl.erl:33: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_SwElements_StreckeImpl.erl
+src/class_Run_Application.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Run_Application.erl:102: Warning: this clause cannot match because of different types/sizes
+src/class_Run_Application.erl:1082: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Run_Application.erl:1085: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Run_Application.erl
+src/class_TrackElements_SwWechselImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_SwWechselImpl.erl:69: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_SwWechselImpl.erl:72: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_SwWechselImpl.erl
+src/class_Stellwerk_ZugFolgeImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Stellwerk_ZugFolgeImpl.erl:108: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_ZugFolgeImpl.erl:149: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_ZugFolgeImpl.erl:177: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_ZugFolgeImpl.erl:423: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Stellwerk_ZugFolgeImpl.erl:426: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Stellwerk_ZugFolgeImpl.erl
+Compiled src/error_transform.erl
+Compiled src/cog_monitor.erl
+Compiled src/m_Run.erl
+src/m_Util_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+Compiled src/m_Util_funs.erl
+Compiled src/rationals.erl
+Compiled src/coverage.erl
+src/dc.erl:51: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/dc.erl:60: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/dc.erl:110: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+src/dc.erl:115: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/dc.erl
+src/class_TrackElements_PZBMagnetImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_PZBMagnetImpl.erl:107: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_PZBMagnetImpl.erl:110: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_PZBMagnetImpl.erl
+Compiled src/modelapi_v1.erl
+src/class_TrackElements_WeichenPunktImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_WeichenPunktImpl.erl:137: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_WeichenPunktImpl.erl:140: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_WeichenPunktImpl.erl
+src/class_TrackElements_GefahrenPunktImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_GefahrenPunktImpl.erl:132: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_GefahrenPunktImpl.erl:135: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_GefahrenPunktImpl.erl
+src/class_TrackElements_VorSignalImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_TrackElements_VorSignalImpl.erl:114: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_TrackElements_VorSignalImpl.erl:117: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_TrackElements_VorSignalImpl.erl
+src/class_Stellwerk_BahnhofImpl.erl:5: Warning: export_all flag enabled - all functions will be exported
+src/class_Stellwerk_BahnhofImpl.erl:528: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:562: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:581: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:796: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:813: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:830: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:1037: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:1054: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:1102: Warning: this clause cannot match because of different types/sizes
+src/class_Stellwerk_BahnhofImpl.erl:1198: Warning: gen_fsm:send_event/2 is deprecated and will be removed in a future release; use gen_statem:cast/2
+src/class_Stellwerk_BahnhofImpl.erl:1201: Warning: gen_fsm:sync_send_event/2 is deprecated and will be removed in a future release; use gen_statem:call/2
+Compiled src/class_Stellwerk_BahnhofImpl.erl
+src/m_ABS_StdLib_funs.erl:2: Warning: export_all flag enabled - all functions will be exported
+src/m_ABS_StdLib_funs.erl:90: Warning: this clause cannot match because a previous clause at line 89 always matches
+src/m_ABS_StdLib_funs.erl:220: Warning: this clause cannot match because a previous clause at line 219 always matches
+Compiled src/m_ABS_StdLib_funs.erl
+
+Finished.  "gen/erl/run" to start the model.
+          ("gen/erl/run --help" for more options)
+NODE;Graph.NodeImpl:<0.70.0>;4;1;n11
+NODE;Graph.NodeImpl:<0.71.0>;5;0;n12
+NODE;Graph.NodeImpl:<0.72.0>;6;0;n13
+NODE;Graph.NodeImpl:<0.73.0>;7;0;n14
+NODE;Graph.NodeImpl:<0.74.0>;8;0;n15
+NODE;Graph.NodeImpl:<0.75.0>;10;0;n21
+NODE;Graph.NodeImpl:<0.76.0>;11;0;n22
+NODE;Graph.NodeImpl:<0.77.0>;12;0;n23
+NODE;Graph.NodeImpl:<0.78.0>;13;0;n24
+NODE;Graph.NodeImpl:<0.79.0>;14;0;n25
+NODE;Graph.NodeImpl:<0.80.0>;16;0;n31
+NODE;Graph.NodeImpl:<0.81.0>;17;0;n32
+NODE;Graph.NodeImpl:<0.82.0>;18;0;n33
+NODE;Graph.NodeImpl:<0.83.0>;19;0;n34
+NODE;Graph.NodeImpl:<0.84.0>;20;1;n35
+NODE;Graph.NodeImpl:<0.85.0>;18;2;n41
+NODE;Graph.NodeImpl:<0.86.0>;17;2;n42
+NODE;Graph.NodeImpl:<0.87.0>;16;2;n43
+NODE;Graph.NodeImpl:<0.88.0>;15;2;n44
+NODE;Graph.NodeImpl:<0.89.0>;14;2;n45
+NODE;Graph.NodeImpl:<0.90.0>;12;2;n51
+NODE;Graph.NodeImpl:<0.91.0>;11;2;n52
+NODE;Graph.NodeImpl:<0.92.0>;10;2;n53
+NODE;Graph.NodeImpl:<0.93.0>;9;2;n54
+NODE;Graph.NodeImpl:<0.94.0>;8;2;n55
+EDGE;Graph.EdgeImpl:<0.95.0>;Graph.NodeImpl:<0.70.0>;Graph.NodeImpl:<0.71.0>;275;e11
+EDGE;Graph.EdgeImpl:<0.96.0>;Graph.NodeImpl:<0.71.0>;Graph.NodeImpl:<0.72.0>;750;e12
+EDGE;Graph.EdgeImpl:<0.97.0>;Graph.NodeImpl:<0.72.0>;Graph.NodeImpl:<0.73.0>;250;e13
+EDGE;Graph.EdgeImpl:<0.98.0>;Graph.NodeImpl:<0.73.0>;Graph.NodeImpl:<0.74.0>;100;e14
+EDGE;Graph.EdgeImpl:<0.99.0>;Graph.NodeImpl:<0.74.0>;Graph.NodeImpl:<0.75.0>;4000;e15
+EDGE;Graph.EdgeImpl:<0.100.0>;Graph.NodeImpl:<0.75.0>;Graph.NodeImpl:<0.76.0>;275;e21
+EDGE;Graph.EdgeImpl:<0.101.0>;Graph.NodeImpl:<0.76.0>;Graph.NodeImpl:<0.77.0>;750;e22
+EDGE;Graph.EdgeImpl:<0.102.0>;Graph.NodeImpl:<0.77.0>;Graph.NodeImpl:<0.78.0>;250;e23
+EDGE;Graph.EdgeImpl:<0.103.0>;Graph.NodeImpl:<0.78.0>;Graph.NodeImpl:<0.79.0>;100;e24
+EDGE;Graph.EdgeImpl:<0.104.0>;Graph.NodeImpl:<0.79.0>;Graph.NodeImpl:<0.80.0>;4000;e25
+EDGE;Graph.EdgeImpl:<0.105.0>;Graph.NodeImpl:<0.80.0>;Graph.NodeImpl:<0.81.0>;275;e31
+EDGE;Graph.EdgeImpl:<0.106.0>;Graph.NodeImpl:<0.81.0>;Graph.NodeImpl:<0.82.0>;750;e32
+EDGE;Graph.EdgeImpl:<0.107.0>;Graph.NodeImpl:<0.82.0>;Graph.NodeImpl:<0.83.0>;250;e33
+EDGE;Graph.EdgeImpl:<0.108.0>;Graph.NodeImpl:<0.83.0>;Graph.NodeImpl:<0.84.0>;100;e34
+EDGE;Graph.EdgeImpl:<0.109.0>;Graph.NodeImpl:<0.84.0>;Graph.NodeImpl:<0.85.0>;4000;e35
+EDGE;Graph.EdgeImpl:<0.110.0>;Graph.NodeImpl:<0.85.0>;Graph.NodeImpl:<0.86.0>;275;e41
+EDGE;Graph.EdgeImpl:<0.111.0>;Graph.NodeImpl:<0.86.0>;Graph.NodeImpl:<0.87.0>;750;e42
+EDGE;Graph.EdgeImpl:<0.112.0>;Graph.NodeImpl:<0.87.0>;Graph.NodeImpl:<0.88.0>;250;e43
+EDGE;Graph.EdgeImpl:<0.113.0>;Graph.NodeImpl:<0.88.0>;Graph.NodeImpl:<0.89.0>;100;e44
+EDGE;Graph.EdgeImpl:<0.114.0>;Graph.NodeImpl:<0.89.0>;Graph.NodeImpl:<0.90.0>;4250;e45
+EDGE;Graph.EdgeImpl:<0.115.0>;Graph.NodeImpl:<0.90.0>;Graph.NodeImpl:<0.91.0>;275;e51
+EDGE;Graph.EdgeImpl:<0.116.0>;Graph.NodeImpl:<0.91.0>;Graph.NodeImpl:<0.92.0>;750;e52
+EDGE;Graph.EdgeImpl:<0.117.0>;Graph.NodeImpl:<0.92.0>;Graph.NodeImpl:<0.93.0>;250;e53
+EDGE;Graph.EdgeImpl:<0.118.0>;Graph.NodeImpl:<0.93.0>;Graph.NodeImpl:<0.94.0>;100;e54
+EDGE;Graph.EdgeImpl:<0.119.0>;Graph.NodeImpl:<0.94.0>;Graph.NodeImpl:<0.70.0>;3500;e55
+TOWARDS;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;Graph.EdgeImpl:<0.119.0>
+TOWARDS;TrackElements.VorSignalImpl:<0.151.0>;Graph.EdgeImpl:<0.95.0>
+TOWARDS;TrackElements.HauptSignalImpl:<0.152.0>;Graph.EdgeImpl:<0.97.0>
+GROUP;SIGNAL;s1;SwElements.SignalImpl:<0.153.0>;null;null;TrackElements.VorSignalImpl:<0.151.0>;TrackElements.HauptSignalImpl:<0.152.0>;null;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;
+TOWARDS;TrackElements.GefahrenPunktImpl:<0.154.0>;Graph.EdgeImpl:<0.98.0>
+ELEM;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;Graph.NodeImpl:<0.70.0>;STOP;ss1
+ELEM;TrackElements.VorSignalImpl:<0.151.0>;Graph.NodeImpl:<0.71.0>;STOP;vs1
+ELEM;TrackElements.HauptSignalImpl:<0.152.0>;Graph.NodeImpl:<0.73.0>;STOP;hs1
+ELEM;TrackElements.SwWechselImpl:<0.156.0>;Graph.NodeImpl:<0.73.0>;NOSIG;ch1
+ELEM;TrackElements.GefahrenPunktImpl:<0.154.0>;Graph.NodeImpl:<0.74.0>;NOSIG;gp1
+TOWARDS;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;Graph.EdgeImpl:<0.99.0>
+TOWARDS;TrackElements.VorSignalImpl:<0.163.0>;Graph.EdgeImpl:<0.100.0>
+TOWARDS;TrackElements.HauptSignalImpl:<0.164.0>;Graph.EdgeImpl:<0.102.0>
+GROUP;SIGNAL;s2;SwElements.SignalImpl:<0.165.0>;null;null;TrackElements.VorSignalImpl:<0.163.0>;TrackElements.HauptSignalImpl:<0.164.0>;null;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;
+TOWARDS;TrackElements.GefahrenPunktImpl:<0.166.0>;Graph.EdgeImpl:<0.103.0>
+ELEM;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;Graph.NodeImpl:<0.75.0>;STOP;ss2
+ELEM;TrackElements.VorSignalImpl:<0.163.0>;Graph.NodeImpl:<0.76.0>;STOP;vs2
+ELEM;TrackElements.HauptSignalImpl:<0.164.0>;Graph.NodeImpl:<0.78.0>;STOP;hs2
+ELEM;TrackElements.SwWechselImpl:<0.168.0>;Graph.NodeImpl:<0.78.0>;NOSIG;ch2
+ELEM;TrackElements.GefahrenPunktImpl:<0.166.0>;Graph.NodeImpl:<0.79.0>;NOSIG;gp2
+TOWARDS;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;Graph.EdgeImpl:<0.104.0>
+TOWARDS;TrackElements.VorSignalImpl:<0.175.0>;Graph.EdgeImpl:<0.105.0>
+TOWARDS;TrackElements.HauptSignalImpl:<0.176.0>;Graph.EdgeImpl:<0.107.0>
+GROUP;SIGNAL;s3;SwElements.SignalImpl:<0.177.0>;null;null;TrackElements.VorSignalImpl:<0.175.0>;TrackElements.HauptSignalImpl:<0.176.0>;null;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;
+TOWARDS;TrackElements.GefahrenPunktImpl:<0.178.0>;Graph.EdgeImpl:<0.108.0>
+ELEM;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;Graph.NodeImpl:<0.80.0>;STOP;ss3
+ELEM;TrackElements.VorSignalImpl:<0.175.0>;Graph.NodeImpl:<0.81.0>;STOP;vs3
+ELEM;TrackElements.HauptSignalImpl:<0.176.0>;Graph.NodeImpl:<0.83.0>;STOP;hs3
+ELEM;TrackElements.SwWechselImpl:<0.180.0>;Graph.NodeImpl:<0.83.0>;NOSIG;ch3
+ELEM;TrackElements.GefahrenPunktImpl:<0.178.0>;Graph.NodeImpl:<0.84.0>;NOSIG;gp3
+TOWARDS;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;Graph.EdgeImpl:<0.109.0>
+TOWARDS;TrackElements.VorSignalImpl:<0.187.0>;Graph.EdgeImpl:<0.110.0>
+TOWARDS;TrackElements.HauptSignalImpl:<0.188.0>;Graph.EdgeImpl:<0.112.0>
+GROUP;SIGNAL;s4;SwElements.SignalImpl:<0.189.0>;null;null;TrackElements.VorSignalImpl:<0.187.0>;TrackElements.HauptSignalImpl:<0.188.0>;null;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;
+TOWARDS;TrackElements.GefahrenPunktImpl:<0.190.0>;Graph.EdgeImpl:<0.113.0>
+ELEM;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;Graph.NodeImpl:<0.85.0>;STOP;ss4
+ELEM;TrackElements.VorSignalImpl:<0.187.0>;Graph.NodeImpl:<0.86.0>;STOP;vs4
+ELEM;TrackElements.HauptSignalImpl:<0.188.0>;Graph.NodeImpl:<0.88.0>;STOP;hs4
+ELEM;TrackElements.SwWechselImpl:<0.192.0>;Graph.NodeImpl:<0.88.0>;NOSIG;ch4
+ELEM;TrackElements.GefahrenPunktImpl:<0.190.0>;Graph.NodeImpl:<0.89.0>;NOSIG;gp4
+TOWARDS;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;Graph.EdgeImpl:<0.114.0>
+TOWARDS;TrackElements.VorSignalImpl:<0.199.0>;Graph.EdgeImpl:<0.115.0>
+TOWARDS;TrackElements.HauptSignalImpl:<0.200.0>;Graph.EdgeImpl:<0.117.0>
+GROUP;SIGNAL;s5;SwElements.SignalImpl:<0.201.0>;null;null;TrackElements.VorSignalImpl:<0.199.0>;TrackElements.HauptSignalImpl:<0.200.0>;null;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;
+TOWARDS;TrackElements.GefahrenPunktImpl:<0.202.0>;Graph.EdgeImpl:<0.118.0>
+ELEM;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;Graph.NodeImpl:<0.90.0>;STOP;ss5
+ELEM;TrackElements.VorSignalImpl:<0.199.0>;Graph.NodeImpl:<0.91.0>;STOP;vs5
+ELEM;TrackElements.HauptSignalImpl:<0.200.0>;Graph.NodeImpl:<0.93.0>;STOP;hs5
+ELEM;TrackElements.SwWechselImpl:<0.204.0>;Graph.NodeImpl:<0.93.0>;NOSIG;ch5
+ELEM;TrackElements.GefahrenPunktImpl:<0.202.0>;Graph.NodeImpl:<0.94.0>;NOSIG;gp5
+10
+ZUG;Train.TrainImpl:<0.211.0>;z1;100
+ZUG;Train.TrainImpl:<0.218.0>;z2;100
+MV;INIT;Train.TrainImpl:<0.211.0>;0;Graph.EdgeImpl:<0.104.0>
+DATA;z1;0 38;Time(0)
+MV;INIT;Train.TrainImpl:<0.218.0>;0;Graph.EdgeImpl:<0.114.0>
+DATA;z2;0 38;Time(0)
+CH;TrackElements.HauptSignalImpl:<0.176.0>;FAHRT;0
+CH;TrackElements.VorSignalImpl:<0.175.0>;FAHRT;0
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;FAHRT;0
+CH;TrackElements.HauptSignalImpl:<0.200.0>;FAHRT;0
+CH;TrackElements.VorSignalImpl:<0.199.0>;FAHRT;0
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;FAHRT;0
+----Resulting Event for z2 :FrontEv(Ev(2075/19,4150,Stable,38,0,0,Front,Time(0),38,False))
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(0),38,False))
+SPP: 38 - Stable - Time(1950/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;1950/19;Graph.EdgeImpl:<0.105.0>;3900
+DATA;z1;102 38;Time(1950/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(1950/19),38,False))
+SPP: 38 - Stable - Time(2000/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;2000/19;Graph.EdgeImpl:<0.105.0>;100
+DATA;z1;105 38;Time(2000/19)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(2000/19),38,False))
+SPP: 38 - Stable - Time(2075/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;2075/19;Graph.EdgeImpl:<0.115.0>;4150
+DATA;z2;109 38;Time(2075/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(2075/19),38,False))
+SPP: 38 - Stable - Time(4175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;4175/38;Graph.EdgeImpl:<0.106.0>;175
+DATA;z1;109 38;Time(4175/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(4175/38),38,False))
+SPP: 38 - Stable - Time(2125/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;2125/19;Graph.EdgeImpl:<0.115.0>;100
+DATA;z2;111 38;Time(2125/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(2125/19),38,False))
+SPP: 38 - Stable - Time(225/2)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;225/2;Graph.EdgeImpl:<0.106.0>;100
+DATA;z1;112 38;Time(225/2)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(225/2),38,False))
+SPP: 38 - Stable - Time(4425/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;4425/38;Graph.EdgeImpl:<0.116.0>;175
+DATA;z2;116 38;Time(4425/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(4425/38),38,False))
+SPP: 38 - Stable - Time(4525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;4525/38;Graph.EdgeImpl:<0.116.0>;100
+DATA;z2;119 38;Time(4525/38)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(4525/38),38,False))
+SPP: 38 - Stable - Time(4925/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;4925/38;Graph.EdgeImpl:<0.107.0>;650
+DATA;z1;129 38;Time(4925/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(4925/38),38,False))
+SPP: 38 - Stable - Time(5025/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;5025/38;Graph.EdgeImpl:<0.107.0>;100
+DATA;z1;132 38;Time(5025/38)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(5025/38),38,False))
+SPP: 38 - Stable - Time(5175/38)
+SPP: 38 - Stable - Time(5175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;5175/38;Graph.EdgeImpl:<0.108.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;5175/38;Graph.EdgeImpl:<0.117.0>;650
+DATA;z1;136 38;Time(5175/38)
+DATA;z2;136 38;Time(5175/38)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(5175/38),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5175/38),38,False))
+SPP: 38 - Stable - Time(5275/38)
+SPP: 38 - Stable - Time(5275/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;5275/38;Graph.EdgeImpl:<0.109.0>;100
+DATA;z1;138 38;Time(5275/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;5275/38;Graph.EdgeImpl:<0.117.0>;100
+DATA;z2;138 38;Time(5275/38)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(5275/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(5275/38),38,False))
+SPP: 38 - Stable - Time(5275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;5275/38;Graph.EdgeImpl:<0.108.0>;0
+DATA;z1;138 38;Time(5275/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5275/38),38,False))
+SPP: 38 - Stable - Time(5375/38)
+CH;TrackElements.HauptSignalImpl:<0.176.0>;STOP;5375/38
+CH;TrackElements.VorSignalImpl:<0.175.0>;STOP;5375/38
+MV;LEAVES;Train.TrainImpl:<0.211.0>;5375/38;Graph.EdgeImpl:<0.109.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;STOP;5375/38
+DATA;z1;141 38;Time(5375/38)
+CH;TrackElements.HauptSignalImpl:<0.188.0>;FAHRT;5375/38
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(5375/38),38,False))
+CH;TrackElements.VorSignalImpl:<0.187.0>;FAHRT;5375/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;FAHRT;5375/38
+SPP: 38 - Stable - Time(5425/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;5425/38;Graph.EdgeImpl:<0.118.0>;150
+DATA;z2;142 38;Time(5425/38)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(5425/38),38,False))
+SPP: 38 - Stable - Time(5525/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;5525/38;Graph.EdgeImpl:<0.119.0>;100
+DATA;z2;145 38;Time(5525/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(5525/38),38,False))
+SPP: 38 - Stable - Time(5525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;5525/38;Graph.EdgeImpl:<0.118.0>;0
+DATA;z2;145 38;Time(5525/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5525/38),38,False))
+SPP: 38 - Stable - Time(5625/38)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;STOP;5625/38
+CH;TrackElements.VorSignalImpl:<0.199.0>;STOP;5625/38
+MV;LEAVES;Train.TrainImpl:<0.218.0>;5625/38;Graph.EdgeImpl:<0.119.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;STOP;5625/38
+DATA;z2;148 38;Time(5625/38)
+CH;TrackElements.HauptSignalImpl:<0.152.0>;FAHRT;5625/38
+CH;TrackElements.VorSignalImpl:<0.151.0>;FAHRT;5625/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;FAHRT;5625/38
+----Resulting Event for z2 :FrontEv(Ev(1700/19,3400,Stable,38,0,0,Front,Time(5625/38),38,False))
+SPP: 38 - Stable - Time(475/2)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;475/2;Graph.EdgeImpl:<0.95.0>;3400
+DATA;z2;237 38;Time(475/2)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(475/2),38,False))
+SPP: 38 - Stable - Time(9125/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;9125/38;Graph.EdgeImpl:<0.95.0>;100
+DATA;z2;240 38;Time(9125/38)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(9125/38),38,False))
+SPP: 38 - Stable - Time(9275/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;9275/38;Graph.EdgeImpl:<0.110.0>;3900
+DATA;z1;244 38;Time(9275/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(9275/38),38,False))
+SPP: 38 - Stable - Time(4650/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;4650/19;Graph.EdgeImpl:<0.96.0>;175
+DATA;z2;244 38;Time(4650/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(4650/19),38,False))
+SPP: 38 - Stable - Time(9375/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;9375/38;Graph.EdgeImpl:<0.110.0>;100
+DATA;z1;246 38;Time(9375/38)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(9375/38),38,False))
+SPP: 38 - Stable - Time(4700/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;4700/19;Graph.EdgeImpl:<0.96.0>;100
+DATA;z2;247 38;Time(4700/19)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(4700/19),38,False))
+SPP: 38 - Stable - Time(4775/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;4775/19;Graph.EdgeImpl:<0.111.0>;175
+DATA;z1;251 38;Time(4775/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(4775/19),38,False))
+SPP: 38 - Stable - Time(4825/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;4825/19;Graph.EdgeImpl:<0.111.0>;100
+DATA;z1;253 38;Time(4825/19)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(4825/19),38,False))
+SPP: 38 - Stable - Time(5025/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;5025/19;Graph.EdgeImpl:<0.97.0>;650
+DATA;z2;264 38;Time(5025/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5025/19),38,False))
+SPP: 38 - Stable - Time(5075/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;5075/19;Graph.EdgeImpl:<0.97.0>;100
+DATA;z2;267 38;Time(5075/19)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(5075/19),38,False))
+SPP: 38 - Stable - Time(5150/19)
+SPP: 38 - Stable - Time(5150/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;5150/19;Graph.EdgeImpl:<0.98.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;5150/19;Graph.EdgeImpl:<0.112.0>;650
+DATA;z2;271 38;Time(5150/19)
+DATA;z1;271 38;Time(5150/19)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(5150/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5150/19),38,False))
+SPP: 38 - Stable - Time(5200/19)
+SPP: 38 - Stable - Time(5200/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;5200/19;Graph.EdgeImpl:<0.99.0>;100
+DATA;z2;273 38;Time(5200/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;5200/19;Graph.EdgeImpl:<0.112.0>;100
+DATA;z1;273 38;Time(5200/19)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(5200/19),38,False))
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(5200/19),38,False))
+SPP: 38 - Stable - Time(5200/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;5200/19;Graph.EdgeImpl:<0.98.0>;0
+DATA;z2;273 38;Time(5200/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5200/19),38,False))
+SPP: 38 - Stable - Time(5250/19)
+CH;TrackElements.HauptSignalImpl:<0.152.0>;STOP;5250/19
+CH;TrackElements.VorSignalImpl:<0.151.0>;STOP;5250/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;STOP;5250/19
+MV;LEAVES;Train.TrainImpl:<0.218.0>;5250/19;Graph.EdgeImpl:<0.99.0>;100
+DATA;z2;276 38;Time(5250/19)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;FAHRT;5250/19
+CH;TrackElements.VorSignalImpl:<0.163.0>;FAHRT;5250/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;FAHRT;5250/19
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(5250/19),38,False))
+SPP: 38 - Stable - Time(5275/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;5275/19;Graph.EdgeImpl:<0.113.0>;150
+DATA;z1;277 38;Time(5275/19)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(5275/19),38,False))
+SPP: 38 - Stable - Time(5325/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;5325/19;Graph.EdgeImpl:<0.114.0>;100
+DATA;z1;280 38;Time(5325/19)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(5325/19),38,False))
+SPP: 38 - Stable - Time(5325/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;5325/19;Graph.EdgeImpl:<0.113.0>;0
+DATA;z1;280 38;Time(5325/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(5325/19),38,False))
+SPP: 38 - Stable - Time(5375/19)
+CH;TrackElements.HauptSignalImpl:<0.188.0>;STOP;5375/19
+CH;TrackElements.VorSignalImpl:<0.187.0>;STOP;5375/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;STOP;5375/19
+MV;LEAVES;Train.TrainImpl:<0.211.0>;5375/19;Graph.EdgeImpl:<0.114.0>;100
+DATA;z1;282 38;Time(5375/19)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;FAHRT;5375/19
+CH;TrackElements.VorSignalImpl:<0.199.0>;FAHRT;5375/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;FAHRT;5375/19
+----Resulting Event for z1 :FrontEv(Ev(2075/19,4150,Stable,38,0,0,Front,Time(5375/19),38,False))
+SPP: 38 - Stable - Time(7200/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;7200/19;Graph.EdgeImpl:<0.100.0>;3900
+DATA;z2;378 38;Time(7200/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(7200/19),38,False))
+SPP: 38 - Stable - Time(7250/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;7250/19;Graph.EdgeImpl:<0.100.0>;100
+DATA;z2;381 38;Time(7250/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(7250/19),38,False))
+SPP: 38 - Stable - Time(14675/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;14675/38;Graph.EdgeImpl:<0.101.0>;175
+DATA;z2;386 38;Time(14675/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(14675/38),38,False))
+SPP: 38 - Stable - Time(14775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;14775/38;Graph.EdgeImpl:<0.101.0>;100
+DATA;z2;388 38;Time(14775/38)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(14775/38),38,False))
+SPP: 38 - Stable - Time(7450/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;7450/19;Graph.EdgeImpl:<0.115.0>;4150
+DATA;z1;392 38;Time(7450/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(7450/19),38,False))
+SPP: 38 - Stable - Time(7500/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;7500/19;Graph.EdgeImpl:<0.115.0>;100
+DATA;z1;394 38;Time(7500/19)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(7500/19),38,False))
+SPP: 38 - Stable - Time(15175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;15175/38;Graph.EdgeImpl:<0.116.0>;175
+DATA;z1;399 38;Time(15175/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15175/38),38,False))
+SPP: 38 - Stable - Time(15275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;15275/38;Graph.EdgeImpl:<0.116.0>;100
+DATA;z1;401 38;Time(15275/38)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(15275/38),38,False))
+SPP: 38 - Stable - Time(15425/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;15425/38;Graph.EdgeImpl:<0.102.0>;650
+DATA;z2;405 38;Time(15425/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15425/38),38,False))
+SPP: 38 - Stable - Time(15525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;15525/38;Graph.EdgeImpl:<0.102.0>;100
+DATA;z2;408 38;Time(15525/38)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(15525/38),38,False))
+SPP: 38 - Stable - Time(825/2)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;825/2;Graph.EdgeImpl:<0.103.0>;150
+DATA;z2;412 38;Time(825/2)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(825/2),38,False))
+SPP: 38 - Stable - Time(15775/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;15775/38;Graph.EdgeImpl:<0.104.0>;100
+DATA;z2;415 38;Time(15775/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(15775/38),38,False))
+SPP: 38 - Stable - Time(15775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;15775/38;Graph.EdgeImpl:<0.103.0>;0
+DATA;z2;415 38;Time(15775/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15775/38),38,False))
+SPP: 38 - Stable - Time(15875/38)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;STOP;15875/38
+CH;TrackElements.VorSignalImpl:<0.163.0>;STOP;15875/38
+MV;LEAVES;Train.TrainImpl:<0.218.0>;15875/38;Graph.EdgeImpl:<0.104.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;STOP;15875/38
+DATA;z2;417 38;Time(15875/38)
+CH;TrackElements.HauptSignalImpl:<0.176.0>;FAHRT;15875/38
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(15875/38),38,False))
+CH;TrackElements.VorSignalImpl:<0.175.0>;FAHRT;15875/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;FAHRT;15875/38
+SPP: 38 - Stable - Time(15925/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;15925/38;Graph.EdgeImpl:<0.117.0>;650
+DATA;z1;419 38;Time(15925/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15925/38),38,False))
+SPP: 38 - Stable - Time(16025/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;16025/38;Graph.EdgeImpl:<0.117.0>;100
+DATA;z1;421 38;Time(16025/38)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(16025/38),38,False))
+SPP: 38 - Stable - Time(16175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;16175/38;Graph.EdgeImpl:<0.118.0>;150
+DATA;z1;425 38;Time(16175/38)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(16175/38),38,False))
+SPP: 38 - Stable - Time(16275/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;16275/38;Graph.EdgeImpl:<0.119.0>;100
+DATA;z1;428 38;Time(16275/38)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(16275/38),38,False))
+SPP: 38 - Stable - Time(16275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;16275/38;Graph.EdgeImpl:<0.118.0>;0
+DATA;z1;428 38;Time(16275/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(16275/38),38,False))
+SPP: 38 - Stable - Time(16375/38)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;STOP;16375/38
+CH;TrackElements.VorSignalImpl:<0.199.0>;STOP;16375/38
+MV;LEAVES;Train.TrainImpl:<0.211.0>;16375/38;Graph.EdgeImpl:<0.119.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;STOP;16375/38
+DATA;z1;430 38;Time(16375/38)
+----Resulting Event for z1 :FrontEv(Ev(1700/19,3400,Stable,38,0,0,Front,Time(16375/38),38,False))
+CH;TrackElements.HauptSignalImpl:<0.152.0>;FAHRT;16375/38
+CH;TrackElements.VorSignalImpl:<0.151.0>;FAHRT;16375/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;FAHRT;16375/38
+SPP: 38 - Stable - Time(19775/38)
+SPP: 38 - Stable - Time(19775/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;19775/38;Graph.EdgeImpl:<0.95.0>;3400
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;19775/38;Graph.EdgeImpl:<0.105.0>;3900
+DATA;z1;520 38;Time(19775/38)
+DATA;z2;520 38;Time(19775/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(19775/38),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(19775/38),38,False))
+SPP: 38 - Stable - Time(19875/38)
+SPP: 38 - Stable - Time(19875/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;19875/38;Graph.EdgeImpl:<0.105.0>;100
+DATA;z2;523 38;Time(19875/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;19875/38;Graph.EdgeImpl:<0.95.0>;100
+DATA;z1;523 38;Time(19875/38)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(19875/38),38,False))
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(19875/38),38,False))
+SPP: 38 - Stable - Time(10025/19)
+SPP: 38 - Stable - Time(10025/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;10025/19;Graph.EdgeImpl:<0.106.0>;175
+DATA;z2;527 38;Time(10025/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;10025/19;Graph.EdgeImpl:<0.96.0>;175
+DATA;z1;527 38;Time(10025/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(10025/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(10025/19),38,False))
+SPP: 38 - Stable - Time(10075/19)
+SPP: 38 - Stable - Time(10075/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;10075/19;Graph.EdgeImpl:<0.106.0>;100
+DATA;z2;530 38;Time(10075/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;10075/19;Graph.EdgeImpl:<0.96.0>;100
+DATA;z1;530 38;Time(10075/19)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(10075/19),38,False))
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(10075/19),38,False))
+SPP: 38 - Stable - Time(10400/19)
+SPP: 38 - Stable - Time(10400/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;10400/19;Graph.EdgeImpl:<0.97.0>;650
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;10400/19;Graph.EdgeImpl:<0.107.0>;650
+DATA;z1;547 38;Time(10400/19)
+DATA;z2;547 38;Time(10400/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(10400/19),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(10400/19),38,False))
+SPP: 38 - Stable - Time(550)
+SPP: 38 - Stable - Time(550)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;550;Graph.EdgeImpl:<0.97.0>;100
+MV;LEAVES;Train.TrainImpl:<0.218.0>;550;Graph.EdgeImpl:<0.107.0>;100
+DATA;z1;550 38;Time(550)
+DATA;z2;550 38;Time(550)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(550),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(550),38,False))
+SPP: 38 - Stable - Time(10525/19)
+SPP: 38 - Stable - Time(10525/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;10525/19;Graph.EdgeImpl:<0.108.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;10525/19;Graph.EdgeImpl:<0.98.0>;150
+DATA;z2;553 38;Time(10525/19)
+DATA;z1;553 38;Time(10525/19)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(10525/19),38,False))
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(10525/19),38,False))
+SPP: 38 - Stable - Time(10575/19)
+SPP: 38 - Stable - Time(10575/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;10575/19;Graph.EdgeImpl:<0.99.0>;100
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;10575/19;Graph.EdgeImpl:<0.109.0>;100
+DATA;z1;556 38;Time(10575/19)
+DATA;z2;556 38;Time(10575/19)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(10575/19),38,False))
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(10575/19),38,False))
+SPP: 38 - Stable - Time(10575/19)
+SPP: 38 - Stable - Time(10575/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;10575/19;Graph.EdgeImpl:<0.108.0>;0
+MV;LEAVES;Train.TrainImpl:<0.211.0>;10575/19;Graph.EdgeImpl:<0.98.0>;0
+DATA;z2;556 38;Time(10575/19)
+DATA;z1;556 38;Time(10575/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(10575/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(10575/19),38,False))
+SPP: 38 - Stable - Time(10625/19)
+SPP: 38 - Stable - Time(10625/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;10625/19;Graph.EdgeImpl:<0.99.0>;100
+DATA;z1;559 38;Time(10625/19)
+CH;TrackElements.HauptSignalImpl:<0.152.0>;STOP;10625/19
+CH;TrackElements.VorSignalImpl:<0.151.0>;STOP;10625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;STOP;10625/19
+CH;TrackElements.HauptSignalImpl:<0.176.0>;STOP;10625/19
+CH;TrackElements.VorSignalImpl:<0.175.0>;STOP;10625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;STOP;10625/19
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(10625/19),38,False))
+MV;LEAVES;Train.TrainImpl:<0.218.0>;10625/19;Graph.EdgeImpl:<0.109.0>;100
+DATA;z2;559 38;Time(10625/19)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;FAHRT;10625/19
+CH;TrackElements.VorSignalImpl:<0.163.0>;FAHRT;10625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;FAHRT;10625/19
+CH;TrackElements.HauptSignalImpl:<0.188.0>;FAHRT;10625/19
+CH;TrackElements.VorSignalImpl:<0.187.0>;FAHRT;10625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;FAHRT;10625/19
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(10625/19),38,False))
+SPP: 38 - Stable - Time(12575/19)
+SPP: 38 - Stable - Time(12575/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;12575/19;Graph.EdgeImpl:<0.110.0>;3900
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;12575/19;Graph.EdgeImpl:<0.100.0>;3900
+DATA;z2;661 38;Time(12575/19)
+DATA;z1;661 38;Time(12575/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(12575/19),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(12575/19),38,False))
+SPP: 38 - Stable - Time(12625/19)
+SPP: 38 - Stable - Time(12625/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;12625/19;Graph.EdgeImpl:<0.110.0>;100
+MV;LEAVES;Train.TrainImpl:<0.211.0>;12625/19;Graph.EdgeImpl:<0.100.0>;100
+DATA;z2;664 38;Time(12625/19)
+DATA;z1;664 38;Time(12625/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(12625/19),38,False))
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(12625/19),38,False))
+SPP: 38 - Stable - Time(25425/38)
+SPP: 38 - Stable - Time(25425/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;25425/38;Graph.EdgeImpl:<0.111.0>;175
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;25425/38;Graph.EdgeImpl:<0.101.0>;175
+DATA;z2;669 38;Time(25425/38)
+DATA;z1;669 38;Time(25425/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(25425/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(25425/38),38,False))
+SPP: 38 - Stable - Time(25525/38)
+SPP: 38 - Stable - Time(25525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;25525/38;Graph.EdgeImpl:<0.111.0>;100
+DATA;z2;671 38;Time(25525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;25525/38;Graph.EdgeImpl:<0.101.0>;100
+DATA;z1;671 38;Time(25525/38)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(25525/38),38,False))
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(25525/38),38,False))
+SPP: 38 - Stable - Time(26175/38)
+SPP: 38 - Stable - Time(26175/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26175/38;Graph.EdgeImpl:<0.112.0>;650
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26175/38;Graph.EdgeImpl:<0.102.0>;650
+DATA;z2;688 38;Time(26175/38)
+DATA;z1;688 38;Time(26175/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26175/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26175/38),38,False))
+SPP: 38 - Stable - Time(26275/38)
+SPP: 38 - Stable - Time(26275/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26275/38;Graph.EdgeImpl:<0.112.0>;100
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26275/38;Graph.EdgeImpl:<0.102.0>;100
+DATA;z2;691 38;Time(26275/38)
+DATA;z1;691 38;Time(26275/38)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(26275/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(26275/38),38,False))
+SPP: 38 - Stable - Time(26425/38)
+SPP: 38 - Stable - Time(26425/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26425/38;Graph.EdgeImpl:<0.103.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26425/38;Graph.EdgeImpl:<0.113.0>;150
+DATA;z1;695 38;Time(26425/38)
+DATA;z2;695 38;Time(26425/38)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(26425/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(26425/38),38,False))
+SPP: 38 - Stable - Time(26525/38)
+SPP: 38 - Stable - Time(26525/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26525/38;Graph.EdgeImpl:<0.114.0>;100
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26525/38;Graph.EdgeImpl:<0.104.0>;100
+DATA;z2;698 38;Time(26525/38)
+DATA;z1;698 38;Time(26525/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(26525/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(26525/38),38,False))
+SPP: 38 - Stable - Time(26525/38)
+SPP: 38 - Stable - Time(26525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26525/38;Graph.EdgeImpl:<0.113.0>;0
+DATA;z2;698 38;Time(26525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26525/38;Graph.EdgeImpl:<0.103.0>;0
+DATA;z1;698 38;Time(26525/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26525/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26525/38),38,False))
+SPP: 38 - Stable - Time(26625/38)
+SPP: 38 - Stable - Time(26625/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26625/38;Graph.EdgeImpl:<0.104.0>;100
+CH;TrackElements.HauptSignalImpl:<0.188.0>;STOP;26625/38
+CH;TrackElements.VorSignalImpl:<0.187.0>;STOP;26625/38
+DATA;z1;700 38;Time(26625/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26625/38;Graph.EdgeImpl:<0.114.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;STOP;26625/38
+DATA;z2;700 38;Time(26625/38)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;STOP;26625/38
+CH;TrackElements.VorSignalImpl:<0.163.0>;STOP;26625/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;STOP;26625/38
+CH;TrackElements.HauptSignalImpl:<0.200.0>;FAHRT;26625/38
+CH;TrackElements.VorSignalImpl:<0.199.0>;FAHRT;26625/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;FAHRT;26625/38
+CH;TrackElements.HauptSignalImpl:<0.176.0>;FAHRT;26625/38
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(26625/38),38,False))
+CH;TrackElements.VorSignalImpl:<0.175.0>;FAHRT;26625/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;FAHRT;26625/38
+----Resulting Event for z2 :FrontEv(Ev(2075/19,4150,Stable,38,0,0,Front,Time(26625/38),38,False))
+SPP: 38 - Stable - Time(30525/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;30525/38;Graph.EdgeImpl:<0.105.0>;3900
+DATA;z1;803 38;Time(30525/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(30525/38),38,False))
+SPP: 38 - Stable - Time(30625/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;30625/38;Graph.EdgeImpl:<0.105.0>;100
+DATA;z1;805 38;Time(30625/38)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(30625/38),38,False))
+SPP: 38 - Stable - Time(30775/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;30775/38;Graph.EdgeImpl:<0.115.0>;4150
+DATA;z2;809 38;Time(30775/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(30775/38),38,False))
+SPP: 38 - Stable - Time(15400/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;15400/19;Graph.EdgeImpl:<0.106.0>;175
+DATA;z1;810 38;Time(15400/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15400/19),38,False))
+SPP: 38 - Stable - Time(1625/2)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;1625/2;Graph.EdgeImpl:<0.115.0>;100
+DATA;z2;812 38;Time(1625/2)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(1625/2),38,False))
+SPP: 38 - Stable - Time(15450/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;15450/19;Graph.EdgeImpl:<0.106.0>;100
+DATA;z1;813 38;Time(15450/19)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(15450/19),38,False))
+SPP: 38 - Stable - Time(15525/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;15525/19;Graph.EdgeImpl:<0.116.0>;175
+DATA;z2;817 38;Time(15525/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15525/19),38,False))
+SPP: 38 - Stable - Time(15575/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;15575/19;Graph.EdgeImpl:<0.116.0>;100
+DATA;z2;819 38;Time(15575/19)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(15575/19),38,False))
+SPP: 38 - Stable - Time(15775/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;15775/19;Graph.EdgeImpl:<0.107.0>;650
+DATA;z1;830 38;Time(15775/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15775/19),38,False))
+SPP: 38 - Stable - Time(15825/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;15825/19;Graph.EdgeImpl:<0.107.0>;100
+DATA;z1;832 38;Time(15825/19)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(15825/19),38,False))
+SPP: 38 - Stable - Time(15900/19)
+SPP: 38 - Stable - Time(15900/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;15900/19;Graph.EdgeImpl:<0.108.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;15900/19;Graph.EdgeImpl:<0.117.0>;650
+DATA;z1;836 38;Time(15900/19)
+DATA;z2;836 38;Time(15900/19)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(15900/19),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15900/19),38,False))
+SPP: 38 - Stable - Time(15950/19)
+SPP: 38 - Stable - Time(15950/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;15950/19;Graph.EdgeImpl:<0.109.0>;100
+DATA;z1;839 38;Time(15950/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;15950/19;Graph.EdgeImpl:<0.117.0>;100
+DATA;z2;839 38;Time(15950/19)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(15950/19),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(15950/19),38,False))
+SPP: 38 - Stable - Time(15950/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;15950/19;Graph.EdgeImpl:<0.108.0>;0
+DATA;z1;839 38;Time(15950/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(15950/19),38,False))
+SPP: 38 - Stable - Time(16000/19)
+CH;TrackElements.HauptSignalImpl:<0.176.0>;STOP;16000/19
+CH;TrackElements.VorSignalImpl:<0.175.0>;STOP;16000/19
+MV;LEAVES;Train.TrainImpl:<0.211.0>;16000/19;Graph.EdgeImpl:<0.109.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;STOP;16000/19
+DATA;z1;842 38;Time(16000/19)
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(16000/19),38,False))
+SPP: 38 - Stable - Time(16025/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;16025/19;Graph.EdgeImpl:<0.118.0>;150
+DATA;z2;843 38;Time(16025/19)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(16025/19),38,False))
+SPP: 38 - Stable - Time(16075/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;16075/19;Graph.EdgeImpl:<0.119.0>;100
+DATA;z2;846 38;Time(16075/19)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(16075/19),38,False))
+SPP: 38 - Stable - Time(16075/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;16075/19;Graph.EdgeImpl:<0.118.0>;0
+DATA;z2;846 38;Time(16075/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(16075/19),38,False))
+SPP: 38 - Stable - Time(16125/19)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;STOP;16125/19
+CH;TrackElements.VorSignalImpl:<0.199.0>;STOP;16125/19
+MV;LEAVES;Train.TrainImpl:<0.218.0>;16125/19;Graph.EdgeImpl:<0.119.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;STOP;16125/19
+DATA;z2;848 38;Time(16125/19)
+----Resulting Event for z2 :FrontEv(Ev(1700/19,3400,Stable,38,0,0,Front,Time(16125/19),38,False))
+CH;TrackElements.HauptSignalImpl:<0.188.0>;FAHRT;16125/19
+CH;TrackElements.VorSignalImpl:<0.187.0>;FAHRT;16125/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;FAHRT;16125/19
+CH;TrackElements.HauptSignalImpl:<0.152.0>;FAHRT;16125/19
+CH;TrackElements.VorSignalImpl:<0.151.0>;FAHRT;16125/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;FAHRT;16125/19
+SPP: 38 - Stable - Time(17825/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;17825/19;Graph.EdgeImpl:<0.95.0>;3400
+DATA;z2;938 38;Time(17825/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(17825/19),38,False))
+SPP: 38 - Stable - Time(17875/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;17875/19;Graph.EdgeImpl:<0.95.0>;100
+DATA;z2;940 38;Time(17875/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(17875/19),38,False))
+SPP: 38 - Stable - Time(17950/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;17950/19;Graph.EdgeImpl:<0.110.0>;3900
+DATA;z1;944 38;Time(17950/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(17950/19),38,False))
+SPP: 38 - Stable - Time(35925/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;35925/38;Graph.EdgeImpl:<0.96.0>;175
+DATA;z2;945 38;Time(35925/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(35925/38),38,False))
+SPP: 38 - Stable - Time(18000/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;18000/19;Graph.EdgeImpl:<0.110.0>;100
+DATA;z1;947 38;Time(18000/19)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(18000/19),38,False))
+SPP: 38 - Stable - Time(36025/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;36025/38;Graph.EdgeImpl:<0.96.0>;100
+DATA;z2;948 38;Time(36025/38)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(36025/38),38,False))
+SPP: 38 - Stable - Time(36175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;36175/38;Graph.EdgeImpl:<0.111.0>;175
+DATA;z1;951 38;Time(36175/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(36175/38),38,False))
+SPP: 38 - Stable - Time(36275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;36275/38;Graph.EdgeImpl:<0.111.0>;100
+DATA;z1;954 38;Time(36275/38)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(36275/38),38,False))
+SPP: 38 - Stable - Time(36675/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;36675/38;Graph.EdgeImpl:<0.97.0>;650
+DATA;z2;965 38;Time(36675/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(36675/38),38,False))
+SPP: 38 - Stable - Time(36775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;36775/38;Graph.EdgeImpl:<0.97.0>;100
+DATA;z2;967 38;Time(36775/38)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(36775/38),38,False))
+SPP: 38 - Stable - Time(36925/38)
+SPP: 38 - Stable - Time(36925/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;36925/38;Graph.EdgeImpl:<0.112.0>;650
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;36925/38;Graph.EdgeImpl:<0.98.0>;150
+DATA;z1;971 38;Time(36925/38)
+DATA;z2;971 38;Time(36925/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(36925/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(36925/38),38,False))
+SPP: 38 - Stable - Time(37025/38)
+SPP: 38 - Stable - Time(37025/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;37025/38;Graph.EdgeImpl:<0.99.0>;100
+DATA;z2;974 38;Time(37025/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;37025/38;Graph.EdgeImpl:<0.112.0>;100
+DATA;z1;974 38;Time(37025/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(37025/38),38,False))
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(37025/38),38,False))
+SPP: 38 - Stable - Time(37025/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;37025/38;Graph.EdgeImpl:<0.98.0>;0
+DATA;z2;974 38;Time(37025/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(37025/38),38,False))
+SPP: 38 - Stable - Time(37125/38)
+CH;TrackElements.HauptSignalImpl:<0.152.0>;STOP;37125/38
+CH;TrackElements.VorSignalImpl:<0.151.0>;STOP;37125/38
+MV;LEAVES;Train.TrainImpl:<0.218.0>;37125/38;Graph.EdgeImpl:<0.99.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;STOP;37125/38
+DATA;z2;976 38;Time(37125/38)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;FAHRT;37125/38
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(37125/38),38,False))
+CH;TrackElements.VorSignalImpl:<0.163.0>;FAHRT;37125/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;FAHRT;37125/38
+SPP: 38 - Stable - Time(37175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;37175/38;Graph.EdgeImpl:<0.113.0>;150
+DATA;z1;978 38;Time(37175/38)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(37175/38),38,False))
+SPP: 38 - Stable - Time(37275/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;37275/38;Graph.EdgeImpl:<0.114.0>;100
+DATA;z1;980 38;Time(37275/38)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(37275/38),38,False))
+SPP: 38 - Stable - Time(37275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;37275/38;Graph.EdgeImpl:<0.113.0>;0
+DATA;z1;980 38;Time(37275/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(37275/38),38,False))
+SPP: 38 - Stable - Time(37375/38)
+CH;TrackElements.HauptSignalImpl:<0.188.0>;STOP;37375/38
+CH;TrackElements.VorSignalImpl:<0.187.0>;STOP;37375/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;STOP;37375/38
+MV;LEAVES;Train.TrainImpl:<0.211.0>;37375/38;Graph.EdgeImpl:<0.114.0>;100
+DATA;z1;983 38;Time(37375/38)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;FAHRT;37375/38
+CH;TrackElements.VorSignalImpl:<0.199.0>;FAHRT;37375/38
+----Resulting Event for z1 :FrontEv(Ev(2075/19,4150,Stable,38,0,0,Front,Time(37375/38),38,False))
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;FAHRT;37375/38
+SPP: 38 - Stable - Time(41025/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;41025/38;Graph.EdgeImpl:<0.100.0>;3900
+DATA;z2;1079 38;Time(41025/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(41025/38),38,False))
+SPP: 38 - Stable - Time(41125/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;41125/38;Graph.EdgeImpl:<0.100.0>;100
+DATA;z2;1082 38;Time(41125/38)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(41125/38),38,False))
+SPP: 38 - Stable - Time(20650/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;20650/19;Graph.EdgeImpl:<0.101.0>;175
+DATA;z2;1086 38;Time(20650/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(20650/19),38,False))
+SPP: 38 - Stable - Time(20700/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;20700/19;Graph.EdgeImpl:<0.101.0>;100
+DATA;z2;1089 38;Time(20700/19)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(20700/19),38,False))
+SPP: 38 - Stable - Time(41525/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;41525/38;Graph.EdgeImpl:<0.115.0>;4150
+DATA;z1;1092 38;Time(41525/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(41525/38),38,False))
+SPP: 38 - Stable - Time(41625/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;41625/38;Graph.EdgeImpl:<0.115.0>;100
+DATA;z1;1095 38;Time(41625/38)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(41625/38),38,False))
+SPP: 38 - Stable - Time(1100)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;1100;Graph.EdgeImpl:<0.116.0>;175
+DATA;z1;1100 38;Time(1100)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(1100),38,False))
+SPP: 38 - Stable - Time(20950/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;20950/19;Graph.EdgeImpl:<0.116.0>;100
+DATA;z1;1102 38;Time(20950/19)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(20950/19),38,False))
+SPP: 38 - Stable - Time(21025/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;21025/19;Graph.EdgeImpl:<0.102.0>;650
+DATA;z2;1106 38;Time(21025/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(21025/19),38,False))
+SPP: 38 - Stable - Time(21075/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;21075/19;Graph.EdgeImpl:<0.102.0>;100
+DATA;z2;1109 38;Time(21075/19)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(21075/19),38,False))
+SPP: 38 - Stable - Time(21150/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;21150/19;Graph.EdgeImpl:<0.103.0>;150
+DATA;z2;1113 38;Time(21150/19)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(21150/19),38,False))
+SPP: 38 - Stable - Time(21200/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;21200/19;Graph.EdgeImpl:<0.104.0>;100
+DATA;z2;1115 38;Time(21200/19)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(21200/19),38,False))
+SPP: 38 - Stable - Time(21200/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;21200/19;Graph.EdgeImpl:<0.103.0>;0
+DATA;z2;1115 38;Time(21200/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(21200/19),38,False))
+SPP: 38 - Stable - Time(21250/19)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;STOP;21250/19
+MV;LEAVES;Train.TrainImpl:<0.218.0>;21250/19;Graph.EdgeImpl:<0.104.0>;100
+CH;TrackElements.VorSignalImpl:<0.163.0>;STOP;21250/19
+DATA;z2;1118 38;Time(21250/19)
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;STOP;21250/19
+CH;TrackElements.HauptSignalImpl:<0.176.0>;FAHRT;21250/19
+CH;TrackElements.VorSignalImpl:<0.175.0>;FAHRT;21250/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;FAHRT;21250/19
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(21250/19),38,False))
+SPP: 38 - Stable - Time(21275/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;21275/19;Graph.EdgeImpl:<0.117.0>;650
+DATA;z1;1119 38;Time(21275/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(21275/19),38,False))
+SPP: 38 - Stable - Time(21325/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;21325/19;Graph.EdgeImpl:<0.117.0>;100
+DATA;z1;1122 38;Time(21325/19)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(21325/19),38,False))
+SPP: 38 - Stable - Time(21400/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;21400/19;Graph.EdgeImpl:<0.118.0>;150
+DATA;z1;1126 38;Time(21400/19)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(21400/19),38,False))
+SPP: 38 - Stable - Time(21450/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;21450/19;Graph.EdgeImpl:<0.119.0>;100
+DATA;z1;1128 38;Time(21450/19)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(21450/19),38,False))
+SPP: 38 - Stable - Time(21450/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;21450/19;Graph.EdgeImpl:<0.118.0>;0
+DATA;z1;1128 38;Time(21450/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(21450/19),38,False))
+SPP: 38 - Stable - Time(21500/19)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;STOP;21500/19
+CH;TrackElements.VorSignalImpl:<0.199.0>;STOP;21500/19
+MV;LEAVES;Train.TrainImpl:<0.211.0>;21500/19;Graph.EdgeImpl:<0.119.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;STOP;21500/19
+DATA;z1;1131 38;Time(21500/19)
+----Resulting Event for z1 :FrontEv(Ev(1700/19,3400,Stable,38,0,0,Front,Time(21500/19),38,False))
+CH;TrackElements.HauptSignalImpl:<0.152.0>;FAHRT;21500/19
+CH;TrackElements.VorSignalImpl:<0.151.0>;FAHRT;21500/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;FAHRT;21500/19
+SPP: 38 - Stable - Time(23200/19)
+SPP: 38 - Stable - Time(23200/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;23200/19;Graph.EdgeImpl:<0.95.0>;3400
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;23200/19;Graph.EdgeImpl:<0.105.0>;3900
+DATA;z1;1221 38;Time(23200/19)
+DATA;z2;1221 38;Time(23200/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(23200/19),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(23200/19),38,False))
+SPP: 38 - Stable - Time(23250/19)
+SPP: 38 - Stable - Time(23250/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;23250/19;Graph.EdgeImpl:<0.105.0>;100
+MV;LEAVES;Train.TrainImpl:<0.211.0>;23250/19;Graph.EdgeImpl:<0.95.0>;100
+DATA;z2;1223 38;Time(23250/19)
+DATA;z1;1223 38;Time(23250/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(23250/19),38,False))
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(23250/19),38,False))
+SPP: 38 - Stable - Time(46675/38)
+SPP: 38 - Stable - Time(46675/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;46675/38;Graph.EdgeImpl:<0.96.0>;175
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;46675/38;Graph.EdgeImpl:<0.106.0>;175
+DATA;z1;1228 38;Time(46675/38)
+DATA;z2;1228 38;Time(46675/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(46675/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(46675/38),38,False))
+SPP: 38 - Stable - Time(46775/38)
+SPP: 38 - Stable - Time(46775/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;46775/38;Graph.EdgeImpl:<0.96.0>;100
+MV;LEAVES;Train.TrainImpl:<0.218.0>;46775/38;Graph.EdgeImpl:<0.106.0>;100
+DATA;z1;1230 38;Time(46775/38)
+DATA;z2;1230 38;Time(46775/38)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(46775/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(46775/38),38,False))
+SPP: 38 - Stable - Time(47425/38)
+SPP: 38 - Stable - Time(47425/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;47425/38;Graph.EdgeImpl:<0.107.0>;650
+DATA;z2;1248 38;Time(47425/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;47425/38;Graph.EdgeImpl:<0.97.0>;650
+DATA;z1;1248 38;Time(47425/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(47425/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(47425/38),38,False))
+SPP: 38 - Stable - Time(47525/38)
+SPP: 38 - Stable - Time(47525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;47525/38;Graph.EdgeImpl:<0.97.0>;100
+DATA;z1;1250 38;Time(47525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;47525/38;Graph.EdgeImpl:<0.107.0>;100
+DATA;z2;1250 38;Time(47525/38)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(47525/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(47525/38),38,False))
+SPP: 38 - Stable - Time(47675/38)
+SPP: 38 - Stable - Time(47675/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;47675/38;Graph.EdgeImpl:<0.108.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;47675/38;Graph.EdgeImpl:<0.98.0>;150
+DATA;z2;1254 38;Time(47675/38)
+DATA;z1;1254 38;Time(47675/38)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(47675/38),38,False))
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(47675/38),38,False))
+SPP: 38 - Stable - Time(47775/38)
+SPP: 38 - Stable - Time(47775/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;47775/38;Graph.EdgeImpl:<0.109.0>;100
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;47775/38;Graph.EdgeImpl:<0.99.0>;100
+DATA;z2;1257 38;Time(47775/38)
+DATA;z1;1257 38;Time(47775/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(47775/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(47775/38),38,False))
+SPP: 38 - Stable - Time(47775/38)
+SPP: 38 - Stable - Time(47775/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;47775/38;Graph.EdgeImpl:<0.98.0>;0
+DATA;z1;1257 38;Time(47775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;47775/38;Graph.EdgeImpl:<0.108.0>;0
+DATA;z2;1257 38;Time(47775/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(47775/38),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(47775/38),38,False))
+SPP: 38 - Stable - Time(47875/38)
+SPP: 38 - Stable - Time(47875/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;47875/38;Graph.EdgeImpl:<0.99.0>;100
+CH;TrackElements.HauptSignalImpl:<0.152.0>;STOP;47875/38
+CH;TrackElements.VorSignalImpl:<0.151.0>;STOP;47875/38
+DATA;z1;1259 38;Time(47875/38)
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;STOP;47875/38
+CH;TrackElements.HauptSignalImpl:<0.176.0>;STOP;47875/38
+CH;TrackElements.VorSignalImpl:<0.175.0>;STOP;47875/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;STOP;47875/38
+MV;LEAVES;Train.TrainImpl:<0.218.0>;47875/38;Graph.EdgeImpl:<0.109.0>;100
+DATA;z2;1259 38;Time(47875/38)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;FAHRT;47875/38
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(47875/38),38,False))
+CH;TrackElements.VorSignalImpl:<0.163.0>;FAHRT;47875/38
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(47875/38),38,False))
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;FAHRT;47875/38
+CH;TrackElements.HauptSignalImpl:<0.188.0>;FAHRT;47875/38
+CH;TrackElements.VorSignalImpl:<0.187.0>;FAHRT;47875/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;FAHRT;47875/38
+SPP: 38 - Stable - Time(2725/2)
+SPP: 38 - Stable - Time(2725/2)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;2725/2;Graph.EdgeImpl:<0.100.0>;3900
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;2725/2;Graph.EdgeImpl:<0.110.0>;3900
+DATA;z1;1362 38;Time(2725/2)
+DATA;z2;1362 38;Time(2725/2)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(2725/2),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(2725/2),38,False))
+SPP: 38 - Stable - Time(51875/38)
+SPP: 38 - Stable - Time(51875/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;51875/38;Graph.EdgeImpl:<0.100.0>;100
+MV;LEAVES;Train.TrainImpl:<0.218.0>;51875/38;Graph.EdgeImpl:<0.110.0>;100
+DATA;z1;1365 38;Time(51875/38)
+DATA;z2;1365 38;Time(51875/38)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(51875/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(51875/38),38,False))
+SPP: 38 - Stable - Time(26025/19)
+SPP: 38 - Stable - Time(26025/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26025/19;Graph.EdgeImpl:<0.101.0>;175
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26025/19;Graph.EdgeImpl:<0.111.0>;175
+DATA;z1;1369 38;Time(26025/19)
+DATA;z2;1369 38;Time(26025/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26025/19),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26025/19),38,False))
+SPP: 38 - Stable - Time(26075/19)
+SPP: 38 - Stable - Time(26075/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26075/19;Graph.EdgeImpl:<0.101.0>;100
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26075/19;Graph.EdgeImpl:<0.111.0>;100
+DATA;z1;1372 38;Time(26075/19)
+DATA;z2;1372 38;Time(26075/19)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(26075/19),38,False))
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(26075/19),38,False))
+SPP: 38 - Stable - Time(26400/19)
+SPP: 38 - Stable - Time(26400/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26400/19;Graph.EdgeImpl:<0.112.0>;650
+DATA;z2;1389 38;Time(26400/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26400/19;Graph.EdgeImpl:<0.102.0>;650
+DATA;z1;1389 38;Time(26400/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26400/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26400/19),38,False))
+SPP: 38 - Stable - Time(26450/19)
+SPP: 38 - Stable - Time(26450/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26450/19;Graph.EdgeImpl:<0.102.0>;100
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26450/19;Graph.EdgeImpl:<0.112.0>;100
+DATA;z1;1392 38;Time(26450/19)
+DATA;z2;1392 38;Time(26450/19)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(26450/19),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(26450/19),38,False))
+SPP: 38 - Stable - Time(26525/19)
+SPP: 38 - Stable - Time(26525/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26525/19;Graph.EdgeImpl:<0.103.0>;150
+DATA;z1;1396 38;Time(26525/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26525/19;Graph.EdgeImpl:<0.113.0>;150
+DATA;z2;1396 38;Time(26525/19)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(26525/19),38,False))
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(26525/19),38,False))
+SPP: 38 - Stable - Time(26575/19)
+SPP: 38 - Stable - Time(26575/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;26575/19;Graph.EdgeImpl:<0.114.0>;100
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;26575/19;Graph.EdgeImpl:<0.104.0>;100
+DATA;z2;1398 38;Time(26575/19)
+DATA;z1;1398 38;Time(26575/19)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(26575/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(26575/19),38,False))
+SPP: 38 - Stable - Time(26575/19)
+SPP: 38 - Stable - Time(26575/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26575/19;Graph.EdgeImpl:<0.113.0>;0
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26575/19;Graph.EdgeImpl:<0.103.0>;0
+DATA;z2;1398 38;Time(26575/19)
+DATA;z1;1398 38;Time(26575/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26575/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(26575/19),38,False))
+SPP: 38 - Stable - Time(26625/19)
+SPP: 38 - Stable - Time(26625/19)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;STOP;26625/19
+CH;TrackElements.VorSignalImpl:<0.163.0>;STOP;26625/19
+MV;LEAVES;Train.TrainImpl:<0.211.0>;26625/19;Graph.EdgeImpl:<0.104.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;STOP;26625/19
+DATA;z1;1401 38;Time(26625/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;26625/19;Graph.EdgeImpl:<0.114.0>;100
+DATA;z2;1401 38;Time(26625/19)
+CH;TrackElements.HauptSignalImpl:<0.188.0>;STOP;26625/19
+CH;TrackElements.VorSignalImpl:<0.187.0>;STOP;26625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;STOP;26625/19
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(26625/19),38,False))
+CH;TrackElements.HauptSignalImpl:<0.176.0>;FAHRT;26625/19
+----Resulting Event for z2 :FrontEv(Ev(2075/19,4150,Stable,38,0,0,Front,Time(26625/19),38,False))
+CH;TrackElements.VorSignalImpl:<0.175.0>;FAHRT;26625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;FAHRT;26625/19
+CH;TrackElements.HauptSignalImpl:<0.200.0>;FAHRT;26625/19
+CH;TrackElements.VorSignalImpl:<0.199.0>;FAHRT;26625/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;FAHRT;26625/19
+SPP: 38 - Stable - Time(28575/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;28575/19;Graph.EdgeImpl:<0.105.0>;3900
+DATA;z1;1503 38;Time(28575/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(28575/19),38,False))
+SPP: 38 - Stable - Time(28625/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;28625/19;Graph.EdgeImpl:<0.105.0>;100
+DATA;z1;1506 38;Time(28625/19)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(28625/19),38,False))
+SPP: 38 - Stable - Time(28700/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;28700/19;Graph.EdgeImpl:<0.115.0>;4150
+DATA;z2;1510 38;Time(28700/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(28700/19),38,False))
+SPP: 38 - Stable - Time(57425/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;57425/38;Graph.EdgeImpl:<0.106.0>;175
+DATA;z1;1511 38;Time(57425/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(57425/38),38,False))
+SPP: 38 - Stable - Time(28750/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;28750/19;Graph.EdgeImpl:<0.115.0>;100
+DATA;z2;1513 38;Time(28750/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(28750/19),38,False))
+SPP: 38 - Stable - Time(57525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;57525/38;Graph.EdgeImpl:<0.106.0>;100
+DATA;z1;1513 38;Time(57525/38)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(57525/38),38,False))
+SPP: 38 - Stable - Time(57675/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;57675/38;Graph.EdgeImpl:<0.116.0>;175
+DATA;z2;1517 38;Time(57675/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(57675/38),38,False))
+SPP: 38 - Stable - Time(57775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;57775/38;Graph.EdgeImpl:<0.116.0>;100
+DATA;z2;1520 38;Time(57775/38)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(57775/38),38,False))
+SPP: 38 - Stable - Time(58175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;58175/38;Graph.EdgeImpl:<0.107.0>;650
+DATA;z1;1530 38;Time(58175/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(58175/38),38,False))
+SPP: 38 - Stable - Time(58275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;58275/38;Graph.EdgeImpl:<0.107.0>;100
+DATA;z1;1533 38;Time(58275/38)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(58275/38),38,False))
+SPP: 38 - Stable - Time(3075/2)
+SPP: 38 - Stable - Time(3075/2)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;3075/2;Graph.EdgeImpl:<0.108.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;3075/2;Graph.EdgeImpl:<0.117.0>;650
+DATA;z1;1537 38;Time(3075/2)
+DATA;z2;1537 38;Time(3075/2)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(3075/2),38,False))
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(3075/2),38,False))
+SPP: 38 - Stable - Time(58525/38)
+SPP: 38 - Stable - Time(58525/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;58525/38;Graph.EdgeImpl:<0.109.0>;100
+DATA;z1;1540 38;Time(58525/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;58525/38;Graph.EdgeImpl:<0.117.0>;100
+DATA;z2;1540 38;Time(58525/38)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(58525/38),38,False))
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(58525/38),38,False))
+SPP: 38 - Stable - Time(58525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;58525/38;Graph.EdgeImpl:<0.108.0>;0
+DATA;z1;1540 38;Time(58525/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(58525/38),38,False))
+SPP: 38 - Stable - Time(58625/38)
+CH;TrackElements.HauptSignalImpl:<0.176.0>;STOP;58625/38
+CH;TrackElements.VorSignalImpl:<0.175.0>;STOP;58625/38
+MV;LEAVES;Train.TrainImpl:<0.211.0>;58625/38;Graph.EdgeImpl:<0.109.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;STOP;58625/38
+DATA;z1;1542 38;Time(58625/38)
+----Resulting Event for z1 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(58625/38),38,False))
+SPP: 38 - Stable - Time(58675/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;58675/38;Graph.EdgeImpl:<0.118.0>;150
+DATA;z2;1544 38;Time(58675/38)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(58675/38),38,False))
+SPP: 38 - Stable - Time(58775/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;58775/38;Graph.EdgeImpl:<0.119.0>;100
+DATA;z2;1546 38;Time(58775/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(58775/38),38,False))
+SPP: 38 - Stable - Time(58775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;58775/38;Graph.EdgeImpl:<0.118.0>;0
+DATA;z2;1546 38;Time(58775/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(58775/38),38,False))
+SPP: 38 - Stable - Time(58875/38)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;STOP;58875/38
+MV;LEAVES;Train.TrainImpl:<0.218.0>;58875/38;Graph.EdgeImpl:<0.119.0>;100
+CH;TrackElements.VorSignalImpl:<0.199.0>;STOP;58875/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;STOP;58875/38
+DATA;z2;1549 38;Time(58875/38)
+----Resulting Event for z2 :FrontEv(Ev(1700/19,3400,Stable,38,0,0,Front,Time(58875/38),38,False))
+CH;TrackElements.HauptSignalImpl:<0.188.0>;FAHRT;58875/38
+CH;TrackElements.VorSignalImpl:<0.187.0>;FAHRT;58875/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;FAHRT;58875/38
+CH;TrackElements.HauptSignalImpl:<0.152.0>;FAHRT;58875/38
+CH;TrackElements.VorSignalImpl:<0.151.0>;FAHRT;58875/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;FAHRT;58875/38
+SPP: 38 - Stable - Time(62275/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;62275/38;Graph.EdgeImpl:<0.95.0>;3400
+DATA;z2;1638 38;Time(62275/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(62275/38),38,False))
+SPP: 38 - Stable - Time(62375/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;62375/38;Graph.EdgeImpl:<0.95.0>;100
+DATA;z2;1641 38;Time(62375/38)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(62375/38),38,False))
+SPP: 38 - Stable - Time(62525/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;62525/38;Graph.EdgeImpl:<0.110.0>;3900
+DATA;z1;1645 38;Time(62525/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(62525/38),38,False))
+SPP: 38 - Stable - Time(31275/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;31275/19;Graph.EdgeImpl:<0.96.0>;175
+DATA;z2;1646 38;Time(31275/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(31275/19),38,False))
+SPP: 38 - Stable - Time(62625/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;62625/38;Graph.EdgeImpl:<0.110.0>;100
+DATA;z1;1648 38;Time(62625/38)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(62625/38),38,False))
+SPP: 38 - Stable - Time(31325/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;31325/19;Graph.EdgeImpl:<0.96.0>;100
+DATA;z2;1648 38;Time(31325/19)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(31325/19),38,False))
+SPP: 38 - Stable - Time(31400/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;31400/19;Graph.EdgeImpl:<0.111.0>;175
+DATA;z1;1652 38;Time(31400/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(31400/19),38,False))
+SPP: 38 - Stable - Time(31450/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;31450/19;Graph.EdgeImpl:<0.111.0>;100
+DATA;z1;1655 38;Time(31450/19)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(31450/19),38,False))
+SPP: 38 - Stable - Time(31650/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;31650/19;Graph.EdgeImpl:<0.97.0>;650
+DATA;z2;1665 38;Time(31650/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(31650/19),38,False))
+SPP: 38 - Stable - Time(31700/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;31700/19;Graph.EdgeImpl:<0.97.0>;100
+DATA;z2;1668 38;Time(31700/19)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(31700/19),38,False))
+SPP: 38 - Stable - Time(31775/19)
+SPP: 38 - Stable - Time(31775/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;31775/19;Graph.EdgeImpl:<0.98.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;31775/19;Graph.EdgeImpl:<0.112.0>;650
+DATA;z2;1672 38;Time(31775/19)
+DATA;z1;1672 38;Time(31775/19)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(31775/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(31775/19),38,False))
+SPP: 38 - Stable - Time(1675)
+SPP: 38 - Stable - Time(1675)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;1675;Graph.EdgeImpl:<0.99.0>;100
+MV;LEAVES;Train.TrainImpl:<0.211.0>;1675;Graph.EdgeImpl:<0.112.0>;100
+DATA;z2;1675 38;Time(1675)
+DATA;z1;1675 38;Time(1675)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(1675),38,False))
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(1675),38,False))
+SPP: 38 - Stable - Time(1675)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;1675;Graph.EdgeImpl:<0.98.0>;0
+DATA;z2;1675 38;Time(1675)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(1675),38,False))
+SPP: 38 - Stable - Time(31875/19)
+CH;TrackElements.HauptSignalImpl:<0.152.0>;STOP;31875/19
+CH;TrackElements.VorSignalImpl:<0.151.0>;STOP;31875/19
+MV;LEAVES;Train.TrainImpl:<0.218.0>;31875/19;Graph.EdgeImpl:<0.99.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;STOP;31875/19
+DATA;z2;1677 38;Time(31875/19)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;FAHRT;31875/19
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(31875/19),38,False))
+CH;TrackElements.VorSignalImpl:<0.163.0>;FAHRT;31875/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;FAHRT;31875/19
+SPP: 38 - Stable - Time(31900/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;31900/19;Graph.EdgeImpl:<0.113.0>;150
+DATA;z1;1678 38;Time(31900/19)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(31900/19),38,False))
+SPP: 38 - Stable - Time(31950/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;31950/19;Graph.EdgeImpl:<0.114.0>;100
+DATA;z1;1681 38;Time(31950/19)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(31950/19),38,False))
+SPP: 38 - Stable - Time(31950/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;31950/19;Graph.EdgeImpl:<0.113.0>;0
+DATA;z1;1681 38;Time(31950/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(31950/19),38,False))
+SPP: 38 - Stable - Time(32000/19)
+CH;TrackElements.HauptSignalImpl:<0.188.0>;STOP;32000/19
+CH;TrackElements.VorSignalImpl:<0.187.0>;STOP;32000/19
+MV;LEAVES;Train.TrainImpl:<0.211.0>;32000/19;Graph.EdgeImpl:<0.114.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.186.0>;STOP;32000/19
+DATA;z1;1684 38;Time(32000/19)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;FAHRT;32000/19
+----Resulting Event for z1 :FrontEv(Ev(2075/19,4150,Stable,38,0,0,Front,Time(32000/19),38,False))
+CH;TrackElements.VorSignalImpl:<0.199.0>;FAHRT;32000/19
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;FAHRT;32000/19
+SPP: 38 - Stable - Time(33825/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;33825/19;Graph.EdgeImpl:<0.100.0>;3900
+DATA;z2;1780 38;Time(33825/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(33825/19),38,False))
+SPP: 38 - Stable - Time(33875/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;33875/19;Graph.EdgeImpl:<0.100.0>;100
+DATA;z2;1782 38;Time(33875/19)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(33875/19),38,False))
+SPP: 38 - Stable - Time(3575/2)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;3575/2;Graph.EdgeImpl:<0.101.0>;175
+DATA;z2;1787 38;Time(3575/2)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(3575/2),38,False))
+SPP: 38 - Stable - Time(68025/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;68025/38;Graph.EdgeImpl:<0.101.0>;100
+DATA;z2;1790 38;Time(68025/38)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(68025/38),38,False))
+SPP: 38 - Stable - Time(34075/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;34075/19;Graph.EdgeImpl:<0.115.0>;4150
+DATA;z1;1793 38;Time(34075/19)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(34075/19),38,False))
+SPP: 38 - Stable - Time(34125/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;34125/19;Graph.EdgeImpl:<0.115.0>;100
+DATA;z1;1796 38;Time(34125/19)
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(34125/19),38,False))
+SPP: 38 - Stable - Time(68425/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;68425/38;Graph.EdgeImpl:<0.116.0>;175
+DATA;z1;1800 38;Time(68425/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(68425/38),38,False))
+SPP: 38 - Stable - Time(68525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;68525/38;Graph.EdgeImpl:<0.116.0>;100
+DATA;z1;1803 38;Time(68525/38)
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(68525/38),38,False))
+SPP: 38 - Stable - Time(68675/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;68675/38;Graph.EdgeImpl:<0.102.0>;650
+DATA;z2;1807 38;Time(68675/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(68675/38),38,False))
+SPP: 38 - Stable - Time(68775/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;68775/38;Graph.EdgeImpl:<0.102.0>;100
+DATA;z2;1809 38;Time(68775/38)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(68775/38),38,False))
+SPP: 38 - Stable - Time(68925/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;68925/38;Graph.EdgeImpl:<0.103.0>;150
+DATA;z2;1813 38;Time(68925/38)
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(68925/38),38,False))
+SPP: 38 - Stable - Time(69025/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;69025/38;Graph.EdgeImpl:<0.104.0>;100
+DATA;z2;1816 38;Time(69025/38)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(69025/38),38,False))
+SPP: 38 - Stable - Time(69025/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;69025/38;Graph.EdgeImpl:<0.103.0>;0
+DATA;z2;1816 38;Time(69025/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(69025/38),38,False))
+SPP: 38 - Stable - Time(69125/38)
+CH;TrackElements.HauptSignalImpl:<0.164.0>;STOP;69125/38
+MV;LEAVES;Train.TrainImpl:<0.218.0>;69125/38;Graph.EdgeImpl:<0.104.0>;100
+CH;TrackElements.VorSignalImpl:<0.163.0>;STOP;69125/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.162.0>;STOP;69125/38
+DATA;z2;1819 38;Time(69125/38)
+----Resulting Event for z2 :FrontEv(Ev(1950/19,3900,Stable,38,0,0,Front,Time(69125/38),38,False))
+CH;TrackElements.HauptSignalImpl:<0.176.0>;FAHRT;69125/38
+CH;TrackElements.VorSignalImpl:<0.175.0>;FAHRT;69125/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.174.0>;FAHRT;69125/38
+SPP: 38 - Stable - Time(69175/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;69175/38;Graph.EdgeImpl:<0.117.0>;650
+DATA;z1;1820 38;Time(69175/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(69175/38),38,False))
+SPP: 38 - Stable - Time(69275/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;69275/38;Graph.EdgeImpl:<0.117.0>;100
+DATA;z1;1823 38;Time(69275/38)
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(69275/38),38,False))
+SPP: 38 - Stable - Time(69425/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;69425/38;Graph.EdgeImpl:<0.118.0>;150
+DATA;z1;1826 38;Time(69425/38)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(69425/38),38,False))
+SPP: 38 - Stable - Time(69525/38)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;69525/38;Graph.EdgeImpl:<0.119.0>;100
+DATA;z1;1829 38;Time(69525/38)
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(69525/38),38,False))
+SPP: 38 - Stable - Time(69525/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;69525/38;Graph.EdgeImpl:<0.118.0>;0
+DATA;z1;1829 38;Time(69525/38)
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(69525/38),38,False))
+SPP: 38 - Stable - Time(69625/38)
+CH;TrackElements.HauptSignalImpl:<0.200.0>;STOP;69625/38
+CH;TrackElements.VorSignalImpl:<0.199.0>;STOP;69625/38
+MV;LEAVES;Train.TrainImpl:<0.211.0>;69625/38;Graph.EdgeImpl:<0.119.0>;100
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.198.0>;STOP;69625/38
+DATA;z1;1832 38;Time(69625/38)
+CH;TrackElements.HauptSignalImpl:<0.152.0>;FAHRT;69625/38
+----Resulting Event for z1 :FrontEv(Ev(1700/19,3400,Stable,38,0,0,Front,Time(69625/38),38,False))
+CH;TrackElements.VorSignalImpl:<0.151.0>;FAHRT;69625/38
+CH;TrackElements.SichtbarkeitsPunktImpl:<0.150.0>;FAHRT;69625/38
+SPP: 38 - Stable - Time(73025/38)
+SPP: 38 - Stable - Time(73025/38)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;73025/38;Graph.EdgeImpl:<0.105.0>;3900
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;73025/38;Graph.EdgeImpl:<0.95.0>;3400
+DATA;z2;1921 38;Time(73025/38)
+DATA;z1;1921 38;Time(73025/38)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(73025/38),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(73025/38),38,False))
+SPP: 38 - Stable - Time(73125/38)
+SPP: 38 - Stable - Time(73125/38)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;73125/38;Graph.EdgeImpl:<0.105.0>;100
+DATA;z2;1924 38;Time(73125/38)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;73125/38;Graph.EdgeImpl:<0.95.0>;100
+DATA;z1;1924 38;Time(73125/38)
+----Resulting Event for z2 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(73125/38),38,False))
+----Resulting Event for z1 :FrontEv(Ev(175/38,175,Stable,38,0,0,Front,Time(73125/38),38,False))
+SPP: 38 - Stable - Time(36650/19)
+SPP: 38 - Stable - Time(36650/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;36650/19;Graph.EdgeImpl:<0.106.0>;175
+DATA;z2;1928 38;Time(36650/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;36650/19;Graph.EdgeImpl:<0.96.0>;175
+DATA;z1;1928 38;Time(36650/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(36650/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(36650/19),38,False))
+SPP: 38 - Stable - Time(36700/19)
+SPP: 38 - Stable - Time(36700/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;36700/19;Graph.EdgeImpl:<0.106.0>;100
+DATA;z2;1931 38;Time(36700/19)
+MV;LEAVES;Train.TrainImpl:<0.211.0>;36700/19;Graph.EdgeImpl:<0.96.0>;100
+DATA;z1;1931 38;Time(36700/19)
+----Resulting Event for z2 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(36700/19),38,False))
+----Resulting Event for z1 :FrontEv(Ev(325/19,650,Stable,38,0,0,Front,Time(36700/19),38,False))
+SPP: 38 - Stable - Time(37025/19)
+SPP: 38 - Stable - Time(37025/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;37025/19;Graph.EdgeImpl:<0.107.0>;650
+DATA;z2;1948 38;Time(37025/19)
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;37025/19;Graph.EdgeImpl:<0.97.0>;650
+DATA;z1;1948 38;Time(37025/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(37025/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(37025/19),38,False))
+SPP: 38 - Stable - Time(37075/19)
+SPP: 38 - Stable - Time(37075/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;37075/19;Graph.EdgeImpl:<0.107.0>;100
+MV;LEAVES;Train.TrainImpl:<0.211.0>;37075/19;Graph.EdgeImpl:<0.97.0>;100
+DATA;z1;1951 38;Time(37075/19)
+DATA;z2;1951 38;Time(37075/19)
+----Resulting Event for z2 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(37075/19),38,False))
+----Resulting Event for z1 :FrontEv(Ev(75/19,150,Stable,38,0,0,Front,Time(37075/19),38,False))
+SPP: 38 - Stable - Time(37150/19)
+SPP: 38 - Stable - Time(37150/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;37150/19;Graph.EdgeImpl:<0.108.0>;150
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;37150/19;Graph.EdgeImpl:<0.98.0>;150
+DATA;z2;1955 38;Time(37150/19)
+DATA;z1;1955 38;Time(37150/19)
+----Resulting Event for z1 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(37150/19),38,False))
+----Resulting Event for z2 :FrontEv(Ev(50/19,100,Stable,38,0,0,Front,Time(37150/19),38,False))
+SPP: 38 - Stable - Time(37200/19)
+SPP: 38 - Stable - Time(37200/19)
+MV;REACHSTART;Train.TrainImpl:<0.218.0>;37200/19;Graph.EdgeImpl:<0.109.0>;100
+MV;REACHSTART;Train.TrainImpl:<0.211.0>;37200/19;Graph.EdgeImpl:<0.99.0>;100
+DATA;z2;1957 38;Time(37200/19)
+DATA;z1;1957 38;Time(37200/19)
+----Resulting Event for z2 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(37200/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(0,0,Stable,38,0,0,Back,Time(37200/19),38,False))
+SPP: 38 - Stable - Time(37200/19)
+SPP: 38 - Stable - Time(37200/19)
+MV;LEAVES;Train.TrainImpl:<0.218.0>;37217/19;Graph.EdgeImpl:<0.108.0>;0
+MV;LEAVES;Train.TrainImpl:<0.211.0>;37217/19;Graph.EdgeImpl:<0.98.0>;0
+DATA;z2;1958 38;Time(37217/19)
+DATA;z1;1958 38;Time(37217/19)
+----Resulting Event for z2 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(37217/19),38,False))
+----Resulting Event for z1 :BackEv(Ev(50/19,100,Stable,38,0,0,Back,Time(37217/19),38,False))
+SPP: 38 - Stable - Time(37267/19)
+SPP: 38 - Stable - Time(37267/19)

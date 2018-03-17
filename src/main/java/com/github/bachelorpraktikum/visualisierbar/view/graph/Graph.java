@@ -33,7 +33,7 @@ public final class Graph {
     @Nonnull
     private Map<Element, GraphShape<Element>> elements;
     @Nonnull
-    private Map<String, logicalGroup> logicalGroups;
+    private Map<String, LogicalGroup> logicalGroups;
 
 
     /**
@@ -55,10 +55,10 @@ public final class Graph {
         this.group = new Group();
         this.edges = new LinkedHashMap<>(256);
 
-        Junction.clearSelection();      //TEST//
+        Junction.clearSelection();
         for (Node node : Node.in(context).getAll()) {
-            node.setGraph(null);
-            node.getEdges().forEach(a->{a.setGraph(null);});
+            node.setGraph(null);                                                                                            //in case this is a graph switch we need to null this so everything gets
+            node.getEdges().forEach(a->{a.setGraph(null);});                                                                //properly redrawn
             node.getElements().forEach(a->{a.setGraph(null);});
         }
         for (Edge edge : Edge.in(context).getAll()) {
@@ -74,7 +74,6 @@ public final class Graph {
             nodes.put(node, shape);
             node.setGraph(this);
             group.getChildren().add(shape.getFullNode());
-            //node.getElements().forEach((a)->{a.setGraph(null);});
 
             for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
 
@@ -124,12 +123,13 @@ public final class Graph {
 
     /**
      * removes a {@link Node} from the Graph, the Context and the Factory mapping.
+     * Also nulls direction of nodes pointing to this node
+     * This messes with the Node, so dont use it in any other way after calling this function.
      * @param node the Node to remove
      */
     public void removeNode(Node node){
 
         LinkedList<Element> e =new LinkedList<>();
-        //LinkedList<Node> n =new LinkedList();
         LinkedList<Edge> ed =new LinkedList<>();
         elements.forEach((a,b)->{
             if (a.getNode()==node){
@@ -138,7 +138,7 @@ public final class Graph {
         });
 
         edges.forEach((a,b)->{
-            if(a.getNode1()==node || a.getNode2()==node) {
+            if(a.getNode1()==node || a.getNode2()==node) {                                                                  //remove Directions pointing to this Node
                 for( Element element : a.getNode1().getElements()){
                     if(element.getDirection()==node)
                         element.setDirection(null);
@@ -151,8 +151,7 @@ public final class Graph {
                 ed.add(a);
                 a.getOtherNode(node).getEdges().remove(a);
 
-                group.getChildren().remove(b.getFullNode());    //remove edges from graph pane
-                //edges.remove(a);
+                group.getChildren().remove(b.getFullNode());                                                                //remove edges from graph pane
                 a.setGraph(null);
             }
         });
@@ -161,35 +160,17 @@ public final class Graph {
 
         ed.forEach((a)->{
             Edge.in(context).remove(a);
-            edges.remove(a);                                    //remove edges from  context, factory and graph
+            edges.remove(a);                                                                                                //remove edges from  context, factory and graph
             context.removeObject(a);
         });
         group.getChildren().remove(nodes.get(node).getFullNode());
         node.setGraph(null);
-        nodes.remove(node);                                     //remove node from graph, factory context and graph pane
+        nodes.remove(node);                                                                                                 //remove node from graph, factory context and graph pane
         Node.in(context).remove(node);
         context.removeObject(node);
         changed();
 
     }
-
-        /**
-         * removes an {@link Edge} from the Graph as well as the Context and the Factory mapping.
-         *
-         * @param edge the Edge to remove
-         */
-
-    public void removeEdge (Edge edge){
-        edge.getNode1().getEdges().remove(edge);
-        edge.getNode2().getEdges().remove(edge);
-        group.getChildren().remove(edges.get(edge).getFullNode());
-        edges.remove(edge);
-        edge.setGraph(null);
-        context.removeObject(edge);
-        Edge.in(context).remove(edge);
-
-    }
-
 
     /**
      * Connects every Node in the Selection with every other Node part of the Selection.
@@ -202,12 +183,12 @@ public final class Graph {
         HashSet<Node> NodeSet = new HashSet<>(128);
         Iterator it = Junction.getSelection().iterator();
         while(it.hasNext()){
-            NodeSet.add(((Junction) it.next()).getRepresented());       //turn Junctions into Nodes
+            NodeSet.add(((Junction) it.next()).getRepresented());                                                           //turn Junctions into Nodes
         }
-        LinkedList<Node> sList = new LinkedList<>();                      //turn into list to get an order
+        LinkedList<Node> sList = new LinkedList<>();                                                                        //turn into list to get an order
         sList.addAll(NodeSet);
         int l = selection.size();
-        boolean existingEdges[][]=new boolean [l][l];   //mark existing edges in this array
+        boolean existingEdges[][]=new boolean [l][l];                                                                       //mark existing edges in this array
 
         for (int i=0; i<l; i++){
             for (int k=0; k<l ; k++ ){
@@ -225,7 +206,7 @@ public final class Graph {
                 for ( j = 0; j < l; j++) {
                     if(a.getNode2()== sList.get(j)) break;
                 }
-                existingEdges[i][j]=true;               //mark the existing edge
+                existingEdges[i][j]=true;                                                                                   //mark the existing edge
                 existingEdges[j][i]=true;
             }
         });
@@ -236,7 +217,7 @@ public final class Graph {
                 if (!existingEdges[i][k]){
                     String name=null;
 
-                    for (int j=0; j<1000; j++) {               //generate missing edges with random names
+                    for (int j=0; j<1000; j++) {                                                                            //generate missing edges with random names
                         name = gen.nextString();
                         if(!Edge.in(context).NameExists(name)) break;
                     }
@@ -255,6 +236,7 @@ public final class Graph {
 
     /**
      * Removes all Edges that are associated with this Node.
+     * Also nulls direction if it becomes invalid because of the Edge removal
      * Edges are removed from the Graph, the Context and the Factory mapping.
      * @param node to disconnect
      */
@@ -262,14 +244,22 @@ public final class Graph {
         LinkedList<Edge> ed = new LinkedList<>();
         edges.forEach((a,b)-> {
             if (a.getNode1() == node || a.getNode2() == node) {
+                for( Element element : a.getNode1().getElements()){
+                    if(element.getDirection()==a.getNode2())
+                        element.setDirection(null);
+                }
+                for( Element element : a.getNode2().getElements()){
+                    if(element.getDirection()==a.getNode1())
+                        element.setDirection(null);
+                }
                 Node otherNode=a.getOtherNode(node);
                 otherNode.getEdges().remove(a);
                 ed.add(a);
-                group.getChildren().remove(b.getFullNode());    //remove from graph pane
+                group.getChildren().remove(b.getFullNode());                                                                //remove from graph pane
                 a.setGraph(null);
             }
         });
-        ed.forEach((a)->{               //remove from graph, factory, context and node
+        ed.forEach((a)->{                                                                                                   //remove from graph, factory, context and node
             edges.remove(a);
             context.removeObject(a);
             Edge.in(context).remove(a);
@@ -316,9 +306,13 @@ public final class Graph {
 
     }
 
+    /**
+     * rebuilds the Composite Elements of a Node. Call this after modifying a composite Element
+     * @param node
+     */
     public void rebuildComposite (Node node){
         for( Element CompositeElement : node.getElements()){
-            if (CompositeElement.getType().isComposite()){                       //remove composite Elements to rebuild them
+            if (CompositeElement.getType().isComposite()){                                                                  //remove composite Elements to rebuild them
                 if(CompositeElement.getGraph()==this){
                     this.getGroup().getChildren().remove(elements.get(CompositeElement).getFullNode());
                     CompositeElement.setGraph(null);
@@ -356,7 +350,7 @@ public final class Graph {
         nodes.put(node, shape);
         node.setGraph(this);
         group.getChildren().add(shape.getFullNode());
-        //node.getElements().forEach((a)->{a.setGraph(null);});
+
 
         for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
 
@@ -443,7 +437,6 @@ public final class Graph {
      * @param elementToAdd
      */
     public void addElement(Element elementToAdd){
-        //elementtoAdd.getNode().ge
 
         if(elementToAdd.getType().isComposite()){
             for( Element element : elementToAdd.getNode().getElements()){

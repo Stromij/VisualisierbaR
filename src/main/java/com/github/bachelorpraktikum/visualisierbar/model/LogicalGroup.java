@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-public class logicalGroup {
+public class LogicalGroup {
 
     @Nonnull
     private LinkedHashSet<Element> elements;
@@ -18,33 +18,33 @@ public class logicalGroup {
     public static final class GroupFactory{
 
         @Nonnull
-        private static final Map<String, logicalGroup> groups= new LinkedHashMap<>();
+        private static final Map<String, LogicalGroup> groups= new LinkedHashMap<>();
 
 
         @Nonnull
-        public static logicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedList<Element> elements){
+        public static LogicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
-                logicalGroup g= new  logicalGroup(name, kind, elements);
+                LogicalGroup g= new  LogicalGroup(name, kind, elements);
                 groups.put(g.getName(),g);
                 return g;
             }
         }
 
         @Nonnull
-        public static logicalGroup create(@Nonnull String name, @Nonnull String kind){
+        public static LogicalGroup create(@Nonnull String name, @Nonnull String kind){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
-                logicalGroup g= new  logicalGroup(name, kind);
+                LogicalGroup g= new  LogicalGroup(name, kind);
                 groups.put(g.getName(),g);
                 return g;
             }
         }
 
 
-        public static logicalGroup get(String name) {
+        public static LogicalGroup get(String name) {
             if(name.equals("")) return null;
-            logicalGroup group =groups.get(Objects.requireNonNull(name));
+            LogicalGroup group =groups.get(Objects.requireNonNull(name));
             if(group==null){
                 throw new IllegalArgumentException("unknown group: " + name);
             }
@@ -52,16 +52,16 @@ public class logicalGroup {
         }
 
         @Nonnull
-        public static Collection<logicalGroup> getAll() {
+        public static Collection<LogicalGroup> getAll() {
             return Collections.unmodifiableCollection(groups.values());
         }
 
-        public static boolean checkAffiliated(@Nonnull logicalGroup logicalGroup) {
-            return groups.get(logicalGroup.getName()) == logicalGroup;
+        public static boolean checkAffiliated(@Nonnull LogicalGroup LogicalGroup) {
+            return groups.get(LogicalGroup.getName()) == LogicalGroup;
         }
 
         public static boolean NameExists(@Nonnull String name) {
-            logicalGroup group = groups.get(Objects.requireNonNull(name));
+            LogicalGroup group = groups.get(Objects.requireNonNull(name));
             return group != null;
         }
 
@@ -69,14 +69,14 @@ public class logicalGroup {
     }
 
 
-    private logicalGroup(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedList<Element> elements)
+    private LogicalGroup(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements)
         {this.name = name;
          this.kind = kind;
          this.elements = new LinkedHashSet<>();
          this.elements.addAll(elements);
         }
 
-    private logicalGroup(@Nonnull String name, @Nonnull String kind)
+    private LogicalGroup(@Nonnull String name, @Nonnull String kind)
         {this.name = name;
          this.kind = kind;
          this.elements = new LinkedHashSet<>();
