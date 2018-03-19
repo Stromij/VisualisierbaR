@@ -91,12 +91,13 @@ public class LogicalGroup {
         {return kind;}
 
     /**
-     * Adding an element to the group if it doesn't exist in the group yet
+     * Adding an element to the group if it doesn't exist in the group yet and sets the elements logical group to this group
      * @param elem element to be added
      * @return true if successful, false if not
      */
     public boolean addElement(@Nonnull Element elem)
         {if(elements.contains(elem)) return false;
+        elem.setLogicalGroup(this);
          elements.add(elem);
          return true;
         }
@@ -106,8 +107,13 @@ public class LogicalGroup {
         return elements;
     }
 
+    /**
+     * Removes an Element from this Group and sets its Logical Group to null
+     * @param element the element to remove
+     */
     public void removeElement(Element element){
         elements.remove(element);
+        element.setLogicalGroup(null);
     }
 
 

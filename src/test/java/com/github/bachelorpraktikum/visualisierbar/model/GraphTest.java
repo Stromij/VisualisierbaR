@@ -156,6 +156,11 @@ public class GraphTest   {
         Node removedNode = nodes.get(0);
         edges.addAll(removedNode.getEdges());
         Element e = Element.in(graph.getContext()).create("Test", Element.Type.SwWechsel, removedNode, Element.State.NOSIG);
+        Element e2 = Element.in(graph.getContext()).create("TestDirection", Element.Type.SwWechsel, nodes.get(1), Element.State.NOSIG);
+        LogicalGroup TestGroup =LogicalGroup.GroupFactory.create("TestGroup", "???");
+        TestGroup.addElement(e);
+        e2.setDirection(removedNode);
+        graph.addElement(e2);
         graph.addElement(e);
         WeakReference<Element> eR= new WeakReference<Element>(e);
         WeakReference<Edge> edgeR =new WeakReference<Edge>(edges.get(0));
@@ -169,8 +174,9 @@ public class GraphTest   {
         Junction.clearSelection();
         System.gc();
         assertNull(eR.get());
-        assertNull(edgeR.get());
         assertNull(nodeR.get());
+        assertNull(edgeR.get());
+
     }
 
     @Test
