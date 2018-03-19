@@ -8,7 +8,6 @@ import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
 import com.github.bachelorpraktikum.visualisierbar.view.Highlightable;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
-import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,7 +40,6 @@ public final class TrainView implements Highlightable {
     private final Train train;
     private final IntegerProperty timeProperty;
     private final Function<Node, Point2D> coordinatesTranslator;
-    private final double calibrationBase;
     private final Path path;
     private final Rectangle highlightRectangle;
     private BooleanProperty highlightedProperty;
@@ -51,7 +49,7 @@ public final class TrainView implements Highlightable {
     public TrainView(Train train, Graph graph) {
         this.train = train;
         this.coordinatesTranslator = (a)->graph.getCoordinatesAdapter().apply(a);
-        this.calibrationBase = graph.getCoordinatesAdapter().getCalibrationBase();
+        double calibrationBase = graph.getCoordinatesAdapter().getCalibrationBase();
         this.timeProperty = new SimpleIntegerProperty(0);
         this.highlightedProperty = new SimpleBooleanProperty(false);
 

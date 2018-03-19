@@ -3,7 +3,6 @@ package com.github.bachelorpraktikum.visualisierbar.view.graph;
 import com.github.bachelorpraktikum.visualisierbar.model.GraphObject;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Bounds;
@@ -15,42 +14,38 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.swing.event.ChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
     implements GraphShape<R> {
 
-    protected static final double HIGHLIGHT_FACTOR = 1.5;
-    protected static final double HIGHLIGHT_STROKE_WIDTH = 0.05;
+    private static final double HIGHLIGHT_FACTOR = 1.5;
+    private static final double HIGHLIGHT_STROKE_WIDTH = 0.05;
     private final CoordinatesAdapter adapter;
     private final BooleanProperty highlighted = new SimpleBooleanProperty();
     private List<javafx.beans.value.ChangeListener> listeners=new ArrayList<>(1);
-
-
     @Nullable
     private S shape;
     @Nullable
     private Node highlight;
     @Nullable
     private Group full;
-
-
     protected GraphShapeBase(CoordinatesAdapter adapter) {
         this.adapter = adapter;
     }
 
-    protected S initializeShape() {
+    /**
+     * create and initialze a shape
+     * @return shape
+     */
+    private S initializeShape() {
         S shape = createShape();
         resize(shape);
         relocate(shape);
-        // shape.setOnMouseClicked(event -> System.out.println("CLICK: " + getRepresented()));
         return shape;
     }
-
-    protected void initializedShape(S shape) {
-    }
+    protected void initializedShape(S shape) {}
 
     @Nonnull
     @Override
@@ -82,30 +77,40 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
 
     public Node getHighlight() {return highlight;}
 
+    /**
+     * get a CoordinateAdapter
+     * @return adapter
+     */
     protected final CoordinatesAdapter getCoordinatesAdapter() {
         return adapter;
     }
 
+    /**
+     * get a CalibrationBase
+     * @return calibrationBase
+     */
     protected final double getCalibrationBase() {
         return getCoordinatesAdapter().getCalibrationBase();
     }
 
+    /**
+     * get Offset
+     * @return offset
+     */
     protected Point2D getOffset() {
         return new Point2D(0.4, 0.4).multiply(getCalibrationBase());
     }
-
     protected abstract void relocate(S shape);
-
     protected abstract void resize(S shape);
-
     @Nonnull
     protected abstract S createShape();
-
     protected abstract Node createHighlight(S node);
 
-    //protected void setHighlight(Node highlight){this.highlight=highlight;}
-    //protected Node getHighlight(){return highlight;}
-
+    /**
+     * create circle Highlight of node
+     * @param node node for which a circle highlight is created
+     * @return circle
+     */
     protected Node createCircleHighlight(Node node) {
         Circle circle = new Circle();
         Bounds nodeBounds = node.getBoundsInParent();
@@ -149,7 +154,7 @@ public abstract class GraphShapeBase<R extends GraphObject<?>, S extends Node>
         return circle;
     }
 
-    protected Node createRectangleHighlight(Node node) {
+    Node createRectangleHighlight(Node node) {
         Rectangle rectangle = new Rectangle();
         rectangle.setFill(Color.TRANSPARENT);
         rectangle.setStroke(Color.BLUE);

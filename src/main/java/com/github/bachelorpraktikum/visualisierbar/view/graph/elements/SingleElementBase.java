@@ -19,7 +19,7 @@ abstract class SingleElementBase<S extends Shape> extends ElementBase<S> {
 
     @Nonnull
     @Override
-    public Shape getShape(Element element) {
+    public Shape getShape(@Nonnull Element element) {
         return getShape();
     }
 }

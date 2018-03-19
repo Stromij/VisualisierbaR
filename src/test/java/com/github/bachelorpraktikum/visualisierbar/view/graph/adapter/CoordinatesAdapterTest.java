@@ -1,9 +1,5 @@
 package com.github.bachelorpraktikum.visualisierbar.view.graph.adapter;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import com.github.bachelorpraktikum.visualisierbar.model.Context;
 import com.github.bachelorpraktikum.visualisierbar.model.Coordinates;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
@@ -11,6 +7,8 @@ import java.util.Random;
 import javafx.geometry.Point2D;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public abstract class CoordinatesAdapterTest {
 
@@ -67,5 +65,19 @@ public abstract class CoordinatesAdapterTest {
         double base = getAdapter().getCalibrationBase();
         assertTrue(Double.isFinite(base));
         assertTrue(base > 0.0);
+    }
+    @Test(expected = IllegalArgumentException.class)
+    public void testReverseNull(){
+        adapter.reverse(null);
+
+    }
+    @Test
+    public void testReverse(){
+        for(int x=0; x<100; x++){
+            for(int y=0;y<100;y++){
+                assertEquals(adapter.reverse(new Point2D(x,y)), new Coordinates(x, y));
+            }
+        }
+
     }
 }

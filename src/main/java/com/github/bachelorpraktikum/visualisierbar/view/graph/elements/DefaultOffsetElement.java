@@ -6,9 +6,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.Coordinate
 import javafx.geometry.Point2D;
 
 class DefaultOffsetElement extends PathElement {
-
     private final int count;
-
     DefaultOffsetElement(Element element, Node node, CoordinatesAdapter adapter, int count) {
         super(element, node, adapter);
         this.count = count;

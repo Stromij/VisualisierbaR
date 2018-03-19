@@ -51,7 +51,7 @@ public final class Node implements GraphObject<Circle> {
     private Graph graph;
 
 
-    private Node(String name, Coordinates coordinates) {
+    public Node(String name, Coordinates coordinates) {
         this.absName = null;
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);
@@ -62,7 +62,7 @@ public final class Node implements GraphObject<Circle> {
         this.graph =null;
     }
 
-    private Node(String name, Coordinates coordinates, @Nullable String absName) {
+    public Node(String name, Coordinates coordinates, @Nullable String absName) {
         this.absName = absName;
         this.name = Objects.requireNonNull(name);
         this.coordinates = Objects.requireNonNull(coordinates);

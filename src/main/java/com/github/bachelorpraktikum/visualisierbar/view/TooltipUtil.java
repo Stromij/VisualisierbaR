@@ -30,9 +30,9 @@ public final class TooltipUtil {
             tooltip.show(node, bounds.getMinX(), bounds.getMaxY() + 5);
         });
 
-        node.setOnMouseExited(event -> {
-            tooltip.hide();
-        });
+        node.setOnMouseExited(event ->
+            tooltip.hide()
+        );
     }
 
 }

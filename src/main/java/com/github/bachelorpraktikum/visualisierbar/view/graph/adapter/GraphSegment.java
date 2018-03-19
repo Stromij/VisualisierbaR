@@ -31,11 +31,11 @@ class GraphSegment {
         this.endPoint = adapter.apply(this.nodes.getLast());
     }
 
-    public Point2D getStartPoint() {
+    private Point2D getStartPoint() {
         return this.startPoint;
     }
 
-    public Point2D getEndPoint() {
+    private Point2D getEndPoint() {
         return this.endPoint;
     }
 
@@ -47,7 +47,7 @@ class GraphSegment {
         return this.nodes;
     }
 
-    double getSignificantCoordinate() {
+    private double getSignificantCoordinate() {
         if (segmentType == SegmentType.HORIZONTAL) {
             return this.startPoint.getY();
         } else {

@@ -26,7 +26,7 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
     private final List<ChangeListener> listeners;
     private Tooltip tooltip;
 
-    protected Rail(Edge edge, CoordinatesAdapter adapter) {
+    Rail(Edge edge, CoordinatesAdapter adapter) {
         super(edge, adapter);
         listeners = new ArrayList<>(2);
         this.getShape().setOnMousePressed((t)->{
@@ -144,23 +144,11 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
     @Nonnull
     @Override
     public Line createShape() {
-        /*
-        getRepresented().getNode1().movedProperty().addListener((observable, oldValue, newValue) -> {
-            relocate(this.getShape());
-        });
-
-        getRepresented().getNode2().movedProperty().addListener((observable, oldValue, newValue) -> {
-            relocate(this.getShape());
-        });
-        */
-
-        ChangeListener Node1Listener = ((observable, oldValue, newValue) -> {
-            relocate(this.getShape());
-        });
+        ChangeListener Node1Listener = ((observable, oldValue, newValue) ->
+            relocate(this.getShape()));
         listeners.add(Node1Listener);
-        ChangeListener Node2Listener = ((observable, oldValue, newValue) -> {
-            relocate(this.getShape());
-        });
+        ChangeListener Node2Listener = ((observable, oldValue, newValue) ->
+            relocate(this.getShape()));
         listeners.add(Node2Listener);
         getRepresented().getNode1().movedProperty().addListener(new WeakChangeListener(Node1Listener));
         getRepresented().getNode2().movedProperty().addListener(new WeakChangeListener(Node2Listener));

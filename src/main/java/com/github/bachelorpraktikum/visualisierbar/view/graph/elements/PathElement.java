@@ -25,7 +25,7 @@ class PathElement extends SingleElementBase<Shape> {
         shape.relocate(x, y);
     }
 
-    protected double getDesiredMax() {
+    private double getDesiredMax() {
         return 0.5 * getCalibrationBase();
     }
 

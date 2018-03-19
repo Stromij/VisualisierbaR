@@ -32,7 +32,8 @@ public final class Graph {
     private  Map<Edge, GraphShape<Edge>> edges;
     @Nonnull
     private Map<Element, GraphShape<Element>> elements;
-
+    @Nonnull
+    private Map<String, LogicalGroup> logicalGroups;
 
 
     /**
@@ -57,12 +58,34 @@ public final class Graph {
         Junction.clearSelection();
         for (Node node : Node.in(context).getAll()) {
             node.setGraph(null);                                                                                            //in case this is a graph switch we need to null this so everything gets
-            node.getEdges().forEach(a-> a.setGraph(null));                                                                //properly redrawn
-            node.getElements().forEach(a-> a.setGraph(null));
+            node.getEdges().forEach(a->{a.setGraph(null);});                                                                //properly redrawn
+            node.getElements().forEach(a->{a.setGraph(null);});
         }
+        for (Edge edge : Edge.in(context).getAll()) {
+            GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
+            edges.put(edge, shape);
+            edge.setGraph(this);
+            group.getChildren().add(shape.getFullNode());
+        }
+
         for (Node node : Node.in(context).getAll()) {
-            enterNode(node);
+            GraphShape<Node> shape = new Junction(node, coordinatesAdapter);
+
+            nodes.put(node, shape);
+            node.setGraph(this);
+            group.getChildren().add(shape.getFullNode());
+
+            for (GraphShape<Element> elementShape : Elements.create(node, coordinatesAdapter)) {
+
+                for (Element element : elementShape.getRepresentedObjects()) {
+                    elements.put(element, elementShape);
+                    element.setGraph(this);
+                }
+                group.getChildren().add(elementShape.getFullNode());
+
+            }
         }
+
     }
 
     public void scale(double factor) {
@@ -114,11 +137,32 @@ public final class Graph {
             }
         });
 
+        edges.forEach((a,b)->{
+            if(a.getNode1()==node || a.getNode2()==node) {                                                                  //remove Directions pointing to this Node
+                for( Element element : a.getNode1().getElements()){
+                    if(element.getDirection()==node)
+                        element.setDirection(null);
+                }
+                for( Element element : a.getNode2().getElements()){
+                    if(element.getDirection()==node)
+                        element.setDirection(null);
+                }
+
+                ed.add(a);
+                a.getOtherNode(node).getEdges().remove(a);
+
+                group.getChildren().remove(b.getFullNode());                                                                //remove edges from graph pane
+                a.setGraph(null);
+            }
+        });
+
         e.forEach(this::removeElement);
 
-        ed.addAll(node.getEdges());
-        ed.forEach(this::removeEdge);
-
+        ed.forEach((a)->{
+            Edge.in(context).remove(a);
+            edges.remove(a);                                                                                                //remove edges from  context, factory and graph
+            context.removeObject(a);
+        });
         group.getChildren().remove(nodes.get(node).getFullNode());
         node.setGraph(null);
         nodes.remove(node);                                                                                                 //remove node from graph, factory context and graph pane
@@ -129,34 +173,6 @@ public final class Graph {
     }
 
     /**
-     * removes the edge from both nodes, the Graph, the context and factory.
-     * Also nulls direction if it becomes invalid due to edge removal
-     * @param edge the edge to remove
-     */
-    public void removeEdge (Edge edge){
-        Node node1= edge.getNode1();
-        Node node2= edge.getNode2();
-        for(Element element : node1.getElements()){
-            if (element.getDirection()== node2)
-                element.setDirection(null);
-        }
-        for(Element element : node2.getElements()){
-            if (element.getDirection()== node1)
-                element.setDirection(null);
-        }
-        group.getChildren().remove(edges.get(edge).getFullNode());
-        edges.remove(edge);
-        node1.getEdges().remove(edge);
-        node2.getEdges().remove(edge);
-        Edge.in(context).remove(edge);
-        context.removeObject(edge);
-        edge.setGraph(null);
-        changed();
-    }
-
-
-
-    /**
      * Connects every Node in the Selection with every other Node part of the Selection.
      * Already existing Edges are not duplicated.
      * New Edges are given a random name and length -1
@@ -165,8 +181,9 @@ public final class Graph {
      */
     public void fullyConnect (HashSet<Junction> selection){
         HashSet<Node> NodeSet = new HashSet<>(128);
-        for (Junction o : Junction.getSelection()) {
-            NodeSet.add((o).getRepresented());                                                           //turn Junctions into Nodes
+        Iterator it = Junction.getSelection().iterator();
+        while(it.hasNext()){
+            NodeSet.add(((Junction) it.next()).getRepresented());                                                           //turn Junctions into Nodes
         }
         LinkedList<Node> sList = new LinkedList<>();                                                                        //turn into list to get an order
         sList.addAll(NodeSet);
@@ -225,9 +242,29 @@ public final class Graph {
      */
     public void disconnect (Node node){
         LinkedList<Edge> ed = new LinkedList<>();
-
-        ed.addAll(node.getEdges());
-        ed.forEach(this::removeEdge);
+        edges.forEach((a,b)-> {
+            if (a.getNode1() == node || a.getNode2() == node) {
+                for( Element element : a.getNode1().getElements()){
+                    if(element.getDirection()==a.getNode2())
+                        element.setDirection(null);
+                }
+                for( Element element : a.getNode2().getElements()){
+                    if(element.getDirection()==a.getNode1())
+                        element.setDirection(null);
+                }
+                Node otherNode=a.getOtherNode(node);
+                otherNode.getEdges().remove(a);
+                ed.add(a);
+                group.getChildren().remove(b.getFullNode());                                                                //remove from graph pane
+                a.setGraph(null);
+            }
+        });
+        ed.forEach((a)->{                                                                                                   //remove from graph, factory, context and node
+            edges.remove(a);
+            context.removeObject(a);
+            Edge.in(context).remove(a);
+        });
+        node.getEdges().clear();
         changed();
     }
 
@@ -271,7 +308,7 @@ public final class Graph {
 
     /**
      * rebuilds the Composite Elements of a Node. Call this after modifying a composite Element
-     * @param node to rebuild
+     * @param node
      */
     public void rebuildComposite (Node node){
         for( Element CompositeElement : node.getElements()){
@@ -347,32 +384,6 @@ public final class Graph {
         group.getChildren().add(shape.getFullNode());
         changed();
     }
-    public void addNode(Node node, LinkedList<Element> elements,LinkedList<Edge> edges){
-        Node newNode = Node.in(context).create(node.getName(),node.getCoordinates(),node.getAbsName());
-        if(edges!=null) {
-            edges.forEach(edge -> {
-                GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
-                this.edges.put(edge, shape);
-                edge.setGraph(this);
-                group.getChildren().add(shape.getFullNode());
-            });
-        }
-        elements.forEach(a-> {
-            //Element newElement= Element.in(context).create(a.getName(),a.getType(),newNode,a.getState());
-            //System.out.println(a.getNode().getName());
-            this.addElement(a);
-            newNode.addElement(a);
-        });
-        newNode.setGraph(this);
-        //if(nodes.containsKey(newNode)) return;
-        context.addObject(newNode);
-        GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
-        ((Junction) shape).setMoveable(true);
-
-        nodes.put(newNode, shape);
-        group.getChildren().add(shape.getFullNode());
-        changed();
-    }
 
     /**
      * Adds a new Node with the specified name and {@link Coordinates} to the Graph, Context and the Factory mapping
@@ -397,7 +408,7 @@ public final class Graph {
 
     /**
      * Adds am Element to the Graph
-     * @param elementToAdd element to add
+     * @param elementToAdd
      */
     public void addElement(Element elementToAdd){
 

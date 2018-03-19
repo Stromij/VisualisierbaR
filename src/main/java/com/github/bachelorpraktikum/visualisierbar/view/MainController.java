@@ -387,10 +387,6 @@ public class MainController {
                         graph.getNodes().forEach((a, b) -> ((Junction) b).addToSelection());
                     }
                 }
-                Clipboard clipboard = Clipboard.getSystemClipboard();
-                if (event.getCode() == KeyCode.C && event.isControlDown()) {
-
-                }
                 if (event.getCode() == KeyCode.X && event.isControlDown()) {
                     nodeClipboard.clear();
                     HashSet<Node> selectedNodes = new HashSet<>();
@@ -416,7 +412,7 @@ public class MainController {
                         }
                     }
                     if (mostLeftNode != null) {
-                        Coordinates cord = graph.getCoordinatesAdapter().reverse(new Point2D(MousePositionX, MousePositionY));
+                        Coordinates cord = Objects.requireNonNull(graph).getCoordinatesAdapter().reverse(new Point2D(MousePositionX, MousePositionY));
                         Coordinates mostLeftCord = mostLeftNode.getCoordinates();
 
 
@@ -571,7 +567,7 @@ public class MainController {
         };
 
         graphPane.setOnMouseMoved((event -> {
-            Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
+            Point2D c = Objects.requireNonNull(graph).getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
             MousePositionX = c.getX();
             MousePositionY = c.getY();
         }));
@@ -596,7 +592,7 @@ public class MainController {
                             double x = 0 - Math.round(c.getX());
                             Map<Node, GraphShape<Node>> nodes = graph.getNodes();
                             for (Node n : nodes.keySet()) {
-                                n.setCoordinates(new SimpleCoordinatesAdapter().reverse(new Point2D(((int) n.getCoordinates().getX() + x), ((int) n.getCoordinates().getY()))));
+                                n.setCoordinates(new SimpleCoordinatesAdapter().reverse(new Point2D(( n.getCoordinates().getX() + (int) x), ( n.getCoordinates().getY()))));
                             }
 
                             graph.addNode(name, new Coordinates(0, (int) Math.round(c.getY())));
@@ -604,7 +600,7 @@ public class MainController {
                             int y = 0 - (int) Math.round(c.getY());
                             Map<Node, GraphShape<Node>> nodes = graph.getNodes();
                             for (Node n : nodes.keySet()) {
-                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX(), (int) n.getCoordinates().getY() + y));
+                                n.setCoordinates(new Coordinates( n.getCoordinates().getX(),  n.getCoordinates().getY() +  y));
                             }
 
                             graph.addNode(name, new Coordinates((int) Math.round(c.getX()), 0));
@@ -613,7 +609,7 @@ public class MainController {
                             int y = 0 - (int) Math.round(c.getY());
                             Map<Node, GraphShape<Node>> nodes = graph.getNodes();
                             for (Node n : nodes.keySet()) {
-                                n.setCoordinates(new Coordinates((int) n.getCoordinates().getX() + x, (int) n.getCoordinates().getY() + y));
+                                n.setCoordinates(new Coordinates( n.getCoordinates().getX() + x,  n.getCoordinates().getY() + y));
                             }
                             graph.addNode(name, new Coordinates(0, 0));
                         }
@@ -1070,9 +1066,8 @@ public class MainController {
                     );
                     context.addObject(binding);
                     entry.getValue().getShape(element).visibleProperty().bind(binding);
-                    elementShape.setOnMouseClicked(event -> {
-                        elementList.getSelectionModel().select(element);
-                    });
+                    elementShape.setOnMouseClicked(event ->
+                        elementList.getSelectionModel().select(element));
 
                 }
                 showElements();
@@ -1204,7 +1199,7 @@ public class MainController {
     }
 
     private boolean simulationStopWarning() {
-        if (ConfigKey.simulationStoppedDoNotShowAgain.get().equals("true")) {
+        if (Objects.requireNonNull(ConfigKey.simulationStoppedDoNotShowAgain.get()).equals("true")) {
             return true;
         }
 

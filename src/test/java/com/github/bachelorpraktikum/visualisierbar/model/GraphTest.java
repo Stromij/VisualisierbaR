@@ -1,22 +1,15 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
-import com.github.bachelorpraktikum.visualisierbar.view.*;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
-import javafx.application.Application;
-import javafx.stage.Stage;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-
 import static org.junit.Assert.*;
 
 public class GraphTest   {
@@ -85,7 +78,6 @@ public class GraphTest   {
         }
         graph.fullyConnect(Junction.getSelection());
         assertTrue (graph.getEdges().size()== k*(k-1)/2);
-
         Junction.getSelection().forEach((a)->{
            for(Edge edge : a.getRepresentedObjects().get(0).getEdges()){
                Node otherNode=null;
@@ -105,7 +97,7 @@ public class GraphTest   {
         graph.fullyConnect(Junction.getSelection());
         assertTrue(k==graph.getEdges().size());
     }
-    //TODO
+
     @Test
     public void SimpleAddElementTest(){
         addNodes(5);
@@ -135,17 +127,17 @@ public class GraphTest   {
             graph.addElement(e);
             graph.removeElement(e);
             Junction.clearSelection();
-            e=null;
+            /*e=null;
             System.gc();
-
-            assertNull(eR.get());
-
+            assertNull(eR.get());*/
+            assertFalse(graph.getEdges().containsKey(e));
+            assertTrue(e.getGraph()==null);
         }
 
 
     }
 
-//TODO
+
     @Test
     public void SimpleRemoveNodeTest(){
         LinkedList<Node> nodes= new LinkedList<>();
@@ -178,6 +170,14 @@ public class GraphTest   {
         assertNull(edgeR.get());
 
     }
+    @Test
+    public void enterNodeTest(){
+        int n= addNodes(5);
+        Node node=Node.in(graph.getContext()).create("test",new Coordinates(1,1));
+        Edge edge=Edge.in(graph.getContext()).create("testEdge",5,node,graph.getNodes().keySet().iterator().next());
+        graph.enterNode(node);
+        assertTrue(graph.getNodes().containsKey(node));
+    }
 
     @Test
     public void disconnectTest() {
@@ -188,18 +188,13 @@ public class GraphTest   {
         WeakReference<Edge> weakEdge=null;
         WeakReference<GraphShape> EdgeShape=null;
         nodes.addAll(graph.getNodes().keySet());
-        //System.out.println(nodes.size());
         if (nodes.size() > 0) {
-            //System.out.println(graph.getEdges().size());
-            //System.out.println(nodes.get(0).getEdges().size());
             edges.addAll(nodes.get(0).getEdges());
             if(edges.size()>0){
                 weakEdge= new WeakReference<>(edges.get(0));
                 EdgeShape= new WeakReference<GraphShape>(graph.getEdges().get(edges.get(0)));
             }
             graph.disconnect(nodes.get(0));
-            //System.out.println(graph.getEdges().size());
-
             edges.forEach((a)->{assertFalse(graph.getEdges().containsKey(nodes.get(0).getEdges()));});
             assertTrue(nodes.get(0).getEdges().size()==0);
         }
@@ -236,4 +231,27 @@ public class GraphTest   {
         return n;
     }
 
+    @Test
+    public void printToAbsTest() {
+        int n = addNodes(2);
+        addEdges(2);
+        LinkedList<Node> nodeLinkedList= new LinkedList<>();
+        nodeLinkedList.addAll(graph.getNodes().keySet());
+        LinkedList<Edge> edgeLinkedList=new LinkedList<>();
+        edgeLinkedList.addAll(graph.getEdges().keySet());
+        String node1 =String .format("[HTTPName: \"%s\"]Node %s = new local NodeImpl(%s,%s,\"%s\");\n",
+        nodeLinkedList.get(0).getName(),nodeLinkedList.get(0).getName(),nodeLinkedList.get(0).getCoordinates().getX(),nodeLinkedList.get(0).getCoordinates().getY(),nodeLinkedList.get(0).getName());
+        String node2= String.format("[HTTPName: \"%s\"]Node %s = new local NodeImpl(%s,%s,\"%s\");\n",
+                nodeLinkedList.get(1).getName(),nodeLinkedList.get(1).getName(),nodeLinkedList.get(1).getCoordinates().getX(),nodeLinkedList.get(1).getCoordinates().getY(),nodeLinkedList.get(1).getName());
+        String edge1=String.format("[HTTPName: \"%s\"]Edge %s = new local EdgeImpl(%s,%s,%s,%s,\"%s\");\n",
+                edgeLinkedList.get(0).getName(),edgeLinkedList.get(0).getName(), "app",
+                edgeLinkedList.get(0).getNode1().getName(), edgeLinkedList.get(0).getNode2().getName(),
+                edgeLinkedList.get(0).getLength(), edgeLinkedList.get(0).getName());
+        node1 = node1 + node2 +"\n" + edge1 + "\n";
+        assertEquals(graph.printToAbs(),node1);
+
+
+
+
+    }
 }

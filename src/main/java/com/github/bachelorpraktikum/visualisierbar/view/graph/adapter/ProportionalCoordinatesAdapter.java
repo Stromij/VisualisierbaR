@@ -10,12 +10,6 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
-
-import javafx.beans.property.IntegerProperty;
 import javafx.geometry.Point2D;
 import javax.annotation.Nonnull;
 
@@ -46,10 +40,6 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
                 shortestEdgeLength = edgeLength;
             }
         }
-
-        int x = Integer.MAX_VALUE;
-        int y = Integer.MAX_VALUE;
-
         // search for a starting Node
         // this will be the Node with the smallest x and y coordinates,
         // which is the Node in the top left corner
@@ -86,7 +76,6 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
      */
     private boolean removeSingleNodeCollisions() {
         boolean foundCollisions = false;
-
         // first find overlapping nodes and replace their transformation vectors
         for (Map.Entry<Node, Point2D> entry : transformationMap.entrySet()) {
             for (Map.Entry<Node, Point2D> entry2 : transformationMap.entrySet()) {
@@ -105,29 +94,24 @@ public final class ProportionalCoordinatesAdapter implements CoordinatesAdapter 
                         double dx = (p1X > p2X) ? p2X - p1X : p1X - p2X;
                         double dy = (p1Y > p2Y) ? p2Y - p1Y : p1Y - p2Y;
                         Point2D eVec = new Point2D(dx, dy);
-
                         // prefer vertical edges
                         if (eVec.getY() == 0) {
                             edge = e;
                             edgeVec = eVec.normalize();
                             continue;
                         }
-
                         // horizontal edges used if no better edge is found
                         if (eVec.getY() == 0 && edge == null) {
                             edge = e;
                             edgeVec = eVec.normalize();
                             continue;
                         }
-
                         edge = e;
                         edgeVec = eVec.normalize();
                     }
-
                     Point2D oldVec = entry2.getValue();
                     Point2D newVec = oldVec.add(edgeVec.multiply(MOVING_DISTANCE));
                     transformationMap.replace(node, newVec);
-
                     foundCollisions = true;
                 }
             }

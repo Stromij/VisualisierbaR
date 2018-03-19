@@ -12,7 +12,7 @@ public abstract class SingleGraphShapeBase<R extends GraphObject<?>, S extends S
 
     private final R represented;
 
-    protected SingleGraphShapeBase(R represented, CoordinatesAdapter adapter) {
+    SingleGraphShapeBase(R represented, CoordinatesAdapter adapter) {
         super(adapter);
         this.represented = represented;
     }
@@ -29,7 +29,7 @@ public abstract class SingleGraphShapeBase<R extends GraphObject<?>, S extends S
 
     @Nonnull
     @Override
-    public final Shape getShape(R represented) {
+    public final Shape getShape(@Nonnull R represented) {
         return getShape();
     }
 }

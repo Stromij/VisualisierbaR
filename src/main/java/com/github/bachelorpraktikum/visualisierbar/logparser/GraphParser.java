@@ -134,7 +134,7 @@ public final class GraphParser {
             try {
                 String elementName = ctx.elem_name().getText();
                 String nodeName = ctx.node_name().getText();
-                String absName = null;
+                String absName;
                 Node node = Node.in(context).get(nodeName);
                 Element.State state = Element.State.fromName(ctx.STATE().getText());
                 Element.Type type = Element.Type.fromName(elementName);
@@ -207,7 +207,7 @@ public final class GraphParser {
             }
 
         @Override
-        public void enterGroup(LogParser.GroupContext ctx) {
+        public void enterLogicalGroup(LogParser.LogicalGroupContext ctx) {
             try {
                 String groupName = ctx.log_name().getText();
                 String kind = ctx.kind().getText();

@@ -54,8 +54,6 @@ public class LegendListViewCell extends ListCell<Shapeable<?>> {
             eleName.setText(name);
             eleImage.getChildren().clear();
             eleImage.getChildren().add(shape);
-            // load with fxml
-
             setGraphic(cell);
 
             Binding<VisibleState> binding = Bindings.createObjectBinding(() -> {
@@ -72,6 +70,11 @@ public class LegendListViewCell extends ListCell<Shapeable<?>> {
         }
     }
 
+    /**
+     * resize a shape
+     * @param shape that be resized
+     * @param max max
+     */
     private void resizeShape(Shape shape, double max) {
         Bounds shapeBounds = shape.getBoundsInParent();
         double maxShape = Math.max(shapeBounds.getWidth(), shapeBounds.getHeight());

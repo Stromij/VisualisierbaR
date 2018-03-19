@@ -14,11 +14,10 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
-import javax.xml.bind.Marshaller;
 
 abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
 
-    protected static final double MAX_ELEMENT_WIDTH = 0.3;
+    static final double MAX_ELEMENT_WIDTH = 0.3;
 
     private final List<Element> elements;
     private final com.github.bachelorpraktikum.visualisierbar.model.Node node;
@@ -32,10 +31,8 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         this.node = node;
         listeners = new ArrayList<>(elements.size());
         for (Element element : elements) {
-            ChangeListener<Element.State> listener = (observable, oldValue, newValue) -> {
+            ChangeListener<Element.State> listener = (observable, oldValue, newValue) ->
                 displayState(element);
-
-            };
             listeners.add(listener);
             element.stateProperty().addListener(new WeakChangeListener<>(listener));
 
@@ -95,9 +92,8 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
             TooltipUtil.install(elementShape, new Tooltip(element.getName()));
-            ChangeListener NodeListener = ((observable, oldValue, newValue) -> {
-                relocate(this.getShape());
-            });
+            ChangeListener NodeListener = ((observable, oldValue, newValue) ->
+                relocate(this.getShape()));
             listeners.add(NodeListener);
 
             element.getNode().movedProperty().addListener(new WeakChangeListener<>(NodeListener));
@@ -105,11 +101,11 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         }
     }
 
-    protected final void displayState(Element element) {
+    private  void displayState(Element element) {
         getShape(element).setFill(element.getState().getColor());
     }
 
-    protected final void rotateAccordingToOffset(T node) {
+    final void rotateAccordingToOffset(T node) {
         rotateAccordingToOffset(node, getOffset());
     }
 
@@ -121,13 +117,8 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
         angle += 180;
         node.setRotate(angle);
     }
-
     @Override
     protected Node createHighlight(T node) {
         return createCircleHighlight(node);
-    }
-
-    public double getAngle() {
-        return angle;
     }
 }

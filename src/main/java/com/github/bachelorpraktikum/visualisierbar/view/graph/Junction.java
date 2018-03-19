@@ -15,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -50,12 +49,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             mousePressedY = -1;
             selection.forEach((b) -> {
                 Circle a = b.getShape();
-                a.setTranslateX(Math.round(a.getTranslateX()));                                                             //snap to valid coordinates
-                a.setTranslateY(Math.round(a.getTranslateY()));                                                             //technically you would want to move the full Node here
-                double xx = a.getCenterX() + a.getTranslateX();                                                             //but we move only the circle and let the rest adjust itself through
-                double yy = a.getCenterY() + a.getTranslateY();                                                             //listeners
+                a.setTranslateX(Math.round(a.getTranslateX()));//snap to valid coordinates
+                a.setTranslateY(Math.round(a.getTranslateY()));//technically you would want to move the full Node here
+                double xx = a.getCenterX() + a.getTranslateX();//but we move only the circle and let the rest adjust itself through
+                double yy = a.getCenterY() + a.getTranslateY();//listeners
                 if (xx < 0 || yy < 0) {
-                    System.out.println(a.getTranslateY());
                     Map<Node, GraphShape<Node>> nodes = this.getRepresented().getGraph().getNodes();
                     if (xx >= 0 && yy < 0) {                                                                                   //whole bunch of code for handling negative coordinates that currently
                         yy = 0 - yy;                                                                                          //does not work
@@ -310,7 +308,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                         alert.setContentText("Group already exists");
                                         alert.showAndWait();
                                         if (newElement.getLogicalGroup() == null)
-                                            logicalGroup.getSelectionModel().select(1);      //select noGroup string because element is in no group since name is taken
+                                            logicalGroup.getSelectionModel().select(1);//select noGroup string because element is in no group since name is taken
                                         else
                                             logicalGroup.setValue(newElement.getLogicalGroup().getName());
 
@@ -331,7 +329,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                         logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
                                 }
                             } else {
-                                if (newElement.getLogicalGroup() != null) {                                                       //code for switching Group
+                                if (newElement.getLogicalGroup() != null) {//code for switching Group
                                     newElement.getLogicalGroup().removeElement(newElement);
                                 }
                                 newElement.setLogicalGroup(com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.get(logicalGroup.getValue()));
@@ -369,14 +367,14 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         tt.consume();
 
                     }
-                });                                                                                                         //end for Elemente creation Code
+                });                                                                 //end for Elemente creation Code
                 grid.add(createButton, 1, 6);
 
-                for (Element elements : this.getRepresented().getElements()) {                                                //Code for Elements that are already there
-                    TextField eName = new TextField(elements.getName());                                                     //quite a bit of code duplication, you could probably change this to be
-                    ElementNameTextFields.put(elements, eName);                                                             //much more elegant
+                for (Element elements : this.getRepresented().getElements()) {      //Code for Elements that are already there
+                    TextField eName = new TextField(elements.getName());            //quite a bit of code duplication, you could probably change this to be
+                    ElementNameTextFields.put(elements, eName);                    //much more elegant
                     Label type = new Label(elements.getType().getName());
-                    ChoiceBox<String> direction = new ChoiceBox<>();      //direction Type choice box
+                    ChoiceBox<String> direction = new ChoiceBox<>();                //direction Type choice box
                     ChoiceBox<String> logicalGroup = new ChoiceBox<>();
                     direction.setOnAction(directionEvent -> {
                         String NodeName = direction.getValue();
@@ -568,7 +566,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
     public static void clearSelection() {
         selection.forEach((b) -> {
             b.getShape().setFill(Color.BLACK);
-            //b.getShape().setEffect(null);
         });
         selection.clear();
     }
@@ -649,7 +646,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
      */
     public void addToSelection() {
         this.getShape().setFill(Color.BLUE);
-        //this.getShape().setEffect(highlightGlow);
         selection.add(this);
     }
 
@@ -659,7 +655,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
     public void removeFromSelection() {
         this.getShape().setFill(Color.BLACK);
-        //this.getShape().setEffect(null);
         selection.remove(this);
     }
 

@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.DoubleAdder;
-import java.util.stream.Collectors;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Bounds;
@@ -43,9 +42,8 @@ final class CompositeElement extends ElementBase<Group> {
             shape.relocate(0 - bounds.getWidth() / 2, 0 - bounds.getHeight() / 2);
             shape.setTranslateY(y.doubleValue());
             y.add(shape.getBoundsInParent().getHeight() + ELEMENT_SPACING);
-            ChangeListener<Element.State> listener = (observable, oldValue, newValue) -> {
+            ChangeListener<Element.State> listener = (observable, oldValue, newValue) ->
                 shape.setFill(newValue.getColor());
-            };
             stateListeners.add(listener);
             element.stateProperty().addListener(new WeakChangeListener<>(listener));
             shapes.put(element, shape);
@@ -62,29 +60,10 @@ final class CompositeElement extends ElementBase<Group> {
     @Override
     protected void relocate(Group group) {
         Point2D nodePos = getNodePosition().add(getOffset());
-
         Bounds bounds = group.getBoundsInLocal();
         double x = nodePos.getX() - bounds.getWidth() / 2;
         double y = nodePos.getY() - bounds.getHeight() / 2;
-
         group.relocate(x, y);
-
-        /*
-        shapes.forEach((a,b)->{
-            if(a.getDirection()!=null) {
-
-                Point2D p = new Point2D(1, 0);
-                Point2D p2 = this.getCoordinatesAdapter().apply(a.getNode());
-                Point2D p3 = this.getCoordinatesAdapter().apply(a.getDirection());
-                p2= new Point2D(p2.getX()-p3.getX(), p2.getY()-p3.getY());
-                double angle = p.angle(p2);
-                //if(angle>180) angle -=180;
-                if(a.getType()== Element.Type.VorSignal)angle += 180;
-                b.setRotate(angle-getAngle());
-            }
-        });
-        */
-
         rotateAccordingToOffset(group);
 
     }
@@ -134,16 +113,14 @@ final class CompositeElement extends ElementBase<Group> {
 
     @Nonnull
     @Override
-    public Shape getShape(Element represented) {
+    public Shape getShape(@Nonnull  Element represented) {
         return shapes.get(represented);
     }
 
     @Nonnull
     @Override
     protected Group createShape() {
-        Group group = new Group(shapes.values().stream()
-            .collect(Collectors.toList())
-        );
+        Group group = new Group(new ArrayList<>(shapes.values()));
         Bounds bounds = group.getLayoutBounds();
         double endY = bounds.getHeight() + FOOT_HEIGHT * getCalibrationBase();
         Line line = new Line(0, 0, 0, endY);
@@ -160,6 +137,11 @@ final class CompositeElement extends ElementBase<Group> {
         return group;
     }
 
+    /**
+     * create s schape for type of element
+     * @param type is a type of element
+     * @return shape
+     */
     private Shape createShape(Element.Type type) {
         double maxWidth = MAX_SHAPE_WIDTH;
         Shape shape = type.createShape();

@@ -9,9 +9,6 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.Coordinate
 import java.util.*;
 
 public final class Elements {
-
-    //static Map<Switch, GraphShape<Element>> switches = new WeakHashMap<>();
-
     private Elements() {
     }
 
