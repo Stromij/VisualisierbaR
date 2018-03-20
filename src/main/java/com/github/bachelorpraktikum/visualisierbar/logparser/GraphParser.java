@@ -212,7 +212,7 @@ public final class GraphParser {
                 String groupName = ctx.log_name().getText();
                 String kind = ctx.kind().getText();
 
-                LogicalGroup logicalGroup = com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.create(groupName, kind);      //new logicalGroup(groupName, kind);
+                LogicalGroup logicalGroup = LogicalGroup.in(context).create(groupName, kind);      //new logicalGroup(groupName, kind);
 
                 for (int i = 0; ctx.elem_name(i) != null; i++) {
                     if (ctx.elem_name(i).getText().equals("null")) continue;

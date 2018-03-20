@@ -206,7 +206,7 @@ public final class Graph {
                     }
                     Edge edge = Edge.in(context).create(name,-1, sList.get(i), sList.get(k));
                     edge.setGraph(this);
-                    context.addObject(edge);
+                    //context.addObject(edge);
                     GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);
                     edges.put(edge, shape);
                     group.getChildren().add(shape.getFullNode());
@@ -339,7 +339,7 @@ public final class Graph {
         Node newNode =Node.in(context).create(name, coordinates);
         newNode.setGraph(this);
         if(nodes.containsKey(newNode)) return;
-        context.addObject(newNode);
+        //context.addObject(newNode);
         GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
         ((Junction) shape).setMoveable(true);
 
@@ -365,7 +365,7 @@ public final class Graph {
         });
         newNode.setGraph(this);
         //if(nodes.containsKey(newNode)) return;
-        context.addObject(newNode);
+        //context.addObject(newNode);
         GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
         ((Junction) shape).setMoveable(true);
 
@@ -385,7 +385,7 @@ public final class Graph {
         Node newNode =Node.in(context).create(name, coordinates, absName);
         newNode.setGraph(this);
         if(nodes.containsKey(newNode)) return;
-        context.addObject(newNode);
+        //context.addObject(newNode);
         GraphShape<Node> shape = new Junction(newNode, coordinatesAdapter);
         ((Junction) shape).setMoveable(true);
 
@@ -411,7 +411,7 @@ public final class Graph {
                 }
             }
         }
-        context.addObject(elementToAdd);
+        //context.addObject(elementToAdd);
         for (GraphShape<Element> elementShape : Elements.create(elementToAdd.getNode(), coordinatesAdapter)) {
             for (Element element : elementShape.getRepresentedObjects()) {
                 elements.put(element, elementShape);

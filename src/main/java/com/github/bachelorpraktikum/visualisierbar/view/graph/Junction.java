@@ -277,7 +277,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         ChoiceBox<String> logicalGroup = new ChoiceBox<>();                                                     //logical Group choice box
                         logicalGroup.getItems().add("new Group");                                                               //0 is newGroup
                         logicalGroup.getItems().add("no Group");                                                                        //1 is no Group
-                        com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.getAll().forEach((a) -> {     //add all existing groups as options
+                        LogicalGroup.in(this.getRepresented().getGraph().getContext()).getAll().forEach((a) -> {     //add all existing groups as options
                             logicalGroup.getItems().add(a.getName());
                         });
                         if (newElement.getLogicalGroup() == null)
@@ -304,7 +304,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                                 Optional<String> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
                                 if (result.isPresent()) {
-                                    if (com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.NameExists(result.get())) {
+                                    if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get())) {
                                         alert.setContentText("Group already exists");
                                         alert.showAndWait();
                                         if (newElement.getLogicalGroup() == null)
@@ -313,7 +313,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                             logicalGroup.setValue(newElement.getLogicalGroup().getName());
 
                                     } else {
-                                        LogicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.create(result.get(), "????");   //TODO Kind
+                                        LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), "????");   //TODO Kind
                                         if (newElement.getLogicalGroup() != null) {
                                             newElement.getLogicalGroup().removeElement(newElement);
                                         }
@@ -332,7 +332,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                 if (newElement.getLogicalGroup() != null) {//code for switching Group
                                     newElement.getLogicalGroup().removeElement(newElement);
                                 }
-                                newElement.setLogicalGroup(com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.get(logicalGroup.getValue()));
+                                newElement.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
                             }
                         });
 
@@ -393,7 +393,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                     logicalGroup.getItems().add("new Group");
                     logicalGroup.getItems().add("no Group");
-                    com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.getAll().forEach((a) -> logicalGroup.getItems().add(a.getName()));
+                    LogicalGroup.in(this.getRepresented().getGraph().getContext()).getAll().forEach((a) -> logicalGroup.getItems().add(a.getName()));
                     if (elements.getLogicalGroup() == null) logicalGroup.getSelectionModel().select(1);
                     else
                         logicalGroup.getSelectionModel().select(elements.getLogicalGroup().getName());
@@ -417,7 +417,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                             Optional<String> result = groupCreationDialog.showAndWait();
                             if (result.isPresent()) {
-                                if (com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.NameExists(result.get())) {
+                                if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get())) {
                                     alert.setContentText("Group already exists");
                                     alert.showAndWait();
                                     if (elements.getLogicalGroup() == null)
@@ -425,7 +425,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                     else
                                         logicalGroup.setValue(elements.getLogicalGroup().getName());
                                 } else {
-                                    LogicalGroup newGroup = com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.create(result.get(), "????");
+                                    LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), "????");
                                     if (elements.getLogicalGroup() != null) {
                                         elements.getLogicalGroup().removeElement(elements);
                                     }
@@ -443,7 +443,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             if (elements.getLogicalGroup() != null) {
                                 elements.getLogicalGroup().removeElement(elements);
                             }
-                            elements.setLogicalGroup(com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup.GroupFactory.get(logicalGroup.getValue()));
+                            elements.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
                         }
                     });
 

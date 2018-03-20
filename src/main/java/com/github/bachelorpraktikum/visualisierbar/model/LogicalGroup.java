@@ -1,6 +1,7 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
 import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -14,15 +15,37 @@ public class LogicalGroup {
     private String kind;
 
 
-
+    @ParametersAreNonnullByDefault
     public static final class GroupFactory{
 
+        private static final Map<Context, WeakReference<GroupFactory>> instances = new WeakHashMap<>();
+        private static final int INITIAL_NODES_CAPACITY = 32;
+
         @Nonnull
-        private static final Map<String, LogicalGroup> groups= new LinkedHashMap<>();
+        private final Map<String, LogicalGroup> groups;
+
+        private static GroupFactory getInstance(Context context){
+            GroupFactory result = instances.computeIfAbsent(context, ctx -> {
+                GroupFactory factory = new GroupFactory(ctx);
+                ctx.addObject(factory);
+                return new WeakReference<>(factory);
+            }).get();
+
+            if (result == null) {
+                throw new IllegalStateException();
+            }
+            return result;
+        }
+
+        private GroupFactory(Context ctx) {
+            this.groups = new LinkedHashMap<>(INITIAL_NODES_CAPACITY);
+        }
+
+
 
 
         @Nonnull
-        public static LogicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements){
+        public LogicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
                 LogicalGroup g= new  LogicalGroup(name, kind, elements);
@@ -32,7 +55,7 @@ public class LogicalGroup {
         }
 
         @Nonnull
-        public static LogicalGroup create(@Nonnull String name, @Nonnull String kind){
+        public LogicalGroup create(@Nonnull String name, @Nonnull String kind){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
                 LogicalGroup g= new  LogicalGroup(name, kind);
@@ -42,8 +65,7 @@ public class LogicalGroup {
         }
 
 
-        public static LogicalGroup get(String name) {
-            if(name.equals("")) return null;
+        public LogicalGroup get(String name) {
             LogicalGroup group =groups.get(Objects.requireNonNull(name));
             if(group==null){
                 throw new IllegalArgumentException("unknown group: " + name);
@@ -52,20 +74,30 @@ public class LogicalGroup {
         }
 
         @Nonnull
-        public static Collection<LogicalGroup> getAll() {
+        public Collection<LogicalGroup> getAll() {
             return Collections.unmodifiableCollection(groups.values());
         }
 
-        public static boolean checkAffiliated(@Nonnull LogicalGroup LogicalGroup) {
+        public boolean checkAffiliated(@Nonnull LogicalGroup LogicalGroup) {
             return groups.get(LogicalGroup.getName()) == LogicalGroup;
         }
 
-        public static boolean NameExists(@Nonnull String name) {
+        public boolean NameExists(@Nonnull String name) {
             LogicalGroup group = groups.get(Objects.requireNonNull(name));
             return group != null;
         }
 
 
+    }
+    /**
+     * Gets the {@link GroupFactory} instance for the given {@link Context}.
+     *
+     * @param context the context
+     * @return the factory
+     * @throws NullPointerException if context is null
+     */
+    public static GroupFactory in(Context context) {
+        return GroupFactory.getInstance(context);
     }
 
 
