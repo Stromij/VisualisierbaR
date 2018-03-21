@@ -11,9 +11,11 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 import javax.annotation.Nonnull;
+import java.util.HashMap;
 
 final class WeichenpunktElement extends ElementBase<Polygon> {
     private final Switch aSwitch;
+    private HashMap<Element,Circle> highlightCircles;
     WeichenpunktElement(Switch aSwitch, Node node, CoordinatesAdapter adapter) {
         super(aSwitch.getElements(), node, adapter);
         this.aSwitch = aSwitch;
@@ -37,6 +39,14 @@ final class WeichenpunktElement extends ElementBase<Polygon> {
                     others[index++] = adapter.apply(element.getNode());
                 }
             }
+            if(getHighlight()!=null){
+                for (Element element : getRepresentedObjects()) {
+                    Point2D nodePos = getCoordinatesAdapter().apply(element.getNode());
+                    Circle nodeCirlce= highlightCircles.get(element);
+                    nodeCirlce.setLayoutX(nodePos.getX());
+                    nodeCirlce.setLayoutY(nodePos.getY());
+        }}
+
             Point2D nodePos = new Point2D(getMainElement().getNode().getCoordinates().getX(), getMainElement().getNode().getCoordinates().getY());
             Point2D vec1 = others[0].subtract(nodePos);
             Point2D vec2 = others[1].subtract(nodePos);
@@ -66,12 +76,14 @@ final class WeichenpunktElement extends ElementBase<Polygon> {
     @Override
     protected javafx.scene.Node createHighlight(Polygon polygon) {
         Group highlight = new Group();
+        highlightCircles= new HashMap<>(getRepresentedObjects().size());
         for (Element element : getRepresentedObjects()) {
             Node node = element.getNode();
             Point2D nodePos = getCoordinatesAdapter().apply(node);
             Circle nodeCircle = new Circle(0.1 * getCalibrationBase());
-            nodeCircle.setCenterX(nodePos.getX());
-            nodeCircle.setCenterY(nodePos.getY());
+            nodeCircle.setLayoutX(nodePos.getX());
+            nodeCircle.setLayoutY(nodePos.getY());
+            highlightCircles.put(element, nodeCircle);
 
             highlight.getChildren().add(createCircleHighlight(nodeCircle));
         }
