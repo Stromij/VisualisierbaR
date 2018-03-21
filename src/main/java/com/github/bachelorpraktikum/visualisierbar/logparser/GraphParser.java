@@ -210,7 +210,18 @@ public final class GraphParser {
         public void enterLogicalGroup(LogParser.LogicalGroupContext ctx) {
             try {
                 String groupName = ctx.log_name().getText();
-                String kind = ctx.kind().getText();
+
+                String type = ctx.kind().getText();
+
+                LogicalGroup.Kind kind;
+                if(type.equals(("SIGNAL")))
+                    {kind = LogicalGroup.Kind.SIGNAL;}
+                else if(type.equals("SWITCH"))
+                    {kind = LogicalGroup.Kind.SWITCH;}
+                else if(type.equals("LIMITER"))
+                    {kind = LogicalGroup.Kind.LIMITER;}
+                else
+                    {kind = LogicalGroup.Kind.DEFAULT;}
 
                 LogicalGroup logicalGroup = LogicalGroup.in(context).create(groupName, kind);      //new logicalGroup(groupName, kind);
 

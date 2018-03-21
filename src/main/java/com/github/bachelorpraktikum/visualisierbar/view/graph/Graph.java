@@ -437,6 +437,7 @@ public final class Graph {
     @Nonnull
     public String printToAbs()
     {String response = "";
+     HashSet<LogicalGroup> printed = new HashSet<>();
 
           // Generating ABS-Code for all nodes
           for(Map.Entry<Node, GraphShape<Node>> entry : nodes.entrySet())
@@ -450,9 +451,14 @@ public final class Graph {
 
           response = response.concat("\n");
 
-          // Generating ABS-Code for all trackelements
+          // Generating ABS-Code for all trackelements & logical Groups
           for(Map.Entry<Element, GraphShape<Element>> entry : elements.entrySet())
-             {response = response.concat(entry.getKey().toABS());}
+             {response = response.concat(entry.getKey().toABS());
+              if(entry.getKey().getLogicalGroup() != null && !printed.contains(entry.getKey().getLogicalGroup()))
+                {printed.add(entry.getKey().getLogicalGroup());
+                 response = response.concat(entry.getKey().getLogicalGroup().toABS());
+                }
+             }
 
 
           // Print it!

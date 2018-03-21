@@ -12,14 +12,19 @@ public class LogicalGroup {
     @Nonnull
     private String name;
     @Nonnull
-    private String kind;
+    private Kind type;
 
+
+    public enum Kind {
+        SIGNAL, SWITCH, LIMITER, DEFAULT
+    }
 
     @ParametersAreNonnullByDefault
     public static final class GroupFactory{
 
         private static final Map<Context, WeakReference<GroupFactory>> instances = new WeakHashMap<>();
         private static final int INITIAL_NODES_CAPACITY = 32;
+
 
         @Nonnull
         private final Map<String, LogicalGroup> groups;
@@ -45,7 +50,7 @@ public class LogicalGroup {
 
 
         @Nonnull
-        public LogicalGroup create(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements){
+        public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedHashSet<Element> elements){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
                 LogicalGroup g= new  LogicalGroup(name, kind, elements);
@@ -55,7 +60,7 @@ public class LogicalGroup {
         }
 
         @Nonnull
-        public LogicalGroup create(@Nonnull String name, @Nonnull String kind){
+        public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind){
             if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
             else{
                 LogicalGroup g= new  LogicalGroup(name, kind);
@@ -101,16 +106,16 @@ public class LogicalGroup {
     }
 
 
-    private LogicalGroup(@Nonnull String name, @Nonnull String kind, @Nonnull LinkedHashSet<Element> elements)
+    private LogicalGroup(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedHashSet<Element> elements)
         {this.name = name;
-         this.kind = kind;
+         this.type = kind;
          this.elements = new LinkedHashSet<>();
          this.elements.addAll(elements);
         }
 
-    private LogicalGroup(@Nonnull String name, @Nonnull String kind)
+    private LogicalGroup(@Nonnull String name, @Nonnull Kind kind)
         {this.name = name;
-         this.kind = kind;
+         this.type = kind;
          this.elements = new LinkedHashSet<>();
         }
 
@@ -119,8 +124,8 @@ public class LogicalGroup {
         {return name;}
 
     @Nonnull
-    public String getKind()
-        {return kind;}
+    public Kind getKind()
+        {return type;}
 
     /**
      * Adding an element to the group if it doesn't exist in the group yet and sets the elements logical group to this group
@@ -138,6 +143,30 @@ public class LogicalGroup {
     public LinkedHashSet<Element> getElements(){
         return elements;
     }
+
+    /**
+     * Returns a String of the ABS representation of this LogicalGroup
+     * @return the ABS-Code
+     */
+    @Nonnull
+    public String toABS()
+        {String rowOfElements = "";
+         for(Element t : elements)
+            {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));}
+
+         if(type == Kind.SIGNAL)
+            {return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s \"%s\", %s);\n",
+                    name, name, rowOfElements, name, null);}
+         if(type == Kind.SWITCH)
+            {return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s %s, %s, %s, \"%s\");\n",
+                    name, name, rowOfElements, null, null, null, name);
+            }
+         if(type == Kind.LIMITER)
+            {return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s %s, \"%s\");\n",
+                    name, name, rowOfElements, null, name);}
+
+         return "// Type of logical group not supported";
+        }
 
     /**
      * Removes an Element from this Group and sets its Logical Group to null

@@ -149,7 +149,7 @@ public class GraphTest   {
         edges.addAll(removedNode.getEdges());
         Element e = Element.in(graph.getContext()).create("Test", Element.Type.SwWechsel, removedNode, Element.State.NOSIG);
         Element e2 = Element.in(graph.getContext()).create("TestDirection", Element.Type.SwWechsel, nodes.get(1), Element.State.NOSIG);
-        LogicalGroup TestGroup =LogicalGroup.in(graph.getContext()).create("TestGroup", "???");
+        LogicalGroup TestGroup =LogicalGroup.in(graph.getContext()).create("TestGroup", LogicalGroup.Kind.DEFAULT);
         TestGroup.addElement(e);
         e2.setDirection(removedNode);
         graph.addElement(e2);

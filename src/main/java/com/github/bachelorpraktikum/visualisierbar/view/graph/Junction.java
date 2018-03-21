@@ -313,7 +313,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                             logicalGroup.setValue(newElement.getLogicalGroup().getName());
 
                                     } else {
-                                        LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), "????");   //TODO Kind
+                                        LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), LogicalGroup.Kind.DEFAULT);   //TODO Kind
                                         if (newElement.getLogicalGroup() != null) {
                                             newElement.getLogicalGroup().removeElement(newElement);
                                         }
@@ -425,7 +425,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                     else
                                         logicalGroup.setValue(elements.getLogicalGroup().getName());
                                 } else {
-                                    LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), "????");
+                                    LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), LogicalGroup.Kind.DEFAULT); //TODO Kind
                                     if (elements.getLogicalGroup() != null) {
                                         elements.getLogicalGroup().removeElement(elements);
                                     }
