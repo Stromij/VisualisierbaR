@@ -2,19 +2,28 @@ package com.github.bachelorpraktikum.visualisierbar.view.detail;
 
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
+import com.github.bachelorpraktikum.visualisierbar.model.GraphObject;
 import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableIntegerValue;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.GridPane;
+import javafx.util.Callback;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 
 
 class ElementDetails extends DetailsBase<Element> {
@@ -32,7 +41,12 @@ class ElementDetails extends DetailsBase<Element> {
     @FXML
     private Label GroupName;
     @FXML
+    private Label Kind;
+    @FXML
+    private Label lGKind;
+    @FXML
     private Button breakButton;
+
 
     ElementDetails(Element element, ObservableIntegerValue time) {
         // this is executed first
@@ -43,20 +57,18 @@ class ElementDetails extends DetailsBase<Element> {
 
     @FXML
     private void initialize() {
-        //int i=5;
-        /*
-        if(this.getObject().getLogicalGroup()!=null) {
-            for (Element element : this.getObject().getLogicalGroup().getElements()) {
-            elementDetails.add(new Label(element.getName()) ,0,i);
-            i++;
-            }
+
+
+
+        if(this.getObject().getLogicalGroup()==null){
+            GroupName.setText("Not in a Group");
+            Kind.setVisible(false);
+        }
+        else{
+            GroupName.setText(this.getObject().getLogicalGroup().getName());
+            lGKind.setText(this.getObject().getLogicalGroup().getKind().toString());
         }
 
-        if(this.getObject().getLogicalGroup()==null)
-            GroupName.setText("Not in a Group");
-        else
-            GroupName.setText(this.getObject().getLogicalGroup().getName());
-        */
         coordinates.setText(
             getCoordinatesString(getObject().getNode().getCoordinates().toPoint2D())
         );

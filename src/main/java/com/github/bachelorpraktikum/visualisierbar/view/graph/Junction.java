@@ -15,6 +15,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Pair;
+
 import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -287,24 +289,30 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                         logicalGroup.setOnAction(lgEvent -> {
                             if (logicalGroup.getSelectionModel().getSelectedIndex() == 0) {
-                                Dialog<String> groupCreationDialog = new Dialog<>();                                            //Dialog for new Group creation set up
+                                Dialog<Pair<String,LogicalGroup.Kind>> groupCreationDialog = new Dialog<>();
 
                                 groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);
                                 ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
                                 groupCreationDialog.setTitle("Create new Group");
                                 groupCreationDialog.setHeaderText(null);
+                                GridPane gCgP= new GridPane();
                                 TextField GroupCreationName = new TextField();
-                                groupCreationDialog.getDialogPane().setContent(GroupCreationName);
+                                gCgP.add(GroupCreationName,0,0);
+                                ChoiceBox<LogicalGroup.Kind> groupKind= new ChoiceBox<>();
+                                groupKind.getItems().addAll(LogicalGroup.Kind.values());
+                                groupKind.setValue(LogicalGroup.Kind.DEFAULT);
+                                gCgP.add(groupKind,0,1);
+                                groupCreationDialog.getDialogPane().setContent(gCgP);
                                 groupCreationDialog.setResultConverter((dialogButton) -> {
                                     if (dialogButton == ButtonType.APPLY) {
-                                        return GroupCreationName.getText();
+                                        return new Pair<>(GroupCreationName.getText(), groupKind.getValue());
                                     } else
                                         return null;
                                 });
 
-                                Optional<String> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
+                                Optional<Pair<String,LogicalGroup.Kind>> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
                                 if (result.isPresent()) {
-                                    if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get())) {
+                                    if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get().getKey())) {
                                         alert.setContentText("Group already exists");
                                         alert.showAndWait();
                                         if (newElement.getLogicalGroup() == null)
@@ -313,7 +321,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                             logicalGroup.setValue(newElement.getLogicalGroup().getName());
 
                                     } else {
-                                        LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), LogicalGroup.Kind.DEFAULT);   //TODO Kind
+                                        LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get().getKey(), result.get().getValue());
                                         if (newElement.getLogicalGroup() != null) {
                                             newElement.getLogicalGroup().removeElement(newElement);
                                         }
@@ -400,32 +408,38 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
                     logicalGroup.setOnAction(lgEvent -> {
                         if (logicalGroup.getSelectionModel().getSelectedIndex() == 0) {
-                            Dialog<String> groupCreationDialog = new Dialog<>();
+                            Dialog<Pair<String,LogicalGroup.Kind>> groupCreationDialog = new Dialog<>();
 
                             groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);
                             ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
                             groupCreationDialog.setTitle("Create new Group");
                             groupCreationDialog.setHeaderText(null);
+                            GridPane gCgP= new GridPane();
                             TextField GroupCreationName = new TextField();
-                            groupCreationDialog.getDialogPane().setContent(GroupCreationName);
+                            gCgP.add(GroupCreationName,0,0);
+                            ChoiceBox<LogicalGroup.Kind> groupKind= new ChoiceBox<>();
+                            groupKind.getItems().addAll(LogicalGroup.Kind.values());
+                            groupKind.setValue(LogicalGroup.Kind.DEFAULT);
+                            gCgP.add(groupKind,0,1);
+                            groupCreationDialog.getDialogPane().setContent(gCgP);
                             groupCreationDialog.setResultConverter((dialogButton) -> {
                                 if (dialogButton == ButtonType.APPLY) {
-                                    return GroupCreationName.getText();
+                                    return new Pair<>(GroupCreationName.getText(), groupKind.getValue());
                                 } else
                                     return null;
                             });
 
-                            Optional<String> result = groupCreationDialog.showAndWait();
+                            Optional<Pair<String,LogicalGroup.Kind>> result = groupCreationDialog.showAndWait();
                             if (result.isPresent()) {
-                                if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get())) {
+                                if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get().getKey())) {
                                     alert.setContentText("Group already exists");
                                     alert.showAndWait();
                                     if (elements.getLogicalGroup() == null)
-                                        logicalGroup.getSelectionModel().select(1);      //select empty string because element is in no group
+                                        logicalGroup.getSelectionModel().select(1);      //select noGroup because element is in no group
                                     else
                                         logicalGroup.setValue(elements.getLogicalGroup().getName());
                                 } else {
-                                    LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get(), LogicalGroup.Kind.DEFAULT); //TODO Kind
+                                    LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get().getKey(), result.get().getValue());
                                     if (elements.getLogicalGroup() != null) {
                                         elements.getLogicalGroup().removeElement(elements);
                                     }

@@ -18,6 +18,10 @@
 
   <Label fx:id="logicalGroup" text="Group" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
   <Label fx:id="GroupName" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+  <Label fx:id="Kind" text="Kind" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+  <Label fx:id="lGKind" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+
+
 
 
   <padding>
