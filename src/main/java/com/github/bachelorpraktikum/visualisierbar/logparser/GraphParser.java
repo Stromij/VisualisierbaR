@@ -143,7 +143,7 @@ public final class GraphParser {
                 try {absName = ctx.elem_abs_name().getText();
                      elemNew.setAbsName(absName);
                     }
-                catch (NullPointerException e){}
+                catch (NullPointerException ignored){}
 
 
                 if(elemViewTracker.get(elementName) != null)
@@ -214,14 +214,20 @@ public final class GraphParser {
                 String type = ctx.kind().getText();
 
                 LogicalGroup.Kind kind;
-                if(type.equals(("SIGNAL")))
-                    {kind = LogicalGroup.Kind.SIGNAL;}
-                else if(type.equals("SWITCH"))
-                    {kind = LogicalGroup.Kind.SWITCH;}
-                else if(type.equals("LIMITER"))
-                    {kind = LogicalGroup.Kind.LIMITER;}
-                else
-                    {kind = LogicalGroup.Kind.DEFAULT;}
+                switch (type) {
+                    case ("SIGNAL"):
+                        kind = LogicalGroup.Kind.SIGNAL;
+                        break;
+                    case "SWITCH":
+                        kind = LogicalGroup.Kind.SWITCH;
+                        break;
+                    case "LIMITER":
+                        kind = LogicalGroup.Kind.LIMITER;
+                        break;
+                    default:
+                        kind = LogicalGroup.Kind.DEFAULT;
+                        break;
+                }
 
                 LogicalGroup logicalGroup = LogicalGroup.in(context).create(groupName, kind);      //new logicalGroup(groupName, kind);
 

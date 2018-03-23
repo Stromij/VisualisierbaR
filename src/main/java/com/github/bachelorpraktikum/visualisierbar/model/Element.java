@@ -620,57 +620,57 @@ public final class Element implements GraphObject<Shape> {
          String edge = edgeDirection == null ? null : edgeDirection.higherName();
 
          if(getType() == Type.WeichenPunkt)
-            {// [HTTPName: "w1_wa"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10);
-             return String.format("[HTTPName: \"%s\"]WeichenPunkt %s = new local WeichenPunktImpl(%s);\n%s",
-                     highName, highName, node.higherName(), addElem);
+            {// [HTTPName: "w1_wa"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10, "w1_wa");
+             return String.format("[HTTPName: \"%s\"]WeichenPunkt %s = new local WeichenPunktImpl(%s, \"%s\");\n%s",
+                     highName, highName, node.higherName(), highName, addElem);
             }
          if(getType() == Type.HauptSignal)
-            {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33);
-             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s);\n%s",
-                     highName, highName, node.higherName(), null, addElem);
-                      //name, name, Nodename, Kantenname, addElem
+            {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33, "hs3");
+             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s, \"%s\");\n%s",
+                     highName, highName, node.higherName(), null, highName, addElem);
+                      //name, name, Nodename, Kantenname, addElem, name
             }
          if(getType() == Type.GefahrenPunkt)
-            {// [HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl( e54);
-             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n%s",
-                     highName, highName, edge, addElem);
-                      //name, name, Kantenname, addElem
+            {// [HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl(e54, "gp5");
+             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s, \"%s\");\n%s",
+                     highName, highName, edge, highName, addElem);
+                      //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.GeschwindigkeitsAnzeiger)
-            {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21);
-             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new local GeschwindigkeitsAnzeigerImpl(%s);\n%s",
-                     highName, highName, edge, addElem);
-                //name, name, Kantenname, addElem
+            {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21, "vs2");
+             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new local GeschwindigkeitsAnzeigerImpl(%s, \"%s\");\n%s",
+                     highName, highName, edge, highName, addElem);
+                //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.GeschwindigkeitsVoranzeiger)
-            {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21);
-                return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVoranzeiger %s = new local GeschwindigkeitsVoranzeiger(%s);\n%s",
-                        highName, highName, edge, addElem);
-                //name, name, Kantenname, addElem
+            {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21, "vs2");
+                return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVoranzeiger %s = new local GeschwindigkeitsVoranzeiger(%s, \"%s\");\n%s",
+                        highName, highName, edge, highName, addElem);
+                //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.SwWechsel)
-            {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1);
-             return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s);\n%s",
-                     highName, highName, null, addElem);
-                      //name, name, ???, addElem
+            {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1, "ch5");
+             return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s, \"%s\");\n%s",
+                     highName, highName, null, highName, addElem);
+                      //name, name, ???, name, addElem
             }
          if(getType() == Type.VorSignal)
-            {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21);
-             return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s);\n%s",
-                     highName, highName, edge, addElem);
-                      //name, name, Kantenname, addElem
+            {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21, "vs2");
+             return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s, \"%s\");\n%s",
+                     highName, highName, edge, highName, addElem);
+                      //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.Magnet)
             {if(name.contains("PZBMagnetImpl"))
-                {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000,e02);
-                 return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s,%s);\n%s",
-                         highName, highName, null, edge, addElem);
-                      //name, name, MHz, Kantenname, addElem
+                {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000,e02, "m1");
+                 return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s, %s, \"%s\");\n%s",
+                         highName, highName, null, edge, highName, addElem);
+                      //name, name, MHz, Kantenname, name, addElem
                 }
              if(name.contains("ContactMagnetImpl"))
-                {//[HTTPName: "mv1"]ContactMagnet mv1 = new ContactMagnetImpl();
-                 return String.format("[HTTPName: \"%s\"]ContactMagnet %s = new ContactMagnetImpl();\n%s",
-                         highName, highName, addElem);
+                {//[HTTPName: "mv1"]ContactMagnet mv1 = new ContactMagnetImpl("mv1");
+                 return String.format("[HTTPName: \"%s\"]ContactMagnet %s = new ContactMagnetImpl(\"%s\");\n%s",
+                         highName, highName, highName, addElem);
                 }
             }
          if(getType() == Type.SichtbarkeitsPunkt)

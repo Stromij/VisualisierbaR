@@ -299,6 +299,9 @@ public class Train implements GraphObject<Shape> {
         return getState(time, 0);
     }
 
+    @Nonnull
+    public String higherName() {return name;}
+
     /**
      * Gets the state of this train at the given time, similar to {@link #getState(int)}.<br>In
      * contrast to the aforementioned method, this method can use the given state as a starting

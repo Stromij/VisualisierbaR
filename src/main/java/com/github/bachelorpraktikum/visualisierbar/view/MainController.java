@@ -1024,7 +1024,7 @@ public class MainController {
      * @param source AbsSource
      */
 
-    private void initializeDeltas(AbsSource source) {
+    private void initializeDeltas(@Nonnull AbsSource source) {
         ArrayList<String> deltaArray = source.getDeltas();
         if (deltaArray.size() <= 0) {
             return;
@@ -1219,13 +1219,10 @@ public class MainController {
         Optional<ButtonType> result = simulationInfo.showAndWait();
 
         System.out.println(result);
-        if (result.get() == buttonDoNotShowAgain) {
+        if (result.isPresent() && result.get() == buttonDoNotShowAgain) {
             ConfigKey.simulationStoppedDoNotShowAgain.set("true");
             return true;
-        } else if (result.get() == buttonOK) {
-            return true;
-        } else {
-            return false;
         }
+        return result.isPresent() && result.get() == buttonOK;
     }
 }

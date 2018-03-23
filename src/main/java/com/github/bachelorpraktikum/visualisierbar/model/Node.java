@@ -393,6 +393,6 @@ public final class Node implements GraphObject<Circle> {
      * @return the higher rated, available name
      */
     @Nonnull
-    String higherName()
+    public String higherName()
         {return absName == null ? name : absName;}
 }

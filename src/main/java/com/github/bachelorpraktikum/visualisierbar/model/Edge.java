@@ -436,6 +436,6 @@ public final class Edge implements GraphObject<Line> {
      * @return the higher rated, available name
      */
     @Nonnull
-    String higherName()
+    public String higherName()
         {return absName == null ? name : absName;}
 }
