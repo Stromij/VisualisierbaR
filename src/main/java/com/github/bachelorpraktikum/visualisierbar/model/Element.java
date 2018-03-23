@@ -627,7 +627,7 @@ public final class Element implements GraphObject<Shape> {
          if(getType() == Type.HauptSignal)
             {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33, "hs3");
              return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s, \"%s\");\n%s",
-                     highName, highName, node.higherName(), null, highName, addElem);
+                     highName, highName, node.higherName(), edge, highName, addElem);
                       //name, name, Nodename, Kantenname, addElem, name
             }
          if(getType() == Type.GefahrenPunkt)
@@ -662,7 +662,7 @@ public final class Element implements GraphObject<Shape> {
             }
          if(getType() == Type.Magnet)
             {if(name.contains("PZBMagnetImpl"))
-                {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000,e02, "m1");
+                {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000, e02, "m1");
                  return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s, %s, \"%s\");\n%s",
                          highName, highName, null, edge, highName, addElem);
                       //name, name, MHz, Kantenname, name, addElem

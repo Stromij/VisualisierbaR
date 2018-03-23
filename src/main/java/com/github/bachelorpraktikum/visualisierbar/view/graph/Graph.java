@@ -451,20 +451,23 @@ public final class Graph {
 
           response = response.concat("\n");
 
-          // Generating ABS-Code for all trackelements & logical Groups
+          // Generating ABS-Code for all trackelements
           for(Map.Entry<Element, GraphShape<Element>> entry : elements.entrySet())
-             {response = response.concat(entry.getKey().toABS());
-              if(entry.getKey().getLogicalGroup() != null && !printed.contains(entry.getKey().getLogicalGroup()))
-                {printed.add(entry.getKey().getLogicalGroup());
-                 response = response.concat(entry.getKey().getLogicalGroup().toABS());
-                }
-             }
+            {response = response.concat(entry.getKey().toABS());}
+
+          response = response.concat("\n");
+
+          // Generating ABS-Code for all logical Groups
+          for (LogicalGroup iteration_element : LogicalGroup.in(context).getAll()) {
+              response = response.concat(iteration_element.toABS());
+            }
 
 
-          // Print it!
+          // Print it! Remove if you don't need this!
           System.out.println("----- ABS start -----");
           System.out.println(response);
           System.out.println("----- ABS end -----");
+          // Stop removing here!
 
           return response;
     }
