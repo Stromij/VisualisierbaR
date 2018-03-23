@@ -17,8 +17,10 @@
   <Label fx:id="elementName"/>
   <ScrollPane fx:id="scrollPane" VBox.vgrow="ALWAYS">
     <StackPane fx:id="content"/>
+
   </ScrollPane>
   <StackPane>
+
     <Button fx:id="closeButton" text="%close_detail" StackPane.alignment="CENTER_RIGHT"/>
     <padding>
       <Insets right="5.0" bottom="5.0" top="5.0"/>

@@ -337,10 +337,11 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                                         logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
                                 }
                             } else {
-                                if (newElement.getLogicalGroup() != null) {//code for switching Group
+                                if (newElement.getLogicalGroup() != null) {                                                     //code for switching Group
                                     newElement.getLogicalGroup().removeElement(newElement);
                                 }
-                                newElement.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
+                                //newElement.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
+                                LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()).addElement(newElement);
                             }
                         });
 
@@ -457,7 +458,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             if (elements.getLogicalGroup() != null) {
                                 elements.getLogicalGroup().removeElement(elements);
                             }
-                            elements.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
+                            //elements.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
+                            LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()).addElement(elements);
                         }
                     });
 

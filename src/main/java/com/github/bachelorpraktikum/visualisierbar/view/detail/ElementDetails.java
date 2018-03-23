@@ -4,7 +4,7 @@ import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.model.GraphObject;
 import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
-import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.github.bachelorpraktikum.visualisierbar.view.Highlightable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.value.ChangeListener;
@@ -12,18 +12,14 @@ import javafx.beans.value.ObservableIntegerValue;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
-
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
+import javax.annotation.Nullable;
+import java.util.LinkedList;
 
 
 class ElementDetails extends DetailsBase<Element> {
@@ -31,7 +27,11 @@ class ElementDetails extends DetailsBase<Element> {
     private static final String FXML_LOCATION = "ElementDetails.fxml";
 
     @FXML
+    private GridPane detailPane;
+    @FXML
     private GridPane elementDetails;
+    @FXML
+    private GridPane groupElements;
     @FXML
     private Label coordinates;
     @FXML
@@ -57,6 +57,63 @@ class ElementDetails extends DetailsBase<Element> {
 
     @FXML
     private void initialize() {
+
+
+        ListView<GraphObject> ElementList = new ListView<>();
+        if(getObject().getLogicalGroup()!=null){
+            ObservableList objects = FXCollections.observableList(new LinkedList<>());
+            objects.addAll(getObject().getLogicalGroup().getElements());
+
+            ElementList.setCellFactory(new Callback<ListView<GraphObject>,ListCell<GraphObject>> (){
+                @Override
+                public ListCell<GraphObject> call(ListView<GraphObject> arg0) {
+                    ListCellX<GraphObject> cell = new ListCellX<GraphObject>(){
+                        @Override
+                        public void updateItem(GraphObject item,boolean empty){
+                            super.updateItem(item,empty);
+                            if(item!=null){
+                            setGraphic(new Label(item.getName()));
+                            }
+                        }
+                    };
+
+                    cell.init(objects);
+
+                    cell.setOnMouseEntered((a)->{
+                        GraphObject element= cell.getItem();
+                        if(element!=null)
+                            cell.getItem().getGraph().getElements().get(cell.getItem()).highlightedProperty().set(true);
+                    });
+                    cell.setOnMouseExited((a)->{
+                        GraphObject element= cell.getItem();
+                        if(element!=null)
+                            cell.getItem().getGraph().getElements().get(cell.getItem()).highlightedProperty().set(false);
+                    });
+
+
+
+                    return cell;
+                }
+            });
+            groupElements.add(ElementList,0,0);
+            ElementList.setItems(objects);
+            ToggleButton markAllToggle = new ToggleButton();
+            markAllToggle.setText("Mark all Elements");
+            markAllToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue){
+                    for(Element element: getObject().getLogicalGroup().getElements()){
+                        element.getGraph().getElements().get(element).highlightedProperty().set(true);
+                    }
+                }
+                else{
+                    for(Element element: getObject().getLogicalGroup().getElements()){
+                        element.getGraph().getElements().get(element).highlightedProperty().set(false);
+
+                    }
+                }
+            });
+            groupElements.add(markAllToggle,0,1);
+        }
 
 
 
@@ -118,6 +175,6 @@ class ElementDetails extends DetailsBase<Element> {
     @Nonnull
     @Override
     Node getDetails() {
-        return elementDetails;
+        return detailPane;
     }
 }
