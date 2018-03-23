@@ -29,6 +29,14 @@ public interface GraphObject<S extends Shape> extends Shapeable<S> {
     String higherName();
 
     /**
+     * Returns the ABS-Name of this object if it is not null, otherwise null
+     *
+     * @return the ABS-name
+     */
+    @Nullable
+    String getAbsName();
+
+    /**
      * Gets the Graph this object is in
      * @return the graph
      */

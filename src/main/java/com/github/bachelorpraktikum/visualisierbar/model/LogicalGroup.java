@@ -2,6 +2,7 @@ package com.github.bachelorpraktikum.visualisierbar.model;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.lang.annotation.ElementType;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
@@ -151,18 +152,24 @@ public class LogicalGroup {
     @Nonnull
     public String toABS()
         {String rowOfElements = "";
+         int counter = 0;
          for(Element t : elements)
-            {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));}
+            {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
+             counter ++;
+            }
 
          if(type == Kind.SIGNAL)
-            {return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n",
+            {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
+             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n",
                     name, name, rowOfElements, name, null);}
          if(type == Kind.SWITCH)
-            {return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
+            {for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
+             return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
                     name, name, rowOfElements, null, null, null, name);
             }
          if(type == Kind.LIMITER)
-            {return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n",
+            {for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
+             return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n",
                     name, name, rowOfElements, null, name);}
 
          return "// Type of logical group not supported";

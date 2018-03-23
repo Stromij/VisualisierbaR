@@ -303,6 +303,13 @@ public class Train implements GraphObject<Shape> {
     public String higherName() {return name;}
 
     /**
+     * Do not use this Method!
+     * @return null
+     */
+    @Nullable
+    public String getAbsName() {return null;}
+
+    /**
      * Gets the state of this train at the given time, similar to {@link #getState(int)}.<br>In
      * contrast to the aforementioned method, this method can use the given state as a starting
      * point for searching the wanted state, which is potentially more efficient. If the time of the

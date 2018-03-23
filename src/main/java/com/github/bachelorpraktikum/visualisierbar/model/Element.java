@@ -500,6 +500,9 @@ public final class Element implements GraphObject<Shape> {
 
     public void setAbsName(@Nullable String absName) {this.absName = absName;}
 
+    @Nullable
+    public String getAbsName() {return absName;}
+
     @Nonnull
     public String higherName() {return (absName == null) ? name : absName;}
 

@@ -91,7 +91,12 @@ abstract class ElementBase<T extends Node> extends GraphShapeBase<Element, T> {
     protected void initializedShape(T node) {
         for (Element element : elements) {
             Shape elementShape = getShape(element);
-            TooltipUtil.install(elementShape, new Tooltip(element.getName()));
+            String tooltipName = element.getName();
+            if (element.getAbsName() != null) {
+                tooltipName = tooltipName.concat(" | ");
+                tooltipName = tooltipName.concat(element.getAbsName());
+            }
+            TooltipUtil.install(elementShape, new Tooltip(tooltipName));
             ChangeListener NodeListener = ((observable, oldValue, newValue) ->
                 relocate(this.getShape()));
             listeners.add(NodeListener);
