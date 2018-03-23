@@ -21,7 +21,7 @@ public class AbsSource implements DataSource {
     private final URI parent;
     private final String product;
 
-    private ArrayList delta;
+    private ArrayList<String> delta;
 
 
     public AbsSource(String command, File path, String product) throws IOException {
@@ -80,7 +80,7 @@ public class AbsSource implements DataSource {
      * @return An ArrayList of all Deltas
      */
 
-    public ArrayList getDeltas(){
+    public ArrayList<String> getDeltas(){
         ArrayList<Matcher> foundedDeltaLines = new ArrayList<>();
         ArrayList<String> productNames = new ArrayList<>();
         Matcher matcherProduct;

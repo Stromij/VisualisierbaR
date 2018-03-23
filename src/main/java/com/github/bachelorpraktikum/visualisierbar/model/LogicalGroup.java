@@ -2,13 +2,14 @@ package com.github.bachelorpraktikum.visualisierbar.model;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.lang.annotation.ElementType;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class LogicalGroup {
 
     @Nonnull
-    private LinkedHashSet<Element> elements;
+    private LinkedList<Element> elements;
     @Nonnull
     private String name;
     @Nonnull
@@ -109,14 +110,14 @@ public class LogicalGroup {
     private LogicalGroup(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedHashSet<Element> elements)
         {this.name = name;
          this.type = kind;
-         this.elements = new LinkedHashSet<>();
+         this.elements = new LinkedList<>();
          this.elements.addAll(elements);
         }
 
     private LogicalGroup(@Nonnull String name, @Nonnull Kind kind)
         {this.name = name;
          this.type = kind;
-         this.elements = new LinkedHashSet<>();
+         this.elements = new LinkedList<>();
         }
 
     @Nonnull
@@ -140,7 +141,7 @@ public class LogicalGroup {
         }
 
     @Nonnull
-    public LinkedHashSet<Element> getElements(){
+    public LinkedList<Element> getElements(){
         return elements;
     }
 
@@ -151,18 +152,24 @@ public class LogicalGroup {
     @Nonnull
     public String toABS()
         {String rowOfElements = "";
+         int counter = 0;
          for(Element t : elements)
-            {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));}
+            {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
+             counter ++;
+            }
 
          if(type == Kind.SIGNAL)
-            {return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s \"%s\", %s);\n",
+            {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
+             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n",
                     name, name, rowOfElements, name, null);}
          if(type == Kind.SWITCH)
-            {return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s %s, %s, %s, \"%s\");\n",
+            {for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
+             return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
                     name, name, rowOfElements, null, null, null, name);
             }
          if(type == Kind.LIMITER)
-            {return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s %s, \"%s\");\n",
+            {for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
+             return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n",
                     name, name, rowOfElements, null, name);}
 
          return "// Type of logical group not supported";
