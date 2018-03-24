@@ -61,8 +61,7 @@ class ElementDetails extends DetailsBase<Element> {
 
         ListView<GraphObject> ElementList = new ListView<>();
         if(getObject().getLogicalGroup()!=null){
-            ObservableList objects = FXCollections.observableList(new LinkedList<>());
-            objects.addAll(getObject().getLogicalGroup().getElements());
+            ObservableList objects = FXCollections.observableList(getObject().getLogicalGroup().getElements());
 
             ElementList.setCellFactory(new Callback<ListView<GraphObject>,ListCell<GraphObject>> (){
                 @Override
