@@ -20,6 +20,10 @@ public class LogicalGroup {
         SIGNAL, SWITCH, LIMITER, DEFAULT
     }
 
+    /**
+     * Manages all instances of {@link LogicalGroup}.<br>
+     * Ensures there is always only one instance of node per name per {@link Context}.
+     */
     @ParametersAreNonnullByDefault
     public static final class GroupFactory{
 
@@ -29,7 +33,7 @@ public class LogicalGroup {
 
         @Nonnull
         private final Map<String, LogicalGroup> groups;
-
+        @Nonnull
         private static GroupFactory getInstance(Context context){
             GroupFactory result = instances.computeIfAbsent(context, ctx -> {
                 GroupFactory factory = new GroupFactory(ctx);
@@ -49,45 +53,86 @@ public class LogicalGroup {
 
 
 
-
+        /**
+         * Potentially creates a new instance of {@link LogicalGroup}.<br>
+         * If a group with the same name already exists, an exception is thrown
+         *
+         * @param name the unique name of this group
+         * @param kind the {@link Kind} of this Group
+         * @param  elements the Elements this group will contain
+         * @return the created group
+         * @throws IllegalArgumentException if the name is already taken
+         * @throws NullPointerException if any of the arguments is null
+         */
         @Nonnull
-        public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedHashSet<Element> elements){
-            if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
+        public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedList<Element> elements){
+            if(groups.containsKey(Objects.requireNonNull(name))){throw new IllegalArgumentException("group already exist " + name);}
             else{
-                LogicalGroup g= new  LogicalGroup(name, kind, elements);
+                LogicalGroup g= new  LogicalGroup(name, Objects.requireNonNull(kind), Objects.requireNonNull(elements));
                 groups.put(g.getName(),g);
                 return g;
             }
         }
 
+        /**
+         * Potentially creates a new instance of {@link LogicalGroup}.<br>
+         * If a group with the same name already exists, an exception is thrown
+         * @param name the unique name of this group
+         * @param kind the {@link Kind} of this Group
+         * @return the created group
+         * @throws IllegalArgumentException if the name is already taken
+         * @throws NullPointerException if any of the arguments is null
+         */
         @Nonnull
         public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind){
-            if(groups.containsKey(name)){throw new IllegalArgumentException("group already exist " + name);}
+            if(groups.containsKey(Objects.requireNonNull(name))){throw new IllegalArgumentException("group already exist " + name);}
             else{
-                LogicalGroup g= new  LogicalGroup(name, kind);
+                LogicalGroup g= new  LogicalGroup(name, Objects.requireNonNull(kind));
                 groups.put(g.getName(),g);
                 return g;
             }
         }
 
-
-        public LogicalGroup get(String name) {
+        /**
+         * Gets the instance with the given unique name.
+         *
+         * @param name the instance's name
+         * @return the instance with this name
+         * @throws NullPointerException if the name is null
+         * @throws IllegalArgumentException if there is no object associated with the name
+         */
+        public LogicalGroup get(@Nonnull String name) {
             LogicalGroup group =groups.get(Objects.requireNonNull(name));
             if(group==null){
                 throw new IllegalArgumentException("unknown group: " + name);
             }
             return  group;
         }
-
+        /**
+         * Gets all instances in this {@link Context}.
+         *
+         * @return all instances
+         */
         @Nonnull
         public Collection<LogicalGroup> getAll() {
             return Collections.unmodifiableCollection(groups.values());
         }
-
+        /**
+         * Checks whether the given instance of {@link LogicalGroup} was created by this factory.
+         *
+         * @param LogicalGroup instance to check affiliation for
+         * @return whether the given object was created by this factory
+         */
         public boolean checkAffiliated(@Nonnull LogicalGroup LogicalGroup) {
             return groups.get(LogicalGroup.getName()) == LogicalGroup;
         }
 
+        /**
+         * Check whether a name is already taken
+         * @param name the Name to check
+         * @return  true if name is already taken, false otherwise
+         * @throws NullPointerException is name is null
+         */
         public boolean NameExists(@Nonnull String name) {
             LogicalGroup group = groups.get(Objects.requireNonNull(name));
             return group != null;
@@ -107,7 +152,7 @@ public class LogicalGroup {
     }
 
 
-    private LogicalGroup(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedHashSet<Element> elements)
+    private LogicalGroup(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedList<Element> elements)
         {this.name = name;
          this.type = kind;
          this.elements = new LinkedList<>();

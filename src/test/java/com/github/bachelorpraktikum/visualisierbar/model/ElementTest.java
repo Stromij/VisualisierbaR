@@ -351,4 +351,17 @@ public class ElementTest extends FactoryTest<Element> {
                 throw new IllegalStateException();
         }
     }
+
+    @Test
+    public void testLogicalGroup(){
+        Element element = createElement();
+        LogicalGroup group = LogicalGroup.in(context).create("Test", LogicalGroup.Kind.DEFAULT);
+        group.addElement(element);
+        assertTrue(group.getElements().contains(element));
+        assertTrue(element.getLogicalGroup()==group);
+        group.removeElement(element);
+        assertFalse(group.getElements().contains(element));
+        assertTrue(element.getLogicalGroup()==null);
+    }
+
 }
