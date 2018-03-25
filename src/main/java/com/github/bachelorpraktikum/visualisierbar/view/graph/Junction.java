@@ -15,7 +15,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.util.Pair;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -132,7 +131,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.setHgap(10);
                 grid.setVgap(5);
                 grid.setPadding(new Insets(20, 150, 10, 10));
-                HashMap<Element, TextField> ElementNameTextFields = new HashMap<>(3);                            //Holds the TextFields of the Elements of the Node
+                HashMap<Element, ElementEditorUI> ElementUI = new HashMap<>(3);                            //Holds the TextFields of the Elements of the Node
 
 
                 TextField name = new TextField();                                                                          //TextField for the Node name
@@ -258,117 +257,29 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             this.getRepresented().getGraph().addElement(newElement);                                            //normal elements are simply added
                         }                                                                                                       //end of special treatment for Weichen
 
-                        TextField eName = new TextField(newElement.getName());                                                   //Add UI for the editing of the new Element
-                        ElementNameTextFields.put(newElement, eName);
-                        Label type = new Label(newElement.getType().getName());
 
-                        ChoiceBox<String> direction = new ChoiceBox<>();                                                        //direction choice box
-                        direction.setOnAction(directionEvent -> {                                                                 //when Direction changes redraw element to indicate direction
+                        ElementEditorUI eUI = new ElementEditorUI(newElement);            //quite a bit of code duplication, you could probably change this to be
+                        ElementUI.put(newElement, eUI);                                   //much more elegant
 
-                            String NodeName = direction.getValue();
-                            Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
-                            newElement.setDirection(otherNode);
-                            this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
+                        grid.add(eUI,0,i,4,1);
 
-                        });
-                        for (Edge e : this.getRepresented().getEdges()) {
-                            Node otherNode = e.getOtherNode(this.getRepresented());
-                            direction.getItems().addAll(otherNode.getName());                                                   //set direction choice box Items
-                        }
-
-                        ChoiceBox<String> logicalGroup = new ChoiceBox<>();                                                     //logical Group choice box
-                        logicalGroup.getItems().add("new Group");                                                               //0 is newGroup
-                        logicalGroup.getItems().add("no Group");                                                                        //1 is no Group
-                        LogicalGroup.in(this.getRepresented().getGraph().getContext()).getAll().forEach((a) -> {     //add all existing groups as options
-                            logicalGroup.getItems().add(a.getName());
-                        });
-                        if (newElement.getLogicalGroup() == null)
-                            logicalGroup.getSelectionModel().select(1);                 //select no Group as default
-                        else
-                            logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
-
-                        logicalGroup.setOnAction(lgEvent -> {
-                            if (logicalGroup.getSelectionModel().getSelectedIndex() == 0) {
-                                Dialog<Pair<String,LogicalGroup.Kind>> groupCreationDialog = new Dialog<>();
-
-                                groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);
-                                ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
-                                groupCreationDialog.setTitle("Create new Group");
-                                groupCreationDialog.setHeaderText(null);
-                                GridPane gCgP= new GridPane();
-                                TextField GroupCreationName = new TextField();
-                                gCgP.add(GroupCreationName,0,0);
-                                ChoiceBox<LogicalGroup.Kind> groupKind= new ChoiceBox<>();
-                                groupKind.getItems().addAll(LogicalGroup.Kind.values());
-                                groupKind.setValue(LogicalGroup.Kind.DEFAULT);
-                                gCgP.add(groupKind,0,1);
-                                groupCreationDialog.getDialogPane().setContent(gCgP);
-                                groupCreationDialog.setResultConverter((dialogButton) -> {
-                                    if (dialogButton == ButtonType.APPLY) {
-                                        return new Pair<>(GroupCreationName.getText(), groupKind.getValue());
-                                    } else
-                                        return null;
-                                });
-
-                                Optional<Pair<String,LogicalGroup.Kind>> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
-                                if (result.isPresent()) {
-                                    if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get().getKey())) {
-                                        alert.setContentText("Group already exists");
-                                        alert.showAndWait();
-                                        if (newElement.getLogicalGroup() == null)
-                                            logicalGroup.getSelectionModel().select(1);//select noGroup string because element is in no group since name is taken
-                                        else
-                                            logicalGroup.setValue(newElement.getLogicalGroup().getName());
-
-                                    } else {
-                                        LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get().getKey(), result.get().getValue());
-                                        if (newElement.getLogicalGroup() != null) {
-                                            newElement.getLogicalGroup().removeElement(newElement);
-                                        }
-                                        newGroup.addElement(newElement);
-                                        newElement.setLogicalGroup(newGroup);
-                                        logicalGroup.getItems().add(newGroup.getName());
-                                        logicalGroup.getSelectionModel().select(newGroup.getName());
-                                    }
-                                } else {
-                                    if (newElement.getLogicalGroup() == null)
-                                        logicalGroup.getSelectionModel().select(1);
-                                    else
-                                        logicalGroup.getSelectionModel().select(newElement.getLogicalGroup().getName());
-                                }
-                            } else {
-                                if (newElement.getLogicalGroup() != null) {                                                     //code for switching Group
-                                    newElement.getLogicalGroup().removeElement(newElement);
-                                }
-                                //newElement.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
-                                LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()).addElement(newElement);
-                            }
-                        });
-
-
-                        grid.add(eName, 1, i);                                                                        //Editor layout code for new Elements
-                        grid.add(type, 2, i);
-                        grid.add(logicalGroup, 3, i);
-                        if (newElement.getType().isComposite()) grid.add(direction, 4, i);
                         Button deleteButton = new Button();
                         deleteButton.setText("X");
                         deleteButton.setTextFill(Color.RED);
-                        deleteButton.setOnAction((event) -> {
-                            if (newElement.getGraph() == null)
-                                return;                                                        //should never happen
+                        deleteButton.setOnAction((ttt) -> {
+                            if (newElement.getGraph() == null) {
+                                System.out.println("Error element not in Graph");
+                                return;
+                            }
                             newElement.getGraph().removeElement(newElement);
-                            grid.getChildren().remove(eName);
-                            ElementNameTextFields.remove(newElement);
-                            grid.getChildren().remove(type);
+                            grid.getChildren().remove(ElementUI.get(newElement));
+                            ElementUI.remove(newElement);
                             grid.getChildren().remove(deleteButton);
-                            grid.getChildren().remove(direction);
-                            grid.getChildren().remove(logicalGroup);
-
-
                         });
                         grid.add(deleteButton, 5, i);
                         i++;
                         dialog.getDialogPane().getScene().getWindow().sizeToScene();
+
 
                     } else {
                         alert.setContentText("Name already taken");
@@ -380,94 +291,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 grid.add(createButton, 1, 6);
 
                 for (Element elements : this.getRepresented().getElements()) {      //Code for Elements that are already there
-                    TextField eName = new TextField(elements.getName());            //quite a bit of code duplication, you could probably change this to be
-                    ElementNameTextFields.put(elements, eName);                    //much more elegant
-                    Label type = new Label(elements.getType().getName());
-                    ChoiceBox<String> direction = new ChoiceBox<>();                //direction Type choice box
-                    ChoiceBox<String> logicalGroup = new ChoiceBox<>();
-                    direction.setOnAction(directionEvent -> {
-                        String NodeName = direction.getValue();
-                        if (this.getRepresented().getGraph() != null) {                                                        //should never be null
-                            Node otherNode = Node.in(this.getRepresented().getGraph().getContext()).get(NodeName);
-                            elements.setDirection(otherNode);
-                            this.getRepresented().getGraph().rebuildComposite(this.getRepresented());
-                        }
+                    ElementEditorUI eUI = new ElementEditorUI(elements);            //some code duplication
+                    ElementUI.put(elements, eUI);
 
-                    });
-                    for (Edge e : this.getRepresented().getEdges()) {
-                        Node otherNode = e.getOtherNode(this.getRepresented());
-                        direction.getItems().addAll(otherNode.getName());
-                        if (otherNode == elements.getDirection()) direction.setValue(otherNode.getName());
-                    }
-
-                    logicalGroup.getItems().add("new Group");
-                    logicalGroup.getItems().add("no Group");
-                    LogicalGroup.in(this.getRepresented().getGraph().getContext()).getAll().forEach((a) -> logicalGroup.getItems().add(a.getName()));
-                    if (elements.getLogicalGroup() == null) logicalGroup.getSelectionModel().select(1);
-                    else
-                        logicalGroup.getSelectionModel().select(elements.getLogicalGroup().getName());
-
-                    logicalGroup.setOnAction(lgEvent -> {
-                        if (logicalGroup.getSelectionModel().getSelectedIndex() == 0) {
-                            Dialog<Pair<String,LogicalGroup.Kind>> groupCreationDialog = new Dialog<>();
-
-                            groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);
-                            ((Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
-                            groupCreationDialog.setTitle("Create new Group");
-                            groupCreationDialog.setHeaderText(null);
-                            GridPane gCgP= new GridPane();
-                            TextField GroupCreationName = new TextField();
-                            gCgP.add(GroupCreationName,0,0);
-                            ChoiceBox<LogicalGroup.Kind> groupKind= new ChoiceBox<>();
-                            groupKind.getItems().addAll(LogicalGroup.Kind.values());
-                            groupKind.setValue(LogicalGroup.Kind.DEFAULT);
-                            gCgP.add(groupKind,0,1);
-                            groupCreationDialog.getDialogPane().setContent(gCgP);
-                            groupCreationDialog.setResultConverter((dialogButton) -> {
-                                if (dialogButton == ButtonType.APPLY) {
-                                    return new Pair<>(GroupCreationName.getText(), groupKind.getValue());
-                                } else
-                                    return null;
-                            });
-
-                            Optional<Pair<String,LogicalGroup.Kind>> result = groupCreationDialog.showAndWait();
-                            if (result.isPresent()) {
-                                if (LogicalGroup.in(this.getRepresented().getGraph().getContext()).NameExists(result.get().getKey())) {
-                                    alert.setContentText("Group already exists");
-                                    alert.showAndWait();
-                                    if (elements.getLogicalGroup() == null)
-                                        logicalGroup.getSelectionModel().select(1);      //select noGroup because element is in no group
-                                    else
-                                        logicalGroup.setValue(elements.getLogicalGroup().getName());
-                                } else {
-                                    LogicalGroup newGroup = LogicalGroup.in(this.getRepresented().getGraph().getContext()).create(result.get().getKey(), result.get().getValue());
-                                    if (elements.getLogicalGroup() != null) {
-                                        elements.getLogicalGroup().removeElement(elements);
-                                    }
-                                    newGroup.addElement(elements);
-                                    elements.setLogicalGroup(newGroup);
-                                    logicalGroup.getItems().add(newGroup.getName());
-                                    logicalGroup.getSelectionModel().select(newGroup.getName());
-                                }
-                            } else {
-                                if (elements.getLogicalGroup() == null) logicalGroup.getSelectionModel().select(1);
-                                else
-                                    logicalGroup.getSelectionModel().select(elements.getLogicalGroup().getName());
-                            }
-                        } else {
-                            if (elements.getLogicalGroup() != null) {
-                                elements.getLogicalGroup().removeElement(elements);
-                            }
-                            //elements.setLogicalGroup(LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()));
-                            LogicalGroup.in(this.getRepresented().getGraph().getContext()).get(logicalGroup.getValue()).addElement(elements);
-                        }
-                    });
-
-
-                    grid.add(eName, 1, i);
-                    grid.add(type, 2, i);
-                    grid.add(logicalGroup, 3, i);
-                    if (elements.getType().isComposite()) grid.add(direction, 4, i);
+                    grid.add(eUI,0,i,4,1);
                     Button deleteButton = new Button();
                     deleteButton.setText("X");
                     deleteButton.setTextFill(Color.RED);
@@ -477,13 +304,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                             return;
                         }
                         elements.getGraph().removeElement(elements);
-                        grid.getChildren().remove(eName);
-                        ElementNameTextFields.remove(elements);
-                        grid.getChildren().remove(type);
+                        grid.getChildren().remove(ElementUI.get(elements));
+                        ElementUI.remove(elements);
                         grid.getChildren().remove(deleteButton);
-                        grid.getChildren().remove(direction);
-                        grid.getChildren().remove(logicalGroup);
-
                     });
                     grid.add(deleteButton, 5, i);
                     i++;
@@ -496,9 +319,6 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         LinkedList<String> result = new LinkedList<>();
                         result.add(name.getText());
                         result.add(coordinates.getText());
-                        ElementNameTextFields.forEach((a, b) -> {
-
-                        });
                         return result;
                     }
                     return null;
@@ -531,9 +351,9 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         return;
                     }
 
-                    ElementNameTextFields.forEach((a, b) -> {                                                                          //set Element names
+                    ElementUI.forEach((a, b) -> {                                                                          //set Element names
                         if (a.getGraph() != null) {
-                            if (a.getName().equals(b.getText()) | a.setName(b.getText())) {                                           //TODO Tooltip updates for Elements
+                            if (a.getName().equals(b.getName()) | a.setName(b.getName())) {                                           //TODO Tooltip updates for Elements
                                 //initializedShape(a.getGraph().getElements().get(a));
                                 //TooltipUtil.install(a.getGraph().getElements().get(a), new Tooltip(a.getName()));
                             } else {
