@@ -164,16 +164,14 @@ public final class Graph {
      * Already existing Edges are not duplicated.
      * New Edges are given a random name and length -1
      * New Edges are added to the Graph and the Factory mapping.
-     * @param selection the Selection to fully connect
+     * @param NodeSet the Selection to fully connect
      */
-    public void fullyConnect (HashSet<Junction> selection){
-        HashSet<Node> NodeSet = new HashSet<>(128);
-        for (Junction o : selection) {
-            NodeSet.add((o).getRepresented());                                                                              //turn Junctions into Nodes
-        }
+    public void fullyConnect (Set<Node> NodeSet){
+
+
         LinkedList<Node> sList = new LinkedList<>();                                                                        //turn into list to get an order
         sList.addAll(NodeSet);
-        int l = selection.size();
+        int l = NodeSet.size();
         boolean existingEdges[][]=new boolean [l][l];                                                                       //mark existing edges in this array
 
         for (int i=0; i<l; i++){

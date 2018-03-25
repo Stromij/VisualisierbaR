@@ -57,26 +57,24 @@ public class GraphTest   {
 
     @Test
     public void SimpleFullyConnectTest(){
-        LinkedList<Junction> j = new LinkedList<>();
+        LinkedList<Node> j = new LinkedList<>();
         //LinkedList<Node> nodes = new LinkedList<>();
         HashSet<Node> nodes = new HashSet<>(128);
         HashSet<Node> checkedNodes = new HashSet<>(64);
 
-        Junction.clearSelection();
         int n = addNodes(5);                                     //add n nodes
-        for(GraphShape junction : graph.getNodes().values()){
-            j.add((Junction)junction);
+        for(Node node : graph.getNodes().keySet()){
+            j.add(node);
         }
         //n = j.size();
         int k =0;
         if (n!=0){
             k = n;                                              //connect k=n nodes
             for (int i=0; i<k; i++){
-            j.get(i).addToSelection();
-            nodes.add(j.get(i).getRepresentedObjects().get(0));
+            nodes.add(j.get(i));
             }
         }
-        graph.fullyConnect(Junction.getSelection());
+        graph.fullyConnect(nodes);
         assertTrue (graph.getEdges().size()== k*(k-1)/2);
         Junction.getSelection().forEach((a)->{
            for(Edge edge : a.getRepresentedObjects().get(0).getEdges()){
@@ -94,7 +92,7 @@ public class GraphTest   {
            checkedNodes.clear();
         });
         k=graph.getEdges().size();
-        graph.fullyConnect(Junction.getSelection());
+        graph.fullyConnect(nodes);
         assertTrue(k==graph.getEdges().size());
     }
 
@@ -207,17 +205,19 @@ public class GraphTest   {
     }
 
     public void addEdges(int k){
-        LinkedList<Junction> j = new LinkedList<>();
-        Junction.clearSelection();
-        for(GraphShape junction : graph.getNodes().values()){
-            j.add((Junction)junction);
+
+        LinkedList<Node> a = new LinkedList<>();
+        HashSet<Node> j = new HashSet<>(16);
+
+        for(Node node : graph.getNodes().keySet()){
+            a.add(node);
         }
-        if (j.size()!=0 && k-1<j.size()){
+        if (a.size()!=0 && k-1<a.size()){
             for (int i=0; i<k; i++){
-                j.get(i).addToSelection();
+                j.add(a.get(i));
             }
         }
-        graph.fullyConnect(Junction.getSelection());
+        graph.fullyConnect(j);
     }
 
     public  int addNodes(int n) {

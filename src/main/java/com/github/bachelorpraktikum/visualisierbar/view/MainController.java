@@ -353,7 +353,11 @@ public class MainController {
 
         fcButton.setOnAction((t) -> {
             if (graph == null) return;
-            graph.fullyConnect(Junction.getSelection());
+            HashSet<Node> nodeSet= new HashSet<>(Junction.getSelection().size());
+            for(Junction j :Junction.getSelection()){
+                nodeSet.add(j.getRepresentedObjects().get(0));
+            }
+            graph.fullyConnect(nodeSet);
         });
         // add Shortcut Handler
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -470,7 +474,6 @@ public class MainController {
                                     newElem.setDirection(copyNodes.get(element.getDirection()));
                                 if (element.getLogicalGroup() != null) {
                                     element.getLogicalGroup().addElement(newElem);
-                                    newElem.setLogicalGroup(element.getLogicalGroup());
                                 }
                                 copyNodes.get(node).addElement(newElem);
                             }
@@ -1060,16 +1063,19 @@ public class MainController {
                 for (Map.Entry<Element, GraphShape<Element>> entry : graph.getElements().entrySet()) {
                     Element element = entry.getKey();
                     Shape elementShape = entry.getValue().getShape(element);
+
                     Binding<Boolean> binding = Bindings.createBooleanBinding(() ->
                                     element.getType().isVisible(elementShape.getBoundsInParent()),
                             element.getType().visibleStateProperty()
                     );
                     context.addObject(binding);
                     entry.getValue().getShape(element).visibleProperty().bind(binding);
+
                     elementShape.setOnMouseClicked(event ->
                         elementList.getSelectionModel().select(element));
 
                 }
+                //System.out.println(context.getObjets().size());
                 showElements();
             });
             graph.changeProperty().addListener(GraphListener);
