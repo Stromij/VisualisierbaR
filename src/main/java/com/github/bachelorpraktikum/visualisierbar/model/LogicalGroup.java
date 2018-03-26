@@ -203,7 +203,6 @@ public class LogicalGroup {
             {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
              counter ++;
             }
-
          if(type == Kind.SIGNAL)
             {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
              return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n",
