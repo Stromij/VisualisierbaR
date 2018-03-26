@@ -675,10 +675,14 @@ public final class Element implements GraphObject<Shape> {
                  return String.format("[HTTPName: \"%s\"]ContactMagnet %s = new ContactMagnetImpl(\"%s\");\n%s",
                          highName, highName, highName, addElem);
                 }
+
+             //[HTTPName: "mv1"]Magnet mv1 = new MagnetImpl("mv1");
+             return String.format("[HTTPName: \"%s\"]Magnet %s = new MagnetImpl(\"%s\");\n%s",
+                        highName, highName, highName, addElem);
             }
          if(getType() == Type.SichtbarkeitsPunkt)
             {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15);
-             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s);\n%s",
+             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new local SichtbarkeitsPunktImpl(%s);\n%s",
                      highName, highName, edge, addElem);
                       //name, name, Kantenname, addElem
             }

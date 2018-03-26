@@ -1,6 +1,11 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
+import com.github.bachelorpraktikum.visualisierbar.logparser.GraphParser;
 import com.github.bachelorpraktikum.visualisierbar.model.Node.NodeFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
@@ -117,7 +122,7 @@ public class NodeTest extends FactoryTest<Node> {
     }
 
     @Test
-    public void testToABS()
+    public void testToABSSimple()
         {Node node0 = Node.in(context).create("node0", new Coordinates(0, 0));
          Node node1 = Node.in(context).create("node1", new Coordinates(3, 6));
          Node node2 = Node.in(context).create("node2", new Coordinates(4, 5), "n2");
@@ -132,6 +137,76 @@ public class NodeTest extends FactoryTest<Node> {
          assertEquals(result1, node1.toABS());
          assertEquals(result2, node2.toABS());
          assertEquals(result3, node3.toABS());
+        }
+
+    /**
+     * Testet die ABS Ausgabe, wenn keine ABS-Namen vorhanden sind.
+     * @throws IOException wenn Datei nicht lesbar
+     */
+    @Test
+    public void testToAbsNoAbsNames() throws IOException
+        {String toFindArray[] = {
+                "[HTTPName: \"<0.45.0>:class_Graph_NodeImpl\"]Node <0.45.0>:class_Graph_NodeImpl = new local NodeImpl(0,0,\"<0.45.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.46.0>:class_Graph_NodeImpl\"]Node <0.46.0>:class_Graph_NodeImpl = new local NodeImpl(12,8,\"<0.46.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.47.0>:class_Graph_NodeImpl\"]Node <0.47.0>:class_Graph_NodeImpl = new local NodeImpl(4,0,\"<0.47.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.48.0>:class_Graph_NodeImpl\"]Node <0.48.0>:class_Graph_NodeImpl = new local NodeImpl(5,0,\"<0.48.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.49.0>:class_Graph_NodeImpl\"]Node <0.49.0>:class_Graph_NodeImpl = new local NodeImpl(6,0,\"<0.49.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.50.0>:class_Graph_NodeImpl\"]Node <0.50.0>:class_Graph_NodeImpl = new local NodeImpl(7,0,\"<0.50.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.51.0>:class_Graph_NodeImpl\"]Node <0.51.0>:class_Graph_NodeImpl = new local NodeImpl(8,1,\"<0.51.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.52.0>:class_Graph_NodeImpl\"]Node <0.52.0>:class_Graph_NodeImpl = new local NodeImpl(8,3,\"<0.52.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.53.0>:class_Graph_NodeImpl\"]Node <0.53.0>:class_Graph_NodeImpl = new local NodeImpl(7,4,\"<0.53.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.54.0>:class_Graph_NodeImpl\"]Node <0.54.0>:class_Graph_NodeImpl = new local NodeImpl(6,4,\"<0.54.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.55.0>:class_Graph_NodeImpl\"]Node <0.55.0>:class_Graph_NodeImpl = new local NodeImpl(5,4,\"<0.55.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.56.0>:class_Graph_NodeImpl\"]Node <0.56.0>:class_Graph_NodeImpl = new local NodeImpl(4,5,\"<0.56.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.57.0>:class_Graph_NodeImpl\"]Node <0.57.0>:class_Graph_NodeImpl = new local NodeImpl(4,7,\"<0.57.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.58.0>:class_Graph_NodeImpl\"]Node <0.58.0>:class_Graph_NodeImpl = new local NodeImpl(5,8,\"<0.58.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.59.0>:class_Graph_NodeImpl\"]Node <0.59.0>:class_Graph_NodeImpl = new local NodeImpl(6,8,\"<0.59.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.60.0>:class_Graph_NodeImpl\"]Node <0.60.0>:class_Graph_NodeImpl = new local NodeImpl(7,8,\"<0.60.0>:class_Graph_NodeImpl\");\n",
+                "[HTTPName: \"<0.61.0>:class_Graph_NodeImpl\"]Node <0.61.0>:class_Graph_NodeImpl = new local NodeImpl(8,8,\"<0.61.0>:class_Graph_NodeImpl\");\n",
+
+        };
+         ArrayList<String> toFind = new ArrayList<>(Arrays.asList(toFindArray));
+         int count = 0;
+
+         Context context = new GraphParser().parse("src/test/resources/test5.zug.clean");
+         for(Node node : Node.in(context).getAll())
+            {assertTrue(toFind.contains(node.toABS()));
+             count++;
+            }
+         assertTrue(count == toFindArray.length);
+        }
+
+    /**
+     * Testet die ABS Ausgabe, wenn alle ABS-Namen vorhanden sind.
+     * @throws IOException wenn Datei nicht lesbar
+     */
+    @Test
+    public void testToAbsFullAbsNames() throws IOException
+        {String toFindArray[] = {
+                "[HTTPName: \"n01\"]Node n01 = new local NodeImpl(0,0,\"n01\");\n",
+                "[HTTPName: \"n02\"]Node n02 = new local NodeImpl(2,0,\"n02\");\n",
+                "[HTTPName: \"n03\"]Node n03 = new local NodeImpl(3,0,\"n03\");\n",
+                "[HTTPName: \"n04\"]Node n04 = new local NodeImpl(4,0,\"n04\");\n",
+                "[HTTPName: \"n05\"]Node n05 = new local NodeImpl(5,0,\"n05\");\n",
+                "[HTTPName: \"n06\"]Node n06 = new local NodeImpl(6,0,\"n06\");\n",
+                "[HTTPName: \"n07\"]Node n07 = new local NodeImpl(8,0,\"n07\");\n",
+                "[HTTPName: \"n08\"]Node n08 = new local NodeImpl(9,0,\"n08\");\n",
+                "[HTTPName: \"n09\"]Node n09 = new local NodeImpl(10,0,\"n09\");\n",
+                "[HTTPName: \"n10\"]Node n10 = new local NodeImpl(11,0,\"n10\");\n",
+                "[HTTPName: \"n11\"]Node n11 = new local NodeImpl(12,0,\"n11\");\n",
+                "[HTTPName: \"n12\"]Node n12 = new local NodeImpl(13,0,\"n12\");\n",
+                "[HTTPName: \"n13\"]Node n13 = new local NodeImpl(12,1,\"n13\");\n",
+                "[HTTPName: \"n14\"]Node n14 = new local NodeImpl(13,1,\"n14\");\n"
+               };
+         ArrayList<String> toFind = new ArrayList<>(Arrays.asList(toFindArray));
+         int count = 0;
+
+         Context context = new GraphParser().parse("src/test/resources/test9.zug.clean");
+         for(Node node : Node.in(context).getAll())
+            {assertTrue(toFind.contains(node.toABS()));
+             count++;
+            }
+         assertTrue(count == toFindArray.length);
         }
 
     @Test

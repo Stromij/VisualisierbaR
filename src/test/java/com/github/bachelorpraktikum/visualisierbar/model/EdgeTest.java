@@ -1,14 +1,22 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
+import com.github.bachelorpraktikum.visualisierbar.logparser.GraphParser;
 import com.github.bachelorpraktikum.visualisierbar.model.Edge.EdgeFactory;
-import java.util.Random;
+
+import java.io.IOException;
+import java.util.*;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.CoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
+import javafx.geometry.Point2D;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import javax.annotation.Nonnull;
 
 import static org.junit.Assert.*;
 
@@ -205,6 +213,71 @@ public class EdgeTest extends FactoryTest<Edge> {
          assertEquals(result6, edge6.toABS());
          assertEquals(result7, edge7.toABS());
          assertEquals(result8, edge8.toABS());
+        }
+
+    /**
+     * Testet die ABS Ausgabe, wenn keine ABS-Namen vorhanden sind.
+     * @throws IOException wenn Datei nicht lesbar
+     */
+    @Test
+    public void testToAbsNoAbsNames() throws IOException
+        {String toFindArray[] = {
+                "[HTTPName: \"<0.62.0>:class_Graph_EdgeImpl\"]Edge <0.62.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.45.0>:class_Graph_NodeImpl,<0.47.0>:class_Graph_NodeImpl,4000,\"<0.62.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.63.0>:class_Graph_EdgeImpl\"]Edge <0.63.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.47.0>:class_Graph_NodeImpl,<0.48.0>:class_Graph_NodeImpl,275,\"<0.63.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.64.0>:class_Graph_EdgeImpl\"]Edge <0.64.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.48.0>:class_Graph_NodeImpl,<0.49.0>:class_Graph_NodeImpl,750,\"<0.64.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.65.0>:class_Graph_EdgeImpl\"]Edge <0.65.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.49.0>:class_Graph_NodeImpl,<0.50.0>:class_Graph_NodeImpl,250,\"<0.65.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.66.0>:class_Graph_EdgeImpl\"]Edge <0.66.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.50.0>:class_Graph_NodeImpl,<0.51.0>:class_Graph_NodeImpl,100,\"<0.66.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.67.0>:class_Graph_EdgeImpl\"]Edge <0.67.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.51.0>:class_Graph_NodeImpl,<0.52.0>:class_Graph_NodeImpl,4000,\"<0.67.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.68.0>:class_Graph_EdgeImpl\"]Edge <0.68.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.52.0>:class_Graph_NodeImpl,<0.53.0>:class_Graph_NodeImpl,275,\"<0.68.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.69.0>:class_Graph_EdgeImpl\"]Edge <0.69.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.53.0>:class_Graph_NodeImpl,<0.54.0>:class_Graph_NodeImpl,750,\"<0.69.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.70.0>:class_Graph_EdgeImpl\"]Edge <0.70.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.54.0>:class_Graph_NodeImpl,<0.55.0>:class_Graph_NodeImpl,250,\"<0.70.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.71.0>:class_Graph_EdgeImpl\"]Edge <0.71.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.55.0>:class_Graph_NodeImpl,<0.56.0>:class_Graph_NodeImpl,100,\"<0.71.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.72.0>:class_Graph_EdgeImpl\"]Edge <0.72.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.56.0>:class_Graph_NodeImpl,<0.57.0>:class_Graph_NodeImpl,4000,\"<0.72.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.73.0>:class_Graph_EdgeImpl\"]Edge <0.73.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.57.0>:class_Graph_NodeImpl,<0.58.0>:class_Graph_NodeImpl,275,\"<0.73.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.74.0>:class_Graph_EdgeImpl\"]Edge <0.74.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.58.0>:class_Graph_NodeImpl,<0.59.0>:class_Graph_NodeImpl,750,\"<0.74.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.75.0>:class_Graph_EdgeImpl\"]Edge <0.75.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.59.0>:class_Graph_NodeImpl,<0.60.0>:class_Graph_NodeImpl,250,\"<0.75.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.76.0>:class_Graph_EdgeImpl\"]Edge <0.76.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.60.0>:class_Graph_NodeImpl,<0.61.0>:class_Graph_NodeImpl,100,\"<0.76.0>:class_Graph_EdgeImpl\");\n",
+                "[HTTPName: \"<0.77.0>:class_Graph_EdgeImpl\"]Edge <0.77.0>:class_Graph_EdgeImpl = new local EdgeImpl(app,<0.61.0>:class_Graph_NodeImpl,<0.46.0>:class_Graph_NodeImpl,4000,\"<0.77.0>:class_Graph_EdgeImpl\");\n",
+               };
+         ArrayList<String> toFind = new ArrayList<>(Arrays.asList(toFindArray));
+         int count = 0;
+
+         Context context = new GraphParser().parse("src/test/resources/test5.zug.clean");
+         for(Edge edge : Edge.in(context).getAll())
+            {assertTrue(toFind.contains(edge.toABS()));
+             count++;
+            }
+         assertTrue(count == toFindArray.length);
+        }
+
+    /**
+     * Testet die ABS Ausgabe, wenn alle ABS-Namen vorhanden sind.
+     * @throws IOException wenn Datei nicht lesbar
+     */
+    @Test
+    public void testToAbsFullAbsNames() throws IOException
+        {String toFindArray[] = {"[HTTPName: \"e01\"]Edge e01 = new local EdgeImpl(app,n01,n02,200,\"e01\");\n",
+                            "[HTTPName: \"e02\"]Edge e02 = new local EdgeImpl(app,n02,n03,100,\"e02\");\n",
+                            "[HTTPName: \"e03\"]Edge e03 = new local EdgeImpl(app,n03,n04,100,\"e03\");\n",
+                            "[HTTPName: \"e04\"]Edge e04 = new local EdgeImpl(app,n04,n05,100,\"e04\");\n",
+                            "[HTTPName: \"e05\"]Edge e05 = new local EdgeImpl(app,n05,n06,100,\"e05\");\n",
+                            "[HTTPName: \"e06\"]Edge e06 = new local EdgeImpl(app,n06,n07,200,\"e06\");\n",
+                            "[HTTPName: \"e07\"]Edge e07 = new local EdgeImpl(app,n07,n08,100,\"e07\");\n",
+                            "[HTTPName: \"e08\"]Edge e08 = new local EdgeImpl(app,n08,n09,200,\"e08\");\n",
+                            "[HTTPName: \"e09\"]Edge e09 = new local EdgeImpl(app,n09,n10,100,\"e09\");\n",
+                            "[HTTPName: \"e10\"]Edge e10 = new local EdgeImpl(app,n10,n11,100,\"e10\");\n",
+                            "[HTTPName: \"e11\"]Edge e11 = new local EdgeImpl(app,n10,n13,100,\"e11\");\n",
+                            "[HTTPName: \"e12\"]Edge e12 = new local EdgeImpl(app,n11,n12,100,\"e12\");\n",
+                            "[HTTPName: \"e13\"]Edge e13 = new local EdgeImpl(app,n13,n14,100,\"e13\");\n"};
+         ArrayList<String> toFind = new ArrayList<>(Arrays.asList(toFindArray));
+         int count = 0;
+
+         Context context = new GraphParser().parse("src/test/resources/test9.zug.clean");
+         for(Edge edge : Edge.in(context).getAll())
+            {assertTrue(toFind.contains(edge.toABS()));
+             count++;
+            }
+         assertTrue(count == toFindArray.length);
         }
 
     @Test
