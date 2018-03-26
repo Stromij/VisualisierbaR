@@ -2,18 +2,24 @@ package com.github.bachelorpraktikum.visualisierbar.datasource;
 
 import com.github.bachelorpraktikum.visualisierbar.logparser.GraphParser;
 import com.github.bachelorpraktikum.visualisierbar.model.Context;
+import com.github.bachelorpraktikum.visualisierbar.model.Element;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 
 import javax.annotation.Nonnull;
 import java.io.*;
 import java.net.URI;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.util.regex.Pattern.compile;
 
 public class AbsSource implements DataSource {
+
+    private static final Logger log = Logger.getLogger(DatabaseSource.class.getName());
 
     private final File fileToAbs;
     private final File fileToAbsSource;
@@ -119,6 +125,102 @@ public class AbsSource implements DataSource {
 
         return this.delta;
     }
+
+
+    public void refactorSource(Graph graph)
+        {File destDir = new File(fileToAbsSource.toString().concat("_new"));
+         for(int i = 1; destDir.exists(); i++)
+            {destDir = new File(fileToAbsSource.toString().concat("_new_" + i));}
+
+         String newCode = "";
+
+         if(copyFiles(destDir))
+            {try {
+                FileReader fr = new FileReader(destDir + "/Run.abs");
+                BufferedReader br = new BufferedReader(fr);
+
+                newCode = newCode.concat(searchForDelta(br, newCode));
+
+                String zeile;
+                while((zeile = br.readLine()) != null) {
+                    newCode = newCode.concat(zeile).concat("\n");
+                    if (zeile.contains("this.getApplication()")) {break;}
+                }
+
+                newCode = newCode.concat(graph.printNodesToAbs("\t\t"));
+                newCode = newCode.concat("\n\n\n");
+                newCode = newCode.concat(graph.printEdgesToAbs("\t\t"));
+                newCode = newCode.concat("\n\n\n");
+
+
+                while((zeile = br.readLine()) != null)
+                    {if (zeile.contains("new TrainImpl") || zeile.contains("}")) {break;}
+                     if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.replaceAll("(\t| )*", "").length() <= 2)) {
+                        boolean found = false;
+                        for (Element.Type t : Element.Type.values()) {
+                            if (zeile.toLowerCase().contains(t.getName().toLowerCase())) found = true;
+                        }
+                        if (!found) {
+                            newCode = newCode.concat(zeile).concat("\n");
+                        }
+                    }
+                }
+
+                newCode = newCode.concat("\n\n\n");
+                newCode = newCode.concat(graph.printElementsToAbs("\t\t"));
+                newCode = newCode.concat("\n\n\n");
+                newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t"));
+                newCode = newCode.concat("\n\n\n");
+
+                newCode = newCode.concat(zeile).concat("\n");
+                while((zeile = br.readLine()) != null)
+                    {newCode = newCode.concat(zeile).concat("\n");}
+
+                FileWriter fw = new FileWriter(destDir+"/Run.abs");
+                BufferedWriter bw = new BufferedWriter(fw);
+
+                bw.write(newCode);
+
+                bw.close();
+                fw.close();
+                fr.close();
+                br.close();
+            }
+            catch(FileNotFoundException e){log.warning("Something went wrong while copying the ABS-Files");
+            e.printStackTrace();}
+            catch(IOException e){log.warning("Cannot read Run.abs");}
+            }
+
+
+        }
+
+        private String searchForDelta(BufferedReader br, String newCode) throws IOException
+            {String zeile;
+             while((zeile = br.readLine()) != null)
+                {newCode = newCode.concat(zeile).concat("\n");
+                 for(String aDelta : delta) {
+                    if (zeile.contains("delta " + aDelta + ";")) {
+                        return newCode;
+                       }
+                   }
+                }
+             return newCode;
+            }
+
+    private boolean copyFiles(File destDir)
+        {try {
+            ProcessBuilder builder = new ProcessBuilder();
+            builder.directory(new File(this.parent.getPath()));
+            builder.command("/bin/bash", "-c", String.format("cp -r %s %s", fileToAbsSource, destDir));
+
+            Process process = builder.start();
+            process.waitFor();
+            return true;
+         }
+         catch(IOException e) {log.warning("Cannot copy ABS directory.");}
+         catch(InterruptedException e){log.warning("Copying the ABS directory was interrupted.");}
+         return false;
+        }
 
     @Override
     public void close(){ }

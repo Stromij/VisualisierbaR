@@ -408,47 +408,87 @@ public final class Graph {
     }
 
     /**
-     * Printing the nodes to ABS-Code to the console
-     * If there are some negative nodes this function translate the
-     * whole graph to a positive graph
+     * Generating the Nodes ABS-Code
+     * @param prefix the prefix of each line (e.g. \t)
      * @return a String of all Nodes in ABS-Code-Format
      */
     @Nonnull
-    public String printToAbs()
-    {String response = "";
-     HashSet<LogicalGroup> printed = new HashSet<>();
-
-          // Generating ABS-Code for all nodes
-          for(Map.Entry<Node, GraphShape<Node>> entry : nodes.entrySet())
-             {response = response.concat(entry.getKey().toABS());}
-
-          response = response.concat("\n");
-
-          // Generating ABS-Code for all edges
-          for(Map.Entry<Edge, GraphShape<Edge>> entry : edges.entrySet())
-             {response = response.concat(entry.getKey().toABS());}
-
-          response = response.concat("\n");
-
-          // Generating ABS-Code for all trackelements
-          for(Map.Entry<Element, GraphShape<Element>> entry : elements.entrySet())
+    public String printNodesToAbs(String prefix)
+        {String response = prefix;
+         for(Map.Entry<Node, GraphShape<Node>> entry : nodes.entrySet())
             {response = response.concat(entry.getKey().toABS());}
+         response = response.replace("\n", "\n" + prefix);
+         return response;
+        }
 
-          response = response.concat("\n");
+    /**
+     * Generating the edges ABS-Code
+     * @param prefix the prefix of each line (e.g. \t)
+     * @return a String of all edges in ABS-Code-Format
+     */
+    @Nonnull
+    public String printEdgesToAbs(String prefix)
+        {String response = prefix;
+         for(Map.Entry<Edge, GraphShape<Edge>> entry : edges.entrySet())
+            {response = response.concat(entry.getKey().toABS());}
+         response = response.replace("\n", "\n" + prefix);
+         return response;
+        }
 
-          // Generating ABS-Code for all logical Groups
-          for (LogicalGroup iteration_element : LogicalGroup.in(context).getAll()) {
-              response = response.concat(iteration_element.toABS());
+    /**
+     * Generating the elements ABS-Code
+     * @param prefix the prefix of each line (e.g. \t)
+     * @return a String of all elements in ABS-Code-Format
+     */
+    @Nonnull
+    public String printElementsToAbs(String prefix)
+        {String response = prefix;
+         for(Map.Entry<Element, GraphShape<Element>> entry : elements.entrySet())
+            {response = response.concat(entry.getKey().toABS());}
+         response = response.replace("\n", "\n" + prefix);
+         return response;
+        }
+
+    /**
+     * Generating the logicalGroups ABS-Code
+     * @param prefix the prefix of each line (e.g. \t)
+     * @return a String of all logicalGroups in ABS-Code-Format
+     */
+    @Nonnull
+    public String printLogicalGroupsToAbs(String prefix)
+        {String response = prefix;
+            for (LogicalGroup iteration_element : LogicalGroup.in(context).getAll()) {
+                response = response.concat(iteration_element.toABS());
             }
+         response = response.replace("\n", "\n" + prefix);
+         return response;
+        }
 
+    /**
+     * Printing the Graph to ABS-Code to the console
+     * @return a String of all Nodes, Elements, Edges and LogicalGroups in ABS-Code-Format
+     */
+    @Nonnull
+    public String printToAbs() {
+        String response = "";
+        response = response.concat(printNodesToAbs(""));
+        response = response.concat("\n");
 
-          // Print it! Remove if you don't need this!
-          System.out.println("----- ABS start -----");
-          System.out.println(response);
-          System.out.println("----- ABS end -----");
-          // Stop removing here!
+        response = response.concat(printEdgesToAbs(""));
+        response = response.concat("\n");
 
-          return response;
+        response = response.concat(printElementsToAbs(""));
+        response = response.concat("\n");
+
+        response = response.concat(printLogicalGroupsToAbs(""));
+
+        // Print it! Remove if you don't need this!
+        System.out.println("----- ABS start -----");
+        System.out.println(response);
+        System.out.println("----- ABS end -----");
+        // Stop removing here!
+
+        return response;
     }
 
     public void changed(){

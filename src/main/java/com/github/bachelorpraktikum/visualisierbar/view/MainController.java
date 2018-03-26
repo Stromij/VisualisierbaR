@@ -168,6 +168,10 @@ public class MainController {
     private boolean autoChange = false;
     private Pattern timePattern;
 
+    @Nullable
+    private AbsSource absSource;
+
+
     private IntegerProperty simulationTime;
     private LinkedList<ChangeListener> listeners;
     /**
@@ -266,7 +270,12 @@ public class MainController {
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
         printToABSButton.setOnAction(event -> {
-            if (graph != null) graph.printToAbs();
+            if(graph != null && absSource != null)
+                {absSource.refactorSource(graph);}
+            if (graph != null) {
+                graph.printToAbs();
+            }
+
         });
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
@@ -1010,6 +1019,7 @@ public class MainController {
 
         if (source instanceof AbsSource) {
             initializeDeltas((AbsSource) source);
+            this.absSource = (AbsSource) source;
         }
 
         DataSourceHolder.getInstance().set(source);
