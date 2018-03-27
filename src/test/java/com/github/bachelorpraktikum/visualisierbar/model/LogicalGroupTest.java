@@ -1,10 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
-import com.github.bachelorpraktikum.visualisierbar.Visualisierbar;
 import com.github.bachelorpraktikum.visualisierbar.logparser.GraphParser;
-import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
-import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
-import javafx.fxml.FXMLLoader;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 public class LogicalGroupTest {
 
-    Context context;
+    private Context context;
     private int elementCounter;
     private int nodeCounter;
     private Random random;

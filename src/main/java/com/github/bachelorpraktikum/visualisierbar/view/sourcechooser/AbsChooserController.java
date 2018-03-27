@@ -134,6 +134,7 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
      *
      * @return Initial directory for the file chooser
      */
+    @Nonnull
     private String getInitialDirectory() {
         String path = ConfigKey.initialLogFileDirectory.get(System.getProperty("user.home"));
         if (!new File(path).isDirectory()) {
@@ -168,6 +169,10 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
     public ObservableBooleanValue inputChosen() {return fileChosen;}
 
 
+    /**
+     * Creates compiling-command if, and only if the fileURI an the product are selected by the user.
+     * The command is stored in completeProperty
+     */
     private void check(){
         String command = null;
 
