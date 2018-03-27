@@ -600,6 +600,16 @@ public class MainController {
                 Point2D c = graph.getGroup().parentToLocal(new Point2D(event.getX(), event.getY()));
                 try {
                     if (Math.round(c.getX()) < 0 || Math.round(c.getY()) < 0) {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setX(event.getX());
+                        alert.setY(event.getY());
+                        alert.setGraphic(null);
+                        alert.setHeaderText(null);
+                        alert.setContentText("no negative coordinates allowed");
+                        alert.showAndWait();
+                        return;
+                        /*
                         if (Math.round(c.getX()) < 0 && Math.round(c.getY()) >= 0) {
                             double x = 0 - Math.round(c.getX());
                             Map<Node, GraphShape<Node>> nodes = graph.getNodes();
@@ -625,9 +635,12 @@ public class MainController {
                             }
                             graph.addNode(name, new Coordinates(0, 0));
                         }
+                        */
                     } else {
                         graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
                     }
+
+
                 } catch (IllegalArgumentException e) {
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");

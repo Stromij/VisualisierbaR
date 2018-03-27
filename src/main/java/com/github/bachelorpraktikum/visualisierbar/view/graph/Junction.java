@@ -55,6 +55,16 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 double xx = a.getCenterX() + a.getTranslateX();//but we move only the circle and let the rest adjust itself through
                 double yy = a.getCenterY() + a.getTranslateY();//listeners
                 if (xx < 0 || yy < 0) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);                                                             //prepare Error dialog for later use
+                    alert.setTitle("Error");
+                    alert.setGraphic(null);
+                    alert.setHeaderText(null);
+                    alert.setContentText("Coordinates cant be negative");
+                    alert.showAndWait();
+                    a.setTranslateY(0);
+                    a.setTranslateX(0);
+                    return;
+                    /*
                     Map<Node, GraphShape<Node>> nodes = this.getRepresented().getGraph().getNodes();
                     if (xx >= 0 && yy < 0) {                                                                                   //whole bunch of code for handling negative coordinates that currently
                         yy = 0 - yy;                                                                                          //does not work
@@ -92,6 +102,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                     a.setTranslateX(0);
                     return;*/
                 }
+
                 a.setCenterX(xx);
                 a.setCenterY(yy);
                 b.getRepresented().setCoordinates(adapter.reverse(new Point2D(((int) a.getCenterX()), (int) a.getCenterY())));  //update coordinates in the model
@@ -463,6 +474,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
         ChangeListener sizeListener = ((observable, oldValue, newValue) -> resize(this.getShape()));
         listeners.add(sizeListener);
         CALIBRATION_COEFFICIENT.addListener(new WeakChangeListener<>(sizeListener));
+
+        ChangeListener locationListener = ((observable, oldValue, newValue) -> relocate(this.getShape()));
+        listeners.add(sizeListener);
+        getRepresented().movedProperty().addListener(new WeakChangeListener<>(locationListener));
 
         return new Circle();
     }
