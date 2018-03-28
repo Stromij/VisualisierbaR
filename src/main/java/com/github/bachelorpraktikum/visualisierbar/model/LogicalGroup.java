@@ -212,7 +212,7 @@ public class LogicalGroup {
              Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
              String edge1 = "null";
              String edge2 = "null";
-             /*for(Map.Entry<Edge, GraphShape<Edge>> e : edges.entrySet())
+             for(Map.Entry<Edge, GraphShape<Edge>> e : edges.entrySet())
                 {Node node1 = e.getKey().getNode1();
                  Node node2 = e.getKey().getNode2();
                  if(node1.equals(elements.get(0).getNode()) && node2.equals(elements.get(1).getNode()) ||
@@ -225,7 +225,7 @@ public class LogicalGroup {
                         {if(edge1.equals("null")) {edge1 = e.getKey().higherName();}
                          else{edge2 = e.getKey().higherName(); break;}
                         }
-                }*/
+                }
              return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
                     name, name, rowOfElements, edge1, edge2, null, name);
             }
