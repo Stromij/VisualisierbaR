@@ -19,5 +19,10 @@ public final class ContextMenuUtil {
             else
             {contextMenu.show(node, event.getScreenX(), event.getScreenY());}
         });
+        node.setOnMouseClicked(event->{
+            if (contextMenu.isShowing()){
+                contextMenu.hide();
+            }
+        });
     }
 }
