@@ -24,10 +24,14 @@ public class ElementEditorUI extends GridPane{
         direction= new ChoiceBox<>();
         for (Edge e : element.getNode().getEdges()) {
             Node otherNode = e.getOtherNode(element.getNode());
-            direction.getItems().addAll(otherNode.getName());                                                           //set direction choice box Items
+            String output = otherNode.getAbsName() == null ? otherNode.getName() : otherNode.getAbsName().concat(" | ").concat(otherNode.getName());
+            direction.getItems().addAll(output);  //set direction choice box Items
         }
         if(element.getDirection()!=null){
-            direction.getSelectionModel().select(element.getDirection().getName());
+           Node node = element.getDirection();
+            String output = node.getAbsName() == null ? node.getName() : node.getAbsName().concat(" | ").concat(node.getName());
+
+            direction.getSelectionModel().select(output);
         }
         ChoiceBox<String> logicalGroup = new ChoiceBox<>();                                                             //logical Group choice box
         logicalGroup.getItems().add("new Group");                                                                       //0 is newGroup

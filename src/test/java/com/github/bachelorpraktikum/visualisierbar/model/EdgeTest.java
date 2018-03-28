@@ -96,11 +96,11 @@ public class EdgeTest extends FactoryTest<Edge> {
         Edge edge = Edge.in(context).create("Edge", length, getNode(), getNode());
     }
 
-    @Test
+    /*@Test
     public void testNullNodes() {
         expected.expect(IllegalArgumentException.class);
         Edge edge = Edge.in(context).create("Edge", 50, null, null);
-    }
+    }*/
 
     @Test
     public void testNullName() {

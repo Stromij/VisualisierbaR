@@ -300,7 +300,6 @@ public class MainController {
 
 
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
             if (graph == null) return;
             if (newValue) {
 
@@ -380,7 +379,9 @@ public class MainController {
                 if (event.getCode() == KeyCode.N && event.isControlDown()) {
                     newNodeButton.fire();
                 }
-                if (event.getCode() == KeyCode.R && event.isControlDown()) {
+                if (event.getCode() == KeyCode.R && event.isControlDown() ||
+                     event.getCode() == KeyCode.DELETE ||
+                     event.getCode() == KeyCode.BACK_SPACE ) {
                     deleteButton.fire();
                 }
                 if (event.getCode() == KeyCode.C && event.isAltDown()) {
@@ -813,7 +814,8 @@ public class MainController {
                         simulationTime.set(newValue.getTime());
                     }
                     Context context = DataSourceHolder.getInstance().getContext();
-                    Element.in(context).setTime(newValue.getTime());
+                    if(Element.in(context) != null)
+                       {Element.in(context).setTime(newValue.getTime());}
                 }
         );
     }
@@ -1246,7 +1248,7 @@ public class MainController {
         simulationInfo.getButtonTypes().setAll(buttonDoNotShowAgain, buttonOK, buttonCancel);
         Optional<ButtonType> result = simulationInfo.showAndWait();
 
-        System.out.println(result);
+
         if (result.isPresent() && result.get() == buttonDoNotShowAgain) {
             ConfigKey.simulationStoppedDoNotShowAgain.set("true");
             return true;

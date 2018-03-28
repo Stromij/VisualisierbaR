@@ -149,7 +149,7 @@ public class AbsSource implements DataSource {
                 String zeile;
                 while((zeile = br.readLine()) != null) {
                     newCode = newCode.concat(zeile).concat("\n");
-                    if (zeile.contains("this.getApplication()")) {break;}
+                    if (zeile.toLowerCase().contains("grid start")) {break;}
                 }
 
                 newCode = newCode.concat(graph.printNodesToAbs("\t\t"));
@@ -159,8 +159,8 @@ public class AbsSource implements DataSource {
 
 
                 while((zeile = br.readLine()) != null)
-                    {if (zeile.contains("new TrainImpl") || zeile.contains("}")) {break;}
-                     if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.replaceAll("(\t| )*", "").length() <= 2)) {
+                    {if (zeile.toLowerCase().contains("grid end")) {break;}
+                     if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.contains("SpeedLimiter") || zeile.replaceAll("(\t| )*", "").length() <= 2)) {
                         boolean found = false;
                         for (Element.Type t : Element.Type.values()) {
                             if (zeile.toLowerCase().contains(t.getName().toLowerCase())) found = true;
