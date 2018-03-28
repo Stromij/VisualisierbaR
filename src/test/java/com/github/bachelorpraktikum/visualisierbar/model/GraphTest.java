@@ -247,7 +247,7 @@ public class GraphTest   {
                 edgeLinkedList.get(0).getName(),edgeLinkedList.get(0).getName(), "app",
                 edgeLinkedList.get(0).getNode1().getName(), edgeLinkedList.get(0).getNode2().getName(),
                 edgeLinkedList.get(0).getLength(), edgeLinkedList.get(0).getName());
-        node1 = node1 + node2 +"\n" + edge1 + "\n";
+        node1 = node1 + node2 +"\n" + edge1 + "\n\n";
         assertEquals(graph.printToAbs(),node1);
 
 
