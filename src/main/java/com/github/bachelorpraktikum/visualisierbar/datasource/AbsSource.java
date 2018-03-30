@@ -6,9 +6,9 @@ import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
@@ -85,7 +85,7 @@ public class AbsSource implements DataSource {
      *
      * @return An ArrayList of all Deltas
      */
-
+    @Nonnull
     public ArrayList<String> getDeltas(){
         ArrayList<Matcher> foundedDeltaLines = new ArrayList<>();
         ArrayList<String> productNames = new ArrayList<>();
@@ -176,8 +176,8 @@ public class AbsSource implements DataSource {
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t"));
                 newCode = newCode.concat("\n\n\n");
-
-                newCode = newCode.concat(zeile).concat("\n");
+                if(zeile != null)
+                     {newCode = newCode.concat(zeile).concat("\n");}
                 while((zeile = br.readLine()) != null)
                     {newCode = newCode.concat(zeile).concat("\n");}
 
@@ -199,12 +199,13 @@ public class AbsSource implements DataSource {
 
         }
 
-        private String searchForDelta(BufferedReader br, String newCode) throws IOException
+    @Nonnull
+    private String searchForDelta(BufferedReader br, @Nonnull String newCode) throws IOException
             {String zeile;
              while((zeile = br.readLine()) != null)
                 {newCode = newCode.concat(zeile).concat("\n");
                  for(String aDelta : delta) {
-                    if (zeile.contains("delta " + aDelta + ";")) {
+                    if (zeile.contains("delta ".concat(aDelta).concat(";"))) {
                         return newCode;
                        }
                    }
@@ -212,7 +213,7 @@ public class AbsSource implements DataSource {
              return newCode;
             }
 
-    private boolean copyFiles(File destDir)
+    private boolean copyFiles(@Nonnull File destDir)
         {try {
             ProcessBuilder builder = new ProcessBuilder();
             builder.directory(new File(this.parent.getPath()));
