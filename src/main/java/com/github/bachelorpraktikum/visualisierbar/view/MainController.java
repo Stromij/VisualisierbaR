@@ -49,6 +49,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
@@ -327,6 +328,29 @@ public class MainController {
                 graph.getNodes().forEach(((a, b) -> ((Junction) b).setMoveable(true)));
                 rootPane.setLeft(null);
 
+                Line x = new Line();                                                                                    //add marker for (0,0)
+                Node zero = Node.in(graph.getContext()).create("zero", new Coordinates(0,0));
+                Point2D cord= graph.getCoordinatesAdapter().apply(zero);
+                graph.enterNode(zero);
+
+                x.setStartX(cord.getX() -0.5);
+                x.setEndX( cord.getX() + 0.5);
+                x.setStartY(cord.getY());
+                x.setEndY(cord.getY());
+                x.setStrokeWidth(0.01);
+
+                Line y = new Line();
+                y.setStartY(cord.getY()-0.5);
+                y.setEndY(cord.getY()+0.5);
+                y.setStartX(cord.getX());
+                y.setEndX(cord.getX());
+                y.setStrokeWidth(0.01);
+                graph.removeNode(zero);
+
+
+                graph.getGroup().getChildren().addAll(x,y);
+
+
             } else {
                 graph.getNodes().forEach(((a, b) -> ((Junction) b).setMoveable(false)));
                 toolSelector.setValue(toolSelector.getItems().get(0));
@@ -504,6 +528,7 @@ public class MainController {
         TooltipUtil.install(disconnectButton, new Tooltip(KeyCode.ALT.getName() + " + " + KeyCode.C.getName()));
         TooltipUtil.install(deleteButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName()));
         TooltipUtil.install(printToABSButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.P.getName()));
+        TooltipUtil.install(toolSelector, new Tooltip("use " + KeyCode.DIGIT1.getName() + " and " + KeyCode.DIGIT2.getName()+ " to switch between modes "));
         NodeSizeSlider.valueProperty().bindBidirectional(Junction.getCALIBRATION_COEFFICIENT_prop());
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {
