@@ -655,7 +655,7 @@ public final class Element implements GraphObject<Shape> {
             {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1, "ch5");
              return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s, \"%s\");\n%s",
                      highName, highName, null, highName, addElem);
-                      //name, name, ???, name, addElem
+                      //name, name, zfst?, name, addElem
             }
          if(getType() == Type.VorSignal)
             {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21, "vs2");
@@ -668,7 +668,7 @@ public final class Element implements GraphObject<Shape> {
                 {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000, e02, "m1");
                  return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s, %s, \"%s\");\n%s",
                          highName, highName, null, edge, highName, addElem);
-                      //name, name, MHz, Kantenname, name, addElem
+                      //name, name, MHz?, Kantenname, name, addElem
                 }
              if(name.contains("ContactMagnetImpl"))
                 {//[HTTPName: "mv1"]ContactMagnet mv1 = new ContactMagnetImpl("mv1");

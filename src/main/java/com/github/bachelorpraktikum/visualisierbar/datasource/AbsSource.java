@@ -4,6 +4,7 @@ import com.github.bachelorpraktikum.visualisierbar.logparser.GraphParser;
 import com.github.bachelorpraktikum.visualisierbar.model.Context;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
+import javafx.scene.control.Alert;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -11,6 +12,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -145,17 +147,20 @@ public class AbsSource implements DataSource {
                 BufferedReader br = new BufferedReader(fr);
 
                 newCode = newCode.concat(searchForDelta(br, newCode));
-
+                System.out.println(delta);
                 String zeile;
                 while((zeile = br.readLine()) != null) {
                     newCode = newCode.concat(zeile).concat("\n");
-                    if (zeile.toLowerCase().contains("grid start")) {break;}
+                    if(zeile.toLowerCase().contains("grid start")) {break;}
+                    if(zeile.toLowerCase().contains("delta")) {throw new IOException("Cannot find grid start!");}
                 }
 
+                newCode = newCode.concat("\t\t// changed start\n");
                 newCode = newCode.concat(graph.printNodesToAbs("\t\t"));
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(graph.printEdgesToAbs("\t\t"));
                 newCode = newCode.concat("\n\n\n");
+
 
 
                 while((zeile = br.readLine()) != null)
@@ -175,7 +180,9 @@ public class AbsSource implements DataSource {
                 newCode = newCode.concat(graph.printElementsToAbs("\t\t"));
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t"));
+                newCode = newCode.concat("// changed end\n");
                 newCode = newCode.concat("\n\n\n");
+
                 if(zeile != null)
                      {newCode = newCode.concat(zeile).concat("\n");}
                 while((zeile = br.readLine()) != null)
@@ -191,9 +198,28 @@ public class AbsSource implements DataSource {
                 fr.close();
                 br.close();
             }
-            catch(FileNotFoundException e){log.warning("Something went wrong while copying the ABS-Files");
-            e.printStackTrace();}
-            catch(IOException e){log.warning("Cannot read Run.abs");}
+            catch(FileNotFoundException e){
+                e.printStackTrace();
+                ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                String headerText = bundle.getString("file_not_copied_header");
+                alert.setHeaderText(headerText);
+                String contentText = bundle.getString("file_not_copied_content");
+                contentText = String.format(contentText, e.getMessage());
+                alert.setContentText(contentText);
+                alert.showAndWait();
+            }
+            catch(IOException e){
+                e.printStackTrace();
+                ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                String headerText = bundle.getString("file_io_exception_header");
+                alert.setHeaderText(headerText);
+                String contentText = bundle.getString("file_io_exception_content");
+                contentText = String.format(contentText, e.getMessage());
+                alert.setContentText(contentText);
+                alert.showAndWait();
+            }
             }
 
 
