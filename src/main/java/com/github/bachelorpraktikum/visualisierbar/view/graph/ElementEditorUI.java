@@ -14,13 +14,12 @@ public class ElementEditorUI extends GridPane{
 
     private TextField eName;
     private ChoiceBox<String> direction;
-    private ChoiceBox<String> logicalGroup;
 
     ElementEditorUI(Element element){
         super();
         this.setHgap(10);
         this.setVgap(5);
-        eName= new TextField(element.getName());
+        eName= new TextField(element.higherName());
         direction= new ChoiceBox<>();
         for (Edge e : element.getNode().getEdges()) {
             Node otherNode = e.getOtherNode(element.getNode());
