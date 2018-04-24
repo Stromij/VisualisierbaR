@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.visualisierbar.model;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.ref.WeakReference;
 import java.util.*;
@@ -13,6 +14,8 @@ public class LogicalGroup {
     private LinkedList<Element> elements;
     @Nonnull
     private String name;
+    @Nullable
+    private Element belongsTo;
     @Nonnull
     private Kind type;
 
@@ -66,10 +69,10 @@ public class LogicalGroup {
          * @throws NullPointerException if any of the arguments is null
          */
         @Nonnull
-        public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedList<Element> elements){
+        public LogicalGroup create(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedList<Element> elements, @Nullable Element belongsTo){
             if(groups.containsKey(Objects.requireNonNull(name))){throw new IllegalArgumentException("group already exist " + name);}
             else{
-                LogicalGroup g= new  LogicalGroup(name, Objects.requireNonNull(kind), Objects.requireNonNull(elements));
+                LogicalGroup g= new  LogicalGroup(name, Objects.requireNonNull(kind), Objects.requireNonNull(elements), belongsTo);
                 groups.put(g.getName(),g);
                 return g;
             }
@@ -153,11 +156,12 @@ public class LogicalGroup {
     }
 
 
-    private LogicalGroup(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedList<Element> elements)
+    private LogicalGroup(@Nonnull String name, @Nonnull Kind kind, @Nonnull LinkedList<Element> elements, @Nullable Element belongsTo)
         {this.name = name;
          this.type = kind;
          this.elements = new LinkedList<>();
          this.elements.addAll(elements);
+         this.belongsTo = belongsTo;
         }
 
     private LogicalGroup(@Nonnull String name, @Nonnull Kind kind)
@@ -186,6 +190,9 @@ public class LogicalGroup {
          return true;
         }
 
+    public void setBelongsTo(@Nullable Element belongsTo)
+        {this.belongsTo = belongsTo;}
+
     @Nonnull
     public LinkedList<Element> getElements(){
         return elements;
@@ -205,8 +212,9 @@ public class LogicalGroup {
             }
          if(type == Kind.SIGNAL)
             {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
-             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n",
-                    name, name, rowOfElements, name, null);}
+             String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n",
+                    name, name, rowOfElements, name, null, belongOut, name);}
          if(type == Kind.SWITCH)
             {for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
              Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
@@ -231,8 +239,9 @@ public class LogicalGroup {
             }
          if(type == Kind.LIMITER)
             {for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
-             return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n",
-                    name, name, rowOfElements, null, name);}
+             String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+             return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n%s.setLogical(%s);\n",
+                    name, name, rowOfElements, null, name, belongOut, name);}
 
          return "// Type of logical group not supported";
         }

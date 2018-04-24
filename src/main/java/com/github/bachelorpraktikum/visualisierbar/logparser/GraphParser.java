@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import sun.rmi.runtime.Log;
 
 @ParametersAreNonnullByDefault
 public final class GraphParser {
@@ -89,12 +90,14 @@ public final class GraphParser {
 
         private HashMap<String, Edge> elemViewTracker;
         private HashMap<String, LogicalGroup> elemGroupTracker;
+        private HashMap<String, String> alsoGroupTracker;
 
         Listener(Context context) {
             this.context = context;
             this.thousandInt = BigInteger.valueOf(1000);
             elemViewTracker = new HashMap<>();
             elemGroupTracker = new HashMap<>();
+            alsoGroupTracker = new HashMap<>();
         }
 
         private int createTime(LogParser.TimeContext ctx) {
@@ -140,11 +143,12 @@ public final class GraphParser {
                 Element.Type type = Element.Type.fromName(elementName);
                 Element elemNew = Element.in(context).create(elementName, type, node, state);
 
+
+
                 try {absName = ctx.elem_abs_name().getText();
                      elemNew.setAbsName(absName);
                     }
                 catch (NullPointerException ignored){}
-
 
                 if(elemViewTracker.get(elementName) != null)
                     {Edge view = elemViewTracker.get(elementName);
@@ -153,12 +157,20 @@ public final class GraphParser {
                      elemViewTracker.remove(elementName);
                     }
 
-                if(elemGroupTracker.get(elementName) != null)
-                    {LogicalGroup logicalGroup = elemGroupTracker.get(elementName);
-                     elemNew.setLogicalGroup(logicalGroup);
-                     logicalGroup.addElement(elemNew);
-                     elemGroupTracker.remove(elementName);
-                    }
+                if(elemGroupTracker.get(elementName) != null) {
+                    LogicalGroup logicalGroup = elemGroupTracker.get(elementName);
+                    elemNew.setLogicalGroup(logicalGroup);
+                    logicalGroup.addElement(elemNew);
+                    elemGroupTracker.remove(elementName);
+                }
+
+                if(alsoGroupTracker.get(elementName) != null){
+                    LogicalGroup group = elemGroupTracker.get(alsoGroupTracker.get(elementName));
+                    group.setBelongsTo(elemNew);
+                    elemGroupTracker.remove(alsoGroupTracker.get(elementName));
+                }
+
+
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
@@ -241,6 +253,20 @@ public final class GraphParser {
             }
         }
 
+
+        @Override
+        public void enterAlso(LogParser.AlsoContext ctx)
+            {try
+                {String elemName = ctx.elem_name().getText();
+                 String logName = ctx.log_name().getText();
+
+                 alsoGroupTracker.put(elemName, logName);
+                }
+            catch (IllegalArgumentException e) {
+                log.warning("Could not parse line: " + ctx.getText()
+                        + "\nReason: " + e.getMessage());
+            }
+            }
 
         @Override
         public void enterTrain(LogParser.TrainContext ctx) {

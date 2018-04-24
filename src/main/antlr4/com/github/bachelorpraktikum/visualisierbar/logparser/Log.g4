@@ -8,6 +8,7 @@ elements:         node
                 | elem
                 | view
                 | logicalGroup
+                | also
                 | train
                 | mv_init
                 | mv_leaves
@@ -27,6 +28,8 @@ elem: 'ELEM' SEP elem_name SEP node_name SEP STATE (SEP elem_abs_name)?;
 view: 'TOWARDS' SEP elem_name SEP edge_name;
 
 logicalGroup: 'GROUP' SEP kind SEP log_name SEP (elem_name SEP)*;
+
+also: 'ALSO' SEP elem_name SEP log_name;
 
 train: 'ZUG' SEP train_name SEP train_readable_name SEP INT;
 

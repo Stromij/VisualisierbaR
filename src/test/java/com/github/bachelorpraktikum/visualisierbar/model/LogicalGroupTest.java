@@ -72,7 +72,7 @@ public class LogicalGroupTest {
     public void testElements() {
         LinkedList<Element> list = new LinkedList<>();
         for(int i = 0; i < 10; i++) {list.add(getElement(context));}
-        LogicalGroup logGro1 = LogicalGroup.in(context).create("lg2", LogicalGroup.Kind.DEFAULT, list);
+        LogicalGroup logGro1 = LogicalGroup.in(context).create("lg2", LogicalGroup.Kind.DEFAULT, list, null);
 
         assertEquals(list, logGro1.getElements());
     }
