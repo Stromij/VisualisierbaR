@@ -50,13 +50,22 @@ public class AbsSource implements DataSource {
      */
     private File compileABS(String command) throws IOException {
         File file = new File(String.format("%s/actual.zug", this.parent.getPath()));
+        String OS = System.getProperty("os.name").toLowerCase();
+        String fileToConsole = "/bin/bash";
+        String c = "-c";
+        String printConsole = String.format("rm -r gen/erlang/*; %s; cd gen/erlang; ./run > %s/actual.zug;", command, this.parent.getPath());
+        if(OS.indexOf("win") >= 0)
+            {fileToConsole = "cmd.exe";
+             c = "/c";
+             printConsole = "";
+            }
+
 
         ProcessBuilder builder = new ProcessBuilder();
         builder.directory(new File(this.parent.getPath()));
-        builder.command("/bin/bash", "-c", String.format(
-                "rm -r gen/erlang/*; %s; cd gen/erlang; ./run > %s/actual.zug;",
-                command,
-                this.parent.getPath()));
+        builder.command(fileToConsole, c, printConsole);
+
+        System.out.println(command);
 
         Process process = builder.start();
 
