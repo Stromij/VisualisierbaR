@@ -123,7 +123,7 @@ public class LogicalGroupTest {
         Context context = new GraphParser().parse("src/test/resources/test10.zug.clean");
 
         for(LogicalGroup lg : LogicalGroup.in(context).getAll())
-            {assertTrue(toFind.contains(lg.toABS()));
+            {assertTrue(toFind.contains(lg.toABS(null)));
              count++;
             }
         assertEquals(count, toFind.size());

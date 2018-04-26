@@ -456,10 +456,10 @@ public final class Graph {
      * @return a String of all logicalGroups in ABS-Code-Format
      */
     @Nonnull
-    public String printLogicalGroupsToAbs(String prefix)
+    public String printLogicalGroupsToAbs(@Nonnull String prefix, @Nullable String deltaContent)
         {String response = prefix;
             for (LogicalGroup iteration_element : LogicalGroup.in(context).getAll()) {
-                response = response.concat(iteration_element.toABS());
+                response = response.concat(iteration_element.toABS(deltaContent));
             }
          response = response.replace("\n", "\n" + prefix);
          return response;
@@ -481,7 +481,7 @@ public final class Graph {
         response = response.concat(printElementsToAbs("", null));
         response = response.concat("\n");
 
-        response = response.concat(printLogicalGroupsToAbs(""));
+        response = response.concat(printLogicalGroupsToAbs("", null));
 
         // Print it! Remove if you don't need this!
         System.out.println("----- ABS start -----");

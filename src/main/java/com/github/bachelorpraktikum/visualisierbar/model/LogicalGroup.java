@@ -7,6 +7,10 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.compile;
 
 public class LogicalGroup {
 
@@ -14,6 +18,8 @@ public class LogicalGroup {
     private LinkedList<Element> elements;
     @Nonnull
     private String name;
+    @Nonnull
+    private final String oldName;
     @Nullable
     private Element belongsTo;
     @Nonnull
@@ -162,12 +168,14 @@ public class LogicalGroup {
          this.elements = new LinkedList<>();
          this.elements.addAll(elements);
          this.belongsTo = belongsTo;
+         this.oldName = name;
         }
 
     private LogicalGroup(@Nonnull String name, @Nonnull Kind kind)
         {this.name = name;
          this.type = kind;
          this.elements = new LinkedList<>();
+         this.oldName = name;
         }
 
     @Nonnull
@@ -203,7 +211,7 @@ public class LogicalGroup {
      * @return the ABS-Code
      */
     @Nonnull
-    public String toABS()
+    public String toABS(String deltaContent)
         {String rowOfElements = "";
          int counter = 0;
          for(Element t : elements)
@@ -213,13 +221,29 @@ public class LogicalGroup {
          if(type == Kind.SIGNAL)
             {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+             // Suche nach einem zfst in alter Datei - falls vorhanden
+             String zfst = " null /*missing zfst*/";
+             if(deltaContent != null)
+                {//Pattern patternSignal = compile("(.*new SwWechselImpl\\()(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
+                 Pattern patternSignal = compile("(.*new local SignalImpl\\(.*,\\p{Blank}*\"" + oldName + "\",\\p{Blank}*)(.*?)(\\);.*)");
+                 try {Matcher matcherSignal = patternSignal.matcher(deltaContent);
+                      matcherSignal.find();
+                      zfst = matcherSignal.group(2);
+                    }
+                    catch(IllegalStateException ignored) {/*Falls Signal in alter Datei nicht gefunden werden konnte*/}
+                }
+             //Ende der Suche nach einem zfst
+
              return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n",
-                    name, name, rowOfElements, name, null, belongOut, name);}
+                    name, name, rowOfElements, name, zfst, belongOut, name);
+            }
          if(type == Kind.SWITCH)
             {for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
              Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
              String edge1 = "null";
              String edge2 = "null";
+
+             // Suche die Kanten
              for(Map.Entry<Edge, GraphShape<Edge>> e : edges.entrySet())
                 {Node node1 = e.getKey().getNode1();
                  Node node2 = e.getKey().getNode2();
@@ -234,14 +258,38 @@ public class LogicalGroup {
                          else{edge2 = e.getKey().higherName(); break;}
                         }
                 }
+
+             //Suche true/false
+             String bool = "false";
+             if(deltaContent != null)
+                {Pattern patternSwitch = compile("(.*new local SwitchImpl\\(.*,\\p{Blank}*)(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
+                 try {Matcher matcherSwitch = patternSwitch.matcher(deltaContent);
+                      matcherSwitch.find();
+                      bool = matcherSwitch.group(2);
+                     }
+                 catch(IllegalStateException ignored) {/*Falls Switch in alter Datei nicht gefunden werden konnte*/}
+                }
+
              return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
-                    name, name, rowOfElements, edge1, edge2, null, name);
+                    name, name, rowOfElements, edge1, edge2, bool, name);
             }
          if(type == Kind.LIMITER)
             {for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+
+             // Suche nach Speedlimit
+             String limit = "40";
+             if(deltaContent != null)
+                {Pattern patternLimit = compile("(.*new SpeedLimiterImpl\\(.*,\\p{Blank}*)(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
+                    try {Matcher matcherLimit = patternLimit.matcher(deltaContent);
+                        matcherLimit.find();
+                        limit = matcherLimit.group(2);
+                    }
+                    catch(IllegalStateException ignored) {/*Falls Switch in alter Datei nicht gefunden werden konnte*/}
+                }
+
              return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n%s.setLogical(%s);\n",
-                    name, name, rowOfElements, null, name, belongOut, name);}
+                    name, name, rowOfElements, limit, name, belongOut, name);}
 
          return "// Type of logical group not supported";
         }

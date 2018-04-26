@@ -209,7 +209,7 @@ public class AbsSource implements DataSource {
                 // Füge alles, dessen Löschung ungewiss ist ein
                 while((zeile = br.readLine()) != null)
                     {if (zeile.toLowerCase().contains("grid end")) {break;}
-                     if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.contains("SpeedLimiter") || zeile.replaceAll("(\t| )*", "").length() <= 2)) {
+                     if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.contains("SpeedLimiter") || zeile.replaceAll("(\t| )*", "").length() <= 2 || zeile.contains("//"))) {
                         boolean found = false;
                         for (Element.Type t : Element.Type.values()) {
                             if (zeile.toLowerCase().contains(t.getName().toLowerCase())) found = true;
@@ -225,7 +225,7 @@ public class AbsSource implements DataSource {
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(graph.printElementsToAbs("\t\t", deltaContent));
                 newCode = newCode.concat("\n\n\n");
-                newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t"));
+                newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t", deltaContent));
                 newCode = newCode.concat("// changed end\n");
                 newCode = newCode.concat("\n\n\n");
 
