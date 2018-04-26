@@ -160,7 +160,6 @@ public class AbsSource implements DataSource {
                  * Lade zuerst einmal das Grid in einen String (deltaContent) zum Finden fehlender Daten
                  */
                 newCode = newCode.concat(searchForDelta(br, newCode));
-                System.out.println(delta);
                 String zeile;
 
                 // Suche nach grid start. Wenn nicht gefunden, werfe einen Fehler
@@ -183,7 +182,6 @@ public class AbsSource implements DataSource {
                 br = new BufferedReader(fr);
                 // Suche nach dem Delta
                 newCode = newCode.concat(searchForDelta(br, newCode));
-                System.out.println(delta);
 
                 // Suche nach grid start. Wenn nicht gefunden, werfe einen Fehler
                 while((zeile = br.readLine()) != null) {
