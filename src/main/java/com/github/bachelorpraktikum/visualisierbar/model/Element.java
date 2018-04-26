@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.beans.property.Property;
@@ -21,6 +23,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static java.util.regex.Pattern.compile;
+
 /**
  * Represents an element on the track.<p>Every element is associated with a {@link Node}.</p>
  * <p>Typically represents a signal. The {@link Type type} of signal can be retrieved via {@link
@@ -35,6 +39,8 @@ public final class Element implements GraphObject<Shape> {
     private final ElementFactory factory;
     @Nonnull
     private String name;
+    @Nonnull
+    private  String oldName;
     @Nonnull
     private final Node node;
     @Nonnull
@@ -506,6 +512,11 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     public String higherName() {return (absName == null) ? name : absName;}
 
+    @Nullable
+    public String getOldName() {return oldName;}
+
+    public void setOldName(String oldName) {this.oldName = oldName;}
+
     @Nonnull
     @Override
     public Shape createShape() {
@@ -610,7 +621,7 @@ public final class Element implements GraphObject<Shape> {
      * @return the ABS-Code
      */
     @Nonnull
-    public String toABS()
+    public String toABS(@Nullable String deltaContent)
         {String highName = higherName();
          String addElem = String.format("%s.addElement(%s);\n", node.higherName(), highName);
             Edge edgeDirection = null;
@@ -653,9 +664,19 @@ public final class Element implements GraphObject<Shape> {
             }
          if(getType() == Type.SwWechsel)
             {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1, "ch5");
+             // Suche in deltaContent nach dem Element um die zfst zu übernehmen.
+             String zfst = "null /*missing zfst!*/";
+             if(deltaContent != null)
+                {Pattern patternSwWechsel = compile("(.*new SwWechselImpl\\()(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
+                 try {Matcher matcherSwWechsel = patternSwWechsel.matcher(deltaContent);
+                      matcherSwWechsel.find();
+                      zfst = matcherSwWechsel.group(2);
+                     }
+                 catch(IllegalStateException ignored) {/*Falls SwWechsel in alter Datei nicht gefunden werden konnte*/}
+                }
              return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s, \"%s\");\n%s",
-                     highName, highName, null, highName, addElem);
-                      //name, name, zfst?, name, addElem
+                     highName, highName, zfst, highName, addElem);
+                      //name, name, zfst, name, addElem
             }
          if(getType() == Type.VorSignal)
             {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21, "vs2");
@@ -666,9 +687,22 @@ public final class Element implements GraphObject<Shape> {
          if(getType() == Type.Magnet)
             {if(name.contains("PZBMagnetImpl"))
                 {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000, e02, "m1");
+                 // Default: 2000Mhz, erster Magnet in Signal: 1000Mhz, zweiter 500Mhz, dritter 2000Mhz
+                 String mhz = "Mhz2000";
+                 if(this.getLogicalGroup() != null)
+                    {int magnetCount = 0;
+                     String[] arrayOfMhz = {"Mhz1000", "Mhz500", "Mhz2000"};
+                     for (Element e : getLogicalGroup().getElements()) {
+                            if(e.equals(this))
+                                {mhz = arrayOfMhz[magnetCount]; break;}
+                            if(e.getType() == Type.Magnet && e.getName().contains("PZBMagnetImpl"))
+                                {magnetCount++;}
+                        }
+                    }
+
                  return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s, %s, \"%s\");\n%s",
-                         highName, highName, null, edge, highName, addElem);
-                      //name, name, MHz?, Kantenname, name, addElem
+                         highName, highName, mhz, edge, highName, addElem);
+                      //name, name, MHz, Kantenname, name, addElem
                 }
              if(name.contains("ContactMagnetImpl"))
                 {//[HTTPName: "mv1"]ContactMagnet mv1 = new ContactMagnetImpl("mv1");

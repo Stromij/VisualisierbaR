@@ -147,6 +147,7 @@ public final class GraphParser {
 
                 try {absName = ctx.elem_abs_name().getText();
                      elemNew.setAbsName(absName);
+                     elemNew.setOldName(elemNew.higherName());
                     }
                 catch (NullPointerException ignored){}
 

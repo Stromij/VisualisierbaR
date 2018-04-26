@@ -154,16 +154,50 @@ public class AbsSource implements DataSource {
             {try {
                 FileReader fr = new FileReader(destDir + "/Run.abs");
                 BufferedReader br = new BufferedReader(fr);
+                String deltaContent = "";
 
+                /*
+                 * Lade zuerst einmal das Grid in einen String (deltaContent) zum Finden fehlender Daten
+                 */
                 newCode = newCode.concat(searchForDelta(br, newCode));
                 System.out.println(delta);
                 String zeile;
+
+                // Suche nach grid start. Wenn nicht gefunden, werfe einen Fehler
                 while((zeile = br.readLine()) != null) {
-                    newCode = newCode.concat(zeile).concat("\n");
                     if(zeile.toLowerCase().contains("grid start")) {break;}
                     if(zeile.toLowerCase().contains("delta")) {throw new IOException("Cannot find grid start!");}
                 }
 
+                BufferedReader contentReader = br;
+                while ((zeile = contentReader.readLine()) != null)
+                    {if(zeile.toLowerCase().contains("grid end")) {break;}
+                     deltaContent = deltaContent.concat(zeile).concat("EOL");
+                    }
+
+                /*
+                 * Beginne nun mit dem Einlesen der Datei für die Erstellung der neuen Datei
+                 */
+
+                fr = new FileReader(destDir + "/Run.abs");
+                br = new BufferedReader(fr);
+                // Suche nach dem Delta
+                newCode = newCode.concat(searchForDelta(br, newCode));
+                System.out.println(delta);
+
+                // Suche nach grid start. Wenn nicht gefunden, werfe einen Fehler
+                while((zeile = br.readLine()) != null) {
+                    newCode = newCode.concat(zeile).concat("\n");
+                    if (zeile.toLowerCase().contains("grid start")) {
+                        break;
+                    }
+                    if (zeile.toLowerCase().contains("delta")) {
+                        throw new IOException("Cannot find grid start!");
+                    }
+                }
+
+
+                // Füge Nodes und Edges in Datei ein
                 newCode = newCode.concat("\t\t// changed start\n");
                 newCode = newCode.concat(graph.printNodesToAbs("\t\t"));
                 newCode = newCode.concat("\n\n\n");
@@ -172,6 +206,7 @@ public class AbsSource implements DataSource {
 
 
 
+                // Füge alles, dessen Löschung ungewiss ist ein
                 while((zeile = br.readLine()) != null)
                     {if (zeile.toLowerCase().contains("grid end")) {break;}
                      if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.contains("SpeedLimiter") || zeile.replaceAll("(\t| )*", "").length() <= 2)) {
@@ -185,13 +220,17 @@ public class AbsSource implements DataSource {
                     }
                 }
 
+
+                // Füge Elemente und LogicalGroups ein
                 newCode = newCode.concat("\n\n\n");
-                newCode = newCode.concat(graph.printElementsToAbs("\t\t"));
+                newCode = newCode.concat(graph.printElementsToAbs("\t\t", deltaContent));
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t"));
                 newCode = newCode.concat("// changed end\n");
                 newCode = newCode.concat("\n\n\n");
 
+
+                // Schreibe den Rest der Datei
                 if(zeile != null)
                      {newCode = newCode.concat(zeile).concat("\n");}
                 while((zeile = br.readLine()) != null)

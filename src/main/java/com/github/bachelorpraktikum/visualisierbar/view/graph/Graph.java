@@ -11,6 +11,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
@@ -441,10 +442,10 @@ public final class Graph {
      * @return a String of all elements in ABS-Code-Format
      */
     @Nonnull
-    public String printElementsToAbs(String prefix)
+    public String printElementsToAbs(@Nonnull String prefix, @Nullable String deltaContent)
         {String response = prefix;
          for(Map.Entry<Element, GraphShape<Element>> entry : elements.entrySet())
-            {response = response.concat(entry.getKey().toABS());}
+            {response = response.concat(entry.getKey().toABS(deltaContent));}
          response = response.replace("\n", "\n" + prefix);
          return response;
         }
@@ -477,7 +478,7 @@ public final class Graph {
         response = response.concat(printEdgesToAbs(""));
         response = response.concat("\n");
 
-        response = response.concat(printElementsToAbs(""));
+        response = response.concat(printElementsToAbs("", null));
         response = response.concat("\n");
 
         response = response.concat(printLogicalGroupsToAbs(""));

@@ -319,7 +319,7 @@ public class ElementTest extends FactoryTest<Element> {
         Element wp = Element.in(context).create("w1_wa", Type.WeichenPunkt, nodeOfWp, State.NOSIG);
         String expect = "[HTTPName: \"w1_wa\"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10, \"w1_wa\");\nn10.addElement(w1_wa);\n";
 
-        assertEquals(expect, wp.toABS());
+        assertEquals(expect, wp.toABS(null));
     }
 
     @Test
@@ -327,7 +327,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfHs = Node.in(context).create("n34", new Coordinates(0, 0));
         Element hs = Element.in(context).create("hs3", Type.HauptSignal, nodeOfHs, State.NOSIG);
         String expect = "[HTTPName: \"hs3\"]HauptSignal hs3 = new local HauptSignalImpl(n34, null, \"hs3\");\nn34.addElement(hs3);\n";
-        assertEquals(expect, hs.toABS());
+        assertEquals(expect, hs.toABS(null));
     }
 
     @Test
@@ -335,7 +335,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfGp = Node.in(context).create("n11", new Coordinates(0, 0));
         Element gp = Element.in(context).create("gp5", Type.GefahrenPunkt, nodeOfGp, State.NOSIG);
         String expect = "[HTTPName: \"gp5\"]GefahrenPunkt gp5 = new local GefahrenPunktImpl(null, \"gp5\");\nn11.addElement(gp5);\n";
-        assertEquals(expect, gp.toABS());
+        assertEquals(expect, gp.toABS(null));
     }
 
     @Test
@@ -343,7 +343,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfGa = Node.in(context).create("n12", new Coordinates(0, 0));
         Element ga = Element.in(context).create("vs2", Type.GeschwindigkeitsAnzeiger, nodeOfGa, State.NOSIG);
         String expect = "[HTTPName: \"vs2\"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(null, \"vs2\");\nn12.addElement(vs2);\n";
-        assertEquals(expect, ga.toABS());
+        assertEquals(expect, ga.toABS(null));
     }
 
     @Test
@@ -351,7 +351,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfGv = Node.in(context).create("n13", new Coordinates(0, 0));
         Element gv = Element.in(context).create("vs2", Type.GeschwindigkeitsVoranzeiger, nodeOfGv, State.NOSIG);
         String expect = "[HTTPName: \"vs2\"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(null, \"vs2\");\nn13.addElement(vs2);\n";
-        assertEquals(expect, gv.toABS());
+        assertEquals(expect, gv.toABS(null));
     }
 
     @Test
@@ -359,7 +359,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfSw = Node.in(context).create("n14", new Coordinates(0, 0));
         Element sw = Element.in(context).create("ch5", Type.SwWechsel, nodeOfSw, State.NOSIG);
         String expect = "[HTTPName: \"ch5\"]SwWechsel ch5 = new SwWechselImpl(null, \"ch5\");\nn14.addElement(ch5);\n";
-        assertEquals(expect, sw.toABS());
+        assertEquals(expect, sw.toABS(null));
     }
 
     @Test
@@ -367,7 +367,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfVs = Node.in(context).create("n15", new Coordinates(0, 0));
         Element vs = Element.in(context).create("vs2", Type.VorSignal, nodeOfVs, State.NOSIG);
         String expect = "[HTTPName: \"vs2\"]VorSignal vs2 = new local VorSignalImpl(null, \"vs2\");\nn15.addElement(vs2);\n";
-        assertEquals(expect, vs.toABS());
+        assertEquals(expect, vs.toABS(null));
     }
 
     @Test
@@ -375,7 +375,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfPm = Node.in(context).create("n16", new Coordinates(0, 0));
         Element pm = Element.in(context).create("PZBMagnetImpl", Type.Magnet, nodeOfPm, State.NOSIG);
         String expect = "[HTTPName: \"PZBMagnetImpl\"]Magnet PZBMagnetImpl = new local PZBMagnetImpl(null, null, \"PZBMagnetImpl\");\nn16.addElement(PZBMagnetImpl);\n";
-        assertEquals(expect, pm.toABS());
+        assertEquals(expect, pm.toABS(null));
     }
 
     @Test
@@ -383,7 +383,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfCm = Node.in(context).create("n17", new Coordinates(0, 0));
         Element cm = Element.in(context).create("ContactMagnetImpl", Type.Magnet, nodeOfCm, State.NOSIG);
         String expect = "[HTTPName: \"ContactMagnetImpl\"]ContactMagnet ContactMagnetImpl = new ContactMagnetImpl(\"ContactMagnetImpl\");\nn17.addElement(ContactMagnetImpl);\n";
-        assertEquals(expect, cm.toABS());
+        assertEquals(expect, cm.toABS(null));
     }
 
     @Test
@@ -391,7 +391,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfM = Node.in(context).create("n18", new Coordinates(0, 0));
         Element m = Element.in(context).create("m1", Type.Magnet, nodeOfM, State.NOSIG);
         String expect = "[HTTPName: \"m1\"]Magnet m1 = new MagnetImpl(\"m1\");\nn18.addElement(m1);\n";
-        assertEquals(expect, m.toABS());
+        assertEquals(expect, m.toABS(null));
     }
 
     @Test
@@ -399,7 +399,7 @@ public class ElementTest extends FactoryTest<Element> {
         Node nodeOfSp = Node.in(context).create("n18", new Coordinates(0, 0));
         Element sp = Element.in(context).create("ss2", Type.SichtbarkeitsPunkt, nodeOfSp, State.NOSIG);
         String expect = "[HTTPName: \"ss2\"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(null);\nn18.addElement(ss2);\n";
-        assertEquals(expect, sp.toABS());
+        assertEquals(expect, sp.toABS(null));
     }
 
     /**
@@ -434,7 +434,7 @@ public class ElementTest extends FactoryTest<Element> {
 
         Context context = new GraphParser().parse("src/test/resources/test5.zug.clean");
         for(Element elem : Element.in(context).getAll())
-            {assertTrue(toFind.contains(elem.toABS()));
+            {assertTrue(toFind.contains(elem.toABS(null)));
              count++;
             }
         assertTrue(count == toFindArray.length);
@@ -479,7 +479,7 @@ public class ElementTest extends FactoryTest<Element> {
 
          Context context = new GraphParser().parse("src/test/resources/test10.zug.clean");
          for(Element elem : Element.in(context).getAll())
-            {assertTrue(toFind.contains(elem.toABS()));
+            {assertTrue(toFind.contains(elem.toABS(null)));
              count++;
             }
          assertTrue(count == toFindArray.length);
