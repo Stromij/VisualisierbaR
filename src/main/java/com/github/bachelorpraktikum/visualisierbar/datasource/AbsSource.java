@@ -194,12 +194,16 @@ public class AbsSource implements DataSource {
                     }
                 }
 
+                String nodeAbs = graph.printNodesToAbs("\t\t");
+                String edgeAbs = graph.printEdgesToAbs("\t\t");
+                String elementAbs = graph.printElementsToAbs("\t\t", deltaContent);
+                String logicalGroupAbs = graph.printLogicalGroupsToAbs("\t\t", deltaContent);
 
                 // Füge Nodes und Edges in Datei ein
                 newCode = newCode.concat("\t\t// changed start\n");
-                newCode = newCode.concat(graph.printNodesToAbs("\t\t"));
+                newCode = newCode.concat(nodeAbs);
                 newCode = newCode.concat("\n\n\n");
-                newCode = newCode.concat(graph.printEdgesToAbs("\t\t"));
+                newCode = newCode.concat(edgeAbs);
                 newCode = newCode.concat("\n\n\n");
 
 
@@ -221,9 +225,9 @@ public class AbsSource implements DataSource {
 
                 // Füge Elemente und LogicalGroups ein
                 newCode = newCode.concat("\n\n\n");
-                newCode = newCode.concat(graph.printElementsToAbs("\t\t", deltaContent));
+                newCode = newCode.concat(elementAbs);
                 newCode = newCode.concat("\n\n\n");
-                newCode = newCode.concat(graph.printLogicalGroupsToAbs("\t\t", deltaContent));
+                newCode = newCode.concat(logicalGroupAbs);
                 newCode = newCode.concat("// changed end\n");
                 newCode = newCode.concat("\n\n\n");
 
@@ -243,6 +247,13 @@ public class AbsSource implements DataSource {
                 fw.close();
                 fr.close();
                 br.close();
+
+                System.out.println("----- ABS start -----");
+                System.out.println(nodeAbs.concat("\n").replace("\t\t", ""));
+                System.out.println(edgeAbs.concat("\n").replace("\t\t", ""));
+                System.out.println(elementAbs.concat("\n").replace("\t\t", ""));
+                System.out.println(logicalGroupAbs.concat("\n").replace("\t\t", ""));
+                System.out.println("----- ABS end -----");
             }
             catch(FileNotFoundException e){
                 e.printStackTrace();

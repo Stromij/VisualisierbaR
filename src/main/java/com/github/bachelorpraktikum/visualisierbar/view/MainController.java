@@ -272,7 +272,7 @@ public class MainController {
         printToABSButton.setOnAction(event -> {
             if(graph != null && absSource != null)
                 {absSource.refactorSource(graph);}
-            if (graph != null) {
+            else if (graph != null) {
                 graph.printToAbs();
             }
 
