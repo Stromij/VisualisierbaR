@@ -146,7 +146,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
 
 
                 TextField name = new TextField();                                                                          //TextField for the Node name
-                name.setText(this.getRepresented().getName());
+                name.setText(this.getRepresented().higherName());
 
                 TextField coordinates = new TextField();
                 coordinates.setText("(" + this.getRepresented().getCoordinates().getX() + "," + this.getRepresented().getCoordinates().getY() + ")");
@@ -354,7 +354,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         return;
                     }
 
-                    if (this.getRepresented().getName().equals(result.get().get(0)) | this.getRepresented().setName(result.get().get(0))) {      //set new Name
+                    if (this.getRepresented().getName().equals(result.get().get(0)) | this.getRepresented().setAbsName(result.get().get(0))) {      //set new Name
                         initializedShape(this.getShape());
                     } else {
                         alert.setContentText("Name already taken");

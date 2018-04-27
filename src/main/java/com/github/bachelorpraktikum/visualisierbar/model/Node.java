@@ -257,7 +257,7 @@ public final class Node implements GraphObject<Circle> {
      * @param newAbsName the new ABS name the node will have
      * @return true if the change was successful, false if the name is already taken or null
      */
-    boolean setAbsName(@Nullable String newAbsName)
+    public boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null)
             {Boolean exit = Node.in(graph.getContext()).absNameExists(newAbsName);
