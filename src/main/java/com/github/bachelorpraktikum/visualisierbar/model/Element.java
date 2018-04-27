@@ -19,6 +19,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import sun.rmi.runtime.Log;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -689,7 +691,7 @@ public final class Element implements GraphObject<Shape> {
                 {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000, e02, "m1");
                  // Default: 2000Mhz, erster Magnet in Signal: 1000Mhz, zweiter 500Mhz, dritter 2000Mhz
                  String mhz = "Mhz2000";
-                 if(this.getLogicalGroup() != null)
+                 if(this.getLogicalGroup() != null && this.getLogicalGroup().getKind() == LogicalGroup.Kind.SIGNAL)
                     {int magnetCount = 0;
                      String[] arrayOfMhz = {"Mhz1000", "Mhz500", "Mhz2000"};
                      for (Element e : getLogicalGroup().getElements()) {
