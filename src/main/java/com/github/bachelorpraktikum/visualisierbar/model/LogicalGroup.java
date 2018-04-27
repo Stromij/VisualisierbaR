@@ -218,6 +218,8 @@ public class LogicalGroup {
             {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
              counter ++;
             }
+
+
          if(type == Kind.SIGNAL)
             {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
@@ -237,6 +239,9 @@ public class LogicalGroup {
              return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n",
                     name, name, rowOfElements, name, zfst, belongOut, name);
             }
+
+
+
          if(type == Kind.SWITCH)
             {for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
              Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
@@ -273,6 +278,9 @@ public class LogicalGroup {
              return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
                     name, name, rowOfElements, edge1, edge2, bool, name);
             }
+
+
+
          if(type == Kind.LIMITER)
             {for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();

@@ -57,7 +57,7 @@ public class AbsSource implements DataSource {
         if(OS.indexOf("win") >= 0)
             {fileToConsole = "cmd.exe";
              c = "/c";
-             printConsole = "";
+             printConsole = String.format("rmdir gen\\erlang /S /Q; %s; cd gen\\erlang; ./run > %s/actual.zug;", command, this.parent.getPath());
             }
 
 
@@ -200,7 +200,6 @@ public class AbsSource implements DataSource {
                 String logicalGroupAbs = graph.printLogicalGroupsToAbs("\t\t", deltaContent);
 
                 // Füge Nodes und Edges in Datei ein
-                newCode = newCode.concat("\t\t// changed start\n");
                 newCode = newCode.concat(nodeAbs);
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(edgeAbs);
@@ -228,7 +227,6 @@ public class AbsSource implements DataSource {
                 newCode = newCode.concat(elementAbs);
                 newCode = newCode.concat("\n\n\n");
                 newCode = newCode.concat(logicalGroupAbs);
-                newCode = newCode.concat("// changed end\n");
                 newCode = newCode.concat("\n\n\n");
 
 
@@ -300,7 +298,18 @@ public class AbsSource implements DataSource {
         {try {
             ProcessBuilder builder = new ProcessBuilder();
             builder.directory(new File(this.parent.getPath()));
-            builder.command("/bin/bash", "-c", String.format("cp -r %s %s", fileToAbsSource, destDir));
+
+            String OS = System.getProperty("os.name").toLowerCase();
+            String fileToConsole = "/bin/bash";
+            String c = "-c";
+            String command = String.format("cp -r %s %s", fileToAbsSource, destDir);
+            if(OS.indexOf("win") >= 0)
+            {fileToConsole = "cmd.exe";
+                c = "/c";
+                command = String.format("xcopy %s %s /E /I /Y;", fileToAbsSource, destDir);
+            }
+            builder.command(fileToConsole, c, command);
+
 
             Process process = builder.start();
             process.waitFor();
