@@ -65,8 +65,6 @@ public class AbsSource implements DataSource {
         builder.directory(new File(this.parent.getPath()));
         builder.command(fileToConsole, c, printConsole);
 
-        System.out.println(command);
-
         Process process = builder.start();
 
         try {
