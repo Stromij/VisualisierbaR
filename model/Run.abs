@@ -1,0 +1,537 @@
+module Run;
+
+export *;
+import * from Train;
+import * from Graph;
+import * from Util;
+import * from SwElements;
+import * from TrackElements;
+import * from Stellwerk;
+import * from Rbc;
+
+
+
+interface App{ Unit advance(Rat r); [HTTPCallable] Unit next(); }
+
+class Application implements App{ 
+
+
+
+	/*
+		Use this part of the code ONLY to drive the model from the outside with the DriveOutside delta
+		do NOT use Application as some kind of global store, ALWAYS set the app parameter of BahnhofImpl, EdgeImpl and TrainImpl
+		to null when using the model in any other way then visualization.
+	*/
+    Int i = -1;
+    Fut<Int> f;
+
+    
+    [HTTPCallable] Unit next(){ 
+        i = 100;
+        await duration(i,i);
+        i = -1;
+    }
+
+    Unit advance(Rat r){
+        await i>0;
+        await duration(r,r);
+    }
+    
+    App getApplication(){
+    	return null;
+    }
+
+	Unit addBreak(Int delay, Signal s){
+		//await duration(delay,delay);
+		//s.break(now());
+	}
+	
+	Unit run() { 
+	
+		println("choose an example!");
+
+	}
+		
+	Unit insertTrainInStation(Node n, Edge e, Int t, Int v, Train zug, ZugMelde resp){
+		//await duration(t,t);
+		zug!goResp(e,n,0,v, resp);
+	}
+}
+
+
+{
+	[HTTPName: "APP"]new local Application();
+}
+
+
+
+delta GroupEx;
+modifies class Run.Application{
+
+
+  	adds Unit insertTrain(Edge e, Node n, Int t, Int v, ZugFolge resp, Train zug, ZugFolge last, Strecke str){
+			await duration(t,t);
+			resp!vorblock(last, str);
+			zug!goResp(e,n,0,v,resp);
+	}
+  	modifies Unit run() {
+  		App app = this.getApplication();
+
+		// grid start
+  		[HTTPName: "n01"]Node n01 = new local NodeImpl(0,0,"n01");
+  		[HTTPName: "n02"]Node n02 = new local NodeImpl(2,0,"n02");
+  		[HTTPName: "n03"]Node n03 = new local NodeImpl(3,0,"n03");
+  		[HTTPName: "n04"]Node n04 = new local NodeImpl(4,0,"n04");
+  		[HTTPName: "n05"]Node n05 = new local NodeImpl(5,0,"n05");
+  		[HTTPName: "n06"]Node n06 = new local NodeImpl(6,0,"n06");
+  		[HTTPName: "n07"]Node n07 = new local NodeImpl(8,0,"n07");
+  		[HTTPName: "n08"]Node n08 = new local NodeImpl(9,0,"n08");
+  		[HTTPName: "n09"]Node n09 = new local NodeImpl(10,0,"n09");
+  		[HTTPName: "n10"]Node n10 = new local NodeImpl(11,0,"n10");
+  		[HTTPName: "n11"]Node n11 = new local NodeImpl(12,0,"n11");
+  		[HTTPName: "n12"]Node n12 = new local NodeImpl(13,0,"n12");
+  		[HTTPName: "n13"]Node n13 = new local NodeImpl(12,1,"n13");
+  		[HTTPName: "n14"]Node n14 = new local NodeImpl(13,1,"n14");
+
+
+		[HTTPName: "e01"]Edge e01 = new local EdgeImpl(app,n01,n02,200,"e01");
+		[HTTPName: "e02"]Edge e02 = new local EdgeImpl(app,n02,n03,100,"e02");
+		[HTTPName: "e03"]Edge e03 = new local EdgeImpl(app,n03,n04,100,"e03");
+		[HTTPName: "e04"]Edge e04 = new local EdgeImpl(app,n04,n05,100,"e04");
+		[HTTPName: "e05"]Edge e05 = new local EdgeImpl(app,n05,n06,100,"e05");
+		[HTTPName: "e06"]Edge e06 = new local EdgeImpl(app,n06,n07,200,"e06");
+		[HTTPName: "e07"]Edge e07 = new local EdgeImpl(app,n07,n08,100,"e07");
+		[HTTPName: "e08"]Edge e08 = new local EdgeImpl(app,n08,n09,200,"e08");
+		[HTTPName: "e09"]Edge e09 = new local EdgeImpl(app,n09,n10,100,"e09");
+		[HTTPName: "e10"]Edge e10 = new local EdgeImpl(app,n10,n11,100,"e10");
+		[HTTPName: "e11"]Edge e11 = new local EdgeImpl(app,n10,n13,100,"e11");
+		[HTTPName: "e12"]Edge e12 = new local EdgeImpl(app,n11,n12,100,"e12");
+		[HTTPName: "e13"]Edge e13 = new local EdgeImpl(app,n13,n14,100,"e13");
+
+		[HTTPName: "zfst1"]ActiveZugFolge zfst1 = new ZugFolgeImpl("zfst1");
+
+
+        [HTTPName: "ss1"]SichtbarkeitsPunkt ss1 = new local SichtbarkeitsPunktImpl(e01,"ss1");
+        [HTTPName: "vs1"]VorSignal vs1 = new local VorSignalImpl(e02,"vs1");
+        [HTTPName: "hs1"]HauptSignal hs1 = new local HauptSignalImpl(n05, e04,"hs1");    
+
+        [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000,e02,"m1");
+        [HTTPName: "m2"]Magnet m2 = new local PZBMagnetImpl(Mhz500,e03,"m2");
+        [HTTPName: "m3"]Magnet m3 = new local PZBMagnetImpl(Mhz2000,e04,"m3");
+
+
+        [HTTPName: "s1"]Signal s1 = new local SignalImpl(hs1,m3,m2,vs1,m1,ss1,"s1",zfst1);
+        [HTTPName: "gp1"]GefahrenPunkt gp1 = new local GefahrenPunktImpl(e05,"gp1");
+        gp1.setSignal(s1);        
+
+        n02.addElement(ss1);
+        n03.addElement(vs1);
+        n03.addElement(m1);
+        n04.addElement(m2);
+        n05.addElement(m3);
+        n05.addElement(hs1);
+        n06.addElement(gp1);
+
+
+        
+        [HTTPName: "vanz"]GeschwindigkeitsVorAnzeiger vanz = new GeschwindigkeitsVorAnzeigerImpl(e06,"vanz");
+        [HTTPName: "anz"]GeschwindigkeitsAnzeiger anz = new GeschwindigkeitsAnzeigerImpl(e07,"anz");
+        [HTTPName: "mv1"]ContactMagnet mv1 = new ContactMagnetImpl("mv1");
+        [HTTPName: "mv2"]Magnet mv2 = new PZBMagnetImpl(Mhz500,e08,"mv2");
+
+        [HTTPName: "lim"]SpeedLimiter lim = new SpeedLimiterImpl(anz, vanz, mv1, mv2, 10,"lim");
+        mv1.setLogical(lim);
+       // mv2.setLogical(lim);
+
+        n07.addElement(vanz);
+        n08.addElement(anz);
+        n08.addElement(mv1);
+        n09.addElement(mv2);
+
+
+
+
+        [HTTPName: "w1_wa"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10,"w1_wa");
+        [HTTPName: "w1_we1"]WeichenPunkt w1_we1 = new local WeichenPunktImpl(n11,"w1_we1");
+        [HTTPName: "w1_we2"]WeichenPunkt w1_we2 = new local WeichenPunktImpl(n13,"w1_we2");
+
+        [HTTPName: "w1_sw"]Switch w1_sw = new local SwitchImpl(w1_wa, w1_we1, w1_we2, e10, e11, False,"w1_sw");
+
+        n10.addElement(w1_wa);
+        n11.addElement(w1_we1);
+        n13.addElement(w1_we2);
+
+	//grid end 
+
+	// This is something that i have to say at the end! Cause I'm cool. 
+    }
+}
+
+
+delta SmallEx;
+modifies class Run.Application{
+
+
+  	adds Unit insertTrain(Edge e, Node n, Int t, Int v, ZugFolge resp, Train zug, ZugFolge last, Strecke str){
+			await duration(t,t);
+			resp!vorblock(last, str);
+			zug!goResp(e,n,0,v,resp);
+	}
+  	modifies Unit run() {
+  		App app = this.getApplication();
+		// grid start
+  		[HTTPName: "n11"]Node n11 = new local NodeImpl(4,1,"n11");
+		[HTTPName: "n12"]Node n12 = new local NodeImpl(5,0,"n12");
+		[HTTPName: "n13"]Node n13 = new local NodeImpl(6,0,"n13");
+		[HTTPName: "n14"]Node n14 = new local NodeImpl(7,0,"n14");
+		[HTTPName: "n15"]Node n15 = new local NodeImpl(8,0,"n15");
+		
+		[HTTPName: "n21"]Node n21 = new local NodeImpl(10,0,"n21");
+		[HTTPName: "n22"]Node n22 = new local NodeImpl(11,0,"n22");
+		[HTTPName: "n23"]Node n23 = new local NodeImpl(12,0,"n23");
+		[HTTPName: "n24"]Node n24 = new local NodeImpl(13,0,"n24");
+		[HTTPName: "n25"]Node n25 = new local NodeImpl(14,0,"n25");
+		
+		[HTTPName: "n31"]Node n31 = new local NodeImpl(16,0,"n31");
+		[HTTPName: "n32"]Node n32 = new local NodeImpl(17,0,"n32");
+		[HTTPName: "n33"]Node n33 = new local NodeImpl(18,0,"n33");
+		[HTTPName: "n34"]Node n34 = new local NodeImpl(19,0,"n34");
+		[HTTPName: "n35"]Node n35 = new local NodeImpl(20,1,"n35");
+		
+		[HTTPName: "n41"]Node n41 = new local NodeImpl(18,2,"n41");
+		[HTTPName: "n42"]Node n42 = new local NodeImpl(17,2,"n42");
+		[HTTPName: "n43"]Node n43 = new local NodeImpl(16,2,"n43");
+		[HTTPName: "n44"]Node n44 = new local NodeImpl(15,2,"n44");
+		[HTTPName: "n45"]Node n45 = new local NodeImpl(14,2,"n45");
+		
+		[HTTPName: "n51"]Node n51 = new local NodeImpl(12,2,"n51");
+		[HTTPName: "n52"]Node n52 = new local NodeImpl(11,2,"n52");
+		[HTTPName: "n53"]Node n53 = new local NodeImpl(10,2,"n53");
+		[HTTPName: "n54"]Node n54 = new local NodeImpl(9,2,"n54");
+		[HTTPName: "n55"]Node n55 = new local NodeImpl(8,2,"n55");
+		
+		
+		
+		[HTTPName: "e11"]Edge e11 = new local EdgeImpl(app,n11,n12,275,"e11");//ss -> vs
+		[HTTPName: "e12"]Edge e12 = new local EdgeImpl(app,n12,n13,750,"e12");//vs -> m
+		[HTTPName: "e13"]Edge e13 = new local EdgeImpl(app,n13,n14,250,"e13");//m-> hs
+		[HTTPName: "e14"]Edge e14 = new local EdgeImpl(app,n14,n15,100,"e14");//hs->gp
+		[HTTPName: "e15"]Edge e15 = new local EdgeImpl(app,n15,n21,4000,"e15");//gp->ss
+ 	
+		[HTTPName: "e21"]Edge e21 = new local EdgeImpl(app,n21,n22,275,"e21");
+		[HTTPName: "e22"]Edge e22 = new local EdgeImpl(app,n22,n23,750,"e22");
+		[HTTPName: "e23"]Edge e23 = new local EdgeImpl(app,n23,n24,250,"e23");
+		[HTTPName: "e24"]Edge e24 = new local EdgeImpl(app,n24,n25,100,"e24");
+		[HTTPName: "e25"]Edge e25 = new local EdgeImpl(app,n25,n31,4000,"e25");
+		
+		[HTTPName: "e31"]Edge e31 = new local EdgeImpl(app,n31,n32,275,"e31");
+		[HTTPName: "e32"]Edge e32 = new local EdgeImpl(app,n32,n33,750,"e32");
+		[HTTPName: "e33"]Edge e33 = new local EdgeImpl(app,n33,n34,250,"e33");
+		[HTTPName: "e34"]Edge e34 = new local EdgeImpl(app,n34,n35,100,"e34");
+		[HTTPName: "e35"]Edge e35 = new local EdgeImpl(app,n35,n41,4000,"e35");
+		
+		[HTTPName: "e41"]Edge e41 = new local EdgeImpl(app,n41,n42,275,"e41");
+		[HTTPName: "e42"]Edge e42 = new local EdgeImpl(app,n42,n43,750,"e42");
+		[HTTPName: "e43"]Edge e43 = new local EdgeImpl(app,n43,n44,250,"e43");
+		[HTTPName: "e44"]Edge e44 = new local EdgeImpl(app,n44,n45,100,"e44");
+		[HTTPName: "e45"]Edge e45 = new local EdgeImpl(app,n45,n51,4250,"e45");
+		
+		
+		[HTTPName: "e51"]Edge e51 = new local EdgeImpl(app,n51,n52,275,"e51");
+		[HTTPName: "e52"]Edge e52 = new local EdgeImpl(app,n52,n53,750,"e52");
+		[HTTPName: "e53"]Edge e53 = new local EdgeImpl(app,n53,n54,250,"e53");
+		[HTTPName: "e54"]Edge e54 = new local EdgeImpl(app,n54,n55,100,"e54");
+		[HTTPName: "e55"]Edge e55 = new local EdgeImpl(app,n55,n11,3500,"e55");
+		
+		
+		//[HTTPName: "zfst1"]
+		[HTTPName: "zfst1"]ActiveZugFolge zfst1 = new ZugFolgeImpl("zfst1");
+		//[HTTPName: "zfst2"]
+		[HTTPName: "zfst2"]ActiveZugFolge zfst2 = new ZugFolgeImpl("zfst2");
+		//[HTTPName: "zfst3"]
+		[HTTPName: "zfst3"]ActiveZugFolge zfst3 = new ZugFolgeImpl("zfst3");
+		//[HTTPName: "zfst4"]
+		[HTTPName: "zfst4"]ActiveZugFolge zfst4 = new ZugFolgeImpl("zfst4");
+		//[HTTPName: "zfst5"]
+		[HTTPName: "zfst5"]ActiveZugFolge zfst5 = new ZugFolgeImpl("zfst5");
+		
+		[HTTPName: "str1"]Strecke str1 = new StreckeImpl(e15,e15,zfst1,zfst2,4000);
+		[HTTPName: "str2"]Strecke str2 = new StreckeImpl(e25,e25,zfst2,zfst3,4000);
+		[HTTPName: "str3"]Strecke str3 = new StreckeImpl(e35,e35,zfst3,zfst4,4000);
+		[HTTPName: "str4"]Strecke str4 = new StreckeImpl(e45,e45,zfst4,zfst5,4000);
+		[HTTPName: "str5"]Strecke str5 = new StreckeImpl(e55,e55,zfst5,zfst1,4000);
+		
+		
+		[HTTPName: "ss1"]SichtbarkeitsPunkt ss1 = new local SichtbarkeitsPunktImpl(e55,"ss1");
+		[HTTPName: "vs1"]VorSignal vs1 = new local VorSignalImpl(e11,"vs1");
+		[HTTPName: "hs1"]HauptSignal hs1 = new local HauptSignalImpl(n14, e13,"hs1");
+ 
+ 		
+		[HTTPName: "s1"]Signal s1 = new local SignalImpl(hs1,null,null,vs1,null,ss1, "s1",zfst1);
+		[HTTPName: "gp1"]GefahrenPunkt gp1 = new local GefahrenPunktImpl(e14,"gp1");
+		gp1.setSignal(s1);		
+		[HTTPName: "ch1"]SwWechsel ch1 = new SwWechselImpl(zfst2,"ch1");
+		
+		n11.addElement(ss1);
+		n12.addElement(vs1);
+		n14.addElement(hs1);
+		n14.addElement(ch1);
+		n15.addElement(gp1);
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+		[HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15,"ss2");
+		[HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21,"vs2");
+		[HTTPName: "hs2"]HauptSignal hs2 = new local HauptSignalImpl(n24, e23,"hs2");
+
+ 		
+		[HTTPName: "s2"]Signal s2 = new local SignalImpl(hs2,null,null,vs2,null,ss2, "s2",zfst2);
+		[HTTPName: "gp2"]GefahrenPunkt gp2 = new local GefahrenPunktImpl(e24,"gp2");
+		gp2.setSignal(s2);		
+		[HTTPName: "ch2"]SwWechsel ch2 = new SwWechselImpl(zfst3,"ch2");
+ 		
+		n21.addElement(ss2);
+		n22.addElement(vs2);
+		n24.addElement(hs2);
+		n24.addElement(ch2);
+		n25.addElement(gp2);
+ 		
+ 		
+ 		
+ 		
+ 		
+		
+		[HTTPName: "ss3"]SichtbarkeitsPunkt ss3 = new local SichtbarkeitsPunktImpl(e25,"ss3");
+		[HTTPName: "vs3"]VorSignal vs3 = new local VorSignalImpl(e31,"vs3");
+		[HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33,"hs3");
+ 
+		
+		[HTTPName: "s3"]Signal s3 = new local SignalImpl(hs3,null,null,vs3,null,ss3, "s3",zfst3);
+		[HTTPName: "gp3"]GefahrenPunkt gp3 = new local GefahrenPunktImpl(e34,"gp3");
+		gp3.setSignal(s3);	
+		[HTTPName: "ch3"]SwWechsel ch3 = new SwWechselImpl(zfst4,"ch3");
+		
+		n31.addElement(ss3);
+		n32.addElement(vs3);
+		n34.addElement(hs3);
+		n34.addElement(ch3);
+		n35.addElement(gp3);
+		
+		
+		
+		
+		
+		
+		[HTTPName: "ss4"]SichtbarkeitsPunkt ss4 = new local SichtbarkeitsPunktImpl(e35,"ss4");
+		[HTTPName: "vs4"]VorSignal vs4 = new local VorSignalImpl(e41,"vs4");
+		[HTTPName: "hs4"]HauptSignal hs4 = new local HauptSignalImpl(n44, e43,"hs4");
+ 
+ 		
+		[HTTPName: "s4"]Signal s4 = new local SignalImpl(hs4,null,null,vs4,null,ss4, "s4",zfst4);
+		[HTTPName: "gp4"]GefahrenPunkt gp4 = new local GefahrenPunktImpl(e44,"gp4");
+		gp4.setSignal(s4);	
+		[HTTPName: "ch4"]SwWechsel ch4 = new SwWechselImpl(zfst5,"ch4");
+		
+		n41.addElement(ss4);
+		n42.addElement(vs4);
+		n44.addElement(hs4);
+		n44.addElement(ch4);
+		n45.addElement(gp4);
+ 		
+ 		
+ 		
+ 		
+ 		
+ 		
+		[HTTPName: "ss5"]SichtbarkeitsPunkt ss5 = new local SichtbarkeitsPunktImpl(e45,"ss5");
+		[HTTPName: "vs5"]VorSignal vs5 = new local VorSignalImpl(e51,"vs5");
+		[HTTPName: "hs5"]HauptSignal hs5 = new local HauptSignalImpl(n54, e53,"hs5");
+
+		
+		[HTTPName: "s5"]Signal s5 = new local SignalImpl(hs5,null,null,vs5,null,ss5, "s5", zfst5);
+		[HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl( e54,"gp5");
+		gp5.setSignal(s5);	
+		[HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1,"ch5");
+		
+		n51.addElement(ss5);
+		n52.addElement(vs5);
+		n54.addElement(hs5);
+		n54.addElement(ch5);
+		n55.addElement(gp5);
+		
+		// grid end
+		
+		//this!addBreak(250,s2);
+			
+			
+		println("10");
+			
+		[HTTPName: "z1"]Train t1 = new TrainImpl(app,"z1",100);
+		t1.setTtl(3600);
+		[HTTPName: "z2"]
+		Train t2 = new TrainImpl(app,"z2",100);
+		t2.setTtl(3600);
+		//[HTTPName: "z3"]Train t3 = new TrainImpl("z3",100);
+ 		
+ 
+		zfst1.addSignalZf(zfst5,str5,s1,str1,zfst2);
+		zfst2.addSignalZf(zfst1,str1,s2,str2,zfst3);
+		zfst3.addSignalZf(zfst2,str2,s3,str3,zfst4);
+		zfst4.addSignalZf(zfst3,str3,s4,str4,zfst5);
+		zfst5.addSignalZf(zfst4,str4,s5,str5,zfst1);
+		
+
+		//this!insertTrain(e45,n45,0,38, zfst5, t1, zfst4, str4);
+		/*this!insertTrain(e35,n35,0,38, zfst4, t1, zfst3, str3);
+		this!insertTrain(e35,n35,150,38, zfst4, t2, zfst3, str3);*/
+		this!insertTrain(e25,n25,0, 38, zfst3, t1, zfst2, str2);
+		this!insertTrain(e45,n45,0, 38, zfst5, t2, zfst4, str4);
+		//this!insertTrain(e35,n35,350,28, zfst4, t3, zfst3, str3);
+		
+
+  	
+  	 
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+delta BlindDriver;
+modifies class Train.TrainImpl{
+ 	modifies Unit processInfo(Information i){
+				case i {
+					ChangeResp(zf) => {
+						responsible = zf;
+					}
+					Info(FAHRT) => {
+							if(listContains(orders, Ord144)){
+								pGen.setAccelEmergency();
+								orders = without(orders, Ord144);
+							}
+					}
+					StartPrepare(FAHRT) => {
+							if(listContains(orders, Ord144)){
+								pGen.setAccelBreakNull();
+								orders = without(orders, Ord144);
+								nextStopReq = True;
+							}
+					}
+					Mhz1000 => {
+							pzbGen.setState(Last1000, distanceTotal);
+					}
+					Mhz500 => {
+							pzbGen.setState(Last500, distanceTotal);
+					}
+					Mhz2000 => {
+							pGen.setAccelEmergency();
+							pzbGen.setState(LastNone, distanceTotal);
+					}
+					Limit(x) => pGen.handleLimitEv(x);
+					LimitPrepare(x) => pGen.handleLimitPrepareEv(x);
+					WeichenbereichVerlassen => {Rat vreise = pGen.getReise(); this.processInfo(Limit(truncate(vreise)));}
+					_ => skip;
+				}
+ 	}
+ }
+ 
+delta BreakExample;
+modifies class Run.Application{
+	
+	modifies Unit addBreak(Int delay, Signal s){
+		await duration(delay,delay);
+		s.break(now());
+	}
+}
+
+
+delta Fix;
+modifies class Stellwerk.ZugFolgeImpl {
+	modifies Unit continueTrain(Signal s){
+			Train train = await s!getObserver();
+			await train!acqStop();
+			train!order(Cons( Ord2, Nil));
+	}
+}
+
+delta RandBreak;
+modifies class TrackElements.HauptSignalImpl {
+	modifies Unit setState(SignalState  newState, Time t){ 
+		original(newState, t);
+		if(random(100) > 95) this.s!break(t);
+	}
+}
+
+delta DriveDelta;
+modifies class Stellwerk.BahnhofImpl {
+	modifies Unit advance(Rat r){
+		await this.app!advance(r);
+	}
+}
+modifies class Graph.EdgeImpl {
+	modifies Unit advance(Rat r){
+		await this.app!advance(r);
+	}
+}
+modifies class Train.TrainImpl {
+	modifies Unit advance(Rat r){
+		await this.app!advance(r);
+	}
+}  	
+modifies class Run.Application{
+ 	modifies App getApplication(){
+    	return this;
+    }
+}  	
+
+
+productline Examples;
+features Demo2, Drive, Group,
+         FixOrder, Break, BreakEx, ETCS,
+         Blind;
+
+delta SmallEx when Demo2;
+delta GroupEx when Group;
+delta BlindDriver when Blind;
+
+delta RandBreak when Break;
+delta BreakExample when BreakEx;
+delta Fix when FixOrder;
+
+delta DriveDelta when Drive;
+
+delta ETCSRBC after ETCSCore when ETCS;
+delta ETCSTimer after ETCSCore when ETCS;
+delta ETCSUtil after ETCSCore, Balises when ETCS;
+delta Balises when ETCS;
+delta ETCSCore when ETCS;
+
+
+product Small (Demo2); 
+product Groups (Group); 
+product SmallFix (Demo2, FixOrder); 
+product SmallDrive (Demo2, Drive); 
+product SmallBreak (Demo2, Break); 
+product SmallBreakFix (Demo2, FixOrder); 
+product ETCS1 (ETCS);
+
+
+root Scenarios {
+  group oneof {
+    Demo2, ETCS, Group
+  }
+}

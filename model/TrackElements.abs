@@ -1,0 +1,386 @@
+module TrackElements;
+
+export *;
+
+import * from Graph;
+import * from Train;
+import * from Util;
+import * from SwElements;
+import * from Stellwerk;
+import * from ABS.StdLib;
+
+interface TrackElement {
+  Information triggerFront(Train train, Time t, Edge e);
+  Information triggerBack(Train train, Time t, Edge e);
+  SignalState getState();
+  String getName();}
+
+interface CriticalElement extends TrackElement {
+  Bool isPassable();}
+
+interface HauptSignal extends CriticalElement {
+  Unit setState(SignalState state, Time t);
+  Node getNode();
+  Edge getWaitTrack();
+  [Atomic]
+  Unit setSignal(Signal sig);}
+
+interface VorSignal extends TrackElement {
+  Unit setState(SignalState state, Time t);
+  [Atomic]
+  Unit setSignal(Signal sig);}
+
+interface SichtbarkeitsPunkt extends LogikElement {
+  Unit setState(SignalState state, Time t);
+  [Atomic]
+  Unit setSignal(Signal sig);}
+
+interface GeschwindigkeitsAnzeiger extends TrackElement {
+  Unit setAllowed(Int i);}
+
+interface GeschwindigkeitsVorAnzeiger extends TrackElement {
+  Unit setAllowed(Int i);}
+
+interface Magnet extends TrackElement {
+  Unit activate();
+  Unit deactivate();}
+  
+  
+
+
+interface ContactMagnet extends Magnet {
+  Unit setLogical(Magnetable log);}
+
+interface LogikElement extends TrackElement {
+  }
+
+interface GefahrenPunkt extends LogikElement {
+  [Atomic]
+  Unit setSignal(Signal sig);
+  [Atomic]
+  Unit setLast(Bool last);}
+
+interface PrellBock extends TrackElement {
+  }
+
+interface SwWechsel extends TrackElement {
+  }
+
+interface WeichenPunkt extends CriticalElement {
+  [Atomic]
+  Unit addEdge(Edge edge);
+  [Atomic]
+  Unit removeEdge(Edge edge);}
+
+class WeichenPunktImpl(Node n, String name) implements WeichenPunkt {
+  
+  
+  [Atomic]
+  Unit addEdge(Edge edge){
+    this.n.addNext(edge);
+  }
+  [Atomic]
+  Unit removeEdge(Edge edge){
+    this.n.removeNext(edge);
+  }
+  Bool isPassable(){
+    return True;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  Information triggerFront(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+
+class PZBMagnetImpl(Information freq, Edge waitTrack, String name) implements Magnet {
+  Bool active = True;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  Information triggerFront(Train train, Time t, Edge e){
+    Information info = NoInfo;
+    if ( ( this.active && ( this.waitTrack == e ) ) ){
+      info = this.freq;
+    }
+    return info;
+  }
+  Unit activate(){
+    this.active = True;
+  }
+  Unit deactivate(){
+    this.active = False;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+  
+  
+  
+  
+  
+
+class ContactMagnetImpl(String name) implements ContactMagnet {
+  Magnetable logical = null;
+  Bool active = False;
+  
+  Unit setLogical(Magnetable log){
+    this.logical = log;
+    println("ALSO;"+toString(this)+";"+toString(log));	
+  }
+  Information triggerFront(Train train, Time t, Edge e){
+    Information info = NoInfo;
+    if ( ( this.logical != null ) ){
+      this.logical!passed(this);
+    }
+    if ( this.active ){
+      info = TestInfo;
+    }
+    return info;
+  }
+  Unit activate(){
+    this.active = True;
+  }
+  Unit deactivate(){
+    this.active = False;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+
+class HauptSignalImpl(Node n, Edge waitTrack, String name) implements HauptSignal {
+  SignalState state = STOP;
+  Signal s = null;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  
+  Node getNode(){
+    return this.n;
+  }
+  Edge getWaitTrack(){
+    return this.waitTrack;
+  }
+  Information triggerFront(Train train, Time t, Edge e){
+    Information ret = NoInfo;
+    if ( ( ( this.s != null ) && ( this.waitTrack == e ) ) ){
+      this.s.setObserver(null);
+      ret = Info( this.state );
+    }
+    return ret;
+  }
+  Bool isPassable(){
+    return ( this.state == FAHRT );
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  [Atomic]
+  Unit setSignal(Signal sig){
+    this.s = sig;
+  }
+  SignalState getState(){
+    return this.state;
+  }
+  Unit setState(SignalState newState, Time t){
+    this.state = newState;
+    println(( ( ( ( ( "CH;" + toString(this) ) + ";" ) + toString(newState) ) + ";" ) + toString(timeValue(t)) ));
+  }
+  String getName(){ return name; }
+  }
+
+class VorSignalImpl(Edge waitTrack, String name) implements VorSignal {
+  SignalState state = STOP;
+  Signal s = null;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  
+  Information triggerFront(Train train, Time t, Edge e){
+    Information ret = NoInfo;
+    if ( ( ( this.s != null ) && ( this.waitTrack == e ) ) ){
+      ret = StartPrepare( this.state );
+    }
+    return ret;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  [Atomic]
+  Unit setSignal(Signal sig){
+    this.s = sig;
+  }
+  SignalState getState(){
+    return this.state;
+  }
+  Unit setState(SignalState newState, Time t){
+    this.state = newState;
+    println(( ( ( ( ( "CH;" + toString(this) ) + ";" ) + toString(newState) ) + ";" ) + toString(timeValue(t)) ));
+  }
+  String getName(){ return name; }
+  }
+
+class SichtbarkeitsPunktImpl(Edge waitTrack, String name) implements SichtbarkeitsPunkt {
+  SignalState state = STOP;
+  Signal s = null;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  
+  Information triggerFront(Train train, Time t, Edge e){
+    Information ret = NoInfo;
+    if ( ( ( this.s != null ) && ( this.waitTrack == e ) ) ){
+      this.s.setObserver(train);
+      ret = Prepare( this.state );
+    }
+    return ret;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  [Atomic]
+  Unit setSignal(Signal sig){
+    this.s = sig;
+  }
+  SignalState getState(){
+    return this.state;
+  }
+  Unit setState(SignalState newState, Time t){
+    this.state = newState;
+    println(( ( ( ( ( "CH;" + toString(this) ) + ";" ) + toString(newState) ) + ";" ) + toString(timeValue(t)) ));
+  }
+  String getName(){ return name; }
+  }
+
+class GeschwindigkeitsAnzeigerImpl(Edge waitTrack, String name) implements GeschwindigkeitsAnzeiger {
+  Int allowed = -1;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  
+  Information triggerBack(Train train, Time t, Edge e){
+    Information info = NoInfo;
+    if ( ( ( this.waitTrack == e ) && ( this.allowed >= 0 ) ) ){
+      info = Limit( this.allowed );
+    }
+    return info;
+  }
+  Unit setAllowed(Int i){
+    this.allowed = i;
+  }
+  Information triggerFront(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+
+class GeschwindigkeitsVorAnzeigerImpl(Edge waitTrack, String name) implements GeschwindigkeitsVorAnzeiger {
+  Int allowed = -1;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  
+  Information triggerFront(Train train, Time t, Edge e){
+    Information info = NoInfo;
+    if ( ( ( this.waitTrack == e ) && ( this.allowed >= 0 ) ) ){
+      info = LimitPrepare( this.allowed );
+    }
+    return info;
+  }
+  Unit setAllowed(Int i){
+    this.allowed = i;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+
+class PrellbockImpl(String name) implements PrellBock {
+  
+  
+  Information triggerFront(Train train, Time t, Edge e){
+    return Crash;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+
+class SwWechselImpl(ZugFolge zf, String name) implements SwWechsel {
+  
+  
+  Information triggerFront(Train train, Time t, Edge e){
+    return ChangeResp( this.zf );
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+
+class GefahrenPunktImpl(Edge waitTrack, String name) implements GefahrenPunkt {
+  List<Signal> signals = Nil;
+  Bool lastPoint = False;
+ {
+    println("TOWARDS;"+toString(this)+";"+toString(waitTrack));
+ }
+  
+  [Atomic]
+  Unit setSignal(Signal sig){
+    this.signals = Cons(sig,this.signals);
+    println("ALSO;"+toString(this)+";"+toString(sig));
+  }
+  [Atomic]
+  Unit setLast(Bool last){
+    this.lastPoint = last;
+  }
+  Information triggerBack(Train train, Time t, Edge e){
+    Information info = NoInfo;
+    Int i = 0;
+    while(i < length(signals) && e == this.waitTrack){
+    	nth(signals, i)!triggered();
+    	i = i + 1;
+    }
+    if ( ( this.lastPoint && ( e == this.waitTrack ) ) ){
+      info = WeichenbereichVerlassen;
+    }
+    return info;
+  }
+  Information triggerFront(Train train, Time t, Edge e){
+    return NoInfo;
+  }
+  SignalState getState(){
+    return NOSIG;
+  }
+  String getName(){ return name; }
+  }
+

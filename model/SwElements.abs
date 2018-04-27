@@ -1,0 +1,208 @@
+module SwElements;
+
+export *;
+import * from TrackElements;
+import * from Train;
+import * from Graph;
+import * from Stellwerk;
+import * from Util;
+
+//logical collection of information communicating events, e.g. signals or switches
+
+//swap only needed for old examples
+interface SwElement { }
+
+interface Strecke { Int getLength();}
+
+interface Magnetable { Unit passed(Magnet m); }
+
+//observer is train who can see signal changes, i.e. a train with passed Sichtbarkeitspunkt
+interface Signal extends SwElement {
+	Train getObserver(); 
+	Bool sperren(Time t); 
+	Unit break(Time t); 
+	Bool freischalten(); 
+	Bool isFree(); 
+	Unit setObserver(Train obs);
+	Unit acqFree();
+	Unit acqHalt();
+	Unit printName(String prefix);
+	Unit triggered();
+	[HTTPCallable] Unit breakNow();
+}
+
+interface Switch extends SwElement{ Unit swap();}
+
+interface SpeedLimiter extends SwElement, Magnetable {
+	Unit setLimit(Int i);
+	
+}
+
+class StreckeImpl(Edge a, Edge b, ZugFolge aZfst, ZugFolge bZfst, Int length) implements Strecke{ Int getLength(){ return length;} }
+
+class SpeedLimiterImpl(GeschwindigkeitsAnzeiger anz, GeschwindigkeitsVorAnzeiger vanz, ContactMagnet m2000, Magnet m1000, Rat distance, String name) implements SpeedLimiter{
+	//ausschaltmagnet, 1000hz auch extra magnet
+	Int limit = -1;
+	
+    {
+        println("GROUP;LIMITER;"+name+";"+toString(this)+";"+toString(anz)+";"+toString(vanz)+";"+toString(m2000)+";"+toString(m1000)+";");
+    }
+	
+	Unit advance(Rat r){
+		await duration(r,r);
+	}
+	
+	Unit setLimit(Int i){
+		limit = i;
+		anz.setAllowed(i);
+		vanz.setAllowed(i);
+	}
+	
+	Unit passed(Magnet m){
+		if(m == m2000 && limit > 0){
+			m1000!activate();
+			Rat delay = distance/limit;
+			await duration(delay,delay);
+			m1000!deactivate();
+		}
+	}
+}
+
+class SwitchImpl(WeichenPunkt wa, WeichenPunkt w1, WeichenPunkt w2, Edge e1, Edge e2, Bool joinSwitch, String name) implements Switch {
+	Bool inDefault = True;
+	{
+		wa.removeEdge(e2);
+		w2.removeEdge(e2);
+        println("GROUP;SWITCH;"+name+";"+toString(this)+";"+toString(wa)+";"+toString(w1)+";"+toString(w2)+";");
+	}
+	
+	Unit swap(){
+		if(inDefault) { //wa---e1--->w1
+			wa.removeEdge(e1);
+			w1.removeEdge(e1);
+			wa.addEdge(e2);
+			w2.addEdge(e2);
+		} else {
+			wa.removeEdge(e2);
+			w2.removeEdge(e2);
+			wa.addEdge(e1);
+			w1.addEdge(e1);
+		}
+		inDefault = ~inDefault;
+	}
+	
+}
+
+
+class SignalImpl(HauptSignal hs, 
+				Magnet mhz2000,
+				Magnet mhz500, 
+				VorSignal vs,  
+				Magnet mhz1000,
+				SichtbarkeitsPunkt sp,
+				String name,
+				ZugFolge resp) implements Signal {
+
+	SignalState state = STOP;
+	Bool free = False;
+	Bool broken = False;
+	Train observedBy = null;
+	
+	
+	{
+		hs.setSignal(this);
+		if(sp!=null) sp.setSignal(this);
+		if(vs!=null) vs.setSignal(this);
+        println("GROUP;SIGNAL;"+name+";"+toString(this)+";"+toString(mhz2000)+";"+toString(mhz500)+";"+toString(vs)+";"+toString(hs)+";"+toString(mhz1000)+";"+toString(sp)+";");
+	}
+	
+	
+	
+	Unit triggered(){
+		if(resp != null)
+			resp!triggered(this);
+	}
+	
+	Unit printName(String prefix){
+		println(prefix+ " "+name);
+	}
+	
+	
+	Unit acqFree(){
+		await state == FAHRT;
+	}
+	
+	Unit acqHalt(){
+		await state == STOP;
+	}
+	
+	
+	Train getObserver(){
+		await observedBy != null;
+		return observedBy;
+	}
+	
+	Unit setObserver(Train obs){
+		observedBy = obs;
+	}
+	
+	Unit swap(Time t){
+		if(free) this.sperren(t);
+		else     this.freischalten();
+		free = ~free;
+	}
+	
+	Unit break(Time t){
+		broken = True;
+	}
+	[HTTPCallable] Unit breakNow(){
+		broken = True;
+	}
+	
+	Bool isFree(){
+		Node n = hs.getNode();
+		Edge fromEdge = hs.getWaitTrack();
+		Edge next = n.getOut(fromEdge);
+		Node nextNode = next.getTo(n);
+		Bool fin = nextNode.hasCrit(); 
+		while(~fin){
+			next = n.getOut(next);		
+			nextNode = next.getTo(nextNode);
+			fin = nextNode.hasCrit();
+		}
+		return True;//nextNode.getCrit().passable();
+	}
+
+
+	Bool freischalten(){
+		hs.setState(FAHRT,now());
+		if(vs!=null) vs.setState(FAHRT,now());
+		if(sp!=null) sp.setState(FAHRT,now());
+		state = FAHRT;
+		if(mhz2000 != null)mhz2000.deactivate();
+		if(mhz500 != null)mhz500.deactivate();
+		if(mhz1000 != null)mhz1000.deactivate();
+		if(observedBy != null) {
+			observedBy!notify(Info(FAHRT),now());
+		} 
+		return True;
+	}
+	
+	Bool sperren(Time t){
+		
+		if(!broken){
+			hs.setState(STOP, t);
+			if(vs!=null) vs.setState(STOP,t);
+			if(sp!=null) sp.setState(STOP,t);
+			if(mhz2000 != null)mhz2000.activate();
+			if(mhz500 != null)mhz500.activate();
+			if(mhz1000 != null)mhz1000.activate();	
+			state = STOP;
+		}else{
+			Node n = hs.getNode();
+			println("MSG;"+toString(n)+";"+toString(timeValue(now()))+";failure occured at "+name);
+		}
+		return broken;
+	}
+
+}

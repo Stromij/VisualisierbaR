@@ -1,0 +1,435 @@
+module Generator;
+
+export *;
+import * from Graph;
+import * from Util;
+import * from TrackElements;
+import * from Stellwerk;
+import * from Run;
+import * from Train;
+
+data PZBState = Last1000 | Last500 | LastNone;
+
+interface EventGenerator { 
+	List<GenEvent> getNextEvents(Rat frontNext, Rat backNext, Int fahrCounter, Int emergCount, Rat dist); 
+}
+
+
+interface PZBGenerator extends EventGenerator {
+	PZBState getState();
+	Unit setState(PZBState nV, Rat dist);
+	Unit oneLess();
+}
+
+interface PhysicsGenerator extends EventGenerator{ 
+	Rat getBreak();
+	Rat getEmerg();
+	Rat getAccel();
+	Rat getReise();
+	AccelState getAccelState();
+	Rat getV();
+	Unit setV(Rat nV);
+	Unit setVmax(Rat vm);
+	Rat getVmax();
+	Unit setAccelMax();
+	Unit setAccelEmergency();
+	Unit setAccelBreakNull();
+	Unit acqStop();
+	Rat handleEv(NextEvent ev);
+	Unit handleLimitEv(Rat x);
+	Unit handleLimitPrepareEv(Rat x);
+	Rat calculateBreakingDistance(Rat fromSpeed, Rat toSpeed);
+	GenEvent getNextUpEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount, Bool up); //package private
+	GenEvent getNextEmergencyEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount);
+	GenEvent getNextEoaEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount);
+}
+
+
+
+
+class PZBGenerator(Train train, PhysicsGenerator pGen, String name) implements PZBGenerator{
+	PZBState state = LastNone;
+	Rat last1000 = -1;
+	Time last1000Time = Time(-1);
+	Rat last500 = -1;
+	Time last500Time = Time(-1);
+		
+	PZBState getState() { 
+		return state; 
+	}
+	
+	List<GenEvent> getNextEvents(Rat frontNext, Rat backNext, Int fahrCounter, Int emergCount, Rat dist){
+		List<GenEvent> l = Nil;
+		//this computes when the 1000mhz supervision stops
+		if(last1000 >= 0){
+			GenEvent nextUp1000 = pGen.getNextUpEvent(frontNext, backNext, 1250 - (dist - last1000), fahrCounter, emergCount, True);
+			l = Cons(nextUp1000, l);
+		} 
+		//this computes when the 500mhz supervision stops
+		if(last500 >= 0){
+			GenEvent nextUp500  = pGen.getNextUpEvent(frontNext, backNext,  200 - (dist -  last500), fahrCounter, emergCount, True); 
+			l = Cons(nextUp500, l);
+		}
+
+		//23.5v
+		Rat v = pGen.getV();
+		AccelState acc = pGen.getAccelState();
+		Rat accel = pGen.getAccel();
+		Rat break = pGen.getBreak();
+		Rat emerg = pGen.getEmerg();
+		Time n = now();
+		Rat distTo1000Const = case acc {
+				Break(_) =>   ((235/10)*(235/10)-v*v)/(2*break);  
+				Emergency =>   ((235/10)*(235/10)-v*v)/(2*emerg); 
+				Accel(_) =>   ((235/10)*(235/10)-v*v)/(2*accel);
+				Stable =>   if( v <= (235/10)) then 1/10 else 100000000000;
+			};
+			
+		//this computes when the train hits the CONSTANT part of the 1000mhz supervision
+		Rat distTo500Const = case acc {
+				Break(_) =>   ((125/10)*(125/10)-v*v)/(2*break);  
+				Emergency =>   ((125/10)*(125/10)-v*v)/(2*emerg); 
+				Accel(_) =>   ((125/10)*(125/10)-v*v)/(2*accel);
+				Stable =>   if( v <= (125/10)) then 1/10 else 100000000000;
+			};
+			
+		//this computes when the train hits the CONSTANT part of the 500mhz supervision
+		Rat a = case acc {
+				Break(vfinns) =>   break;  
+				Emergency =>   emerg; 
+				Accel(vfinns) => accel;
+				Stable =>  0;
+			};		
+			
+		//if a != 0
+		Rat b = -1512/10000;
+		Rat nn = 359/10000;
+		
+		Rat intern = v*v-(a/nn)*(36+(a/nn));
+		Rat distTo500Slope  = -1;
+		if(intern >= 0)
+		  distTo500Slope  = (in_sqrt(intern)+a/nn-18)/nn;
+			
+		GenEvent hit1000Parabola = NoGenEvent;
+		Rat distTo1000Parabola = -1;
+		if(a != -1){
+			Rat timeTo1000Parabola = (46-v)/(a+1);
+			distTo1000Parabola = v*timeTo1000Parabola+1/2*a*timeTo1000Parabola*timeTo1000Parabola;
+		}
+
+	 	if(last500 > 0 && dist - last500 < 153 && distTo500Slope >= 0){
+			GenEvent hit500Slope  = pGen.getNextEmergencyEvent(frontNext, backNext,  distTo500Slope, fahrCounter, emergCount); 
+	 		l = Cons(hit500Slope,l);
+	 	} else if(last500 > 0 && last500 >= 153 && distTo500Const >= 0){
+			GenEvent hit500Const  = pGen.getNextEmergencyEvent(frontNext, backNext,  distTo500Const, fahrCounter, emergCount); 
+	 		l = Cons(hit500Const,l);	 	
+	 	}
+ 	
+	 	if(timeValue(last1000Time) > 0 && (timeValue(now()) - timeValue(last1000Time)) < 23 && distTo1000Parabola >= 0){
+	 		if(a != -1){
+				hit1000Parabola  = pGen.getNextEmergencyEvent(frontNext, backNext,  distTo1000Parabola, fahrCounter, emergCount); 	
+	 			l = Cons(hit1000Parabola,l);		
+			}
+	 	} else if(timeValue(last1000Time) > 0 && (timeValue(now()) - timeValue(last1000Time)) >= 23 && distTo1000Const >= 0){
+			GenEvent hit1000Const  = pGen.getNextEmergencyEvent(frontNext, backNext,  distTo1000Const, fahrCounter, emergCount); 
+	 		l = Cons(hit1000Const,l);	 	
+	 	}
+		return l;
+	}
+	
+	Unit setState(PZBState nV, Rat dist){ 
+		state = nV; 
+		println("ASD: state: "+toString(nV));
+		if(nV == Last1000){
+			last1000 = dist;
+			last1000Time = now();
+		}
+		if(nV == Last500){
+			last500 = dist;
+			last500Time = now();
+		}
+	}
+	
+	Unit oneLess(){
+		if(state == Last500)
+			state = Last1000;
+		else if(state == Last1000)
+			state = LastNone;
+		else{
+			println("Error when leaving PZB!");
+		}
+	}
+	
+}
+
+
+
+class PhysicsGenerator(Train train, String name) implements PhysicsGenerator {
+	Rat v = 0;				//in m/s
+	AccelState accelState = Stable; 
+	
+	//hardcoded S-Bahn Baureihe 430 with 150(?) brh
+	Int length = 70;		//in m
+	Int force = 145;		//in kN
+	Int weight = 125;		//in t
+	Rat accel = 1;			//in m/s^2  //1 for 430
+	Rat emerg = -116/100;	//in m/s^2  //bremsenverzögerung 2s?
+	Rat break = -80/100;	//in m/s^2      //-8/10 for 430
+	Rat vmax  = 38;			//in m/s^2
+
+	//statt Geschwindigkeit pro Strecke im Fahrplan
+	Rat vreise  = 38;			//in m/s^2
+
+	{
+	
+	}
+	
+	//Getter/Setter
+	Rat getBreak(){ return break; }
+	Rat getEmerg(){ return emerg; }
+	Rat getAccel(){ return accel; }
+	Rat getReise(){ return vreise; }
+	AccelState getAccelState(){ return accelState; }
+	Rat getV(){ return v; }
+	Rat getVmax(){ return vmax; }
+	Unit setV(Rat nV){ v = nV; }
+	Unit setVmax(Rat vm){ vmax = vm; }
+	Unit setAccelMax(){ accelState = Accel(vmax); }
+	Unit setAccelBreakNull(){ accelState = Break(0); }
+	Unit setAccelEmergency(){ accelState = Emergency; }
+	
+	//complex Setter
+	Unit handleLimitEv(Rat x){
+		if(x > vmax) skip;//signal shows nonsense
+		if(v <= x) { //train is slower
+		   	accelState = case accelState{
+				Break(vnew) => Accel(x);
+				Accel(vnew) => if vnew > x then Accel(x) else accelState;
+				Stable => Accel(x);
+				_ => accelState;                                       
+			};	
+		} else {//train is faster
+				//accelState = Emergency; //this is caught by the two magnet thing?
+		}
+	}
+	
+	Unit handleLimitPrepareEv(Rat x){
+		if(x > vmax) skip;//signal shows nonsense
+		if(v <= x){ //train is slower
+			accelState = case accelState{
+				Break(vnew) => if vnew > x then Break(x) else accelState; //break more
+				Accel(vnew) => if vnew > x then Accel(x) else accelState; //accel less
+				_ => accelState;                                          //do not change in case of emergency break
+			};
+		} else { //train too fast
+			accelState = case accelState{
+				Break(vnew) => if vnew > x then Break(x) else accelState; //break more
+				Accel(vnew) => Break(x);
+				Stable => Break(x);
+				_ => accelState;                                       
+			};						
+		}
+	}
+	
+	Rat calculateBreakingDistance(Rat fromSpeed, Rat toSpeed){
+		return ((toSpeed * toSpeed - fromSpeed * fromSpeed) / (2 * break));
+	}
+	
+	//State part of the NextEvenmt
+	Rat handleEv(NextEvent ev){
+		accelState = newState(ev);
+		v = vnew(ev);println("SPP: "+toString(v) + " - "+toString(accelState) + " - "+toString(now()));
+		return v;
+	}
+	
+	Unit acqStop(){
+		await v == 0;
+	}
+	
+	Rat getNextChangeTime(AccelState acc) {
+		Rat returnval =  truncate(case acc {
+				Break(vfinns) =>   (vfinns*vfinns-v*v)/(2*break);  
+				Emergency =>   -(v*v)/(2*emerg); 
+				Accel(vfinns) =>   (vfinns*vfinns-v*v)/(2*accel);
+				Stable =>   100000000/1;
+		});
+		if(returnval < 0) {
+			returnval = 0;
+		}
+		return returnval;
+	}
+	
+	List<GenEvent> getNextEvents(Rat frontNext, Rat backNext, Int fahrCounter, Int emergCounter, Rat dist){
+		Rat changeNext = this.getNextChangeTime(accelState);
+		List<GenEvent> l = Nil;
+		if(changeNext <= backNext && changeNext <= frontNext){
+			GenEvent ev1 = this.getNextChangeEvent(frontNext, backNext, changeNext, fahrCounter, emergCounter, False);
+			l = Cons(ev1, l);
+		} else if(frontNext <= backNext && frontNext <= changeNext){
+			GenEvent ev2 = this.getNextFrontEvent(frontNext, backNext, changeNext, fahrCounter, emergCounter);
+			l = Cons(ev2, l);
+		}else if(backNext <= frontNext && backNext <= changeNext){
+			GenEvent ev3 = this.getNextBackEvent(frontNext, backNext, changeNext, fahrCounter, emergCounter);
+			l = Cons(ev3, l);
+		}
+		return l;
+
+	}
+	
+	GenEvent getNextEoaEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount){
+		Rat vnew = in_short(v);
+		Rat timeNext = 0;
+	  	case accelState {
+	  		Break(vfin) => { timeNext = (2*changeNext/(v+vfin)); vnew = v+break*timeNext; }  
+	  		Emergency => { timeNext = (2*changeNext/v);          vnew = v+emerg*timeNext; }  
+	  		Accel(vfin) => { timeNext = (2*changeNext/(v+vfin)); vnew = v+accel*timeNext; }  
+			Stable => { timeNext = changeNext/v; }
+		}
+		return EoaEv(Ev(timeNext, changeNext, accelState, vnew, emergCount, fahrCounter, Middle, now(), v, False));
+	}
+	
+	GenEvent getNextEmergencyEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount){
+	  	Rat vnew = in_short(v);
+		Rat timeNext = 0;
+	  	case accelState {
+	  		Break(vfin) => { timeNext = (2*changeNext/(v+vfin)); vnew = v+break*timeNext; }  
+	  		Emergency => { timeNext = (2*changeNext/v);          vnew = v+emerg*timeNext; }  
+	  		Accel(vfin) => { timeNext = (2*changeNext/(v+vfin)); vnew = v+accel*timeNext; }  
+			Stable => { timeNext = changeNext/v; }
+		}
+		return ChangeEv(Ev(timeNext, changeNext, Emergency, vnew, emergCount, fahrCounter, Middle, now(), v, False), True);	
+	}
+		
+	GenEvent getNextUpEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount, Bool up){
+	  	Rat vnew = in_short(v);
+		Rat timeNext = 0;
+		AccelState resultAccState = accelState;
+	  	case accelState {	  	
+	  		Break(vfin) => {
+	  			timeNext = (2*changeNext/(v+vfin));
+	  			vnew = v+break*timeNext;
+	  			if(vnew < vfin) {
+	  				vnew = vfin;
+	  				resultAccState = Stable;
+	  			}
+	  		}  
+	  		Emergency => {
+	  			timeNext = (2*changeNext/v);
+	  			vnew = v+emerg*timeNext;
+	  			if(vnew < 0) {
+	  				vnew = 0;
+	  				resultAccState = Stable;
+	  			}
+	  		}  
+	  		Accel(vfin) => {
+	  			timeNext = (2*changeNext/(v+vfin));
+	  			vnew = v+accel*timeNext;
+	  			if(vnew > vfin) {
+	  				vnew = vfin;
+	  				resultAccState = Stable;
+	  			}
+	  		}  
+			Stable => { timeNext = changeNext/v; }
+		}
+		GenEvent ret = NoGenEvent;
+		if (timeNext > 0) {
+			ret= ChangeEv(Ev(timeNext, changeNext, resultAccState, vnew, emergCount, fahrCounter, Middle, now(), v, up), False);
+		}	
+		return ret;
+	}
+	
+	GenEvent getNextChangeEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount, Bool up){
+	  	Rat vnew = in_short(v);
+		Rat timeNext = 0;
+	  	case accelState {	  		
+	  		Break(vfin) => { timeNext = (vfin - v)/break; vnew = vfin; }  
+			Emergency => { timeNext = -(v/emerg); vnew = 0; }
+			Accel(vfin) => { timeNext = (vfin - v)/accel; vnew = vfin; }
+			Stable => { timeNext = changeNext/v; } 
+		}
+		return ChangeEv(Ev(timeNext, changeNext, Stable, vnew, emergCount, fahrCounter, Middle, now(), v, up), False);	
+	}
+	
+	GenEvent getNextFrontEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount){
+		Rat vnew = in_short(v);
+		Rat vcalculated = in_short(v);
+		AccelState resultAccState = accelState;
+		Rat timeNext = 0;
+		case accelState { 
+			Break(vfin) => {
+				vcalculated = in_short(in_sqrt(abs(v*v+2*break*frontNext)));
+				vnew = vcalculated;
+				if(vcalculated < vfin) {
+					vnew = vfin;
+					resultAccState = Stable;
+				}
+				timeNext = (vcalculated - v)/break;
+			}
+			Emergency => {
+				vcalculated = in_short(in_sqrt(abs(v*v+2*emerg*frontNext)));
+				vnew = vcalculated;
+				if(vcalculated < 0) {
+					vnew = 0;
+					resultAccState = Stable;
+				}
+				timeNext = (vcalculated - v)/emerg;
+			}
+			Accel(vfin) => {
+				vcalculated = in_short(in_sqrt(abs(v*v+2*accel*frontNext)));
+				vnew = vcalculated;
+				if(vcalculated > vfin) {
+					vnew = vfin;
+					resultAccState = Stable;
+				}
+				timeNext = (vcalculated - v)/accel;
+			}
+			Stable => { vnew = v; timeNext = frontNext/v; }
+		}
+		if(timeNext < 0) {
+			timeNext = 0;
+		}
+		return FrontEv(Ev(timeNext, frontNext, resultAccState, vnew, emergCount, fahrCounter, Front, now(), v, False));
+	}
+	
+	GenEvent getNextBackEvent(Rat frontNext, Rat backNext, Rat changeNext, Int fahrCounter, Int emergCount){
+		Rat vnew = in_short(v);
+		Rat vcalculated = in_short(v);
+		AccelState resultAccState = accelState;
+		Rat timeNext = 0;
+		case accelState { 
+			Break(vfin) => {
+				vcalculated = in_short(in_sqrt(abs(v*v+2*break*backNext)));
+				vnew = vcalculated;
+				if(vcalculated < vfin) {
+					vnew = vfin;
+					resultAccState = Stable;
+				}
+				timeNext = (vcalculated - v)/break;
+			}
+			Emergency => {
+				vcalculated = in_short(in_sqrt(abs(v*v+2*emerg*backNext)));
+				vnew = vcalculated;
+				if(vcalculated < 0) {
+					vnew = 0;
+					resultAccState = Stable;
+				}
+				timeNext = (vcalculated - v)/emerg;
+			}
+			Accel(vfin) => {
+				vcalculated = in_short(in_sqrt(abs(v*v+2*accel*backNext)));
+				vnew = vcalculated;
+				if(vcalculated > vfin) {
+					vnew = vfin;
+					resultAccState = Stable;
+				}
+				timeNext = (vcalculated - v)/accel;
+			}
+			Stable => { vnew = v; timeNext = backNext/v; }
+		}
+		//Rat timeNext = 2*backNext/(vcalculated + v);
+		if(timeNext < 0) {
+			timeNext = 0;
+		}
+		return BackEv(Ev(timeNext, backNext, resultAccState, vnew, emergCount, fahrCounter, Back, now(), v, False));
+	}
+}

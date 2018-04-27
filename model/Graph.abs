@@ -1,0 +1,174 @@
+module Graph;
+
+export *;
+import * from TrackElements;
+import * from Train;
+import * from Util;
+import * from Run;
+
+// aux. methods for switches
+def Edge getOutEdge(List<Edge> list, Edge fromEdge) =
+	case list {
+		Cons(x, xs) => if(x == fromEdge) then getOutEdge(xs, fromEdge) else x;
+		Nil => null;
+	};
+
+def List<Edge> remOutEdge(List<Edge> list, Edge fromEdge) =
+	case list {
+		Cons(x, xs) => if(x == fromEdge) then remOutEdge(xs, fromEdge) else Cons(x, remOutEdge(xs, fromEdge)) ;
+		Nil         => Nil;
+	};
+
+
+//point of information flow
+interface Node {
+	[Atomic] Unit addNext(Edge e);
+	[Atomic] Unit removeNext(Edge e);
+	Unit addElement(TrackElement elem);
+	Edge getOut(Edge e);
+	List<Information> triggerFront(Train train, Time t, Edge e);
+	List<Information> triggerBack(Train train, Time t, Edge e);
+	Bool hasCrit();
+	TrackElement getCrit();
+}
+
+//track
+interface Edge {
+	Unit trainEnters(Train train);
+	Unit trainFullyEnters(Train train);
+	Unit trainLeaves(Train train);
+	Node getTo(Node n);
+	Int getLength();
+}
+
+class EdgeImpl(App app, Node frNode, Node toNode, Int l, String name) implements Edge{
+	List<Train> usedBy = Nil;
+	{
+		frNode.addNext(this);
+		toNode.addNext(this);
+		println("EDGE;"+toString(this)+";"+toString(frNode)+";"+toString(toNode)+";"+intToString(l)+";"+name);
+	}
+	
+	Unit advance(Rat r){
+		await duration(r,r);
+	}
+	
+	//one tick of "synchronous" simulation
+	Unit pulse(Train train){
+		Bool first = True;
+		Rat r = timeValue(now());
+		Int z = 0;
+		while(length(usedBy) > 1 && z< 10){
+			Int i = 0;
+			while(i < length(usedBy)){
+				if(!(first && nth(usedBy,i) == train)) //this train just entered and is at the correct position at the first tick
+					nth(usedBy,i)!forceUpdate(r);
+				i = i+1;
+			}
+
+			this.advance(20);// TODO: dynamic timeframe + determination of collisions
+			r = timeValue(now());
+			first = False;
+			z = z+1;
+		}
+		
+		//last pulse once first train leaves
+		Int i = 0;
+		while(i < length(usedBy)){
+			await nth(usedBy,i)!forceUpdate(r); //await is debug only
+			i = i+1;
+		}
+	}
+
+	//start pulse once the event that the back of the train fires
+	Unit trainFullyEnters(Train train){ 
+		if (length(usedBy) > 1) {
+			this!pulse(train);
+		}	
+	}
+
+	//event front enters
+	Unit trainEnters(Train train){ 
+		usedBy = Cons(train,usedBy); 
+	}
+
+	//event back leaves
+	Unit trainLeaves(Train train){ 
+		usedBy = without(usedBy,train);
+	}
+
+	
+	Node getTo(Node n){
+		Node ret = toNode;
+		if(n == toNode) ret = frNode;
+		return ret;
+	}
+	
+	Int getLength(){return l;}
+}
+
+class NodeImpl(Int x, Int y, String name) implements Node {
+	List<Edge> edges = Nil;
+	Train waiting = null;
+	List<TrackElement> belongs = Nil;
+	
+	{
+		println("NODE;"+toString(this)+";"+intToString(x)+";"+intToString(y)+";"+name);
+	}
+	
+	//TODO: use these methods for setting Fahrstraßen and KeY
+	TrackElement getCrit(){
+		return null;
+	}
+	Bool hasCrit(){
+		return False;
+	}
+	
+	//add element for communication at this PoI
+	Unit addElement(TrackElement elem){ 
+	 	SignalState st = elem.getState();
+	 	String nn = elem.getName();
+		println("ELEM;"+toString(elem)+";"+toString(this)+";"+toString(st)+";"+nn);
+		belongs = Cons(elem,belongs);
+	} 
+	
+	//Train train enters at t seconds from edge, trigger all communication elements and forward their state
+	List<Information> triggerFront(Train train, Time t, Edge edge){ 
+		Int i = 0;
+		List<Information> ret = Nil;
+		Information last = NoInfo;             
+		while (i< length(belongs) ){
+			TrackElement e = nth(belongs,i);
+			last = e.triggerFront(train,t, edge);
+			if(last != NoInfo) ret = Cons(last,ret);
+			i = i+1;
+		}
+		return ret;
+	}
+	
+	//Train train leaves at t seconds, trigger all communication elements and forward their state
+	List<Information> triggerBack(Train train, Time t, Edge e){ 
+		Int i = 0;
+		List<Information> ret = Nil;
+		Information last = NoInfo;             
+		while (i< length(belongs) ){
+			TrackElement el = nth(belongs,i);
+			last = el.triggerBack(train,t,e);
+			if(last != NoInfo) ret = Cons(last,ret);
+			i = i+1;
+		}
+		return ret;
+	}
+	
+	//graph init
+	[Atomic] Unit addNext(Edge e){
+			edges = Cons(e,edges);
+	}
+	[Atomic] Unit removeNext(Edge e){
+		edges = remOutEdge(edges,e);
+	}
+	Edge getOut(Edge e){ 
+		return getOutEdge(edges,e);
+	}
+	
+}

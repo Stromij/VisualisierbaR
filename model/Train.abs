@@ -1,0 +1,441 @@
+module Train;
+
+export *;
+import * from Graph;
+import * from Util;
+import * from TrackElements;
+import * from Stellwerk;
+import * from Run;
+import * from Generator;
+
+
+def Bool listContains<T>(List<T> list, T elem) = 
+	case list {
+		Cons(x ,xs) => if(elem == x ) then True else listContains(xs, elem);
+		Nil => False;
+	};
+
+def Int approxStart(Rat r) = approxStartHelper(r,1);
+def Int approxStartHelper(Rat r, Int i) = if i*i > r then i else approxStartHelper(r,i+2);
+
+def Rat in_short(Rat r) = if(denominator(r) < 1000) then r else truncate(numerator(r)/denominator(r)*1000)/1000;
+def Rat in_sqrt(Rat t) = sqrt_newton(t,20,1/100); 
+
+
+interface Train {
+	Unit go(Edge start, Node init, Rat startOffset, Rat startSpeed);
+	Unit goResp(Edge start, Node init, Rat startOffset, Rat startSpeed, ZugFolge resp);
+	Unit notify(Information info, Time t);
+	Unit setTtl(Int i);
+	Unit command(Command com, Time t);
+	Unit forceUpdate(Rat r);
+	Unit order(List<Order> given);
+	Time acqStop();
+ 	[RESTCallable] Unit tellTime();
+ 	Int getLength();
+ 	String getName();
+ 	[Atomic] Unit initMe();
+}
+
+
+
+
+
+
+
+class TrainImpl(App app, String name, Int length) implements Train{
+	Edge posFront = null;
+	Edge posBack = null;
+	Node nodeFront = null;
+	Node nodeBack = null;
+	Rat locFront = 0;
+	Rat locBack = 0;
+	Int ttl = -1;
+	Time lastStop = Time(0);
+	
+	ZugFolge responsible = null;
+	Bool nextStopReq = False;
+	
+	List<Order> orders = Nil;
+	
+	Int emergCount = 0;
+	Int fahrCounter = 0;
+	Bool wait = False;
+	NextEvent nEv = NoEvent;
+	
+	Rat distanceTotal = 0;
+	
+	PhysicsGenerator pGen = null;
+	PZBGenerator pzbGen = null;
+
+	
+	{
+		this.initMe();
+	}
+	
+	[Atomic] Unit initMe(){
+		println("ZUG;"+toString(this)+";"+name+";"+intToString(length));
+		[HTTPName: "pG"+name] pGen = new local PhysicsGenerator(this, name);
+		[HTTPName: "pzbG"+name] pzbGen = new local PZBGenerator(this, pGen, name);
+	}
+	
+	Int getLength() {return length;}
+	
+	String getName() {return name;}
+	
+	GenEvent getNext(List<GenEvent> list,Rat frontNext,Rat backNext) {
+		GenEvent minEv = ChangeEv(NoEvent, False);
+		Rat min = 1000*60*60*24;
+		Int i = 0;
+		while(i < length(list)){
+		  //println(toString(minEv));
+		  GenEvent next = nth(list,i);
+		  Rat nextT = case next {
+		  		ChangeEv(ne, _) => moment(ne);
+				FrontEv(ne)  => moment(ne);
+				BackEv(ne)   => moment(ne);
+				EoaEv(ne)  => moment(ne);
+				NoGenEvent => -1;
+		  };
+		  if(nextT < min && nextT >= 0){
+		  	min = nextT;
+		  	minEv = next;
+		  }
+		  //println("----Event " + intToString(i) + " in list for " + name + " :" + toString(next));
+		  i = i+1;
+		}
+		println("----Resulting Event for " + name + " :" + toString(minEv));
+		return minEv;
+	}
+	
+	
+	Unit advance(Rat r){
+		await duration(r,r);
+	}
+	
+	Unit forceUpdate(Rat r){
+		println("----forceUpdate for " + name);
+		Rat break = pGen.getBreak();
+		Rat emerg = pGen.getEmerg();
+		Rat accel = pGen.getAccel();
+		NextEvent oldEv = nEv;
+		case nEv {
+			NoEvent => skip;
+			Ev( moment,  ll,  newState,  vnew,  counter, fahr,  position,  start, vold, pzb) => {
+				Rat a = case newState{
+					Break(v) =>   break;  
+					Emergency =>   emerg; 
+					Accel(v) =>   accel;
+					Stable =>   0;
+				};
+				
+				Rat lFront = await posFront!getLength();
+				Rat t = timeValue(now()) - timeValue(start);
+				Rat changeNow = vold*t+a*t*t/2; //distance since last event
+				Rat vNow = vold + a*t;
+				
+				
+				Rat lF = await posFront!getLength();
+				Rat lB = await posBack!getLength();
+				Rat frontNext = lF-locFront;      //distance to next node at front
+				Rat backNext = lB-locBack;         //distance to next node at back
+				if(backNext < changeNow || frontNext < changeNow){
+					emergCount = emergCount+1;
+					this.detNext();
+				}else{
+					fahrCounter = fahrCounter + changeNow;
+					nEv = Ev( moment,  ll,  newState,  vnew,  counter, fahrCounter,  position,  now(), vNow, pzb);
+					this.arriveMiddle(Ev(0, changeNow, newState, vNow, emergCount, fahrCounter, position, now(), vold, pzb), True);
+				}
+			}
+		}
+	}
+	
+	Unit detNext(){
+			//println("----detNext() for " + name + " at " + intToString(truncate(timeValue(now()))));
+			Rat v = pGen.getV();
+			println("DATA;"+name+";"+toString(truncate(timeValue(now())))+" "+intToString(truncate(v))+";"+toString(now()));
+			wait = False;
+			Rat lFront = await posFront!getLength();
+			Rat lBack = await posBack!getLength();
+			Rat frontNext = lFront-locFront;      //distance to next node at front
+			Rat backNext = lBack-locBack;         //distance to next node at back
+			List<GenEvent> list = pGen.getNextEvents(frontNext, backNext, fahrCounter, emergCount, distanceTotal);
+			List<GenEvent> list2 = pzbGen.getNextEvents(frontNext, backNext, fahrCounter, emergCount, distanceTotal);
+			list = concatenate(list,list2);
+			GenEvent gen = this.getNext(list,frontNext,backNext);
+			this.handleEventLocally(gen);
+
+	}
+	
+	Unit handleEventLocally(GenEvent gen){
+			case gen{
+				ChangeEv(ne, em)=>  {
+					nEv = ne;
+					this!arriveMiddle(nEv, False);
+				}
+				FrontEv(ne) => {
+					nEv = ne;
+					this!arriveFront(nEv);
+				}
+				BackEv(ne) 	=>{
+					nEv = ne;
+					this!arriveBack(nEv);
+				}
+			}
+	}
+	
+	
+	
+	Unit goResp(Edge start, Node init, Rat startOffset, Rat startSpeed, ZugFolge resp){
+		if(startOffset > 0)
+ 		this.advance(startOffset);
+ 		println("MV;INIT;"+toString(this)+";"+intToString(truncate(startOffset))+";"+toString(start));
+		posFront = start;
+		posBack = start;
+		nodeFront = init;
+		nodeBack = init; 
+		locFront = length;
+		locBack = 0;
+		pGen.setV(startSpeed);
+		responsible = resp;
+		if(startSpeed > 0)
+			this.detNext();
+	}
+	Unit go(Edge start, Node init, Rat startOffset, Rat startSpeed){
+		this.goResp(start, init, startOffset, startSpeed, null);
+	}
+	
+	Unit setTtl(Int i){
+		ttl = i;
+	}
+	
+	Unit notify(Information info, Time t){
+		case info {
+			Info(FAHRT) => {
+				//if(wait){
+					println("----notify FAHRT for " + name + " at " + intToString(truncate(timeValue(now()))));
+					wait = False;
+					pGen.setAccelMax();
+					pzbGen.setState(LastNone, distanceTotal);
+					emergCount = emergCount + 1;
+					this.detNext();
+				//}
+			}
+			_ => skip;
+		}
+	}
+
+	Unit command(Command com, Time t){
+		case com {
+			EmergencyBrake => {
+				pGen.setAccelEmergency();
+				emergCount = emergCount + 1;
+				this.detNext();
+			}
+			Resume => {
+				emergCount = emergCount + 1;
+				this.notify(Info(FAHRT), t);
+			}
+			_ => skip;
+		}
+	}
+	
+	
+	
+	Unit order(List<Order> given){		
+		orders = concatenate(given, orders);
+		this.command(Resume,now());
+	}
+
+
+	Time acqStop(){
+		await pGen!acqStop();
+		return lastStop;
+	}
+
+ 	Unit arriveBack(NextEvent ev){
+		this.advance(in_short(moment(ev)));
+		if(counter(ev) == emergCount){
+			pGen.handleEv(ev);
+			distanceTotal = distanceTotal + ll(ev);
+			//distFromLrbg = distFromLrbg + ll(ev);
+			
+	 		Bool reachedEnd = False;
+			Node n = await posBack!getTo(nodeBack);
+			
+			Fut<List<Information>> fi = n!triggerBack(this, now(), posBack);
+			await fi?;
+			List<Information> li = fi.get; 
+			
+			
+			Edge oldBack = posBack;
+			Fut<Edge> fe = n!getOut(posBack);
+			await fe?;
+			posBack = fe.get; 
+			
+			Int j = 0;
+			while ( j < length(li)){
+				Information i = nth(li,j);
+				this.processInfo(i);
+				j = j+1;
+			}
+			if(posBack == null){
+				reachedEnd = True;
+	 			println("MV;TERM;"+toString(this)+";"+toString(timeValue(now()))+";"+intToString(truncate(ll(ev))));
+			}else{
+				oldBack!trainLeaves(this);
+				nodeBack = n;
+				locFront = locFront + ll(ev);
+				locBack = 0;
+				posBack!trainFullyEnters(this);
+	 			println("MV;LEAVES;"+toString(this)+";"+toString(timeValue(now()))+";"+toString(posBack)+";"+intToString(truncate(ll(ev))));		
+			}
+			if(~wait && ~reachedEnd){
+				this.detNext();
+			}
+			//else if(wait && ~reachedEnd){
+			//	this.detNextTimerOnly();
+			//}	
+		}
+	}
+ 	
+ 	Unit tellTime(){
+ 		println(toString(now()));
+ 	}
+ 	
+ 	Unit arriveMiddle(NextEvent ev, Bool forceSkip){
+		this.advance(in_short(moment(ev)));
+		
+		if(counter(ev) == emergCount){
+			Rat nV = pGen.handleEv(ev);
+			if(pzbOneLess(ev))
+				pzbGen.oneLess();
+			distanceTotal = distanceTotal + ll(ev);
+			//distFromLrbg = distFromLrbg + ll(ev);
+			locFront = locFront+ll(ev);
+			locBack = locBack+ll(ev);
+			println("MV;SPEED;"+toString(this)+";"+intToString(truncate(timeValue(now())))+";"+intToString(truncate(ll(ev)))+";"+intToString(truncate(vnew(ev))));
+			if( nV == 0 ){
+			    println("DATA;"+name+";"+intToString(truncate(timeValue(now())))+" "+intToString(truncate(nV))+";"+toString(now()));
+			    lastStop = now();
+				wait = True;
+				if(nextStopReq == True){
+					this.requestAtResp();
+				}
+				//this.detNextTimerOnly();
+			} else if (forceSkip){
+				wait = True;
+				//this.detNextTimerOnly();
+			} else {
+				this.detNext();
+			}
+		}
+	}
+	
+	Unit requestAtResp(){
+		nextStopReq = False;
+		if(responsible != null){
+			this.command(Resume,now());
+		}	
+	}
+
+ 	Unit arriveFront(NextEvent ev){
+		this.advance(in_short(moment(ev)));
+		if(fahrCount(ev) != fahrCounter){
+			this.detNext();
+		} else if(counter(ev) == emergCount){
+			distanceTotal = distanceTotal + ll(ev);
+			//distFromLrbg = distFromLrbg + ll(ev);
+			Rat dis = ll(ev);
+			pGen.handleEv(ev);
+	 		Bool reachedEnd = False;
+	 		Node  n = await posFront!getTo(nodeFront);
+			Fut<List<Information>> fi = n!triggerFront(this, now(), posFront);
+			await fi?;
+			List<Information> li = fi.get;
+						
+			Fut<Edge> f = n!getOut(posFront);
+			await f?;
+			Edge nextFront = f.get;			
+			
+			Bool setNew = True;
+			Int j = 0;
+			while ( j < length(li)){
+				Information i = nth(li,j);
+				this.processInfo(i);
+				j = j+1;
+			}
+			if(nextFront == null || (ttl > 0 && timeValue(now()) > ttl)){
+				reachedEnd = True;
+				posFront!trainLeaves(this);
+	 			println("MV;TERM;"+toString(this)+";"+toString(timeValue(now()))+";"+intToString(truncate(dis)));
+	 			println("terminated by ttl or error at "+ toString(timeValue(now()) ) + "s with ttl="+ toString(ttl)+"s");		
+			}else {
+				posFront = nextFront;
+				posFront!trainEnters(this);
+				locFront = 0;
+				nodeFront = n;
+				locBack = locBack + dis;
+	 			println("MV;REACHSTART;"+toString(this)+";"+toString(timeValue(now()))+";"+toString(posFront)+";"+intToString(truncate(dis)));	
+				this.detNext();			
+			}
+		}
+			
+ 	}
+ 	
+ 	Unit processInfo(Information i){
+				case i {
+					ChangeResp(zf) => {
+						responsible = zf;
+					}
+					Info(STOP) => {
+							if(!listContains(orders, Ord2)){
+								pGen.setAccelEmergency();
+							} else {
+								orders = without(orders, Ord2);
+							}
+					}
+					StartPrepare(STOP) => {
+							if(!listContains(orders, Ord2)){
+								pGen.setAccelBreakNull();
+							} else {
+								orders = without(orders, Ord2);
+							}
+					}
+					Info(FAHRT) => {
+							if(listContains(orders, Ord144)){
+								pGen.setAccelEmergency();
+								orders = without(orders, Ord144);
+							}
+					}
+					StartPrepare(FAHRT) => {
+							if(listContains(orders, Ord144)){
+								pGen.setAccelBreakNull();
+								orders = without(orders, Ord144);
+								nextStopReq = True;
+							}
+					}
+					Mhz1000 => {
+							pzbGen.setState(Last1000, distanceTotal);
+					}
+					Mhz500 => {
+							pzbGen.setState(Last500, distanceTotal);
+					}
+					Mhz2000 => {
+							pGen.setAccelEmergency();
+							pzbGen.setState(LastNone, distanceTotal);
+					}
+					Limit(x) => pGen.handleLimitEv(x);
+					LimitPrepare(x) => pGen.handleLimitPrepareEv(x);
+					WeichenbereichVerlassen => {Rat vreise = pGen.getReise(); this.processInfo(Limit(truncate(vreise)));}
+					_ => skip;
+				}
+ 	}
+
+}
+
+
+
+
+

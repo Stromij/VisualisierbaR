@@ -1,0 +1,715 @@
+module Stellwerk;
+
+export *;
+import * from Train;
+import * from Graph;
+import * from SwElements;
+import * from Util;
+import * from TrackElements;
+import * from Run;
+
+//Note that this version contains the german terms for railway operations
+//The most important translations are
+//offer = anbieten
+//permit = Erlaubnis
+//announce = anmelden
+
+/*trait BlockstelleTrait = {
+
+	Unit rueckblock(ZugFolge zf){//signal must have state HALT as precondition on the caller
+		Strecke stTo = extractOutStrecke(this.outDesc, zf);
+		this.outLocked = put(this.outLocked, stTo, False);
+	}
+	
+	Unit vorblock(ZugFolge zf, Strecke st){//signal must have state HALT as precondition on the caller
+		Signal s = extractSignal(this.inDesc, zf, st);
+		this.inLocked = put(this.inLocked, st, True);
+	}		
+		
+}*/
+
+
+def Bool unused(Int id, Set<Int> usedFs, FahrMatrix exclusion) = case usedFs {
+	EmptySet            => True;
+	Insert(used, setFs) => if( contains(set(exclusion) ,Pair(id, used)) || contains(set(exclusion) ,Pair(used, id))) 
+	                       then False 
+	                       else unused(id, setFs, exclusion);
+};
+
+def T lastOf<T>(List<T> list) = 
+	case list {
+		Cons(x, xs) =>  if xs == Nil then x else lastOf(xs);
+	};
+
+def Signal extract(List<Triple<ZugFolge, Strecke, Signal>> list, Strecke str) =
+	case list {
+		Nil => null;
+		Cons(Triple(zf, st, sg), xs) => if(str == st) then sg else extract(xs, str);
+	};
+
+def List<Pair<Train, Signal>> removeAll(List<Pair<Train, Signal>> list, Train z) =
+	case list {
+		Nil => Nil;
+		Cons(Pair(a,b), xs) => if z == a then  removeAll(xs,z) else Cons(Pair(a,b), removeAll(xs,z));
+	};
+	
+def Strecke getOther(List<Pair<Strecke, Strecke>> list, Strecke st) =
+	case list {
+		Nil => null;
+		Cons(Pair(a, b), xs) => if(a == st) then b else 
+		                          if(b == st) then a else getOther(xs, st);
+	};
+
+def List<Triple<Train, Signal, ZugMelde>> trainRemove(List<Triple<Train, Signal, ZugMelde>> list, Train z) =
+	case list {
+		Nil => Nil;
+		Cons(Triple(zg,s,sw), xs) => if(z == zg) then trainRemove(xs,z) else Cons(Triple(zg,s,sw), trainRemove(xs,z));
+	};
+	
+def ZugMelde getMeldeFrom(List<Triple<Train, Signal, ZugMelde>> list, Train z) =
+	case list {
+		Nil => null;
+		Cons(Triple(zg,s,sw), xs) => if(z == zg) then sw else getMeldeFrom(xs,z);
+	};
+
+def Signal getFromMelde(List<Pair<Signal, ZugMelde>> list, ZugMelde m) = 
+	case list {
+		Nil => null;
+		Cons(Pair(s,m2), xs) => if m == m2 then s else getFromMelde(xs, m);
+	};
+	
+	
+def ZugMelde getFromSignal(List<Pair<Signal, ZugMelde>> list, Signal s) = 
+	case list {
+		Nil => null;
+		Cons(Pair(s2,m), xs) => if s == s2 then m else getFromSignal(xs, s);
+	};
+
+def Bool has<T>(List<T> list, T elem) = 
+	case list {
+		Nil => False;
+		Cons(x, xs) => if(elem == x) then True else has(xs, elem);
+	};
+
+	
+
+def Bool isIn(List<Triple<ZugFolge, Strecke, Signal>> list, Signal sig) =
+	case list {
+		Nil => False;
+		Cons(Triple(zf, st, sg), xs) => if(sig == sg) then True else isIn(xs, sig);
+	};
+	
+	
+def Signal extractSignal(List<Triple<ZugFolge, Strecke, Signal>> list, ZugFolge zfi, Strecke s) =
+	case list {
+		Nil => null;
+		Cons(Triple(zf, st, sg), xs) => if(zf == zfi && st == s) then sg else extractSignal(xs, zfi,s);
+	};
+	
+
+def Strecke extractNextStrecke(List<Triple<Signal, Strecke, ZugFolge>> list, Signal s) =
+	case list {
+		Nil => null;
+		Cons(Triple(sg, st2, zf2), xs) => if(s == sg) then st2 else extractNextStrecke(xs, s);
+	};
+	
+def Strecke extractLastStrecke(List<Triple<ZugFolge, Strecke, Signal>> list, Signal s) =
+	case list {
+		Nil => null;
+		Cons(Triple(zf, st, sg), xs) => if(s == sg) then st else extractLastStrecke(xs, s);
+	};
+	
+def ZugFolge extractLastFolge(List<Triple<ZugFolge, Strecke, Signal>> list, Signal s) =
+	case list {
+		Nil => null;
+		Cons(Triple(zf, st, sg), xs) => if(s == sg) then zf else extractLastFolge(xs, s);
+	};
+	
+
+def ZugFolge extractNextFolge(List<Triple<Signal, Strecke, ZugFolge>> list, Signal s) =
+	case list {
+		Nil => null;
+		Cons(Triple(sg, st2, zf2), xs) => if(s == sg) then zf2 else extractNextFolge(xs, s);
+	};
+
+def Strecke extractOutStrecke(List<Triple<Signal, Strecke, ZugFolge>> list, ZugFolge zf) =
+	case list {
+		Nil => null;
+		Cons(Triple(sg, st2, zf2), xs) => if(zf == zf2) then st2 else extractOutStrecke(xs, zf);
+	};
+	
+def Signal getFree(List<Triple<Signal, Strecke, ZugFolge>> list, ZugFolge ziel, List<Signal> used) =
+	case list {
+		Nil => null;
+		Cons(Triple(sg, st2, zf2), xs) => if(zf2 == ziel && !has(used,sg) ) then sg else getFree(xs, ziel, used);
+	};
+	
+def List<Signal> getUsed(List<Pair<Train, Signal>> list) =
+	case list {
+		Nil => Nil;
+		Cons(Pair(a,b), xs) => Cons(b, getUsed(xs));
+	};
+	
+def Signal getSigFor(List<Pair<Train, Signal>> list, Train train) =
+	case list {
+		Nil => null;
+		Cons(Pair(a,b), xs) => if (a == train) then b else getSigFor(xs, train);
+	};
+	
+def Signal getSigForRes(List<Triple<Train, Signal, ZugMelde>> list, Train train) =
+	case list {
+		Nil => null;
+		Cons(Triple(a,b,c), xs) => if (a == train) then b else getSigForRes(xs, train);
+	};
+	
+def Train getTrainOnMelde(List<Triple<Train, Signal, ZugMelde>> list, ZugMelde m) =
+	case list {
+		Nil => null;
+		Cons(Triple(a,b,c), xs) => if (c == m) then a else getTrainOnMelde(xs, m);
+	};
+	
+//Protokoll
+interface ZugFolge/* extends ContElem*/{
+	Unit rueckblock(ZugFolge zf);	
+	Unit vorblock(ZugFolge zf, Strecke s);	
+	Unit triggered(Signal s);
+	
+	//fault
+    Unit nextZfFailed(ActiveZugFolge zf, Strecke st);
+    Unit reqFree(ActiveZugFolge zf, Strecke st);
+}
+
+interface ActiveZugFolge extends ZugFolge{
+	//init
+	Unit addSignalZf( ZugFolge zf, Strecke st, Signal s, Strecke st2, ZugFolge zf2);
+	Unit listen(Fut<Pair<Train, Strecke>> f);
+}
+
+
+
+interface ZugMelde extends ZugFolge {
+	//Zugmeldeverfahren
+	Pair<Train, Strecke> anbieten(Train train, Strecke st, ZugMelde swFrom);
+	Unit anmelden(Train train, Rat dur, ZugMelde swFrom, Strecke st);
+	Unit rueckmeldung(ZugMelde swFrom, Train z, Strecke stMelde);
+	Pair<Bool, Strecke>  reqErlaubnis(ZugMelde sw, Strecke stMelde);
+	
+	//spec-only public
+	Fut<Unit>  process(Train n);
+	Unit setOutPath(FahrStrasse weichen);
+	FahrStrasse setPreconditions(Signal s, Train n, Strecke st2, ZugFolge next, ZugMelde nextM);
+	Unit acqPermit(Signal s, Train n, Strecke st2, ZugFolge next, ZugMelde nextM);
+	
+	//init
+	Unit addOutSignal(Signal s, Strecke st, ZugFolge toSw/*, Rat del*/);
+	Unit addInSignal(ZugFolge zf, Strecke st, Signal s);
+	Unit addSignalMelde(Signal s, ZugMelde melde, Int dur);
+	Unit addInSignalMelde(Signal s, ZugMelde melde);
+	Unit setSchedule(Map<Train,ZugFolge> sch);
+	Unit setInTracks(Map<ZugMelde,Pair<Strecke, Strecke>> inTr);
+	Unit setStreckeMap(List<Pair<Strecke, Strecke>> melde);
+	Unit initTrain(Train train, Signal s);
+	Unit go(List<Train> sch);
+	Unit force(Train zug, Signal sig);
+	Unit forceErl(Strecke st2);
+	Unit setPaths(Map<Pair<Signal,Signal>,FahrStrasse> pa);
+	Unit setOutPaths(Map<Pair<Signal,ZugMelde>,FahrStrasse> pa);
+	Unit setMatrix(FahrMatrix matrix);
+}
+
+
+class ZugFolgeImpl(String name) implements ActiveZugFolge{
+/** neighbours **/
+	List<Triple<ZugFolge, Strecke, Signal>> inDesc = Nil; 
+	List<Triple<Signal, Strecke, ZugFolge>> outDesc = Nil;
+	
+/** state **/
+	Map<Strecke, Bool> inLocked = EmptyMap;		// inLocked(s)  = TRUE -> allowed to set to FAHRT     (last Zf let train in)
+	Map<Strecke, Bool> outLocked = EmptyMap;	//outLocked(s)  = TRUE -> not allowed to set to FAHRT (next Zf didn't report that train arrived)
+	Map<Strecke, Bool> broken = EmptyMap;	    //broken(s)     = TRUE -> next signal along ST can not be set back to HALT
+	Map<Signal, Bool> brokenHere = EmptyMap;	//brokenHere(s) = TRUE -> this signal can not be set back to HALT 
+	
+/** fault **/
+	Int counter = 0;
+	List<VorblockEv> inProg = Nil;
+	Set<VorblockEv> obsolete = EmptySet;
+
+
+
+/** init **/
+	Unit addSignalZf( ZugFolge zf, Strecke st, Signal s, Strecke st2, ZugFolge zf2){
+		inDesc = Cons(Triple(zf, st, s), inDesc);	
+		outDesc = Cons(Triple(s, st2, zf2), outDesc);	
+		inLocked = put(inLocked, st, False);    
+		outLocked = put(outLocked, st2, False);  
+		broken = put(broken, st2, False);    
+		brokenHere = put(brokenHere, s, False);  
+	}
+	
+/** Communication on L4 **/
+	Unit rueckblock(ZugFolge zf){//signal must have state HALT as precondition on the caller
+		Strecke stTo = extractOutStrecke(this.outDesc, zf);
+		this.outLocked = put(this.outLocked, stTo, False);
+	}
+	
+	Unit vorblock(ZugFolge zf, Strecke st){
+		Signal s = extractSignal(inDesc, zf, st);
+		Strecke st2 = extractNextStrecke(outDesc,s);
+		
+		/** the inProg list is a list of events waiting for Rückblocken to mark them as obsolete in case of failure **/
+		VorblockEv ev = VEvent(zf, st2, counter);
+		inProg = Cons(ev, inProg); 
+		counter = counter + 1;
+		if(lookupUnsafe(broken, st2)){ 
+		    /* if the next signal is broken, ask the next zfst first that the block inbetween (and the next) is free */
+			ZugFolge next = extractNextFolge(outDesc, s);
+			Rat n = timeValue(now());
+			await next!reqFree(this, st2);	
+			inLocked = put(inLocked, st, True);
+			this.continueTrain(s);
+		} else {
+			Rat n = timeValue(now());
+			/* obsolete handles the case where the next signal breaks while waiting for Rückblocken */
+			await !lookupUnsafe(outLocked, st2) || contains(obsolete, ev);
+		    if(contains(obsolete, ev)){
+		    	this.vorblock(zf, st);
+		    }else{
+				inLocked = put(inLocked, st, True);
+				Int len = await st!getLength();
+				len = len - truncate(timeValue(now()) - n);
+				this.actSignal(s,len+5);
+			}
+		}
+		inProg = without(inProg, ev);		
+	}	
+ 	
+ 	
+	//here listening of Zfst on communication between Zmst is handled
+	Unit listen(Fut<Pair<Train, Strecke>> f){
+		skip;//TODO HERE
+	}
+	
+/** helper **/
+	Unit actSignal(Signal s, Int dur){
+		Strecke zf = extractLastStrecke(inDesc,s);
+		await lookupUnsafe(inLocked,extractLastStrecke(inDesc,s)) && !lookupUnsafe(outLocked,extractNextStrecke(outDesc,s)); 
+		s!freischalten();
+	}
+	
+	
+/** Communication for faults **/
+	Unit continueTrain(Signal s){
+	 	/** next signal is broken, wait for train to stop, then give it the orders to continue **/
+	 	/** this must be called after next!reqFree has returned **/
+		Train train = await s!getObserver();
+		await train!acqStop();
+		train!order(Cons(Ord144, Cons( Ord2, Nil)));
+	}
+	
+    Unit reqFree(ActiveZugFolge zf, Strecke st){
+    	/** TODO: check safety of this one **/
+		await !lookupUnsafe(inLocked, st);
+		Signal s = extractSignal(inDesc, zf, st);
+		if(lookupUnsafe(brokenHere,s)){
+			Strecke st2 = extractNextStrecke(outDesc,s);
+			ZugFolge zf2 = extractNextFolge(outDesc, s);
+			await zf2!reqFree(this, st2);
+		}
+    }
+    
+    Unit nextZfFailed(ActiveZugFolge zf, Strecke st){
+		broken = put(broken, st, True);	
+		Int i = 0;
+		while( i < length(inProg) ){
+			VorblockEv ev = nth(inProg, i);
+			case ev {
+			 	VEvent(zf2, st2, j) => if (st == st2)  obsolete = insertElement(obsolete, ev);
+			}			
+			i = i + 1;
+		}
+	}
+	
+/** Communication down **/		
+	Unit triggered(Signal s){
+		Bool failed = await s!sperren(now());
+		Strecke st = extractLastStrecke(inDesc, s);
+		Strecke st2 = extractNextStrecke(outDesc, s);
+		ZugFolge next = extractNextFolge(outDesc, s);
+		ZugFolge last = extractLastFolge(inDesc, s);
+		if(failed){
+			last!nextZfFailed(this,  st);
+			brokenHere = put(brokenHere, s, True);  
+		}else{
+			last!rueckblock(this);
+		}
+		next!vorblock(this,st2);
+		outLocked = put(outLocked, st2, True);
+		inLocked = put(inLocked, st, False);
+	}
+	
+
+} 
+
+
+interface ZfstState{
+
+}
+
+class ZfstState implements ZfstState{
+
+}
+
+
+class BahnhofImpl(App app, String name) implements ZugMelde{
+	List<Triple<ZugFolge, Strecke, Signal>> inDesc = Nil; 
+	List<Triple<Signal, Strecke, ZugFolge>> outDesc = Nil; 
+	
+	Map<Strecke, Bool> inLocked = EmptyMap;		    // inLocked(s) = TRUE -> allowed to set to FAHRT     (last Zf let train in)
+	Map<Strecke, Bool> outLocked = EmptyMap;		//outLocked(s) = TRUE -> not allowed to set to FAHRT (next Zf didn't report that train arrived)
+	Map<Strecke, Bool> erlaubnis = EmptyMap;		
+	Map<Strecke, Bool> erlaubnisUnlocked = EmptyMap;	
+	
+	
+	Map<Strecke, Bool> allowed = EmptyMap;			
+	
+	
+	List<Pair<Train, Signal>> parking = Nil;
+	List<Triple<Train, Signal, ZugMelde>> reserved = Nil;
+	List<Pair<Signal, ZugMelde>> outMelde = Nil;
+	Map<Signal, ZugMelde> inMelde = EmptyMap;
+	List<Pair<Strecke, Strecke>> streckeMap = Nil;
+	Map<Signal, Signal> inUse = EmptyMap;
+	Map<Pair<Signal,Signal>,FahrStrasse> paths = EmptyMap;
+	Map<Pair<Signal,ZugMelde>,FahrStrasse> outPaths = EmptyMap;
+	Map<ZugMelde, List<ActiveZugFolge>> listen = EmptyMap;
+	Int co = 0;
+	Int haltTime = 30;
+	Set<Int> usedFs = EmptySet;
+	
+	FahrMatrix exclusion = Nil;
+	
+	
+	Map<Train, ZugFolge> schedule = EmptyMap;
+	Map<Strecke, List<Train>> expectOut = EmptyMap;
+	Map<Strecke, List<Train>> expectIn = EmptyMap;
+	Map<ZugMelde,Pair<Strecke, Strecke>> inTracks = EmptyMap;
+	Map<Pair<ZugMelde,Signal>, Int> dura = EmptyMap;
+	
+	Unit setMatrix(FahrMatrix matrix){
+		this.exclusion = matrix;
+	}
+	
+	Unit rueckblock(ZugFolge zf){//signal must have state HALT as precondition on the caller
+		Strecke stTo = extractOutStrecke(this.outDesc, zf);
+		this.outLocked = put(this.outLocked, stTo, False);
+	}
+
+	Unit vorblock(ZugFolge zf, Strecke st){//signal must have state HALT as precondition on the caller
+		Signal s = extractSignal(this.inDesc, zf, st);
+		this.inLocked = put(this.inLocked, st, True);
+	}		
+	Unit advance(Rat r){
+		await duration(r,r);
+	}
+	
+ 	Unit tellTime(){
+ 		println(toString(now()));
+ 	}
+	
+    Unit reqFree(ActiveZugFolge zf, Strecke st){
+		skip;//HACK
+    }
+	
+	
+	Unit nextZfFailed(ActiveZugFolge zf, Strecke st){
+		skip; //HACK
+	}
+	
+	Unit setListen(Map<ZugMelde, List<ActiveZugFolge>> listenMap) { listen = listenMap; }
+	
+	Unit setPaths(Map<Pair<Signal,Signal>, FahrStrasse> pa){
+		paths = pa;
+	}
+	Unit setOutPaths(Map<Pair<Signal,ZugMelde>, FahrStrasse> pa){
+		outPaths = pa;
+	}
+	
+	Unit setStreckeMap(List<Pair<Strecke, Strecke>> melde){
+		streckeMap = melde;
+	}
+	
+	Unit forceErl(Strecke st2){
+		erlaubnis = put(erlaubnis, st2, True);	
+	}
+	
+	Unit actSignal(Signal s){	
+		Strecke st = extractLastStrecke(inDesc,s);
+		await lookupUnsafe(inLocked,st); 
+		Fut<Bool> f = s!freischalten();
+		inLocked = put(inLocked, st, False);
+	}
+	
+	
+	Unit force(Train zug, Signal sig){
+		parking = Cons(Pair(zug,sig),parking);
+	}
+	
+	
+	Unit setInTracks(Map<ZugMelde,Pair<Strecke, Strecke>> inTr){
+		inTracks = inTr;
+	}
+	
+	Unit setSchedule(Map<Train,ZugFolge> sch){
+		schedule = sch;
+	}
+	
+	Unit initTrain(Train train, Signal s){
+		parking = Cons(Pair(train,s), parking);
+	}
+
+
+
+	Fut<Unit> process(Train n){
+		await getSigFor(parking, n) != null;
+		Fut<Time> f1 = n!acqStop();
+		await f1?;
+		Time last = f1.get;
+		Rat r = timeValue(now()) - timeValue(last);
+		await duration(haltTime-r,haltTime-r);
+		Signal s = getSigFor(parking, n);
+		//Anmelden
+		Strecke st2 = extractNextStrecke(outDesc, s);
+		ZugFolge next = extractNextFolge(outDesc, s);
+		ZugMelde nextM = getFromSignal(outMelde, s); 
+		
+		Fut<FahrStrasse> f = this!setPreconditions(s, n, st2, next, nextM);
+		await f?;
+		FahrStrasse sws = f.get;
+		expectOut = put(expectOut, st2, Cons(n, lookupUnsafe(expectOut,st2))); 
+		erlaubnisUnlocked = put(erlaubnisUnlocked, st2, True); 
+		Fut<Unit> f8 = this!setOutPath(sws);
+		return f8;
+	}
+	
+	FahrStrasse setPreconditions(Signal s, Train n, Strecke st2, ZugFolge next, ZugMelde nextM){
+	
+		Fut<Unit> acq = this!acqPermit(s,n,st2,next,nextM);
+		await acq?;
+		erlaubnisUnlocked = put(erlaubnisUnlocked, st2, False); 
+		//println(toString(now()) + " +++ "+name+"calls anbieten");
+		Fut<Pair<Train, Strecke>> fAnbieten = nextM!anbieten(n, st2, this);
+		/*Maybe<List<ActiveZugFolge>> mLi = lookup(listen, nextM);
+		
+		case mLi {
+			Just(li) =>
+			{
+				Int k = 0;
+				while( k < length(li) ){
+					ActiveZugFolge zf = nth(li,k);
+					zf!listen(fAnbieten);
+					k = k + 1;
+				}
+			}
+			_ => skip; 
+		}*/
+		await fAnbieten?;
+		//println(toString(now()) + " +++ "+name+"reads anbieten");
+		Fut<Unit> f4 = nextM!anmelden(n, lookupUnsafe(dura,Pair(nextM, s)), this, st2);
+		//fahrstraße stellen
+		FahrStrasse sws = lookupUnsafe(outPaths, Pair(s, nextM));
+		Fut<Unit> fOut = this!setOutPath(sws);
+		await fOut?;
+		await !lookupUnsafe(outLocked, st2);
+		Fut<Bool> ff = s!freischalten();
+		parking = removeAll(parking, n);
+		Fut<Unit> fFree = s!acqFree();
+		await fFree?;
+		Fut<Unit> fHalt = s!acqHalt();
+		await fHalt?;
+		return sws;
+	}
+	
+	Unit acqPermit(Signal s, Train n, Strecke st2, ZugFolge next, ZugMelde nextM){
+		while(!lookupUnsafe(erlaubnis, st2)){
+			println(toString(now()) + " +++ "+name+"starts permit loop: "+toString(expectIn));
+			await lookupUnsafe(expectIn, st2) == Nil; 
+		    allowed = put(allowed, st2, False);   //RSSR
+			println(toString(now()) + " +++ "+name+"calls reqPermit: "+toString(expectIn));
+			Fut<Pair<Bool, Strecke> > swapF =  nextM!reqErlaubnis(this, st2);
+			await swapF?;
+			Pair<Bool, Strecke>  swapP = swapF.get;
+			Bool swap = fst(swapP);
+			println(toString(now()) + " +++ "+name+"reads reqPermit: "+toString(swap));
+		    allowed = put(allowed, st2, True);   //RSSR
+			if(swap) erlaubnis = put(erlaubnis, st2, True);
+			else this.advance(1);
+		}
+	}
+	
+	Unit go(List<Train> sch){
+	case sch{
+		Cons(n, xs) =>{
+			Fut<Unit> ff = this.process(n);
+			await ff?;
+			this.go(xs);
+		}
+		Nil => skip;
+	}
+	
+	}
+	
+	Unit addInSignal( ZugFolge zf, Strecke st, Signal s){
+		inDesc = Cons(Triple(zf, st, s), inDesc);	
+		inLocked = put(inLocked, st, False);    
+		erlaubnis = put(erlaubnis, st, False);  
+		allowed = put(allowed, st, True);   //RSSR
+		erlaubnisUnlocked = put(erlaubnisUnlocked, st, True);    
+		expectOut = put(expectOut, st, Nil);     
+		expectIn = put(expectIn, st, Nil);    
+	}
+	
+	Unit addOutSignal( Signal s, Strecke st2, ZugFolge zf2){
+		outDesc = Cons(Triple(s, st2, zf2), outDesc);	
+		outLocked = put(outLocked, st2, False);  
+		erlaubnis = put(erlaubnis, st2, False);  
+		allowed = put(allowed, st2, True);  //RSSR
+		erlaubnisUnlocked = put(erlaubnisUnlocked, st2, True); 
+		expectOut = put(expectOut, st2, Nil);     
+		expectIn = put(expectIn, st2, Nil);     
+	}
+	
+	Unit addSignalMelde(Signal s, ZugMelde melde, Int dur){
+		outMelde = Cons(Pair(s,melde),outMelde);
+		dura = put(dura,Pair(melde,s),dur);
+	}
+	
+	Unit addInSignalMelde(Signal s, ZugMelde melde){
+		inMelde = put(inMelde, s, melde);
+	}
+	
+	
+	Signal getInSignal(Strecke s){
+		Signal res = extract(inDesc, s);
+		return res;
+	}
+ 
+		
+	Pair<Train, Strecke> anbieten(Train train, Strecke st, ZugMelde swFrom){	
+		ZugFolge zf = lookupUnsafe(schedule, train);
+		Signal parkSig = getFree(outDesc, zf, getUsed(parking));
+		Strecke inStr = getOther(streckeMap, st);
+		await lookupUnsafe(allowed, inStr) && getFree(outDesc, lookupUnsafe(schedule, train), getUsed(parking)) != null; //here RSSR
+		
+		reserved = Cons(Triple(train, parkSig, swFrom), reserved);
+		
+		/*Maybe<List<Train>> alreadyExpM = lookup(expectIn, inStr);
+		List<Train> alreadyExp = case alreadyExpM{
+			Just(l) => l;
+			_ => Nil;
+		};*/
+		//for KeY-ABS
+		List<Train> alreadyExp = Nil;
+		Maybe<List<Train>> alreadyExpM = lookup(expectIn, inStr);
+		if(alreadyExpM != Nothing) {alreadyExp = fromJust(alreadyExpM);}
+		
+		expectIn = put(expectIn, inStr, Cons(train, alreadyExp));
+		return Pair(train, inStr);
+	}
+	
+	Unit anmelden(Train train, Rat dur, ZugMelde swFrom, Strecke st){
+		Signal inSig = getSigForRes(reserved, train);
+		Strecke inStr = getOther(streckeMap, st);//if hauptGleis then fst(lookupUnsafe(inTracks, swFrom)) else fst(lookupUnsafe(inTracks, swFrom));
+		Signal sig = extract(inDesc,inStr);
+		this!handle(dur, inSig, sig);
+	}
+	
+	Unit handle(Rat dur, Signal inSig, Signal sig){
+		this.advance(dur);
+		this.setPath(inSig, sig);
+		this.actSignal(sig);
+	}
+	
+	Unit setOutPath(FahrStrasse fs){
+		List<Switch> weichen = switches(fs);
+		Int id = fahrId(fs);
+		await unused(id, usedFs, exclusion);
+		if(contains(usedFs, id)) usedFs = insertElement(usedFs, id);
+		else 					 usedFs = remove(usedFs, id);
+		Int i = 0;
+		while(i < length(weichen)){
+			await nth(weichen, i)!swap();
+			i = i+1;
+		}
+	}
+	
+	Unit setPath(Signal fromSig, Signal toSig){
+		fromSig.printName(name);
+		toSig.printName(name);
+		FahrStrasse fs = lookupUnsafe(paths, Pair(fromSig, toSig));
+		List<Switch> weichen = switches(fs);
+		Int id = fahrId(fs);
+		await unused(id, usedFs, exclusion);
+		if(contains(usedFs, id)) usedFs = insertElement(usedFs, id);
+		else 					 usedFs = remove(usedFs, id);
+		Int i = 0;
+		while(i < length(weichen)){
+			Fut<Unit> f =  nth(weichen, i)!swap();
+			await f?;
+			i = i+1;
+		}
+		inUse = put(inUse, toSig, fromSig); 
+	}
+	
+	Unit triggered(Signal s){
+		s!sperren(now());
+		if(isIn(inDesc, s)) this.triggeredIn(s);
+		else 				this.triggeredOut(s);
+	}
+	
+	Unit triggeredIn(Signal s){
+		ZugFolge last = extractLastFolge(inDesc, s);
+		last!rueckblock(this);	
+		ZugMelde back = lookupUnsafe(inMelde, s);
+		Strecke st2 = extractLastStrecke(inDesc,s);
+		List<Train> trains = lookupUnsafe(expectIn, st2);//await s!getObserver();
+		Train train = lastOf(trains);
+		trains = without(trains, train);
+		expectIn = put(expectIn, st2, trains);
+		Signal inSig = getSigForRes(reserved, train);
+		
+		this.setPath(inSig, s); //auflösen
+		parking = Cons(Pair(train, inSig), parking);
+		reserved = trainRemove(reserved, train);
+		back!rueckmeldung(this, train, st2);
+	}
+	
+	
+	Unit triggeredOut(Signal s){
+		println(name + " triggered out " + toString(s));
+		ZugFolge next = extractNextFolge(outDesc, s);
+		Strecke st2 = extractNextStrecke(outDesc, s);
+		next!vorblock(this, st2);
+		outLocked = put(outLocked, st2, True);
+	}
+	
+	Unit rueckmeldung(ZugMelde swFrom, Train z, Strecke stMelde){ 
+		Strecke st = getOther(streckeMap, stMelde);//extractNextStrecke(outDesc, s);
+		List<Train> l = lookupUnsafe(expectOut, st);
+		expectOut = put(expectOut, st, without(l, z));
+	}		/***/
+	
+		
+	Pair<Bool, Strecke> reqErlaubnis(ZugMelde sw, Strecke stMelde){
+		//println(toString(now()) + " +++ "+name+"starts reqPermit");
+		Strecke st = getOther(streckeMap, stMelde);
+		Bool ret = False;
+	//	if(lookupUnsafe(erlaubnis, st)){
+		if(lookupUnsafe(erlaubnisUnlocked, st) && lookupUnsafe(erlaubnis, st)){
+	//		await lookupUnsafe(expectOut,st) == Nil && lookupUnsafe(erlaubnis, st) && lookupUnsafe(erlaubnisUnlocked, st);
+			erlaubnis = put(erlaubnis, st, False);
+			ret = True;
+		}
+		return Pair(ret, st);
+	}				
+
+}
