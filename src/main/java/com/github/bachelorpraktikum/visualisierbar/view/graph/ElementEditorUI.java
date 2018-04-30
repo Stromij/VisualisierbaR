@@ -4,9 +4,13 @@ import com.github.bachelorpraktikum.visualisierbar.model.Edge;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
+import org.antlr.v4.runtime.misc.Triple;
 
 import java.util.Optional;
 
@@ -51,9 +55,9 @@ public class ElementEditorUI extends GridPane{
 
         });
 
-        logicalGroup.setOnAction(lgEvent -> {
+        logicalGroup.setOnAction((ActionEvent lgEvent) -> {
             if (logicalGroup.getSelectionModel().getSelectedIndex() == 0) {
-                javafx.scene.control.Dialog<Pair<String,LogicalGroup.Kind>> groupCreationDialog = new javafx.scene.control.Dialog<>();
+                javafx.scene.control.Dialog<Triple<String,LogicalGroup.Kind, String>> groupCreationDialog = new javafx.scene.control.Dialog<>();
 
                 groupCreationDialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.APPLY);                           //Dialog for new Group creation
                 ((javafx.scene.control.Button) groupCreationDialog.getDialogPane().lookupButton(ButtonType.APPLY)).setDefaultButton(true);
@@ -63,22 +67,47 @@ public class ElementEditorUI extends GridPane{
                 gCgP.setHgap(10);
                 gCgP.setVgap(10);
                 javafx.scene.control.TextField GroupCreationName = new javafx.scene.control.TextField();
+                javafx.scene.control.TextField GroupDefaultValue = new javafx.scene.control.TextField();
+                GroupCreationName.setMinWidth(250);
+                GroupDefaultValue.setMinWidth(250);
                 gCgP.add(GroupCreationName,0,0);
+                gCgP.add(GroupDefaultValue,0,1);
+                GroupCreationName.setPromptText("Name of Group");
+                GroupDefaultValue.setVisible(false);
                 ChoiceBox<LogicalGroup.Kind> groupKind= new ChoiceBox<>();
                 groupKind.getItems().addAll(LogicalGroup.Kind.values());
+                groupKind.setMinWidth(250);
                 groupKind.setValue(LogicalGroup.Kind.DEFAULT);
-                gCgP.add(groupKind,0,1);
+                groupKind.getSelectionModel().selectedIndexProperty().addListener((observable, oldVal, newVal) -> {
+                    LogicalGroup.Kind kind = groupKind.getItems().get(observable.getValue().intValue());
+                    if(kind == LogicalGroup.Kind.SIGNAL)
+                        {GroupDefaultValue.setPromptText("ActiveZugFolge (default = null)");
+                         GroupDefaultValue.setVisible(true);
+                        }
+                    else if(kind == LogicalGroup.Kind.LIMITER)
+                        {GroupDefaultValue.setPromptText("Limit (default = 44)");
+                         GroupDefaultValue.setVisible(true);
+                        }
+                    else if(kind == LogicalGroup.Kind.SWITCH)
+                        {GroupDefaultValue.setPromptText("Direction (default = false)");
+                         GroupDefaultValue.setVisible(true);
+                        }
+                    else
+                        {GroupDefaultValue.setVisible(false);}
+                });
+
+                gCgP.add(groupKind,0,2);
                 groupCreationDialog.getDialogPane().setContent(gCgP);
                 groupCreationDialog.setResultConverter((dialogButton) -> {
                     if (dialogButton == ButtonType.APPLY) {
-                        return new Pair<>(GroupCreationName.getText(), groupKind.getValue());
+                        return new Triple<>(GroupCreationName.getText(), groupKind.getValue(), GroupDefaultValue.getText());
                     } else
                         return null;
                 });
 
-                Optional<Pair<String,LogicalGroup.Kind>> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
+                Optional<Triple<String,LogicalGroup.Kind,String>> result = groupCreationDialog.showAndWait();                                    // Actual Code for Creation of a new Group
                 if (result.isPresent()) {
-                    if (LogicalGroup.in(element.getNode().getGraph().getContext()).NameExists(result.get().getKey())) {
+                    if (LogicalGroup.in(element.getNode().getGraph().getContext()).NameExists(result.get().a)) {
 
                         Alert alert = new Alert(Alert.AlertType.ERROR);
                         alert.setTitle("Error");
@@ -91,8 +120,23 @@ public class ElementEditorUI extends GridPane{
                         else
                             logicalGroup.setValue(element.getLogicalGroup().getName());
 
-                    } else {
-                        LogicalGroup newGroup = LogicalGroup.in(element.getNode().getGraph().getContext()).create(result.get().getKey(), result.get().getValue());
+                    } else if(result.get().a.length() == 0)
+                        {Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setGraphic(null);
+                            alert.setHeaderText(null);
+                            alert.setContentText("Invalid Group-Name!");
+                            alert.showAndWait();
+                            if (element.getLogicalGroup() == null)
+                                logicalGroup.getSelectionModel().select(1);//select noGroup string because element is in no group since name is taken
+                            else
+                                logicalGroup.setValue(element.getLogicalGroup().getName());
+                        } else {
+                        LogicalGroup newGroup = LogicalGroup.in(element.getNode().getGraph().getContext()).create(result.get().a, result.get().b);
+                        if(result.get().c.length() > 0)
+                            {newGroup.setAdditional(result.get().c);}
+                        System.out.println(result.get().c);
+                        System.out.println(newGroup.getAdditional());
                         if (element.getLogicalGroup() != null) {
                             element.getLogicalGroup().removeElement(element);
                         }

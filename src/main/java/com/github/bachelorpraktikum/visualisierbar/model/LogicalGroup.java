@@ -24,6 +24,8 @@ public class LogicalGroup {
     private Element belongsTo;
     @Nonnull
     private Kind type;
+    @Nullable
+    private String additional;
 
 
     public enum Kind {
@@ -169,6 +171,7 @@ public class LogicalGroup {
          this.elements.addAll(elements);
          this.belongsTo = belongsTo;
          this.oldName = name;
+         this.additional = null;
         }
 
     private LogicalGroup(@Nonnull String name, @Nonnull Kind kind)
@@ -176,7 +179,16 @@ public class LogicalGroup {
          this.type = kind;
          this.elements = new LinkedList<>();
          this.oldName = name;
+         this.additional = null;
         }
+
+    public void setAdditional(@Nullable String additional) {
+        this.additional = additional;
+    }
+
+    @Nullable
+    public String getAdditional()
+        {return additional;}
 
     @Nonnull
     public String getName()
@@ -224,8 +236,8 @@ public class LogicalGroup {
             {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
              // Suche nach einem zfst in alter Datei - falls vorhanden
-             String zfst = " null /*missing zfst*/";
-             if(deltaContent != null)
+             String zfst = this.additional == null ? " null /*missing zfst*/" : " " + additional;
+             if(deltaContent != null && this.additional == null)
                 {//Pattern patternSignal = compile("(.*new SwWechselImpl\\()(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
                  Pattern patternSignal = compile("(.*new local SignalImpl\\(.*,\\p{Blank}*\"" + oldName + "\",\\p{Blank}*)(.*?)(\\);.*)");
                  try {Matcher matcherSignal = patternSignal.matcher(deltaContent);
@@ -265,8 +277,8 @@ public class LogicalGroup {
                 }
 
              //Suche true/false
-             String bool = "false";
-             if(deltaContent != null)
+             String bool = this.additional != null ? "false" : this.additional;
+             if(deltaContent != null && this.additional == null)
                 {Pattern patternSwitch = compile("(.*new local SwitchImpl\\(.*,\\p{Blank}*)(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
                  try {Matcher matcherSwitch = patternSwitch.matcher(deltaContent);
                       matcherSwitch.find();
@@ -286,8 +298,8 @@ public class LogicalGroup {
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
 
              // Suche nach Speedlimit
-             String limit = "40";
-             if(deltaContent != null)
+             String limit = this.additional != null ? "40" : this.additional;
+             if(deltaContent != null && this.additional == null)
                 {Pattern patternLimit = compile("(.*new SpeedLimiterImpl\\(.*,\\p{Blank}*)(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
                     try {Matcher matcherLimit = patternLimit.matcher(deltaContent);
                         matcherLimit.find();
