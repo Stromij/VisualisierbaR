@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.model;
 
+import com.github.bachelorpraktikum.visualisierbar.model.Element.Type;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
 
 import javax.annotation.Nonnull;
@@ -205,9 +206,99 @@ public class LogicalGroup {
      */
     public boolean addElement(@Nonnull Element elem)
         {if(elements.contains(elem)) return false;
-        elem.setLogicalGroup(this);
+         elem.setLogicalGroup(this);
          elements.add(elem);
          return true;
+        }
+
+    /**
+     * Adding an elemtn to the group under consideration of the group-specific Requirments
+     * e.g. Signal contains 3 Magneten, 1 Hauptsignal, 1 Vorsignal and 1 Sichtbarkeitspunkt
+
+     * @param elem element to be safe-added
+     * @return null if successful, errormessage if not.
+     */
+    @Nullable
+    public String safeAddElement(@Nonnull Element elem)
+        {if(type == Kind.SIGNAL)
+            {int countMagnet = elem.getType() == Type.Magnet ? 1 : 0;
+             boolean hs = elem.getType() == Type.HauptSignal;
+             boolean vs = elem.getType() == Type.VorSignal;
+             boolean sp = elem.getType() == Type.SichtbarkeitsPunkt;
+
+             if(!(elem.getType() == Type.Magnet ||
+                  elem.getType() == Type.HauptSignal ||
+                  elem.getType() == Type.VorSignal||
+                  elem.getType() == Type.SichtbarkeitsPunkt))
+                {return "Error: A Signal does not contain a " + elem.getReadableName();}
+
+             for(Element e : elements)
+                {if(e.getType() == Type.Magnet)
+                    {countMagnet ++;
+                     if(countMagnet > 3) {return "Error: LogicalGroup contains already 3 three Magnets!";}
+                    }
+                 if(e.getType() == Type.HauptSignal)
+                    {if(hs) {return  "Error: LogicalGroup contains already a Hauptsignal!";}
+                     hs = true;
+                    }
+                 if(e.getType() == Type.VorSignal)
+                    {if(vs) {return  "Error: LogicalGroup contains already a Vorsignal!";}
+                     vs = true;
+                    }
+                 if(e.getType() == Type.SichtbarkeitsPunkt)
+                     {if(sp) {return  "Error: LogicalGroup contains already a Sichtbarkeitspunkt!";}
+                      sp = true;
+                     }
+                }
+             if(!addElement(elem))
+                {return "Warning: This element already exists in LogicalGroup!";}
+             return null;
+            }
+         if(type == Kind.LIMITER)
+            {boolean vanz = elem.getType() == Type.GeschwindigkeitsVoranzeiger;
+             boolean anz = elem.getType() == Type.GeschwindigkeitsAnzeiger;
+             int magnet = elem.getType() == Type.Magnet ? 1 : 0;
+
+             if(!(elem.getType() == Type.GeschwindigkeitsVoranzeiger||
+                  elem.getType() == Type.GeschwindigkeitsAnzeiger ||
+                  elem.getType() == Type.Magnet))
+                {return "Error: A SpeedLimiter does not contain a " + elem.getReadableName();}
+
+             for(Element e : elements)
+                {if(e.getType() == Type.GeschwindigkeitsVoranzeiger)
+                    {if(vanz) {return  "Error: LogicalGroup contains already a GeschwindigkeitsVoranzeiger!";}
+                     vanz = true;
+                    }
+                 if(e.getType() == Type.GeschwindigkeitsAnzeiger)
+                    {if(anz) {return  "Error: LogicalGroup contains already a GeschwindigkeitsAnzeiger!";}
+                     anz = true;
+                    }
+                 if(e.getType() == Type.Magnet)
+                    {magnet++;
+                     if(magnet > 2) {return "Error LogicalGroup contains already 2 Magnets!";}
+                    }
+                }
+             if(!addElement(elem))
+                {return "Warning: This element already exists in LogicalGroup!";}
+             return null;
+            }
+         if(type == Kind.SWITCH)
+            {int wp = elem.getType() == Type.WeichenPunkt ? 1 : 0;
+
+             if(elem.getType() != Type.WeichenPunkt)
+                {return "Error: A Switch does not contain a " + elem.getReadableName();}
+
+             for(Element e : elements)
+                {if(e.getType() == Type.WeichenPunkt)
+                    {wp++;
+                     if(wp > 3) {return "Error: LogicalGroup contains already 3 Magnets!";}
+                    }
+                }
+             if(!addElement(elem))
+                {return "Warning: This element already exists in LogicalGroup!";}
+             return null;
+            }
+         return "Error: Unknown group-type!";
         }
 
     public void setBelongsTo(@Nullable Element belongsTo)

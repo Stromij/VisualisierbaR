@@ -353,11 +353,10 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                         alert.showAndWait();
                         return;
                     }
-
                     if (this.getRepresented().getName().equals(result.get().get(0)) | this.getRepresented().setAbsName(result.get().get(0))) {      //set new Name
                         initializedShape(this.getShape());
                     } else {
-                        alert.setContentText("Name already taken");
+                        alert.setContentText("Name already taken!");
                         alert.showAndWait();
                         return;
                     }

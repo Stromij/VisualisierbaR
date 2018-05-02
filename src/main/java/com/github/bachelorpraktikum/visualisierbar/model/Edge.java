@@ -207,9 +207,11 @@ public final class Edge implements GraphObject<Line> {
          * @param name the String to check
          * @return true, if an Edge with this name exists, otherwise false
          */
-        Boolean AbsNameExists(@Nonnull String name)
+        Boolean AbsNameExists(@Nonnull String name, @Nullable Edge edge)
             {for(Map.Entry<String, Edge> entry : edges.entrySet())
-                {if(Objects.equals(entry.getValue().getAbsName(), name)) {return true;}}
+                {if(Objects.equals(entry.getValue().getAbsName(), name) && !entry.getValue().equals(edge))
+                    {return true;}
+                }
              return false;
             }
 
@@ -335,7 +337,7 @@ public final class Edge implements GraphObject<Line> {
     boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null) {
-             boolean exit = Edge.in(graph.getContext()).AbsNameExists(newAbsName);
+             boolean exit = Edge.in(graph.getContext()).AbsNameExists(newAbsName, this);
              if (!exit) {
                  this.absName = newAbsName;
                  Edge.in(graph.getContext()).edges.remove(name);

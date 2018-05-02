@@ -186,9 +186,9 @@ public final class Node implements GraphObject<Circle> {
          * @param name the String to check
          * @return true, if an Node with this name exists, otherwise false
          */
-        private boolean absNameExists(@Nonnull String name)
+        private boolean absNameExists(@Nonnull String name, @Nullable Node node)
         {for(Map.Entry<String, Node> entry : nodes.entrySet()) {
-            if (Objects.equals(name, entry.getValue().getAbsName())) {
+            if (Objects.equals(name, entry.getValue().getAbsName()) && !entry.getValue().equals(node)) {
                 return true;
             }
          }
@@ -260,7 +260,7 @@ public final class Node implements GraphObject<Circle> {
     public boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null)
-            {Boolean exit = Node.in(graph.getContext()).absNameExists(newAbsName);
+            {Boolean exit = Node.in(graph.getContext()).absNameExists(newAbsName, this);
              if(!exit)
                 {this.absName = newAbsName;
                  Node.in(graph.getContext()).nodes.remove(name);

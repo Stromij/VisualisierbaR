@@ -122,15 +122,15 @@ public class ElementEditorUI extends GridPane{
 
                     } else if(result.get().a.length() == 0)
                         {Alert alert = new Alert(Alert.AlertType.ERROR);
-                            alert.setTitle("Error");
-                            alert.setGraphic(null);
-                            alert.setHeaderText(null);
-                            alert.setContentText("Invalid Group-Name!");
-                            alert.showAndWait();
-                            if (element.getLogicalGroup() == null)
-                                logicalGroup.getSelectionModel().select(1);//select noGroup string because element is in no group since name is taken
-                            else
-                                logicalGroup.setValue(element.getLogicalGroup().getName());
+                         alert.setTitle("Error");
+                         alert.setGraphic(null);
+                         alert.setHeaderText(null);
+                         alert.setContentText("Invalid Group-Name!");
+                         alert.showAndWait();
+                         if (element.getLogicalGroup() == null)
+                            logicalGroup.getSelectionModel().select(1);//select noGroup string because element is in no group since name is taken
+                         else
+                            logicalGroup.setValue(element.getLogicalGroup().getName());
                         } else {
                         LogicalGroup newGroup = LogicalGroup.in(element.getNode().getGraph().getContext()).create(result.get().a, result.get().b);
                         if(result.get().c.length() > 0)
@@ -140,10 +140,22 @@ public class ElementEditorUI extends GridPane{
                         if (element.getLogicalGroup() != null) {
                             element.getLogicalGroup().removeElement(element);
                         }
-                        newGroup.addElement(element);
-                        element.setLogicalGroup(newGroup);
-                        logicalGroup.getItems().add(newGroup.getName());
-                        logicalGroup.getSelectionModel().select(newGroup.getName());
+                        String errorLog = newGroup.safeAddElement(element);
+                        if(errorLog == null) {
+                            element.setLogicalGroup(newGroup);
+                            logicalGroup.getItems().add(newGroup.getName());
+                            logicalGroup.getSelectionModel().select(newGroup.getName());
+                        }
+                        else{
+                            Alert alert = new Alert(Alert.AlertType.ERROR);
+                            alert.setTitle("Error");
+                            alert.setGraphic(null);
+                            alert.setHeaderText(null);
+                            alert.setContentText(errorLog);
+                            alert.showAndWait();
+                            System.out.println(" 1 " + element.getLogicalGroup().getName());
+                            logicalGroup.setValue(element.getLogicalGroup().getName());
+                        }
                     }
                 } else {
                     if (element.getLogicalGroup() == null)
@@ -152,11 +164,23 @@ public class ElementEditorUI extends GridPane{
                         logicalGroup.getSelectionModel().select(element.getLogicalGroup().getName());
                 }
             } else {                                                                                                                                //end of Group creation code
+                LogicalGroup oldLG = element.getLogicalGroup();
                 if (element.getLogicalGroup() != null) {                                                                                            //code for switching Group
                     element.getLogicalGroup().removeElement(element);
                 }
                 if(logicalGroup.getSelectionModel().getSelectedIndex()!=1)
-                    LogicalGroup.in(element.getNode().getGraph().getContext()).get(logicalGroup.getValue()).addElement(element);
+                    {String errorLog = LogicalGroup.in(element.getNode().getGraph().getContext()).get(logicalGroup.getValue()).safeAddElement(element);
+                     if(errorLog != null){
+                         Alert alert = new Alert(Alert.AlertType.ERROR);
+                         alert.setTitle("Error");
+                         alert.setGraphic(null);
+                         alert.setHeaderText(null);
+                         alert.setContentText(errorLog);
+                         alert.showAndWait();
+                         element.setLogicalGroup(oldLG);
+                         logicalGroup.setValue(element.getLogicalGroup().getName());
+                        }
+                    }
             }
         });
 

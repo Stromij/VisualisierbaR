@@ -276,9 +276,24 @@ public final class Element implements GraphObject<Shape> {
             this.nextIndex = 0;
 
         }
+
         public boolean NameExists (@Nonnull String name){
             Element element = elements.get(Objects.requireNonNull(name));
             return element != null;
+        }
+
+        /**
+         * Checks the availability of a ABS name
+         * @param name the String to check
+         * @return true, if an Node with this name exists, otherwise false
+         */
+        private boolean absNameExists(@Nonnull String name, @Nullable Element elem)
+        {for(Map.Entry<String, Element> entry : elements.entrySet()) {
+            if (Objects.equals(name, entry.getValue().getAbsName()) && !entry.getValue().equals(elem)) {
+                return true;
+            }
+        }
+            return false;
         }
 
 
@@ -506,7 +521,19 @@ public final class Element implements GraphObject<Shape> {
 
     public void setLogicalGroup(@Nullable LogicalGroup logicalGroup) {this.logicalGroup = logicalGroup;}
 
-    public void setAbsName(@Nullable String absName) {this.absName = absName;}
+    public boolean setAbsName(@Nullable String newAbsName)
+        {if(newAbsName == null) {return false;}
+            if(graph != null)
+            {Boolean exit = Element.in(graph.getContext()).absNameExists(newAbsName, this);
+                if(!exit)
+                {this.absName = newAbsName;
+                    Element.in(graph.getContext()).elements.remove(name);
+                    Element.in(graph.getContext()).elements.put(name, this);
+                    return true;
+                }
+            }
+            return false;
+        }
 
     @Nullable
     public String getAbsName() {return absName;}
