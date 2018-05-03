@@ -310,21 +310,85 @@ public class LogicalGroup {
     }
 
     /**
+     * Generates a row of Elements in the right order for ABS-Output.
+     * E.G.: Signal: hs,m,m,vs,m,sp
+     *       Switch: w,w,w
+     *       Limiter: vanz,anz,m,m
+     * Missing Elements will be "null"
+     * @return the row of Elements
+     */
+    @Nonnull
+    private String generateRowOfElements()
+        {String rowOfElements = "";
+         int counter = 0;
+         if(type == Kind.SIGNAL)
+            {String[] arrayElem = {"null, ", "null, ", "null, ", "null, ", "null, ", "null, "};
+             for(Element t : elements)
+                {if(t.getType().equals(Type.HauptSignal))
+                    {arrayElem[0] = t.higherName();}
+                 if(t.getType().equals(Type.VorSignal))
+                    {arrayElem[3] = t.higherName();}
+                 if(t.getType().equals(Type.GefahrenPunkt))
+                    {arrayElem[5] = t.higherName();}
+                 if(t.getType().equals(Type.Magnet))
+                    {if(arrayElem[1].equals("null, "))
+                        {arrayElem[1] = t.higherName();}
+                     else if(arrayElem[2].equals("null, "))
+                        {arrayElem[2] = t.higherName();}
+                     else
+                        {arrayElem[4] = t.higherName();}
+                    }
+                }
+             for(int i = 0; i <= 3; i++)
+                {rowOfElements = rowOfElements.concat(arrayElem[i]);}
+             return rowOfElements;
+            }
+         if(type == Kind.SWITCH)
+            {for(Element t : elements)
+                {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
+                 counter ++;
+                 if(counter > 3) {break;}
+                }
+             for(;counter<3;counter++) {rowOfElements = rowOfElements.concat("null, ");}
+             return rowOfElements;
+            }
+         if(type == Kind.LIMITER)
+            {String[] arrayElem = {"null, ", "null, ", "null, ", "null, "};
+             for(Element t : elements)
+                {if(t.getType().equals(Type.GeschwindigkeitsVoranzeiger))
+                    {arrayElem[0] = t.higherName();}
+                 if(t.getType().equals(Type.GeschwindigkeitsAnzeiger))
+                    {arrayElem[1] = t.higherName();}
+                 if(t.getType().equals(Type.Magnet))
+                    {if(arrayElem[2].equals("null, "))
+                        {arrayElem[2] = t.higherName();}
+                     else
+                        {arrayElem[3] = t.higherName();}
+                    }
+                }
+             for(int i = 0; i <= 3; i++)
+                {rowOfElements = rowOfElements.concat(arrayElem[i]);}
+             return rowOfElements;
+            }
+         return "";
+        }
+
+    /**
      * Returns a String of the ABS representation of this LogicalGroup
      * @return the ABS-Code
      */
     @Nonnull
     public String toABS(String deltaContent)
-        {String rowOfElements = "";
-         int counter = 0;
+        {String rowOfElements = generateRowOfElements();
+         /*int counter = 0;
          for(Element t : elements)
             {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
              counter ++;
-            }
+            }*/
 
 
          if(type == Kind.SIGNAL)
-            {for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
+            {//for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
              // Suche nach einem zfst in alter Datei - falls vorhanden
              String zfst = this.additional == null ? " null /*missing zfst*/" : " " + additional;
@@ -346,7 +410,7 @@ public class LogicalGroup {
 
 
          if(type == Kind.SWITCH)
-            {for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
+            {//for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
              Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
              String edge1 = "null";
              String edge2 = "null";
@@ -385,7 +449,7 @@ public class LogicalGroup {
 
 
          if(type == Kind.LIMITER)
-            {for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
+            {//for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
              String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
 
              // Suche nach Speedlimit
