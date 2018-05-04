@@ -157,7 +157,7 @@ public class AbsSource implements DataSource {
                 /*
                  * Lade zuerst einmal das Grid in einen String (deltaContent) zum Finden fehlender Daten
                  */
-                newCode = newCode.concat(searchForDelta(br, newCode));
+                searchForDelta(br, newCode);
                 String zeile;
 
                 // Suche nach grid start. Wenn nicht gefunden, werfe einen Fehler

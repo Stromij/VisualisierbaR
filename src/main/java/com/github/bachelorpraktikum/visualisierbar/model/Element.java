@@ -521,18 +521,23 @@ public final class Element implements GraphObject<Shape> {
 
     public void setLogicalGroup(@Nullable LogicalGroup logicalGroup) {this.logicalGroup = logicalGroup;}
 
+    /**
+     * Set the absName to a given value, if there is no other Element in Graph with the same Name
+     * @param newAbsName the new absName
+     * @return false if something went wrong (linke double names), true if successful
+     */
     public boolean setAbsName(@Nullable String newAbsName)
-        {if(newAbsName == null) {return false;}
-            if(graph != null)
-            {Boolean exit = Element.in(graph.getContext()).absNameExists(newAbsName, this);
-                if(!exit)
-                {this.absName = newAbsName;
-                    Element.in(graph.getContext()).elements.remove(name);
-                    Element.in(graph.getContext()).elements.put(name, this);
-                    return true;
-                }
+        {if(newAbsName == null) {absName = null; return true;}
+         if(graph == null)  {this.absName = newAbsName; return true;}
+         Boolean exit = Element.in(graph.getContext()).absNameExists(newAbsName, this);
+
+         if(!exit)
+            {this.absName = newAbsName;
+                Element.in(graph.getContext()).elements.remove(name);
+                Element.in(graph.getContext()).elements.put(name, this);
+                return true;
             }
-            return false;
+         return false;
         }
 
     @Nullable
@@ -652,13 +657,15 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     public String toABS(@Nullable String deltaContent)
         {String highName = higherName();
-         String addElem = String.format("%s.addElement(%s);\n", node.higherName(), highName);
-            Edge edgeDirection = null;
-            for (Edge edge : this.getNode().getEdges()) {
-                if ((edge.getNode1() == direction && edge.getOtherNode(edge.getNode1()) == this.getNode()) || (edge.getNode2() == direction && edge.getOtherNode(edge.getNode2()) == this.getNode())) {
-                    edgeDirection = edge;
-                }
+         String addElem = "";
+         if(logicalGroup == null)
+             {addElem = String.format("%s.addElement(%s);\n", node.higherName(), highName);}
+         Edge edgeDirection = null;
+         for (Edge edge : this.getNode().getEdges()) {
+            if ((edge.getNode1() == direction && edge.getOtherNode(edge.getNode1()) == this.getNode()) || (edge.getNode2() == direction && edge.getOtherNode(edge.getNode2()) == this.getNode())) {
+                edgeDirection = edge;
             }
+         }
 
          String edge = edgeDirection == null ? null : edgeDirection.higherName();
 
@@ -675,19 +682,25 @@ public final class Element implements GraphObject<Shape> {
             }
          if(getType() == Type.GefahrenPunkt)
             {// [HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl(e54, "gp5");
+             // Achtung: Wenn Gefahrenpunkt zu einem Signal gehört, muss node.addElement später durchgeführt werden
+             for(LogicalGroup g : LogicalGroup.in(graph.getContext()).getAll())
+                {if(g.getBelongsTo().equals(this))
+                    {addElem = ""; break;}
+                }
+
              return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s, \"%s\");\n%s",
                      highName, highName, edge, highName, addElem);
                       //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.GeschwindigkeitsAnzeiger)
             {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21, "vs2");
-             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new local GeschwindigkeitsAnzeigerImpl(%s, \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new GeschwindigkeitsAnzeigerImpl(%s, \"%s\");\n%s",
                      highName, highName, edge, highName, addElem);
                 //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.GeschwindigkeitsVoranzeiger)
             {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21, "vs2");
-                return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVoranzeiger %s = new local GeschwindigkeitsVoranzeiger(%s, \"%s\");\n%s",
+                return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVorAnzeiger %s = new GeschwindigkeitsVorAnzeigerImpl(%s, \"%s\");\n%s",
                         highName, highName, edge, highName, addElem);
                 //name, name, Kantenname, name, addElem
             }
@@ -718,8 +731,10 @@ public final class Element implements GraphObject<Shape> {
                 {// [HTTPName: "m1"]Magnet m1 = new local PZBMagnetImpl(Mhz1000, e02, "m1");
                  // Default: 2000Mhz, erster Magnet in Signal: 1000Mhz, zweiter 500Mhz, dritter 2000Mhz
                  String mhz = "Mhz2000";
+                 String local = "";
                  if(this.getLogicalGroup() != null && this.getLogicalGroup().getKind() == LogicalGroup.Kind.SIGNAL)
                     {int magnetCount = 0;
+                     local = "local ";
                      String[] arrayOfMhz = {"Mhz1000", "Mhz500", "Mhz2000"};
                      for (Element e : getLogicalGroup().getElements()) {
                             if(e.equals(this))
@@ -729,8 +744,8 @@ public final class Element implements GraphObject<Shape> {
                         }
                     }
 
-                 return String.format("[HTTPName: \"%s\"]Magnet %s = new local PZBMagnetImpl(%s, %s, \"%s\");\n%s",
-                         highName, highName, mhz, edge, highName, addElem);
+                 return String.format("[HTTPName: \"%s\"]Magnet %s = new %sPZBMagnetImpl(%s, %s, \"%s\");\n%s",
+                         highName, highName, local, mhz, edge, highName, addElem);
                       //name, name, MHz, Kantenname, name, addElem
                 }
              if(name.contains("ContactMagnetImpl"))
@@ -744,9 +759,9 @@ public final class Element implements GraphObject<Shape> {
                         highName, highName, highName, addElem);
             }
          if(getType() == Type.SichtbarkeitsPunkt)
-            {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15);
-             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new local SichtbarkeitsPunktImpl(%s);\n%s",
-                     highName, highName, edge, addElem);
+            {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15, "ss2");
+             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new local SichtbarkeitsPunktImpl(%s, \"%s\");\n%s",
+                     highName, highName, edge, highName, addElem);
                       //name, name, Kantenname, addElem
             }
          return "";

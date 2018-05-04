@@ -304,6 +304,9 @@ public class LogicalGroup {
     public void setBelongsTo(@Nullable Element belongsTo)
         {this.belongsTo = belongsTo;}
 
+    public Element getBelongsTo()
+        {return this.belongsTo;}
+
     @Nonnull
     public LinkedList<Element> getElements(){
         return elements;
@@ -328,7 +331,7 @@ public class LogicalGroup {
                     {arrayElem[0] = t.higherName();}
                  if(t.getType().equals(Type.VorSignal))
                     {arrayElem[3] = t.higherName();}
-                 if(t.getType().equals(Type.GefahrenPunkt))
+                 if(t.getType().equals(Type.SichtbarkeitsPunkt))
                     {arrayElem[5] = t.higherName();}
                  if(t.getType().equals(Type.Magnet))
                     {if(arrayElem[1].equals("null, "))
@@ -339,8 +342,8 @@ public class LogicalGroup {
                         {arrayElem[4] = t.higherName();}
                     }
                 }
-             for(int i = 0; i <= 3; i++)
-                {rowOfElements = rowOfElements.concat(arrayElem[i]);}
+             for(int i = 0; i <= 5; i++)
+                {rowOfElements = rowOfElements.concat(arrayElem[i]).concat(", ");}
              return rowOfElements;
             }
          if(type == Kind.SWITCH)
@@ -356,9 +359,9 @@ public class LogicalGroup {
             {String[] arrayElem = {"null, ", "null, ", "null, ", "null, "};
              for(Element t : elements)
                 {if(t.getType().equals(Type.GeschwindigkeitsVoranzeiger))
-                    {arrayElem[0] = t.higherName();}
-                 if(t.getType().equals(Type.GeschwindigkeitsAnzeiger))
                     {arrayElem[1] = t.higherName();}
+                 if(t.getType().equals(Type.GeschwindigkeitsAnzeiger))
+                    {arrayElem[0] = t.higherName();}
                  if(t.getType().equals(Type.Magnet))
                     {if(arrayElem[2].equals("null, "))
                         {arrayElem[2] = t.higherName();}
@@ -367,7 +370,7 @@ public class LogicalGroup {
                     }
                 }
              for(int i = 0; i <= 3; i++)
-                {rowOfElements = rowOfElements.concat(arrayElem[i]);}
+                {rowOfElements = rowOfElements.concat(arrayElem[i]).concat(", ");}
              return rowOfElements;
             }
          return "";
@@ -380,16 +383,14 @@ public class LogicalGroup {
     @Nonnull
     public String toABS(String deltaContent)
         {String rowOfElements = generateRowOfElements();
-         /*int counter = 0;
-         for(Element t : elements)
-            {rowOfElements = rowOfElements.concat(t.higherName().concat(", "));
-             counter ++;
-            }*/
 
+         // Alle Elemente innerhalb einer logischen Gruppe werden erst nach dem erstellen der Logischen Gruppe hinzugefügt
+         String addElem = "";
+         for(Element t : elements)
+            {addElem = addElem.concat(String.format("%s.addElement(%s);\n", t.getNode().higherName(), t.higherName()));}
 
          if(type == Kind.SIGNAL)
-            {//for(;counter < 6; counter++){rowOfElements = rowOfElements.concat("null, ");}
-             String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+            {String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
              // Suche nach einem zfst in alter Datei - falls vorhanden
              String zfst = this.additional == null ? " null /*missing zfst*/" : " " + additional;
              if(deltaContent != null && this.additional == null)
@@ -403,15 +404,16 @@ public class LogicalGroup {
                 }
              //Ende der Suche nach einem zfst
 
-             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n",
-                    name, name, rowOfElements, name, zfst, belongOut, name);
+             addElem = addElem.concat(String.format("%s.addElement(%s);\n", belongsTo.getNode().higherName(), belongsTo.higherName()));
+
+             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n%s\n",
+                    name, name, rowOfElements, name, zfst, belongOut, name, addElem);
             }
 
 
 
          if(type == Kind.SWITCH)
-            {//for(;counter < 3; counter++){rowOfElements = rowOfElements.concat("null, ");}
-             Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
+            {Map<Edge, GraphShape<Edge>> edges = elements.get(0).getGraph().getEdges();
              String edge1 = "null";
              String edge2 = "null";
 
@@ -442,15 +444,14 @@ public class LogicalGroup {
                  catch(IllegalStateException ignored) {/*Falls Switch in alter Datei nicht gefunden werden konnte*/}
                 }
 
-             return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n",
-                    name, name, rowOfElements, edge1, edge2, bool, name);
+             return String.format("[HTTPName: \"%s\"]Switch %s = new local SwitchImpl(%s%s, %s, %s, \"%s\");\n%s\n",
+                    name, name, rowOfElements, edge1, edge2, bool, name, addElem);
             }
 
 
 
          if(type == Kind.LIMITER)
-            {//for(;counter < 4; counter++){rowOfElements = rowOfElements.concat("null, ");}
-             String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+            {String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
 
              // Suche nach Speedlimit
              String limit = this.additional != null ? "40" : this.additional;
@@ -463,8 +464,8 @@ public class LogicalGroup {
                     catch(IllegalStateException ignored) {/*Falls Switch in alter Datei nicht gefunden werden konnte*/}
                 }
 
-             return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n%s.setLogical(%s);\n",
-                    name, name, rowOfElements, limit, name, belongOut, name);}
+             return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n%s.setLogical(%s);\n%s\n",
+                    name, name, rowOfElements, limit, name, belongOut, name, addElem);}
 
          return "// Type of logical group not supported";
         }
