@@ -325,7 +325,7 @@ public class LogicalGroup {
         {String rowOfElements = "";
          int counter = 0;
          if(type == Kind.SIGNAL)
-            {String[] arrayElem = {"null, ", "null, ", "null, ", "null, ", "null, ", "null, "};
+            {String[] arrayElem = {"null", "null", "null", "null", "null", "null"};
              for(Element t : elements)
                 {if(t.getType().equals(Type.HauptSignal))
                     {arrayElem[0] = t.higherName();}
@@ -334,9 +334,9 @@ public class LogicalGroup {
                  if(t.getType().equals(Type.SichtbarkeitsPunkt))
                     {arrayElem[5] = t.higherName();}
                  if(t.getType().equals(Type.Magnet))
-                    {if(arrayElem[1].equals("null, "))
+                    {if(arrayElem[1].equals("null"))
                         {arrayElem[1] = t.higherName();}
-                     else if(arrayElem[2].equals("null, "))
+                     else if(arrayElem[2].equals("null"))
                         {arrayElem[2] = t.higherName();}
                      else
                         {arrayElem[4] = t.higherName();}
@@ -356,14 +356,14 @@ public class LogicalGroup {
              return rowOfElements;
             }
          if(type == Kind.LIMITER)
-            {String[] arrayElem = {"null, ", "null, ", "null, ", "null, "};
+            {String[] arrayElem = {"null", "null", "null", "null"};
              for(Element t : elements)
                 {if(t.getType().equals(Type.GeschwindigkeitsVoranzeiger))
                     {arrayElem[1] = t.higherName();}
                  if(t.getType().equals(Type.GeschwindigkeitsAnzeiger))
                     {arrayElem[0] = t.higherName();}
                  if(t.getType().equals(Type.Magnet))
-                    {if(arrayElem[2].equals("null, "))
+                    {if(arrayElem[2].equals("null"))
                         {arrayElem[2] = t.higherName();}
                      else
                         {arrayElem[3] = t.higherName();}
