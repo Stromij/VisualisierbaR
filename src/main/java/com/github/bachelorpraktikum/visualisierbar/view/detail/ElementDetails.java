@@ -71,7 +71,7 @@ class ElementDetails extends DetailsBase<Element> {
                         public void updateItem(GraphObject item,boolean empty){
                             super.updateItem(item,empty);
                             if(item!=null){
-                            setGraphic(new Label(item.getName()));
+                            setGraphic(new Label(item.getAbsName()));
                             }
                         }
                     };
