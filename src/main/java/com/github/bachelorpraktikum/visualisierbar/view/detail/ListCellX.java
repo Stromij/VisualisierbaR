@@ -64,7 +64,7 @@ public class ListCellX<T> extends ListCell<T> implements ChangeListener<Number> 
     @Override
     public void updateItem(T item,boolean empty){
         super.updateItem(item, empty);
-        if(item!=null){
+        /*if(item!=null){
             if(getIndex() == ind.get()){
                 InnerShadow is = new InnerShadow();
                 is.setOffsetX(1.0);
@@ -72,7 +72,7 @@ public class ListCellX<T> extends ListCell<T> implements ChangeListener<Number> 
                 is.setOffsetY(1.0);
                 setEffect(is);
             }
-        }
+        }*/
     }
 
 
@@ -113,11 +113,11 @@ public class ListCellX<T> extends ListCell<T> implements ChangeListener<Number> 
                             toBeDeleted = -1;
                         }
                         if(o != null && temp != null ){
-                            if(getIndex() < items.size())
+                            if(getIndex() < items.size() && !items.contains((T)temp))
                                 items.add(getIndex(),(T)temp);
-                            else if(getIndex() == items.size())
+                            else if(getIndex() == items.size()  && !items.contains((T)temp))
                                 items.add((T)temp);
-
+                         getListView().getSelectionModel().select(getIndex());
                         }
 
                         ind.set(getIndex());
