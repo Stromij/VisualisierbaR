@@ -424,7 +424,7 @@ public class MainController {
                         graph.getNodes().forEach((a, b) -> ((Junction) b).addToSelection());
                     }
                 }
-                if (event.getCode() == KeyCode.X && event.isControlDown()) {
+                if (event.getCode() == KeyCode.C && event.isControlDown()) {
                     nodeClipboard.clear();
                     HashSet<Node> selectedNodes = new HashSet<>();
                     for (Junction junction : Junction.getSelection()) {
@@ -506,7 +506,7 @@ public class MainController {
                                 if (copyNodes.containsKey(element.getDirection()))
                                     newElem.setDirection(copyNodes.get(element.getDirection()));
                                 if (element.getLogicalGroup() != null) {
-                                    element.getLogicalGroup().addElement(newElem);
+                                    //element.getLogicalGroup().addElement(newElem);
                                 }
                                 copyNodes.get(node).addElement(newElem);
                             }
