@@ -615,7 +615,12 @@ public class MainController {
         graphPane.setOnMouseClicked((event) -> {
             if (newNodeButton.isSelected()) {
                 if (graph == null) return;
-                TextInputDialog dialog = new TextInputDialog();
+                //Search for available name
+                String newName = "n0";
+                for(int i=0; Node.in(graph.getContext()).absNameExists(newName, null) || Node.in(graph.getContext()).NameExists(newName); i++)
+                    {newName = "n".concat(String.valueOf(i));}
+
+                TextInputDialog dialog = new TextInputDialog(newName);
                 dialog.setTitle("Enter Node Name");
                 dialog.setGraphic(null);
                 dialog.setHeaderText(null);
@@ -663,6 +668,7 @@ public class MainController {
                         */
                     } else {
                         graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
+                        Node.in(graph.getContext()).get(name).setAbsName(newName);
                     }
 
 

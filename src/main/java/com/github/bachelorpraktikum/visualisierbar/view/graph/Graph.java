@@ -196,16 +196,19 @@ public final class Graph {
             }
         });
 
-        RandomString gen = new RandomString(8, ThreadLocalRandom.current());
+        //RandomString gen = new RandomString(8, ThreadLocalRandom.current());
         for (int i=0; i<l; i++){
             for (int k=i; k<l ; k++ ){
                 if (!existingEdges[i][k]){
-                    String name=null;
+                    String name="e0";
 
-                    for (int j=0; j<1000; j++) {                                                                            //generate missing edges with random names
+                    /*for (int j=0; j<1000; j++) {                                                                            //generate missing edges with random names
                         name = gen.nextString();
                         if(!Edge.in(context).NameExists(name)) break;
-                    }
+                    }*/
+
+                    for(int j=0; Edge.in(context).NameExists(name) || Edge.in(context).AbsNameExists(name, null) ; j++)
+                        {name = "e".concat(String.valueOf(j));}
                     Edge edge = Edge.in(context).create(name,-1, sList.get(i), sList.get(k));
                     edge.setGraph(this);
                     GraphShape<Edge> shape = new Rail(edge, coordinatesAdapter);

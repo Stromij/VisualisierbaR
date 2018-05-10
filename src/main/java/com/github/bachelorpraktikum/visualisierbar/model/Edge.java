@@ -207,7 +207,7 @@ public final class Edge implements GraphObject<Line> {
          * @param name the String to check
          * @return true, if an Edge with this name exists, otherwise false
          */
-        Boolean AbsNameExists(@Nonnull String name, @Nullable Edge edge)
+        public Boolean AbsNameExists(@Nonnull String name, @Nullable Edge edge)
             {for(Map.Entry<String, Edge> entry : edges.entrySet())
                 {if(Objects.equals(entry.getValue().getAbsName(), name) && !entry.getValue().equals(edge))
                     {return true;}
