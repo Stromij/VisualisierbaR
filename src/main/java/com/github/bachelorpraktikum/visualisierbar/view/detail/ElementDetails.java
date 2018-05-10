@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.visualisierbar.view.detail;
 import com.github.bachelorpraktikum.visualisierbar.datasource.RestSource;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.model.GraphObject;
+import com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup;
 import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
 import com.github.bachelorpraktikum.visualisierbar.view.Highlightable;
 import javafx.beans.binding.Bindings;
@@ -112,6 +113,28 @@ class ElementDetails extends DetailsBase<Element> {
                 }
             });
             groupElements.add(markAllToggle,0,1);
+            Label platzhalter = new Label();
+            groupElements.add(platzhalter,0,2);
+
+            Label AdditionalLb = new Label();
+            if(this.getObject().getLogicalGroup().getKind() == LogicalGroup.Kind.LIMITER)
+                {AdditionalLb.setText("Limit:");}
+            if(this.getObject().getLogicalGroup().getKind() == LogicalGroup.Kind.SIGNAL)
+                {AdditionalLb.setText("ActiveZugFolge:");}
+            if(this.getObject().getLogicalGroup().getKind() == LogicalGroup.Kind.SWITCH)
+                {AdditionalLb.setText("Direction:");}
+
+            TextField additionalTF = new TextField();
+            System.out.println(this.getObject().getLogicalGroup().getAdditional());
+            additionalTF.setText(this.getObject().getLogicalGroup().getAdditional());
+
+            additionalTF.textProperty().addListener((observable, oldValue, newValue) -> {
+                this.getObject().getLogicalGroup().setAdditional(newValue);
+            });
+            groupElements.add(AdditionalLb, 0,3);
+            groupElements.add(additionalTF,0,4);
+
+
         }
 
 

@@ -437,7 +437,7 @@ public class LogicalGroup {
                 }
 
              //Suche true/false
-             String bool = this.additional != null ? "false" : this.additional;
+             String bool = this.additional == null ? "false" : this.additional;
              if(deltaContent != null && this.additional == null)
                 {Pattern patternSwitch = compile("(.*new local SwitchImpl\\(.*,\\p{Blank}*)(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
                  try {Matcher matcherSwitch = patternSwitch.matcher(deltaContent);
@@ -457,7 +457,7 @@ public class LogicalGroup {
             {String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
 
              // Suche nach Speedlimit
-             String limit = this.additional != null ? "40" : this.additional;
+             String limit = this.additional == null ? "40" : this.additional;
              if(deltaContent != null && this.additional == null)
                 {Pattern patternLimit = compile("(.*new SpeedLimiterImpl\\(.*,\\p{Blank}*)(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
                     try {Matcher matcherLimit = patternLimit.matcher(deltaContent);
