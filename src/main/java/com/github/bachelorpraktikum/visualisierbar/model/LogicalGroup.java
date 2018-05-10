@@ -404,7 +404,10 @@ public class LogicalGroup {
                 }
              //Ende der Suche nach einem zfst
 
-             addElem = addElem.concat(String.format("%s.addElement(%s);\n", belongsTo.getNode().higherName(), belongsTo.higherName()));
+             String elemVorne = belongsTo != null ? belongsTo.getNode().higherName() : "/*missing Node*/";
+             String elemHinten = belongsTo != null ? belongsTo.higherName() : "/*missing Element*/";
+
+             addElem = addElem.concat(String.format("%s.addElement(%s);\n", elemVorne, elemHinten));
 
              return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n%s\n",
                     name, name, rowOfElements, name, zfst, belongOut, name, addElem);

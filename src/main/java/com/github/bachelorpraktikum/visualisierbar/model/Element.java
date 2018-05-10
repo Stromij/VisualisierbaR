@@ -684,7 +684,7 @@ public final class Element implements GraphObject<Shape> {
             {// [HTTPName: "gp5"]GefahrenPunkt gp5 = new local GefahrenPunktImpl(e54, "gp5");
              // Achtung: Wenn Gefahrenpunkt zu einem Signal gehört, muss node.addElement später durchgeführt werden
              for(LogicalGroup g : LogicalGroup.in(graph.getContext()).getAll())
-                {if(g.getBelongsTo().equals(this))
+                {if(g.getBelongsTo() != null && g.getBelongsTo().equals(this))
                     {addElem = ""; break;}
                 }
 
