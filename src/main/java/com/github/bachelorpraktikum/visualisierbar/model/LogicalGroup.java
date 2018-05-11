@@ -183,8 +183,12 @@ public class LogicalGroup {
          this.additional = null;
         }
 
+    /**
+     * set the Additional-Parameter of this class to the given Value or to null if the given value is ""
+     * @param additional new value of additional
+     */
     public void setAdditional(@Nullable String additional) {
-        this.additional = additional;
+        this.additional = (additional == null || additional.length() == 0) ? null : additional;
     }
 
     @Nullable
