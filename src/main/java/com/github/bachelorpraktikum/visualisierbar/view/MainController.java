@@ -507,6 +507,7 @@ public class MainController {
                                     newElem.setDirection(copyNodes.get(element.getDirection()));
                                 if (element.getLogicalGroup() != null) {
                                     //element.getLogicalGroup().addElement(newElem);
+                                    //TODO check if there is a complete logicalGroup
                                 }
                                 copyNodes.get(node).addElement(newElem);
                             }
@@ -1102,7 +1103,7 @@ public class MainController {
      */
     @Nonnull
     private Graph getGraph() {
-        nodeClipboard.clear();
+        //nodeClipboard.clear();
         if (graph == null) {
             Context context = DataSourceHolder.getInstance().getContext();
             if (proportionalToggle.isSelected()) {
