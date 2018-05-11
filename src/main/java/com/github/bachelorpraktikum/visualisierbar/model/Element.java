@@ -19,7 +19,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
-import sun.rmi.runtime.Log;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -506,7 +505,7 @@ public final class Element implements GraphObject<Shape> {
      */
     public boolean setDirection(@Nullable Node direction) {
         if(direction==null)
-            this.direction=direction;
+            this.direction=null;
         for (Edge edge : this.getNode().getEdges()) {
             if ((edge.getNode1() == direction && edge.getOtherNode(edge.getNode1()) == this.getNode()) || (edge.getNode2() == direction && edge.getOtherNode(edge.getNode2()) == this.getNode())) {
                 this.direction = direction;
@@ -546,7 +545,7 @@ public final class Element implements GraphObject<Shape> {
     @Nonnull
     public String higherName() {return (absName == null) ? name : absName;}
 
-    @Nullable
+    @Nonnull
     public String getOldName() {return oldName;}
 
     public void setOldName(String oldName) {this.oldName = oldName;}

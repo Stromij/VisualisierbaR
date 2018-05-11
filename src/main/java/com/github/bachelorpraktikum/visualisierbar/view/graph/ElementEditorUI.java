@@ -4,12 +4,9 @@ import com.github.bachelorpraktikum.visualisierbar.model.Edge;
 import com.github.bachelorpraktikum.visualisierbar.model.Element;
 import com.github.bachelorpraktikum.visualisierbar.model.LogicalGroup;
 import com.github.bachelorpraktikum.visualisierbar.model.Node;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
-import javafx.util.Pair;
 import org.antlr.v4.runtime.misc.Triple;
 
 import java.util.Optional;

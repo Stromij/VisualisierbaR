@@ -892,8 +892,7 @@ public class MainController {
                         simulationTime.set(newValue.getTime());
                     }
                     Context context = DataSourceHolder.getInstance().getContext();
-                    if(Element.in(context) != null)
-                       {Element.in(context).setTime(newValue.getTime());}
+                    Element.in(context).setTime(newValue.getTime());
                 }
         );
     }
