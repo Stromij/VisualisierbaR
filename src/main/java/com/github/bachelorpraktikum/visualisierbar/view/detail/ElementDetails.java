@@ -72,7 +72,7 @@ class ElementDetails extends DetailsBase<Element> {
                         public void updateItem(GraphObject item,boolean empty){
                             super.updateItem(item,empty);
                             if(item!=null){
-                            setGraphic(new Label(item.getAbsName()));
+                            setGraphic(new Label(item.higherName()));
                             }
                         }
                     };
@@ -125,7 +125,6 @@ class ElementDetails extends DetailsBase<Element> {
                 {AdditionalLb.setText("Direction:");}
 
             TextField additionalTF = new TextField();
-            System.out.println(this.getObject().getLogicalGroup().getAdditional());
             additionalTF.setText(this.getObject().getLogicalGroup().getAdditional());
 
             additionalTF.textProperty().addListener((observable, oldValue, newValue) -> {

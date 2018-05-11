@@ -334,7 +334,7 @@ public final class Edge implements GraphObject<Line> {
      * @param newAbsName the new ABS name
      * @return true if the changes was successfull, false if name already taken or null
      */
-    boolean setAbsName(@Nullable String newAbsName)
+    public boolean setAbsName(@Nullable String newAbsName)
         {if(newAbsName == null) {return false;}
          if(graph != null) {
              boolean exit = Edge.in(graph.getContext()).AbsNameExists(newAbsName, this);

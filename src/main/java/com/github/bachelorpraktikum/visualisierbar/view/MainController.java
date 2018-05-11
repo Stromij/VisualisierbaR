@@ -456,18 +456,22 @@ public class MainController {
                         RandomString gen = new RandomString(8, ThreadLocalRandom.current());
                         String name = null;
                         HashMap<Node, Node> copyNodes = new HashMap<>(Junction.getSelection().size());
-
+                        HashMap<Element, LogicalGroup> groupCollector = new HashMap<>();
                         for (Node node : nodeClipboard) {
 
                             int x = node.getCoordinates().getX() - mostLeftCord.getX();
                             int y = node.getCoordinates().getY() - mostLeftCord.getY();
 
-                            for (int j = 0; j < 10000; j++) {               //generate random name
+                            String newName = node.higherName().concat("_0");
+                            for(int i = 0; Node.in(graph.getContext()).absNameExists(newName, null) || Node.in(graph.getContext()).NameExists(newName) ; i++)
+                                {newName = node.higherName().concat("_").concat(String.valueOf(i));}
+                            /*for (int j = 0; j < 10000; j++) {               //generate random name
                                 name = gen.nextString();
                                 if (!Node.in(graph.getContext()).NameExists(node.getName() + "_copy_" + name)) break;
-                            }
+                            }*/
 
-                            Node copy = Node.in(graph.getContext()).create(node.getName() + "_copy_" + name, new Coordinates(x + cord.getX(), y + cord.getY()));
+                            Node copy = Node.in(graph.getContext()).create(newName, new Coordinates(x + cord.getX(), y + cord.getY()));
+                            copy.setAbsName(newName);
                             copyNodes.put(node, copy);
                             ((Junction) graph.getNodes().get(node)).setMoveable(true);
 
@@ -475,12 +479,16 @@ public class MainController {
                         for (Node node : copyNodes.keySet()) {
                             for (Edge edge : node.getEdges()) {
                                 if (copyNodes.containsKey(edge.getNode1()) && copyNodes.containsKey(edge.getNode2())) {
-                                    for (int j = 0; j < 10000; j++) {
+                                    String newName = edge.higherName().concat("_0");
+                                    for(int i = 1; Edge.in(graph.getContext()).AbsNameExists(newName, null) || Edge.in(graph.getContext()).NameExists(newName); i++)
+                                        {newName = edge.higherName().concat("_").concat(String.valueOf(i));}
+                                    /*for (int j = 0; j < 10000; j++) {
                                         name = gen.nextString();
                                         if (!Edge.in(graph.getContext()).NameExists(edge.getName() + "_copy_" + name))
                                             break;
-                                    }
-                                    Edge copyEdge = Edge.in(graph.getContext()).create(edge.getName() + "_copy_" + name, edge.getLength(), copyNodes.get(edge.getNode1()), copyNodes.get(edge.getNode2()));
+                                    }*/
+                                    Edge copyEdge = Edge.in(graph.getContext()).create(newName, edge.getLength(), copyNodes.get(edge.getNode1()), copyNodes.get(edge.getNode2()));
+                                    copyEdge.setAbsName(newName);
                                     copyNodes.get(node).addEdge(copyEdge);
                                 }
                             }
@@ -497,17 +505,55 @@ public class MainController {
                                         continue;
                                     }
                                 }
-                                for (int j = 0; j < 10000; j++) {
+                                String newName = element.higherName().concat("_0");
+                                for(int i = 0; Element.in(graph.getContext()).NameExists(newName) || Element.in(graph.getContext()).absNameExists(newName, null); i++)
+                                    {newName = element.higherName().concat("_").concat(String.valueOf(i)); }
+                                /*for (int j = 0; j < 10000; j++) {
                                     name = gen.nextString();
                                     if (!Element.in(graph.getContext()).NameExists(element.getName() + "_copy_" + name))
                                         break;
-                                }
-                                Element newElem = Element.in(graph.getContext()).create(element.getName() + "_copy_" + name, element.getType(), copyNodes.get(node), element.getState());
+                                }*/
+                                Element newElem = Element.in(graph.getContext()).create(newName, element.getType(), copyNodes.get(node), element.getState());
+                                newElem.setAbsName(newName);
                                 if (copyNodes.containsKey(element.getDirection()))
                                     newElem.setDirection(copyNodes.get(element.getDirection()));
                                 if (element.getLogicalGroup() != null) {
-                                    //element.getLogicalGroup().addElement(newElem);
-                                    //TODO check if there is a complete logicalGroup
+                                    // Prüfen ob es eine vollständige logische Gruppe ist oder nicht
+                                    LogicalGroup grp = element.getLogicalGroup();
+                                    String newGrpName = grp.getName().concat("_0");
+                                    boolean completeLG = true;
+                                    for(Element e: grp.getElements())
+                                        {if(!nodeClipboard.contains(e.getNode()))
+                                            {completeLG = false; break;}
+                                        }
+
+
+                                    if(completeLG) {
+                                        if(groupCollector.containsKey(element))
+                                            {newElem.setLogicalGroup(groupCollector.get(element));
+                                             groupCollector.get(element).safeAddElement(newElem);
+                                             groupCollector.remove(element);
+                                            }
+                                        else {
+                                            // Suche nach einem geeigneten, verfügbaren Namen der neuen Gruppe
+                                            for (int i = 1; LogicalGroup.in(graph.getContext()).NameExists(newGrpName); i++) {
+                                                newGrpName = grp.getName().concat("_").concat(String.valueOf(i));
+                                            }
+
+                                            // Erstelle eine neue Gruppe unter dem gefundenen Namen
+                                            LogicalGroup newGrp = LogicalGroup.in(graph.getContext()).create(newGrpName, grp.getKind());
+                                            newGrp.safeAddElement(newElem);
+                                            newGrp.setAdditional(grp.getAdditional());
+                                            // Speichere für die kommenden Elemente die Zuweisung zu dieser LogicalGroup
+                                            for(Element e: grp.getElements()){
+                                                groupCollector.put(e, newGrp);
+                                            }
+
+
+                                            //element.getLogicalGroup().addElement(newElem);
+                                            // TODO check if there is a complete logicalGroup
+                                        }
+                                    }
                                 }
                                 copyNodes.get(node).addElement(newElem);
                             }
