@@ -169,7 +169,7 @@ public class LogicalGroup {
         {this.name = name;
          this.type = kind;
          this.elements = new LinkedList<>();
-         this.elements.addAll(elements);
+         for(Element e : elements) {this.addElement(e);}                // Safe-Add Element
          this.belongsTo = belongsTo;
          this.oldName = name;
          this.additional = null;
