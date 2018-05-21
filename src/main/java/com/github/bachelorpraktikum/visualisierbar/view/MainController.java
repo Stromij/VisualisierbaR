@@ -663,7 +663,17 @@ public class MainController {
         graphPane.widthProperty().addListener(boundsListener);
 
         graphPane.setOnMouseClicked((event) -> {
+            Edge replace = null;
             if (newNodeButton.isSelected()) {
+                if(event.getTarget() instanceof javafx.scene.shape.Line) {
+                    Line edgeLine = (Line) event.getTarget();
+                    for(Map.Entry<Edge, GraphShape<Edge>> entry : graph.getEdges().entrySet())
+                        {Edge e = entry.getKey();
+                         if(edgeLine.contains(e.getNode1().getCoordinates().getX(), e.getNode1().getCoordinates().getY()) &&
+                            edgeLine.contains(e.getNode2().getCoordinates().getX(), e.getNode2().getCoordinates().getY()))
+                            {replace = e; break;}
+                        }
+                }
                 if (graph == null) return;
                 //Search for available name
                 String newName = "n0";
@@ -719,10 +729,26 @@ public class MainController {
                     } else {
                         graph.addNode(name, new Coordinates((int) Math.round(c.getX()), (int) Math.round(c.getY())));
                         Node.in(graph.getContext()).get(name).setAbsName(newName);
+                        if(replace != null)
+                            {Node node1 = replace.getNode1();
+                             Node node2 = replace.getNode2();
+                             String firstName = replace.getName();
+                             String firstAbsName = replace.getAbsName();
+                             int length = replace.getLength();
+                             String secondName = replace.higherName().concat("_0");
+                             for(int i=0; Edge.in(graph.getContext()).AbsNameExists(secondName, null) || Edge.in(graph.getContext()).NameExists(secondName); i++)
+                                {secondName = replace.higherName().concat("_").concat(String.valueOf(i));}
+
+                             graph.removeEdge(replace);
+
+                             graph.addEdge(firstName, node1, Node.in(graph.getContext()).get(name), length, firstAbsName);
+                             graph.addEdge(secondName, Node.in(graph.getContext()).get(name), node2, length, secondName);
+                            }
+
                     }
 
 
-                } catch (IllegalArgumentException e) {
+                } catch (IllegalArgumentException e) {e.printStackTrace();
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");
                     alert.setX(event.getX());
@@ -731,6 +757,7 @@ public class MainController {
                     alert.setHeaderText(null);
                     alert.setContentText("Node already exists");
                     alert.showAndWait();
+
                 }
                 newNodeButton.setSelected(false);
                 event.consume();

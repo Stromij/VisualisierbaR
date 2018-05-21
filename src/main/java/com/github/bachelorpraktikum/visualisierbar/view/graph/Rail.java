@@ -30,6 +30,7 @@ final class Rail extends SingleGraphShapeBase<Edge, Line> {
         super(edge, adapter);
         listeners = new ArrayList<>(2);
         this.getShape().setOnMousePressed((t)->{
+
             if(t.isSecondaryButtonDown()){
 
                 Dialog<LinkedList<String>> dialog = new Dialog<>();

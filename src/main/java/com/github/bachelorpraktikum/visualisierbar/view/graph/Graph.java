@@ -8,6 +8,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.sun.istack.internal.NotNull;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
@@ -354,6 +355,26 @@ public final class Graph {
         group.getChildren().add(shape.getFullNode());
         changed();
     }
+
+
+    /**
+     * Adds a new edge with the specified name and attributes to the Graph and the Factory mapping
+     * @param name name of the new edge
+     * @param node1 starting Node of the edge
+     * @param node2 ending Node of the edge
+     * @param length length of the edge
+     * @param absName Abs-Name of the edge (optional, if not used set it to null)
+     */
+    public void addEdge(@Nonnull String name, @Nonnull Node node1, @Nonnull Node node2, int length, @Nullable String absName)
+        {Edge newEdge = Edge.in(context).create(name, length, node1, node2, absName);
+         newEdge.setGraph(this);
+         if(edges.containsKey(newEdge)) return;
+         GraphShape<Edge> shape = new Rail(newEdge, coordinatesAdapter);
+         edges.put(newEdge, shape);
+         group.getChildren().add(shape.getFullNode());
+
+         changed();
+        }
 
 
     /**
