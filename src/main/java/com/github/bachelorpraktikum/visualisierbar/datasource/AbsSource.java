@@ -7,6 +7,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.scene.control.Alert;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
 import java.util.ArrayList;
@@ -42,7 +43,6 @@ public class AbsSource implements DataSource {
         this.context = parseFile();
         this.delta = new ArrayList<>();
     }
-
 
     /**
      * Compiles a given ABS-File
@@ -143,10 +143,12 @@ public class AbsSource implements DataSource {
      * @param graph iterating graph
      * @return returs the destination Directory
      */
-    public File refactorSource(Graph graph)
+    public File refactorSource(@Nullable Graph graph)
         {File destDir = new File(fileToAbsSource.toString().concat("_new"));
-         for(int i = 1; destDir.exists(); i++)
-            {destDir = new File(fileToAbsSource.toString().concat("_new_" + i));}
+         for (int i = 1; destDir.exists(); i++) {
+             destDir = new File(fileToAbsSource.toString().concat("_new_" + i));
+         }
+
 
          String newCode = "";
 
@@ -322,4 +324,10 @@ public class AbsSource implements DataSource {
 
     @Override
     public void close(){ }
+
+    public String getProduct()
+        {return product;}
+
+    public URI getParent()
+        {return parent;}
 }

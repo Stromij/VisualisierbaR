@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
+
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.Property;

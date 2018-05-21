@@ -1143,13 +1143,43 @@ public class MainController {
             this.absSource = (AbsSource) source;
         }
 
-        DataSourceHolder.getInstance().set(source);
-        Context context = source.getContext();
-        logList.setItems(context.getObservableEvents().sorted());
-        fitGraphToCenter(getGraph());
-        simulationTime.set(Context.INIT_STATE_TIME);
+        initializeDataSource(source);
+
+        // Überprüfe, ob eine erneute Kompilierung ein anderes printToAbs liefern würde als die erste
+        if (source instanceof AbsSource) {
+            String firstComp = graph.printToAbs();
+
+            File newAbsFile = absSource.refactorSource(graph);
+            String newCommand = String.format("absc -v -product=Groups -erlang %s/*.abs -d %s/gen/erlang/", newAbsFile, absSource.getParent().toString());
+            try
+                {source = new AbsSource(newCommand, newAbsFile,absSource.getProduct());}
+            catch (IOException e) {
+                // TODO Fehler beim einlesen
+            }
+
+            initializeDataSource(source);
+
+            String secondComp = graph.printToAbs();
+            if(!firstComp.equals(secondComp)){
+                //TODO printToAbs gleicht sich nicht!
+            }
+
+        }
         showElements();
     }
+
+    /**
+     * Doing the initializing things for the graph
+     * @param source the source to be initialized
+     */
+    private void initializeDataSource(DataSource source)
+        {DataSourceHolder.getInstance().set(source);
+         Context context = source.getContext();
+
+         logList.setItems(context.getObservableEvents().sorted());
+         fitGraphToCenter(getGraph());
+         simulationTime.set(Context.INIT_STATE_TIME);
+        }
 
 
     /**
