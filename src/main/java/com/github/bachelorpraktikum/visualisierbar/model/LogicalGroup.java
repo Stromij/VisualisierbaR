@@ -394,9 +394,9 @@ public class LogicalGroup {
             {addElem = addElem.concat(String.format("%s.addElement(%s);\n", t.getNode().higherName(), t.higherName()));}
 
          if(type == Kind.SIGNAL)
-            {String belongOut = belongsTo == null ? "null /*TODO*/" : belongsTo.higherName();
+            {String belongOut = belongsTo == null ? "null/*missing GP*/" : belongsTo.higherName();
              // Suche nach einem zfst in alter Datei - falls vorhanden
-             String zfst = this.additional == null ? " null /*missing zfst*/" : " " + additional;
+             String zfst = this.additional == null ? " null/*missing zfst*/" : " " + additional;
              if(deltaContent != null && this.additional == null)
                 {//Pattern patternSignal = compile("(.*new SwWechselImpl\\()(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
                  Pattern patternSignal = compile("(.*new local SignalImpl\\(.*,\\p{Blank}*\"" + oldName + "\",\\p{Blank}*)(.*?)(\\);.*)");
@@ -408,8 +408,8 @@ public class LogicalGroup {
                 }
              //Ende der Suche nach einem zfst
 
-             String elemVorne = belongsTo != null ? belongsTo.getNode().higherName() : "/*missing Node*/";
-             String elemHinten = belongsTo != null ? belongsTo.higherName() : "/*missing Element*/";
+             String elemVorne = belongsTo != null ? belongsTo.getNode().higherName() : "null/*missing Node*/";
+             String elemHinten = belongsTo != null ? belongsTo.higherName() : "null/*missing Element*/";
 
              addElem = addElem.concat(String.format("%s.addElement(%s);\n", elemVorne, elemHinten));
 

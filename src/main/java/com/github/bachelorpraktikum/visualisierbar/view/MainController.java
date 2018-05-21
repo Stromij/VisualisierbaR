@@ -457,6 +457,8 @@ public class MainController {
                         String name = null;
                         HashMap<Node, Node> copyNodes = new HashMap<>(Junction.getSelection().size());
                         HashMap<Element, LogicalGroup> groupCollector = new HashMap<>();
+                        HashMap<Element, Element> alreadyCopiedElements = new HashMap<>();
+                        HashMap<Element, LogicalGroup> gPCollector = new HashMap<>();
                         for (Node node : nodeClipboard) {
 
                             int x = node.getCoordinates().getX() - mostLeftCord.getX();
@@ -465,10 +467,6 @@ public class MainController {
                             String newName = node.higherName().concat("_0");
                             for(int i = 0; Node.in(graph.getContext()).absNameExists(newName, null) || Node.in(graph.getContext()).NameExists(newName) ; i++)
                                 {newName = node.higherName().concat("_").concat(String.valueOf(i));}
-                            /*for (int j = 0; j < 10000; j++) {               //generate random name
-                                name = gen.nextString();
-                                if (!Node.in(graph.getContext()).NameExists(node.getName() + "_copy_" + name)) break;
-                            }*/
 
                             Node copy = Node.in(graph.getContext()).create(newName, new Coordinates(x + cord.getX(), y + cord.getY()));
                             copy.setAbsName(newName);
@@ -482,11 +480,7 @@ public class MainController {
                                     String newName = edge.higherName().concat("_0");
                                     for(int i = 1; Edge.in(graph.getContext()).AbsNameExists(newName, null) || Edge.in(graph.getContext()).NameExists(newName); i++)
                                         {newName = edge.higherName().concat("_").concat(String.valueOf(i));}
-                                    /*for (int j = 0; j < 10000; j++) {
-                                        name = gen.nextString();
-                                        if (!Edge.in(graph.getContext()).NameExists(edge.getName() + "_copy_" + name))
-                                            break;
-                                    }*/
+
                                     Edge copyEdge = Edge.in(graph.getContext()).create(newName, edge.getLength(), copyNodes.get(edge.getNode1()), copyNodes.get(edge.getNode2()));
                                     copyEdge.setAbsName(newName);
                                     copyNodes.get(node).addEdge(copyEdge);
@@ -495,6 +489,7 @@ public class MainController {
                         }
                         for (Node node : copyNodes.keySet()) {
                             for (Element element : node.getElements()) {
+                                if(alreadyCopiedElements.containsKey(element)) {continue;}
                                 if (element.getType() == Element.Type.WeichenPunkt) {
                                     boolean test = true;
                                     for (Element switchEle : element.getSwitch().getElements()) {
@@ -508,15 +503,11 @@ public class MainController {
                                 String newName = element.higherName().concat("_0");
                                 for(int i = 0; Element.in(graph.getContext()).NameExists(newName) || Element.in(graph.getContext()).absNameExists(newName, null); i++)
                                     {newName = element.higherName().concat("_").concat(String.valueOf(i)); }
-                                /*for (int j = 0; j < 10000; j++) {
-                                    name = gen.nextString();
-                                    if (!Element.in(graph.getContext()).NameExists(element.getName() + "_copy_" + name))
-                                        break;
-                                }*/
+
                                 Element newElem = Element.in(graph.getContext()).create(newName, element.getType(), copyNodes.get(node), element.getState());
                                 newElem.setAbsName(newName);
-                                if (copyNodes.containsKey(element.getDirection()))
-                                    newElem.setDirection(copyNodes.get(element.getDirection()));
+                                if(gPCollector.containsKey(element))
+                                    {gPCollector.get(element).setBelongsTo(newElem);}
                                 if (element.getLogicalGroup() != null) {
                                     // Prüfen ob es eine vollständige logische Gruppe ist oder nicht
                                     LogicalGroup grp = element.getLogicalGroup();
@@ -526,8 +517,10 @@ public class MainController {
                                         {if(!nodeClipboard.contains(e.getNode()))
                                             {completeLG = false; break;}
                                         }
+                                    if(!nodeClipboard.contains(grp.getBelongsTo().getNode()))
+                                        {completeLG = false;}
 
-
+                                    // Wenn es eine komplette logische Gruppe ist:
                                     if(completeLG) {
                                         if(groupCollector.containsKey(element))
                                             {newElem.setLogicalGroup(groupCollector.get(element));
@@ -548,13 +541,23 @@ public class MainController {
                                             for(Element e: grp.getElements()){
                                                 groupCollector.put(e, newGrp);
                                             }
+                                            // Gefahrenpunkte müssen seperat gehandelt werden, da sie nicht direkter Bestandteil
+                                            // einer Gruppe sind und nur über das belongTo-Attribut der Gruppe erreichbar sind
 
+                                            if(grp.getBelongsTo().getType() == Element.Type.GefahrenPunkt)
+                                                {// Wenn der Gefahrenpunkt schon kopiert wurde
+                                                 if(alreadyCopiedElements.containsKey(grp.getBelongsTo()))
+                                                    {newGrp.setBelongsTo(alreadyCopiedElements.get(grp.getBelongsTo()));}
+                                                 // Wenn der Gefahrenpunkt noch nicht kopiert wurde:
+                                                 else
+                                                    {gPCollector.put(grp.getBelongsTo(), newGrp);}
 
-                                            //element.getLogicalGroup().addElement(newElem);
-                                            // TODO check if there is a complete logicalGroup
+                                                }
+
                                         }
                                     }
                                 }
+                                alreadyCopiedElements.put(element, newElem);
                                 copyNodes.get(node).addElement(newElem);
                             }
                             graph.enterNode(copyNodes.get(node));
@@ -1176,7 +1179,7 @@ public class MainController {
                         elementList.getSelectionModel().select(element));
 
                 }
-                //System.out.println(context.getObjets().size());
+
                 showElements();
             });
             graph.changeProperty().addListener(GraphListener);
