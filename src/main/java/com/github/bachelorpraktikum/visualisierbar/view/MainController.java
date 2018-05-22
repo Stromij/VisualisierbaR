@@ -1154,7 +1154,15 @@ public class MainController {
             try
                 {source = new AbsSource(newCommand, newAbsFile,absSource.getProduct());}
             catch (IOException e) {
-                // TODO Fehler beim einlesen
+                e.printStackTrace();
+                ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                String headerText = bundle.getString("file_io_exception_header");
+                alert.setHeaderText(headerText);
+                String contentText = bundle.getString("second_file_not_openable");
+                contentText = String.format(contentText, e.getMessage());
+                alert.setContentText(contentText);
+                alert.showAndWait();
             }
 
             initializeDataSource(source);
