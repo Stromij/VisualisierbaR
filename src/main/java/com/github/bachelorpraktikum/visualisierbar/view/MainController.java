@@ -18,6 +18,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.ProportionalCoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCell;
+import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import javafx.animation.Animation;
@@ -37,11 +38,14 @@ import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -53,6 +57,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
@@ -1080,6 +1085,12 @@ public class MainController {
         stage.setScene(new Scene(rootPane));
 
         stage.centerOnScreen();
+
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
+        stage.setWidth(bounds.getWidth());
+        stage.setHeight(bounds.getHeight());
+
         stage.setMaximized(false);
         stage.setMaximized(true);
     }
@@ -1168,13 +1179,85 @@ public class MainController {
             initializeDataSource(source);
 
             String secondComp = graph.printToAbs();
+            // falls sich die beiden printToAbs nicht gleichen weise den user darauf hin!
             if(!firstComp.equals(secondComp)){
-                //TODO printToAbs gleicht sich nicht!
+                ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                String[] arrFirst = firstComp.split("\n", -1);
+                String[] arrSecond = secondComp.split("\n", -1);
+
+                // Wenn die Längen der beiden Arrays nicht übereinstimmen
+                if(arrFirst.length != arrSecond.length)
+                    {Alert alert = new Alert(Alert.AlertType.WARNING);
+                     alert.setHeaderText(bundle.getString("file_io_exception_header"));
+                     alert.setContentText(bundle.getString("error_length"));
+                     alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+                     alert.initOwner(stage);
+                     alert.showAndWait();
+                    }
+                //Sonst
+                else
+                    { // Definiere eine kleine Klasse für die Tabelle
+
+                     ObservableList<AbsLines> data = FXCollections.observableArrayList();
+
+                     // Suche alle unterschiedlichen Zeilen raus
+                     for(int n = 0; n < arrFirst.length; n++)
+                        {if(!arrFirst[n].equals(arrSecond[n]))
+                            {data.add(new AbsLines(n, arrFirst[n], arrSecond[n]));}
+                        }
+
+
+                     Label label = new Label(bundle.getString("wrong_lines"));
+
+                     // Generiere die Übersichtstabelle
+                     TableView table = new TableView();
+                     TableColumn lineNumber = new TableColumn("#");
+                     lineNumber.setCellValueFactory(
+                                new PropertyValueFactory<AbsLines,String>("line")
+                        );
+                     lineNumber.setMinWidth(40);
+                     TableColumn firstCompTab = new TableColumn("First Output");
+                     firstCompTab.setCellValueFactory(
+                                new PropertyValueFactory<AbsLines,String>("first")
+                        );
+                     firstCompTab.setMinWidth(300);
+                     TableColumn secondCompTab = new TableColumn("Second Output");
+                     secondCompTab.setCellValueFactory(
+                                new PropertyValueFactory<AbsLines,String>("second")
+                        );
+                     secondCompTab.setMinWidth(300);
+
+                     // Fülle die Zellen mit den Daten
+                     table.setItems(data);
+                     table.getColumns().addAll(lineNumber, firstCompTab, secondCompTab);
+
+                     table.setFixedCellSize(25);
+                     table.setMaxHeight(350);
+                     table.setPrefHeight(table.getItems().size()*25 + 28);
+
+
+                     // Wrappe alles
+                     VBox vbox = new VBox();
+                     vbox.setSpacing(5);
+                     vbox.setPadding(new Insets(20, 10, 0, 10));
+                     vbox.getChildren().addAll(label, table);
+
+
+                     // Gerneriere die Warnung an den User
+                     Alert alert = new Alert(Alert.AlertType.WARNING);
+                     alert.setHeaderText(bundle.getString("file_io_exception_header"));
+                     alert.getDialogPane().setContent(vbox);
+                     alert.showAndWait();
+
+
+                    }
             }
 
         }
         showElements();
     }
+
+
 
     /**
      * Doing the initializing things for the graph

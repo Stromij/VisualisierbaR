@@ -98,7 +98,9 @@ public class Visualisierbar extends Application {
             loader.load();
             MainController controller = loader.getController();
             controller.setDataSource(dataSource);
+            System.out.println(primaryStage.isMaximized() + "  t");
             controller.setStage(primaryStage);
+
         } else {
             loader.setLocation(
                 getClass().getResource("view/sourcechooser/SourceChooser.fxml")

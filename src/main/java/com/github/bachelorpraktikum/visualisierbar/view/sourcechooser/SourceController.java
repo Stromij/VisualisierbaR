@@ -187,6 +187,7 @@ public class SourceController {
         MainController controller = mainLoader.getController();
         controller.setStage(stage);
         controller.setDataSource(dataSource);
+
     }
 
     private void closeWindow() {
