@@ -4,8 +4,11 @@ import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -22,6 +25,8 @@ public class TexteditorController {
     private Pane topPane;
     @FXML
     private Pane centerPane;
+    @FXML
+    private ToggleButton copyToggle;
 
     private JEditorPane editorPane;
     private SwingNode editorPaneNode;
@@ -29,12 +34,24 @@ public class TexteditorController {
 
     @FXML
     private void initialize() {
-         // Generiere das GUI
-         editorPaneNode = new SwingNode();
-         editorPane = new JEditorPane();
+        // Füllle das CenterPane mit dem JEditorPane
+        editorPaneNode = new SwingNode();
+        editorPane = new JEditorPane();
 
-         createSwingContent(editorPaneNode, editorPane);
-         centerPane.getChildren().add(editorPaneNode);
+        createSwingContent(editorPaneNode, editorPane);
+        centerPane.getChildren().add(editorPaneNode);
+        centerPane.setFocusTraversable(true);
+        editorPaneNode.setOnMouseClicked((event -> {editorPaneNode.requestFocus();}));
+
+
+        // Fülle das TopPane mit den Funktionstasten
+        SVGPath svgCopy = new SVGPath();
+        svgCopy.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
+        copyToggle.setGraphic(svgCopy);
+
+
+
+
     }
 
     public void setStage(@Nonnull Stage stage) {
@@ -43,13 +60,9 @@ public class TexteditorController {
 
         stage.centerOnScreen();
 
-        Screen screen = Screen.getPrimary();
-        Rectangle2D bounds = screen.getVisualBounds();
-        stage.setWidth(bounds.getWidth());
-        stage.setHeight(bounds.getHeight());
-
         stage.setMaximized(false);
         stage.setMaximized(true);
+        stage.setTitle("Abs-Editor");
     }
 
 

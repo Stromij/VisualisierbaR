@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.SVGPath?>
+<SVGPath
+        content="M200 0 L500 0 L500 600 L0 600 L0 200 Z"
+        opacity="1"
+>
+    <fill>
+        <Color>
+            <red>0.0</red>
+            <green>0.0</green>
+            <blue>0.0</blue>
+        </Color>
+    </fill>
+</SVGPath>
+

@@ -1498,7 +1498,6 @@ public class MainController {
         Stage editorStage = new Stage();
         loader.setResources(localizationBundle);
 
-        System.out.println("gottcha");
         try {loader.load();}
         catch(IOException e) {
             Logger.getLogger(getClass().getName()).severe("Main window couldn't be opened\n" + e);
@@ -1509,5 +1508,7 @@ public class MainController {
         controller.setStage(editorStage);
 
         editorStage.show();
+
+        stage.requestFocus();
     }
 }
