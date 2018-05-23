@@ -20,6 +20,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoor
 import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.TexteditorController;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -71,6 +72,7 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -317,6 +319,8 @@ public class MainController {
                 topPane.getChildren().get(0).setManaged(false);
                 topPane.getChildren().get(1).setVisible(true);
                 topPane.getChildren().get(1).setManaged(true);
+
+                startTexteditor();
 
                 if (eventTraversal.isSelected()) {
                     eventTraversal.fire();
@@ -1482,5 +1486,28 @@ public class MainController {
             return true;
         }
         return result.isPresent() && result.get() == buttonOK;
+    }
+
+
+    /**
+     * Installs the Texteditor
+     */
+    private void startTexteditor(){
+        FXMLLoader loader = new FXMLLoader(TexteditorController.class.getResource("TexteditorView.fxml"));
+        ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
+        Stage editorStage = new Stage();
+        loader.setResources(localizationBundle);
+
+        System.out.println("gottcha");
+        try {loader.load();}
+        catch(IOException e) {
+            Logger.getLogger(getClass().getName()).severe("Main window couldn't be opened\n" + e);
+            return;
+        }
+
+        TexteditorController controller = loader.getController();
+        controller.setStage(editorStage);
+
+        editorStage.show();
     }
 }

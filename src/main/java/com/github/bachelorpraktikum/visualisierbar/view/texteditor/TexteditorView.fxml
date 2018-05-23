@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:id="rootPane" prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.bachelorpraktikum.visualisierbar.view.texteditor.TexteditorController">
+    <top>
+        <StackPane fx:id="topPane">
+
+        </StackPane>
+    </top>
+    <center>
+        <StackPane fx:id="centerPane">
+
+        </StackPane>
+    </center>
+    <left>
+        <StackPane fx:id="leftPane">
+
+        </StackPane>
+    </left>
+</BorderPane>
