@@ -38,8 +38,6 @@ public class AbsSource implements DataSource {
         this.fileToAbsSource = path;
         this.product = product;
 
-        System.out.println(path);
-        System.out.println(command);
         this.context = parseFile();
         this.delta = new ArrayList<>();
     }
@@ -51,11 +49,12 @@ public class AbsSource implements DataSource {
      * @throws IOException throws an Error, when the Input is not valid e.g. it's not an ABS-File
      */
     private File compileABS(String command) throws IOException {
-        File file = new File(String.format("%s/actual.zug", this.parent.getPath()));
+        File file = new File(String.format("%sactual.zug", this.parent.getPath()));
         String OS = System.getProperty("os.name").toLowerCase();
         String fileToConsole = "/bin/bash";
         String c = "-c";
-        String printConsole = String.format("rm -r gen/erlang/*; %s; cd gen/erlang; ./run > %s/actual.zug;", command, this.parent.getPath());
+        String printConsole = String.format("rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run > %sactual.zug;", command, this.parent.getPath());
+
         if(OS.contains("win"))
             {fileToConsole = "cmd.exe";
              c = "/c";

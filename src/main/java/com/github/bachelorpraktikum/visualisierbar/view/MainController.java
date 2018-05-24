@@ -1165,7 +1165,7 @@ public class MainController {
             String firstComp = graph.printToAbs();
 
             File newAbsFile = absSource.refactorSource(graph);
-            String newCommand = String.format("absc -v -product=Groups -erlang %s/*.abs -d %s/gen/erlang/", newAbsFile, absSource.getParent().toString());
+            String newCommand = String.format("absc -v -product=%s -erlang %s/*.abs -d %sgen/erlang/", absSource.getProduct(), newAbsFile, absSource.getParent().getPath());
             try
                 {source = new AbsSource(newCommand, newAbsFile,absSource.getProduct());}
             catch (IOException e) {
