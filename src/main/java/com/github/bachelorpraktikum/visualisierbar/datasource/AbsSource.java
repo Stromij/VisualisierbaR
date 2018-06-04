@@ -53,7 +53,7 @@ public class AbsSource implements DataSource {
         String OS = System.getProperty("os.name").toLowerCase();
         String fileToConsole = "/bin/bash";
         String c = "-c";
-        String printConsole = String.format("rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run > %sactual.zug;", command, this.parent.getPath());
+        String printConsole = String.format("source /etc/bash.bashrc; rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run > %sactual.zug;", command, this.parent.getPath());
 
         if(OS.contains("win"))
             {fileToConsole = "cmd.exe";
@@ -66,13 +66,20 @@ public class AbsSource implements DataSource {
         builder.directory(new File(this.parent.getPath()));
         builder.command(fileToConsole, c, printConsole);
 
+        // Debugging Output (Ausgabe der Konsolenrückgabe)
+        // builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
+
         Process process = builder.start();
+
+
 
         try {
             int exitCode = process.waitFor();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
 
 
         return file;
@@ -329,4 +336,7 @@ public class AbsSource implements DataSource {
 
     public URI getParent()
         {return parent;}
+
+    public File getFileToAbsSource()
+        {return fileToAbsSource;}
 }

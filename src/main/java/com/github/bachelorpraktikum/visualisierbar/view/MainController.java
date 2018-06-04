@@ -1560,18 +1560,22 @@ public class MainController {
      * Installs the Texteditor
      */
     private void startTexteditor(){
+        if(absSource == null) return;
         FXMLLoader loader = new FXMLLoader(TexteditorController.class.getResource("TexteditorView.fxml"));
         ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
         Stage editorStage = new Stage();
         loader.setResources(localizationBundle);
 
+
+
         try {loader.load();}
         catch(IOException e) {
-            Logger.getLogger(getClass().getName()).severe("Main window couldn't be opened\n" + e);
+            Logger.getLogger(getClass().getName()).severe("Editor window couldn't be opened\n" + e);
             return;
         }
 
         TexteditorController controller = loader.getController();
+        controller.setPath(absSource.getFileToAbsSource());
         controller.setStage(editorStage);
 
         editorStage.show();
