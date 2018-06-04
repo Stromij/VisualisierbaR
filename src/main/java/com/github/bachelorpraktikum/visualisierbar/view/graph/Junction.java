@@ -49,6 +49,7 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
             mousePressedX = -1;
             mousePressedY = -1;
             selection.forEach((b) -> {
+
                 Circle a = b.getShape();
                 a.setTranslateX(Math.round(a.getTranslateX()));//snap to valid coordinates
                 a.setTranslateY(Math.round(a.getTranslateY()));//technically you would want to move the full Node here
