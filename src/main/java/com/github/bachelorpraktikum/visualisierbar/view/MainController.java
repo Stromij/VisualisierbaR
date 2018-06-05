@@ -1234,7 +1234,7 @@ public class MainController {
             File newAbsFile = absSource.refactorSource(graph);
             String newCommand = String.format("absc -v -product=%s -erlang %s/*.abs -d %sgen/erlang/", absSource.getProduct(), newAbsFile, absSource.getParent().getPath());
             try
-                {source = new AbsSource(newCommand, newAbsFile,absSource.getProduct());}
+                {source = new AbsSource(newCommand, newAbsFile, absSource.getProduct());}
             catch (IOException e) {
                 e.printStackTrace();
                 ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");

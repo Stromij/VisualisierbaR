@@ -3,30 +3,25 @@ package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.StyledEditorKit;
 import java.awt.*;
 import java.io.*;
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class TexteditorController {
 
@@ -47,16 +42,19 @@ public class TexteditorController {
     private File fileOfAbs;
 
     private Label actualLab;
-    private HashMap<String ,StringBuffer> content;
+    private HashMap<String, StringBuffer> content;
+    private ArrayList<Label> labels;
 
     @FXML
     private void initialize() {
         // Füllle das CenterPane mit dem JEditorPane
         editorPaneNode = new SwingNode();
         editorPane = new JEditorPane()
-            {public boolean getScrollableTracksViewportWidth()
+            {@Override
+             public boolean getScrollableTracksViewportWidth()
                 {return false ;}
 
+             @Override
              public void setSize(Dimension d)
                 {if (d.width < getParent().getSize().width)
                     {d.width = getParent().getSize().width;}
@@ -83,9 +81,16 @@ public class TexteditorController {
 
 
         content = new HashMap<>();
+        labels = new ArrayList<>();
 
     }
 
+
+    /**
+     * The {@link #rootPane} will be displayed on the given stage.
+     *
+     * @param stage Stage on which the scene will be displayed
+     */
     public void setStage(@Nonnull Stage stage) {
         this.stage = stage;
         stage.setScene(new Scene(rootPane));
@@ -97,6 +102,14 @@ public class TexteditorController {
         stage.setTitle("Abs-Editor");
     }
 
+
+    /**
+     * Sets the path to the ABS-Directory, displays its content as labels at the left hand side of the editor
+     * and adds Listeners to the labels to switch the content of the EditorPane and the style of the choosen
+     * input-File
+     *
+     * @param file to the ABS-Directory
+     */
     public void setPath(File file)
         {fileOfAbs = file;
          File[] allFiles = fileOfAbs.listFiles();
@@ -104,9 +117,9 @@ public class TexteditorController {
          grid.setHgap(0);
          grid.setVgap(0);
 
-         Label directory = new Label(file.getParentFile().toString().concat("/"));
+         Label directory = new Label(file.toString().concat("/"));
          directory.setStyle("-fx-font-weight: bold");
-         grid.add(new Label(file.getParentFile().toString().concat("/")), 0, 0);
+         grid.add(directory, 0, 0);
 
 
          int rowInd = 1;
@@ -184,6 +197,7 @@ public class TexteditorController {
 
              // Füge das Label dem Grid hinzu
              grid.add(lab, 0, rowInd);
+             labels.add(lab);
              rowInd++;
             }
 
@@ -193,6 +207,11 @@ public class TexteditorController {
         }
 
 
+    /**
+     * Creates SwingContent of an given JCompnent
+     * @param swingNode
+     * @param component
+     */
     private void createSwingContent(final SwingNode swingNode, final JComponent component) {
         SwingUtilities.invokeLater(() -> swingNode.setContent(component));
     }
