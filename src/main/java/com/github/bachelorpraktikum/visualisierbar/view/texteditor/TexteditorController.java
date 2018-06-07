@@ -1,5 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 
+import com.github.bachelorpraktikum.visualisierbar.absparser.AbsParser;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -17,7 +18,7 @@ import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.StyledEditorKit;
+import javax.swing.text.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
@@ -128,6 +129,7 @@ public class TexteditorController {
              lab.setPadding(new Insets(5,5,5,15));
              lab.setCursor(Cursor.HAND);
 
+             // Listener für Maus-Klicks: Der user möchte eine andere Datei sehen
              lab.setOnMouseClicked((event -> {
                     // Wechsel den Background und lade den editierten Inhalt in die HashMap
                     if(actualLab != lab)
@@ -193,6 +195,26 @@ public class TexteditorController {
 
                  lab.setStyle("-fx-background-color: lightblue");
                  actualLab = lab;
+
+                 AbsParser parser = new AbsParser();
+                 DefaultStyledDocument document = new DefaultStyledDocument();
+                    try {
+                        Document result  = parser.parse(editorPane.getText(), document);
+                        editorPane.setDocument(result);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    /*DefaultStyledDocument document = new DefaultStyledDocument();
+
+                    StyleContext contextStyle = new StyleContext();
+                    Style style = contextStyle.addStyle("group", null);
+                    StyleConstants.setForeground(style, Color.BLUE);
+                    try {document.insertString(0,editorPane.getText(), style);
+                         editorPane.setDocument(document);
+                        }
+                    catch(BadLocationException e) {e.printStackTrace();}*/
                 }
 
              // Füge das Label dem Grid hinzu

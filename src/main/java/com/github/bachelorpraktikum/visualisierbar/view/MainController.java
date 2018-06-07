@@ -1249,7 +1249,7 @@ public class MainController {
 
             initializeDataSource(source);
 
-            String secondComp = graph.printToAbs();
+            String secondComp = graph.printToAbs() + " nkjsjdnb";
             // falls sich die beiden printToAbs nicht gleichen weise den user darauf hin!
             if(!firstComp.equals(secondComp)){
                 ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
