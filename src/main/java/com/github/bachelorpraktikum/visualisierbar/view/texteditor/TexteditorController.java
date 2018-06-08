@@ -1,12 +1,13 @@
 package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 
-import com.github.bachelorpraktikum.visualisierbar.absparser.AbsParser;
+import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -196,25 +197,11 @@ public class TexteditorController {
                  lab.setStyle("-fx-background-color: lightblue");
                  actualLab = lab;
 
-                 AbsParser parser = new AbsParser();
-                 DefaultStyledDocument document = new DefaultStyledDocument();
-                    try {
-                        Document result  = parser.parse(editorPane.getText(), document);
-                        editorPane.setDocument(result);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                 SyntaxLexer lex = new SyntaxLexer();
+                 Document result = lex.lex(editorPane.getText());
+                 editorPane.setDocument(result);
 
-
-                    /*DefaultStyledDocument document = new DefaultStyledDocument();
-
-                    StyleContext contextStyle = new StyleContext();
-                    Style style = contextStyle.addStyle("group", null);
-                    StyleConstants.setForeground(style, Color.BLUE);
-                    try {document.insertString(0,editorPane.getText(), style);
-                         editorPane.setDocument(document);
-                        }
-                    catch(BadLocationException e) {e.printStackTrace();}*/
+                 editorPane.getDocument().addDocumentListener(new ChangeListener());
                 }
 
              // Füge das Label dem Grid hinzu
@@ -227,6 +214,30 @@ public class TexteditorController {
          leftPane.getChildren().add(grid);
          leftPane.setPadding(new Insets(10,10,0,10));
         }
+
+    class ChangeListener implements DocumentListener {
+
+
+        public void insertUpdate(DocumentEvent e) {
+            update();
+        }
+
+        public void removeUpdate(DocumentEvent e)
+            {update();}
+
+        public void changedUpdate(DocumentEvent e) {
+            //Plain text components do not fire these events
+        }
+
+        private void update(){
+            int position = editorPane.getCaretPosition();
+            SyntaxLexer lex = new SyntaxLexer();
+            Document result = lex.lex(editorPane.getText());
+            editorPane.setDocument(result);
+            editorPane.setCaretPosition(position);
+            editorPane.getDocument().addDocumentListener(new ChangeListener());
+        }
+    }
 
 
     /**

@@ -7,11 +7,10 @@
 // - Generate code for full ABS
 // - Implement the raiseExceptions flag
 // - Implement parsing of incomplete expressions and generate the corresponding AST
-grammar ABS;
+grammar Abs;
 
-
-TraditionalComment : '/*' .*? '*/' -> channel(HIDDEN);
-EndOfLineComment : '//' .*? ('\n' | EOF) -> channel(HIDDEN);
+TraditionalComment : '/*' .*? '*/';
+EndOfLineComment : '//' .*? ('\n' | EOF);
 WhiteSpace : [ \t\f\r\n]+;
 
 // Common lexical elements
@@ -478,8 +477,4 @@ compilation_unit : module_decl* delta_decl*
         ('root' feature_decl | 'extension' fextension)*
     ;
 
-goal : compilation_unit;
-
-// additional for Syntaxhighlighting only:
-
-Unmatched: . -> channel(HIDDEN);
+goal : compilation_unit ;
