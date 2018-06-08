@@ -6,9 +6,6 @@ import com.github.bachelorpraktikum.visualisierbar.view.graph.elements.Elements;
 
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-
-import com.sun.istack.internal.NotNull;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Group;
 import javax.annotation.Nonnull;
