@@ -22,8 +22,8 @@ public class SyntaxLexer {
          AbsLexer lexer = new AbsLexer(stream);
 
          for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken())
-            {try {
-                  response.insertString(response.getLength(), token.getText(),getStyle(token.getType()));
+            {try {System.out.println(token.getText() + " " + token.getType());
+                  response.insertString(response.getLength(), token.getText(), getStyle(token.getType()));
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
@@ -52,9 +52,34 @@ public class SyntaxLexer {
                 return null;
             case AbsLexer.T__3:                 // ")" bei Funktionen
                 return null;
-            case AbsLexer.T__4:                 // "?"
-                return getTestStyle();
+            case AbsLexer.T__4:                 // ?
+                return null;
+            case AbsLexer.T__5:                 // "new"
+                return getDeclarationStyle();
             case AbsLexer.T__6:                 // "local"
+                return getDeclarationStyle();
+            case AbsLexer.T__7:                 // "await"
+                return getDeclarationStyle();
+            case AbsLexer.T__8:                 // ?
+                return null;
+            case AbsLexer.T__9:                 // ?
+                return null;
+            case AbsLexer.T__10:                // "[" bei HTTP etc
+                return null;
+            case AbsLexer.T__11:                // "]" bei HTTP etc
+                return null;
+            case AbsLexer.T__12:                // "this" bei internen Klassenbeziehungen
+                return getDeclarationStyle();
+            case AbsLexer.T__13:                // "null"
+                return getDeclarationStyle();
+            case AbsLexer.T__14:                // "if"
+                return getDeclarationStyle();
+            case AbsLexer.T__15:
+                return getDeclarationStyle();
+            case AbsLexer.T__53:                // "module"
+                return getDeclarationStyle();
+            case 90:                            // Leerzeichen
+                return null;
 
             default: return null;
          }
