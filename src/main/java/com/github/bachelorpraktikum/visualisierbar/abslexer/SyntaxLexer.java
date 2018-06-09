@@ -14,6 +14,11 @@ public class SyntaxLexer {
     public SyntaxLexer()
         {}
 
+    /**
+     * Returns a styled document with syntax highlighting
+     * @param toLex the string to be highlighted
+     * @return a styled document
+     */
     public Document lex(String toLex)
         {Document response = new DefaultStyledDocument();
 
@@ -21,8 +26,7 @@ public class SyntaxLexer {
          AbsLexer lexer = new AbsLexer(stream);
 
          for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken())
-            {try {System.out.println(token.getText() + " " + token.getType());
-                  response.insertString(response.getLength(), token.getText(), getStyle(token.getType()));
+            {try {response.insertString(response.getLength(), token.getText(), getStyle(token.getType()));
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
@@ -31,6 +35,12 @@ public class SyntaxLexer {
          return response;
         }
 
+
+    /**
+     * Returns a specific style for the given Token-Type
+     * @param type Token-Type
+     * @return given Style
+     */
     private Style getStyle(int type)
         {switch(type) {
             case AbsLexer.EndOfLineComment:
@@ -226,7 +236,10 @@ public class SyntaxLexer {
          }
         }
 
-
+    /**
+     * Style for commands
+     * @return the style for commands
+     */
     private Style getCommandStyle()
         {Style commentStyle = new StyleContext().addStyle("comment", null);
          StyleConstants.setForeground(commentStyle, new Color(2, 125,0));
@@ -234,6 +247,10 @@ public class SyntaxLexer {
          return commentStyle;
         }
 
+    /**
+     * Style for declarations
+     * @return the style for declarations
+     */
     private Style getDeclarationStyle()
         {Style declarationStyle = new StyleContext().addStyle("declaration", null);
          StyleConstants.setForeground(declarationStyle, new Color(178, 23, 101));
@@ -241,12 +258,20 @@ public class SyntaxLexer {
          return declarationStyle;
         }
 
+    /**
+     * Style for literals
+     * @return the style for literals
+     */
     private Style getLiteralsStyle()
         {Style literalStyle = new StyleContext().addStyle("literal", null);
          StyleConstants.setForeground(literalStyle, new Color(203, 0, 5));
          return literalStyle;
         }
 
+    /**
+     * Style for strings
+     * @return the style for strings
+     */
     private Style getStringStyle()
         {Style stringStyle = new StyleContext().addStyle("string", null);
          StyleConstants.setForeground(stringStyle, new Color(72, 72, 72));
@@ -254,6 +279,10 @@ public class SyntaxLexer {
          return stringStyle;
         }
 
+    /**
+     * Style for from
+     * @return the style for from
+     */
     private Style getFromStyle()
         {Style stringStyle = new StyleContext().addStyle("from", null);
          StyleConstants.setItalic(stringStyle, true);

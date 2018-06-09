@@ -69,6 +69,9 @@ public class TexteditorController {
 
         JScrollPane scrollPane = new JScrollPane(editorPane);
 
+        TextLineNumber tln = new TextLineNumber(editorPane);
+        scrollPane.setRowHeaderView(tln);
+
         createSwingContent(editorPaneNode, scrollPane);
         centerPane.getChildren().add(editorPaneNode);
         centerPane.setFocusTraversable(true);
@@ -215,6 +218,10 @@ public class TexteditorController {
          leftPane.setPadding(new Insets(10,10,0,10));
         }
 
+
+    /**
+     * Inlineclass for the DocumentListener to adapt the Syntaxhighlighting
+     */
     class ChangeListener implements DocumentListener {
 
 
