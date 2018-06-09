@@ -26,7 +26,9 @@ public class SyntaxLexer {
          AbsLexer lexer = new AbsLexer(stream);
 
          for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken())
-            {try {response.insertString(response.getLength(), token.getText(), getStyle(token.getType()));
+            {try {//Ausgabe zum finden von Token-Nummern
+                  //System.out.println(token.getText() + "  " + token.getType());
+                  response.insertString(response.getLength(), token.getText(), getStyle(token.getType()));
                 } catch (BadLocationException e) {
                     e.printStackTrace();
                 }
@@ -55,7 +57,7 @@ public class SyntaxLexer {
                 return getStringStyle();
             case AbsLexer.IDENTIFIER:
                 return null;
-            case AbsLexer.T__0:                 // ?
+            case AbsLexer.T__0:                 // "." im Sinne von Untertyp (String.valueOf)
                 return null;
             case AbsLexer.T__1:                 // "," in Parameterlisten
                 return null;
@@ -63,8 +65,8 @@ public class SyntaxLexer {
                 return null;
             case AbsLexer.T__3:                 // ")" bei Funktionen
                 return null;
-            case AbsLexer.T__4:                 // ?
-                return null;
+            case AbsLexer.T__4:                 // "get"
+                return getDeclarationStyle();
             case AbsLexer.T__5:                 // "new"
                 return getDeclarationStyle();
             case AbsLexer.T__6:                 // "local"
@@ -73,8 +75,8 @@ public class SyntaxLexer {
                 return getDeclarationStyle();
             case AbsLexer.T__8:                 // ?
                 return null;
-            case AbsLexer.T__9:                 // ?
-                return null;
+            case AbsLexer.T__9:                 // "original"
+                return getDeclarationStyle();
             case AbsLexer.T__10:                // "[" bei HTTP etc
                 return null;
             case AbsLexer.T__11:                // "]" bei HTTP etc
@@ -85,10 +87,10 @@ public class SyntaxLexer {
                 return getDeclarationStyle();
             case AbsLexer.T__14:                // "if"
                 return getDeclarationStyle();
-            case AbsLexer.T__15:                // ?
-                return null;
-            case AbsLexer.T__16:                // ?
-                return null;
+            case AbsLexer.T__15:                // "then"
+                return getDeclarationStyle();
+            case AbsLexer.T__16:                // "else"
+                return getDeclarationStyle();
             case AbsLexer.T__17:                // "case"
                 return getDeclarationStyle();
             case AbsLexer.T__18:                // "{"
@@ -115,8 +117,8 @@ public class SyntaxLexer {
                 return getDeclarationStyle();
             case AbsLexer.T__29:                // ?
                 return null;
-            case AbsLexer.T__30:                // ?
-                return null;
+            case AbsLexer.T__30:                // "while"
+                return getDeclarationStyle();
             case AbsLexer.T__31:                // ?
                 return null;
             case AbsLexer.T__32:                // ?
@@ -135,26 +137,26 @@ public class SyntaxLexer {
                 return null;
             case AbsLexer.T__39:                // ?
                 return null;
-            case AbsLexer.T__40:                // ?
+            case AbsLexer.T__40:                // "?"
                 return null;
             case AbsLexer.T__41:                // ?
                 return null;
-            case AbsLexer.T__42:                // ?
+            case AbsLexer.T__42:                // "data"
+                return getDeclarationStyle();
+            case AbsLexer.T__43:                //  "|"
                 return null;
-            case AbsLexer.T__43:                // ?
-                return null;
-            case AbsLexer.T__44:                // ?
-                return null;
+            case AbsLexer.T__44:                // "type"
+                return getDeclarationStyle();
             case AbsLexer.T__45:                // ?
                 return null;
-            case AbsLexer.T__46:                // ?
-                return null;
+            case AbsLexer.T__46:                // "def"
+                return getDeclarationStyle();
             case AbsLexer.T__47:                // ?
                 return null;
             case AbsLexer.T__48:                // "interface"
                 return getDeclarationStyle();
-            case AbsLexer.T__49:                // ?
-                return null;
+            case AbsLexer.T__49:                // "extends"
+                return getDeclarationStyle();
             case AbsLexer.T__50:                // "class"
                 return getDeclarationStyle();
             case AbsLexer.T__51:                // "implements"
@@ -177,8 +179,8 @@ public class SyntaxLexer {
                 return getDeclarationStyle();
             case AbsLexer.T__60:                // "modifies"
                 return getDeclarationStyle();
-            case AbsLexer.T__61:                // ?
-                return null;
+            case AbsLexer.T__61:                // "uses"
+                return getDeclarationStyle();
             case AbsLexer.T__62:                // "delta"
                 return getDeclarationStyle();
             case AbsLexer.T__63:                // ?
@@ -281,7 +283,7 @@ public class SyntaxLexer {
 
     /**
      * Style for from
-     * @return the style for from
+     * @return the style for form
      */
     private Style getFromStyle()
         {Style stringStyle = new StyleContext().addStyle("from", null);

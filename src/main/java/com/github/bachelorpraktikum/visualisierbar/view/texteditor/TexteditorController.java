@@ -46,6 +46,7 @@ public class TexteditorController {
     private Label actualLab;
     private HashMap<String, StringBuffer> content;
     private ArrayList<Label> labels;
+    private SyntaxLexer lex;
 
     @FXML
     private void initialize() {
@@ -87,6 +88,7 @@ public class TexteditorController {
 
         content = new HashMap<>();
         labels = new ArrayList<>();
+        lex = new SyntaxLexer();
 
     }
 
@@ -172,7 +174,7 @@ public class TexteditorController {
                     else
                         {buffer = content.get(f.getName());}
 
-                 editorPane.setText(buffer.toString());
+                 editorPane.setDocument(lex.lex(buffer.toString()));
              }));
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
@@ -200,7 +202,6 @@ public class TexteditorController {
                  lab.setStyle("-fx-background-color: lightblue");
                  actualLab = lab;
 
-                 SyntaxLexer lex = new SyntaxLexer();
                  Document result = lex.lex(editorPane.getText());
                  editorPane.setDocument(result);
 
