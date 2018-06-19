@@ -6,9 +6,8 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextFormatter;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -36,7 +35,11 @@ public class TexteditorController {
     @FXML
     private Pane centerPane;
     @FXML
-    private ToggleButton copyToggle;
+    private Button copyButton;
+    @FXML
+    private Button redoButton;
+    @FXML
+    private Button undoButton;
 
     private JEditorPane editorPane;
     private SwingNode editorPaneNode;
@@ -47,6 +50,10 @@ public class TexteditorController {
     private HashMap<String, StringBuffer> content;
     private ArrayList<Label> labels;
     private SyntaxLexer lex;
+    private History his;
+    private ChangeListener changeListener;
+    private boolean firstUndo;
+    private boolean firstRedo;
 
     @FXML
     private void initialize() {
@@ -83,14 +90,84 @@ public class TexteditorController {
         // Fülle das TopPane mit den Funktionstasten
         SVGPath svgCopy = new SVGPath();
         svgCopy.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
-        copyToggle.setGraphic(svgCopy);
+        copyButton.setGraphic(svgCopy);
+
+        undoButton.setOnAction(ActionEvent -> undo());
+        redoButton.setOnAction(ActionEvent -> redo());
+        undoButton.setDisable(true);
+        redoButton.setDisable(true);
 
 
         content = new HashMap<>();
         labels = new ArrayList<>();
         lex = new SyntaxLexer();
-
+        his = new History(10);
+        changeListener = new ChangeListener();
+        firstUndo = true;
+        firstRedo = true;
     }
+
+    private void undo()
+        {if(!his.canUndo()) {return;}
+         // Wenn der das I im Changelistener größer als 0 ist muss der aktuelle Zustand
+         // gespeicher werden, bevor ein erster Undo gemancht werden kann
+         if(changeListener.getI() > 0 && firstUndo)
+            {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
+             changeListener.setI(0);
+            }
+         // Wenn es der erste Undo ist, dann muss der Undo doppelt gemacht werden,
+         // da sonst beim Klick der aktuelle Zustand geladen wird.
+         if(firstUndo)
+            {firstUndo = false;
+             firstRedo = true;
+             changeListener.resetIsNew();
+             his.undo();
+            }
+
+         // Hole das HistoryElement aus der History
+         HistoryElement hisElem = his.undo();
+         File fileToUndo = hisElem.getFile();
+         StringBuffer doc = hisElem.getDocument();
+
+         //ersetzte das Document in content & lexe es
+         content.replace(fileToUndo.getName(), doc);
+         editorPane.setDocument(lex.lex(doc.toString()));
+         editorPane.getDocument().addDocumentListener(changeListener);
+
+         // TODO: Datei-Switch
+
+         // Disable/Enable die Redo & Undo-Button
+         undoButton.setDisable(!his.canUndo());
+         redoButton.setDisable(!his.canRedo());
+        }
+
+    private void redo()
+        {if(!his.canRedo()) {return;}
+         // beim ersten Redo muss wird der aktuelle Zustand geladen, sodass ein doppeltes Redo
+         // stattfinden muss
+         if(firstRedo)
+            {firstRedo = false;
+             firstUndo = true;
+             changeListener.resetIsNew();
+             his.redo();
+            }
+         // Hole das HistoryElement aus der History
+         HistoryElement hisElem = his.redo();
+         File fileToRedo = hisElem.getFile();
+         StringBuffer doc = hisElem.getDocument();
+
+         //ersetzte das Document in content
+
+         content.replace(fileToRedo.getName(), doc);
+         editorPane.setDocument(lex.lex(doc.toString()));
+         editorPane.getDocument().addDocumentListener(changeListener);
+
+         //TODO: Datei-Switch
+
+         // Disable/Enable die Redo & Undo-Button
+         undoButton.setDisable(!his.canUndo());
+         redoButton.setDisable(!his.canRedo());
+        }
 
 
     /**
@@ -143,7 +220,10 @@ public class TexteditorController {
                          if(actualLab != null)
                              {actualLab.setStyle(null);
                               if(content.containsKey(actualLab.getText()))
-                                  {content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));}
+                                  {if(!content.get(actualLab.getText()).equals(editorPane.getText()))
+                                      {his.insert(new File(fileOfAbs.toString().concat(actualLab.getText())), new StringBuffer(editorPane.getText()));}
+                                   content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));
+                                  }
                              }
                          actualLab = lab;
                         }
@@ -205,7 +285,8 @@ public class TexteditorController {
                  Document result = lex.lex(editorPane.getText());
                  editorPane.setDocument(result);
 
-                 editorPane.getDocument().addDocumentListener(new ChangeListener());
+                 editorPane.getDocument().addDocumentListener(changeListener);
+                 his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
                 }
 
              // Füge das Label dem Grid hinzu
@@ -224,18 +305,54 @@ public class TexteditorController {
      * Inlineclass for the DocumentListener to adapt the Syntaxhighlighting
      */
     class ChangeListener implements DocumentListener {
-
+        private int i = 0;
+        private DocumentEvent lastEvent;
+        private boolean isNew = true;
 
         public void insertUpdate(DocumentEvent e) {
-            update();
+            if(lastEvent != null && !lastEvent.equals(e))
+                {safe(); lastEvent = e;}
+            else if(i > 10 || i + e.getLength() > 10)
+                {safe(); i = 0;}
+            else if(isNew)
+                {isNew = false;
+                 safe(); i = 0;
+                }
+            else
+                {i += e.getLength();}
+            update();System.out.println(e.getLength());
+
         }
 
         public void removeUpdate(DocumentEvent e)
-            {update();}
+            {if(lastEvent != null && !lastEvent.equals(e))
+                {safe(); lastEvent = e;}
+             else if(i > 10 || i + e.getLength() > 10)
+                {safe(); i = 0;}
+             else
+                {i += e.getLength();}
+             update(); System.out.println(e.getLength());
+
+            }
 
         public void changedUpdate(DocumentEvent e) {
-            //Plain text components do not fire these events
+
         }
+
+        private void safe()
+            {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
+             undoButton.setDisable(!his.canUndo());
+             redoButton.setDisable(!his.canRedo());
+            }
+
+        public void resetIsNew()
+            {isNew = true;}
+
+        public int getI()
+            {return i;}
+
+        public void setI(int newi)
+            {this.i = newi;}
 
         private void update(){
             int position = editorPane.getCaretPosition();
@@ -243,7 +360,9 @@ public class TexteditorController {
             Document result = lex.lex(editorPane.getText());
             editorPane.setDocument(result);
             editorPane.setCaretPosition(position);
-            editorPane.getDocument().addDocumentListener(new ChangeListener());
+            editorPane.getDocument().addDocumentListener(changeListener);
+            firstRedo = true;
+            firstUndo = true;
         }
     }
 
