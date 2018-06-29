@@ -134,7 +134,19 @@ public class TexteditorController {
          editorPane.setDocument(lex.lex(doc.toString()));
          editorPane.getDocument().addDocumentListener(changeListener);
 
-         // TODO: Datei-Switch
+         // Datei-Switch
+         if(!actualLab.getText().equals(fileToUndo.getName()))
+            {actualLab.setStyle(null);
+                // Suche nach dem Label der neuen Datei
+                for(Label l : labels)
+                {if(l.getText().equals(fileToUndo.getName()))
+                    {// das Label der neuen Datei ist gefunden.
+                     actualLab = l;
+                     actualLab.setStyle("-fx-background-color: lightblue");
+                     break;
+                    }
+                }
+            }
 
          // Disable/Enable die Redo & Undo-Button
          undoButton.setDisable(!his.canUndo());
@@ -151,6 +163,7 @@ public class TexteditorController {
              changeListener.resetIsNew();
              his.redo();
             }
+
          // Hole das HistoryElement aus der History
          HistoryElement hisElem = his.redo();
          File fileToRedo = hisElem.getFile();
@@ -162,7 +175,19 @@ public class TexteditorController {
          editorPane.setDocument(lex.lex(doc.toString()));
          editorPane.getDocument().addDocumentListener(changeListener);
 
-         //TODO: Datei-Switch
+         // Datei-Switch
+         if(!actualLab.getText().equals(fileToRedo.getName()))
+            {actualLab.setStyle(null);
+             // Suche nach dem Label der neuen Datei
+             for(Label l : labels)
+                {if(l.getText().equals(fileToRedo.getName()))
+                    {// das Label der neuen Datei ist gefunden.
+                     actualLab = l;
+                     actualLab.setStyle("-fx-background-color: lightblue");
+                     break;
+                    }
+                }
+            }
 
          // Disable/Enable die Redo & Undo-Button
          undoButton.setDisable(!his.canUndo());
