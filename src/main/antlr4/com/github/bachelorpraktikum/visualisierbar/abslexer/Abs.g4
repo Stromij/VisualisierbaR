@@ -12,6 +12,8 @@ grammar Abs;
 TraditionalComment : '/*' .*? '*/';
 EndOfLineComment : '//' .*? ('\n' | EOF);
 WhiteSpace : [ \t\f\r\n]+;
+QuotationMark: '"';                             // Benötigt für das Syntaxhighlichting im Editor!
+StrangeCharacters: 'ä' | 'ü' | 'ö' | 'Ü' | 'Ä' | 'Ö' | '@' | '_' | 'ß' | '§';
 
 // Common lexical elements
 
