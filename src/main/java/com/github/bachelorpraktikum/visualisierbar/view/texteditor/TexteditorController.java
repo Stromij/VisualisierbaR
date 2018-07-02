@@ -131,8 +131,8 @@ public class TexteditorController {
 
          //ersetzte das Document in content & lexe es
          content.replace(fileToUndo.getName(), doc);
-         editorPane.setDocument(lex.lex(doc.toString()));
-         editorPane.getDocument().addDocumentListener(changeListener);
+
+         setDocumentToPane(lex.lex(doc.toString()), 0);
 
          // Datei-Switch
          if(!actualLab.getText().equals(fileToUndo.getName()))
@@ -172,8 +172,8 @@ public class TexteditorController {
          //ersetzte das Document in content
 
          content.replace(fileToRedo.getName(), doc);
-         editorPane.setDocument(lex.lex(doc.toString()));
-         editorPane.getDocument().addDocumentListener(changeListener);
+
+         setDocumentToPane(lex.lex(doc.toString()), 0);
 
          // Datei-Switch
          if(!actualLab.getText().equals(fileToRedo.getName()))
@@ -279,7 +279,14 @@ public class TexteditorController {
                     else
                         {buffer = content.get(f.getName());}
 
-                 editorPane.setDocument(lex.lex(buffer.toString()));
+                 Document doc = lex.lex(buffer.toString());
+
+                 // Einstellen der Tab-Size
+                 TabSizeEditorKit tab = new TabSizeEditorKit();
+                 tab.setTabSize(editorPane.getFontMetrics(editorPane.getFont()).charWidth('M'));
+                 editorPane.setEditorKit(tab);
+
+                 editorPane.setDocument(doc);
              }));
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
@@ -308,9 +315,9 @@ public class TexteditorController {
                  actualLab = lab;
 
                  Document result = lex.lex(editorPane.getText());
-                 editorPane.setDocument(result);
 
-                 editorPane.getDocument().addDocumentListener(changeListener);
+                 setDocumentToPane(result, 0);
+
                  his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
                 }
 
@@ -383,14 +390,26 @@ public class TexteditorController {
             int position = editorPane.getCaretPosition();
             SyntaxLexer lex = new SyntaxLexer();
             Document result = lex.lex(editorPane.getText());
-            editorPane.setDocument(result);
-            editorPane.setCaretPosition(position);
-            editorPane.getDocument().addDocumentListener(changeListener);
+
+            setDocumentToPane(result, position);
+
             firstRedo = true;
             firstUndo = true;
         }
     }
 
+
+    private void addGridBackground()
+        {}
+
+    private void setDocumentToPane(Document doc, int pos)
+        {TabSizeEditorKit tab = new TabSizeEditorKit();
+         tab.setTabSize(editorPane.getFontMetrics(editorPane.getFont()).charWidth('M'));
+         editorPane.setEditorKit(tab);
+         editorPane.setDocument(doc);
+         editorPane.setCaretPosition(pos);
+         editorPane.getDocument().addDocumentListener(changeListener);
+        }
 
     /**
      * Creates SwingContent of an given JCompnent
