@@ -287,6 +287,7 @@ public class TexteditorController {
                  editorPane.setEditorKit(tab);
 
                  editorPane.setDocument(doc);
+                 addGridBackground(doc);
              }));
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
@@ -399,14 +400,65 @@ public class TexteditorController {
     }
 
 
-    private void addGridBackground()
-        {}
+    /**
+     * adds a background highlight to every grid
+     * @param doc the document to highlight
+     */
+    private void addGridBackground(Document doc)
+        {editorPane.getHighlighter().removeAllHighlights();
+
+         String content = editorPane.getText().toLowerCase();
+         if(content.contains("grid end") && content.contains("grid start"))
+            {int offset = 0;
+             int startInt;
+             int endInt;
+
+             GridHighlighter highlighter = new GridHighlighter();
+             while((startInt = content.indexOf("grid start", offset)) != -1)
+                {if(content.indexOf("grid start", startInt+ 1) < content.indexOf("grid end", startInt + 1) &&
+                    content.indexOf("grid start", startInt + 1) != -1    ||
+                    content.indexOf("grid end", startInt + 1) == -1)
+                    {// Falls es zu dem gefundenen start kein end gibt
+                     offset = startInt + 1;
+                     continue;
+                    }
+                 offset = startInt + 1;
+
+                 // da die Makierung bis zum Ende der Zeile gehen soll, in der grid end steht,
+                 // suche erst die Position von grid end und dann die Position vom nächsten
+                 // Zeilenumbruch und addiere 1.
+                 endInt = content.indexOf("\n", content.indexOf("grid end", offset)) + 1;
+
+                 startInt = content.lastIndexOf("\n", startInt) + 1;
+
+
+                 try
+                    {editorPane.getHighlighter().addHighlight(startInt, endInt, highlighter); }
+                 catch (BadLocationException e)
+                    {e.printStackTrace();}
+
+                }
+
+            }
+        }
+
+
+    /**
+     * Sets a given Document to the editorpane with syntax highlighting, tabs
+     * and grid-highlightinh
+     * @param doc the document to set
+     * @param pos the cursor position
+     */
 
     private void setDocumentToPane(Document doc, int pos)
-        {TabSizeEditorKit tab = new TabSizeEditorKit();
+        {// Tabstop
+         TabSizeEditorKit tab = new TabSizeEditorKit();
          tab.setTabSize(editorPane.getFontMetrics(editorPane.getFont()).charWidth('M'));
          editorPane.setEditorKit(tab);
+
+
          editorPane.setDocument(doc);
+         addGridBackground(doc);
          editorPane.setCaretPosition(pos);
          editorPane.getDocument().addDocumentListener(changeListener);
         }
