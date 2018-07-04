@@ -287,7 +287,7 @@ public class TexteditorController {
                  editorPane.setEditorKit(tab);
 
                  editorPane.setDocument(doc);
-                 addGridBackground(doc);
+                 addGridBackground();
              }));
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
@@ -402,9 +402,8 @@ public class TexteditorController {
 
     /**
      * adds a background highlight to every grid
-     * @param doc the document to highlight
      */
-    private void addGridBackground(Document doc)
+    private void addGridBackground()
         {editorPane.getHighlighter().removeAllHighlights();
 
          String content = editorPane.getText().toLowerCase();
@@ -458,7 +457,7 @@ public class TexteditorController {
 
 
          editorPane.setDocument(doc);
-         addGridBackground(doc);
+         addGridBackground();
          editorPane.setCaretPosition(pos);
          editorPane.getDocument().addDocumentListener(changeListener);
         }
