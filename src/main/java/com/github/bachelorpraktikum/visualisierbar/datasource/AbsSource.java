@@ -21,7 +21,6 @@ import static java.util.regex.Pattern.compile;
 
 public class AbsSource implements DataSource {
 
-    private static final Logger log = Logger.getLogger(DatabaseSource.class.getName());
 
     private final File fileToAbs;
     private final File fileToAbsSource;
@@ -323,8 +322,8 @@ public class AbsSource implements DataSource {
             process.waitFor();
             return true;
          }
-         catch(IOException e) {log.warning("Cannot copy ABS directory.");}
-         catch(InterruptedException e){log.warning("Copying the ABS directory was interrupted.");}
+         catch(IOException e) {}
+         catch(InterruptedException e){}
          return false;
         }
 

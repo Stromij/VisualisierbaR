@@ -40,8 +40,6 @@ public class SourceController {
     @FXML
     private Node databaseChooserTab;
     @FXML
-    private DatabaseChooserController databaseChooserTabController;
-    @FXML
     private Node restChooserTab;
     @FXML
     private RestChooserController restChooserTabController;
@@ -69,7 +67,6 @@ public class SourceController {
 
         controllers = new HashMap<>();
         controllers.put(fileChooserTab, fileChooserTabController);
-        controllers.put(databaseChooserTab, databaseChooserTabController);
         controllers.put(restChooserTab, restChooserTabController);
         controllers.put(absChooserTab, absChooserTabController);
 
