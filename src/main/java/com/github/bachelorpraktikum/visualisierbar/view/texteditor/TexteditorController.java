@@ -353,7 +353,7 @@ public class TexteditorController {
                 }
             else
                 {i += e.getLength();}
-            update();System.out.println(e.getLength());
+            update();
 
         }
 
@@ -364,7 +364,7 @@ public class TexteditorController {
                 {safe(); i = 0;}
              else
                 {i += e.getLength();}
-             update(); System.out.println(e.getLength());
+             update();
 
             }
 

@@ -322,9 +322,8 @@ public class AbsSource implements DataSource {
             process.waitFor();
             return true;
          }
-         catch(IOException e) {}
-         catch(InterruptedException e){}
-         return false;
+         catch(IOException | InterruptedException ignored) {}
+            return false;
         }
 
     @Override

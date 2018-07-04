@@ -36,6 +36,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -60,6 +61,7 @@ import javafx.scene.shape.Shape;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -105,6 +107,8 @@ public class MainController {
     private ToggleButton playToggle;
     @FXML
     private Button closeButton;
+    @FXML
+    private Button reopenTextEditorButton;
     @FXML
     private Button printToABSButton;
     @FXML
@@ -181,6 +185,9 @@ public class MainController {
 
     private IntegerProperty simulationTime;
     private LinkedList<ChangeListener> listeners;
+
+    private Stage editorStage;
+
     /**
      * Is updated when simulationTime changes, but AFTER the model state has been updated
      */
@@ -276,6 +283,10 @@ public class MainController {
         fireOnEnterPress(logToggle);
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
+        reopenTextEditorButton.setOnAction(event -> {
+            startTexteditor();
+            reopenTextEditorButton.setManaged(false);
+        });
         printToABSButton.setOnAction(event -> {
             if(graph != null && absSource != null)
                 {absSource.refactorSource(graph);}
@@ -1563,7 +1574,7 @@ public class MainController {
         if(absSource == null) return;
         FXMLLoader loader = new FXMLLoader(TexteditorController.class.getResource("TexteditorView.fxml"));
         ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
-        Stage editorStage = new Stage();
+        editorStage = new Stage();
         loader.setResources(localizationBundle);
 
 
@@ -1581,5 +1592,11 @@ public class MainController {
         editorStage.show();
 
         stage.requestFocus();
+
+        editorStage.setOnCloseRequest(event -> {
+            System.out.println("closed");
+            reopenTextEditorButton.setManaged(true);
+            editorStage = null;
+        });
     }
 }
