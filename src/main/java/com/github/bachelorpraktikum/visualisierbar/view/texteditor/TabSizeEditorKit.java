@@ -11,9 +11,7 @@ public class TabSizeEditorKit extends StyledEditorKit{
     }
 
     public void setTabSize(int charWidth)
-        {tabSize = 28;
-         System.out.println(charWidth + "ggggggggg");
-        }
+        {tabSize = 28;}
 
     static class MyViewFactory implements ViewFactory {
 

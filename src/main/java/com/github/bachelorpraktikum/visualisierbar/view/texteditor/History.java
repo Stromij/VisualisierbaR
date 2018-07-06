@@ -26,16 +26,12 @@ public class History {
         {HistoryElement newElem = new HistoryElement(file, doc);
          if(timeline.size() >= size)
             {timeline.pollLast();}
-         System.out.println("pollcursor " + curser);
          if(curser != 0)
             {for(int i = 0; i < curser; i++)
-                {timeline.pollFirst();
-                 System.out.println("poll");
-                }
+                {timeline.pollFirst();}
              curser = 0;
             }
          timeline.push(newElem);
-         System.out.println("insert");
         }
 
 
@@ -68,14 +64,12 @@ public class History {
       * @return true, if a undo is possible, otherwise false
      */
     public boolean canUndo()
-        {System.out.println("Can Undo: " + timeline.size() + "  " + curser);
-            return timeline.size() > curser && timeline.size() != 0;}
+        {return timeline.size() > curser && timeline.size() != 0;}
 
     /**
      * checks if a redo is possible
      * @return true, if a redo is possible, otherwise false
      */
     public boolean canRedo()
-        {System.out.println("Can Redo: " + timeline.size() + "  " + curser);
-            return curser > 0 && timeline.size() != 0;}
+        {return curser > 0 && timeline.size() != 0;}
 }

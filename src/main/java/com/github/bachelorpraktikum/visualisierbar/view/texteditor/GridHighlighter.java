@@ -7,7 +7,10 @@ import java.awt.*;
 
 public class GridHighlighter implements Highlighter.HighlightPainter {
 
+    private Color col;
 
+    public GridHighlighter(Color col)
+        {this.col = col;}
 
 
     private void paintLine(Graphics g, Rectangle r, int x2) {
@@ -27,7 +30,7 @@ public class GridHighlighter implements Highlighter.HighlightPainter {
         } catch (BadLocationException ex) { return; }
         if ((r0 == null) || (r1 == null)) return;
 
-        g.setColor(new Color(234, 234, 234));
+        g.setColor(col);
 
         // special case if p0 and p1 are on the same line
         if (r0.y == r1.y) {

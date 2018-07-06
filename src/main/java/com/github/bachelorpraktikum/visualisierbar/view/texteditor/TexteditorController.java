@@ -279,15 +279,7 @@ public class TexteditorController {
                     else
                         {buffer = content.get(f.getName());}
 
-                 Document doc = lex.lex(buffer.toString());
-
-                 // Einstellen der Tab-Size
-                 TabSizeEditorKit tab = new TabSizeEditorKit();
-                 tab.setTabSize(editorPane.getFontMetrics(editorPane.getFont()).charWidth('M'));
-                 editorPane.setEditorKit(tab);
-
-                 editorPane.setDocument(doc);
-                 addGridBackground();
+                 setDocumentToPane(lex.lex(buffer.toString()), 0);
              }));
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
@@ -315,9 +307,7 @@ public class TexteditorController {
                  lab.setStyle("-fx-background-color: lightblue");
                  actualLab = lab;
 
-                 Document result = lex.lex(editorPane.getText());
-
-                 setDocumentToPane(result, 0);
+                 setDocumentToPane(lex.lex(editorPane.getText()), 0);
 
                  his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
                 }
@@ -390,9 +380,8 @@ public class TexteditorController {
         private void update(){
             int position = editorPane.getCaretPosition();
             SyntaxLexer lex = new SyntaxLexer();
-            Document result = lex.lex(editorPane.getText());
 
-            setDocumentToPane(result, position);
+            setDocumentToPane(lex.lex(editorPane.getText()), position);
 
             firstRedo = true;
             firstUndo = true;
@@ -402,23 +391,56 @@ public class TexteditorController {
 
     /**
      * adds a background highlight to every grid
+     * The background is gray if a start and an end exists
+     * The background is red if there is only a start or an end
      */
     private void addGridBackground()
         {editorPane.getHighlighter().removeAllHighlights();
 
          String content = editorPane.getText().toLowerCase();
-         if(content.contains("grid end") && content.contains("grid start"))
+         if(content.contains("grid end") || content.contains("grid start"))
             {int offset = 0;
              int startInt;
              int endInt;
+             int startRed;
+             int endRed;
 
-             GridHighlighter highlighter = new GridHighlighter();
+             GridHighlighter grayHighlighter = new GridHighlighter(new Color(234, 234, 234));
+             GridHighlighter redHighlighter = new GridHighlighter(new Color(255, 219, 200));
+
+             // Suche nach end vor dem ersten start
+             while(content.indexOf("grid end", offset) < content.indexOf("grid start", offset) && content.indexOf("grid end", offset)  != -1||
+                   content.indexOf("grid start", offset) == -1 && content.indexOf("grid end", offset) != -1
+                  )
+                {offset = content.indexOf("grid end", offset);
+                 offset =  content.indexOf("grid end", offset) + 1;
+                 startRed = content.lastIndexOf("\n", offset) + 1;
+                 endRed = content.indexOf("\n", offset) + 1;
+                 endRed = endRed == 0 ? content.length() : endRed;
+                    System.out.println("start: " + content.indexOf("grid start", offset) + "  end: " + content.indexOf("grid end", offset) + " offset: " + offset);
+
+
+                    try
+                    {editorPane.getHighlighter().addHighlight(startRed, endRed, redHighlighter); }
+                 catch (BadLocationException e)
+                    {e.printStackTrace();}
+                }
+
+
              while((startInt = content.indexOf("grid start", offset)) != -1)
                 {if(content.indexOf("grid start", startInt+ 1) < content.indexOf("grid end", startInt + 1) &&
                     content.indexOf("grid start", startInt + 1) != -1    ||
                     content.indexOf("grid end", startInt + 1) == -1)
                     {// Falls es zu dem gefundenen start kein end gibt
-                     offset = startInt + 1;
+                     startRed = content.lastIndexOf("\n", startInt) + 1;
+                     endRed = content.indexOf("\n", startInt) + 1;
+                     endRed = endRed == 0 ? content.length() : endRed;
+                     System.out.println("catched");
+                     offset = endRed;
+                     try
+                        {editorPane.getHighlighter().addHighlight(startRed, endRed, redHighlighter); }
+                     catch (BadLocationException e)
+                        {e.printStackTrace();}
                      continue;
                     }
                  offset = startInt + 1;
@@ -427,15 +449,34 @@ public class TexteditorController {
                  // suche erst die Position von grid end und dann die Position vom nächsten
                  // Zeilenumbruch und addiere 1.
                  endInt = content.indexOf("\n", content.indexOf("grid end", offset)) + 1;
+                 endInt = endInt >= content.length() || endInt < startInt ? content.length() : endInt;
+
+
 
                  startInt = content.lastIndexOf("\n", startInt) + 1;
 
-
+                 offset = endInt;
                  try
-                    {editorPane.getHighlighter().addHighlight(startInt, endInt, highlighter); }
+                    {editorPane.getHighlighter().addHighlight(startInt, endInt, grayHighlighter); }
                  catch (BadLocationException e)
                     {e.printStackTrace();}
 
+                 // Suche abschließend noch nach end-Kommentaren zwischen jetzt und dem nächsten start/EOF
+
+                 while(content.indexOf("grid start", offset) > content.indexOf("grid end", offset) && content.indexOf("grid end", offset) != -1 ||
+                       content.indexOf("grid start", offset) == -1 && content.indexOf("grid end", offset) != -1
+                      )
+                    {offset =  content.indexOf("grid end", offset) + 1;
+                     startRed = content.lastIndexOf("\n", offset) + 1;
+                     endRed = content.indexOf("\n", offset) + 1;
+                     endRed = endRed == 0 ? content.length() : endRed;
+
+                     try
+                        {editorPane.getHighlighter().addHighlight(startRed, endRed, redHighlighter); }
+                     catch (BadLocationException e)
+                        {e.printStackTrace();}
+
+                    }
                 }
 
             }
@@ -458,6 +499,7 @@ public class TexteditorController {
 
          editorPane.setDocument(doc);
          addGridBackground();
+         pos = pos >= editorPane.getText().length() - 1 ? editorPane.getText().length() : pos;
          editorPane.setCaretPosition(pos);
          editorPane.getDocument().addDocumentListener(changeListener);
         }
