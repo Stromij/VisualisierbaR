@@ -23,6 +23,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TexteditorController {
 
@@ -35,7 +36,7 @@ public class TexteditorController {
     @FXML
     private Pane centerPane;
     @FXML
-    private Button copyButton;
+    private Button saveButton;
     @FXML
     private Button redoButton;
     @FXML
@@ -90,7 +91,9 @@ public class TexteditorController {
         // Fülle das TopPane mit den Funktionstasten
         SVGPath svgCopy = new SVGPath();
         svgCopy.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
-        copyButton.setGraphic(svgCopy);
+        saveButton.setGraphic(svgCopy);
+
+        saveButton.setOnAction(ActionEvent -> save());
 
         undoButton.setOnAction(ActionEvent -> undo());
         redoButton.setOnAction(ActionEvent -> redo());
@@ -106,6 +109,32 @@ public class TexteditorController {
         firstUndo = true;
         firstRedo = true;
     }
+
+    private void save()
+        {// Lade den aktuellen Zustand der editorpane in die Content-Map
+         content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));
+
+         // Gehe jeden Eintrag in der Content-Map durch, da nur diese geändert worden sein könnten
+         for(Map.Entry<String, StringBuffer> ent : content.entrySet())
+            {String pathname = fileOfAbs.toString().concat("/").concat(ent.getKey());
+             String file = ent.getValue().toString();
+             System.out.println(pathname);
+
+             // Schreibe in die Dateien
+             try {
+                 FileWriter fw = new FileWriter(pathname);
+                 BufferedWriter bw = new BufferedWriter(fw);
+
+                 bw.write(file);
+
+                 bw.close();
+                 fw.close();
+                }
+             catch(IOException e) {// TODO throw error
+                  e.printStackTrace();
+                  }
+            }
+        }
 
     private void undo()
         {if(!his.canUndo()) {return;}

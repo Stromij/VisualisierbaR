@@ -181,6 +181,7 @@ public class MainController {
 
     @Nullable
     private AbsSource absSource;
+    private File newAbsFile;
 
 
     private IntegerProperty simulationTime;
@@ -1242,7 +1243,7 @@ public class MainController {
         if (source instanceof AbsSource) {
             String firstComp = graph.printToAbs();
 
-            File newAbsFile = absSource.refactorSource(graph);
+            newAbsFile = absSource.refactorSource(graph);
             String newCommand = String.format("absc -v -product=%s -erlang %s/*.abs -d %sgen/erlang/", absSource.getProduct(), newAbsFile, absSource.getParent().getPath());
             try
                 {source = new AbsSource(newCommand, newAbsFile, absSource.getProduct());}
@@ -1586,7 +1587,7 @@ public class MainController {
         }
 
         TexteditorController controller = loader.getController();
-        controller.setPath(absSource.getFileToAbsSource());
+        controller.setPath(newAbsFile);
         controller.setStage(editorStage);
 
         editorStage.show();
