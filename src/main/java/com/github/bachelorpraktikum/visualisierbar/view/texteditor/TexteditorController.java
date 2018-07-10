@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -96,6 +98,19 @@ public class TexteditorController {
         saveButton.setGraphic(svgCopy);
 
         saveButton.setOnAction(ActionEvent -> save(true));
+
+        rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode() == KeyCode.Z && event.isControlDown()) { // Strg + Z
+               undoButton.fire();
+            }
+            if (event.getCode() == KeyCode.Y && event.isControlDown()) { // Strg + Y
+                redoButton.fire();
+            }
+            if (event.getCode() == KeyCode.S && event.isControlDown()) { // Strg + S
+                saveButton.fire();
+            }
+
+        });
 
         undoButton.setOnAction(ActionEvent -> undo());
         redoButton.setOnAction(ActionEvent -> redo());
