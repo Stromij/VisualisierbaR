@@ -93,7 +93,7 @@ public class TexteditorController {
         svgCopy.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
         saveButton.setGraphic(svgCopy);
 
-        saveButton.setOnAction(ActionEvent -> save());
+        saveButton.setOnAction(ActionEvent -> save(true));
 
         undoButton.setOnAction(ActionEvent -> undo());
         redoButton.setOnAction(ActionEvent -> redo());
@@ -110,7 +110,11 @@ public class TexteditorController {
         firstRedo = true;
     }
 
-    private void save()
+    /**
+     * Save the Content of the EditorPane to the given Path (fileOfAbs)
+     * @param errorReporting if true all Errors will be shown in a Dialog, otherwise not
+     */
+    private void save(boolean errorReporting)
         {// Lade den aktuellen Zustand der editorpane in die Content-Map
          content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));
 
@@ -394,7 +398,6 @@ public class TexteditorController {
         private void safe()
             {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
              undoButton.setDisable(!his.canUndo());
-             redoButton.setDisable(!his.canRedo());
             }
 
         public void resetIsNew()
@@ -414,6 +417,8 @@ public class TexteditorController {
 
             firstRedo = true;
             firstUndo = true;
+
+            save(false);
         }
     }
 
