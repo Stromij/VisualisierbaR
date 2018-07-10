@@ -189,6 +189,8 @@ public class MainController {
 
     private Stage editorStage;
 
+    private TexteditorController textController;
+
     /**
      * Is updated when simulationTime changes, but AFTER the model state has been updated
      */
@@ -288,9 +290,13 @@ public class MainController {
             startTexteditor();
             reopenTextEditorButton.setManaged(false);
         });
+        reopenTextEditorButton.setManaged(false);
         printToABSButton.setOnAction(event -> {
             if(graph != null && absSource != null)
-                {absSource.refactorSource(graph);}
+                {System.out.println("file: " + newAbsFile);
+                 System.out.println("to: " + absSource.refactorSource(graph, newAbsFile));
+                 textController.reloadAll();
+                }
             else if (graph != null) {
                 graph.printToAbs();
             }
@@ -1586,9 +1592,9 @@ public class MainController {
             return;
         }
 
-        TexteditorController controller = loader.getController();
-        controller.setPath(newAbsFile);
-        controller.setStage(editorStage);
+        textController = loader.getController();
+        textController.setPath(newAbsFile);
+        textController.setStage(editorStage);
 
         editorStage.show();
 

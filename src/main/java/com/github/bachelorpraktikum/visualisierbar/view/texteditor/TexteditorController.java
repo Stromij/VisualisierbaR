@@ -315,22 +315,7 @@ public class TexteditorController {
 
                     // Lade aus der Datei, oder falls vorhanden aus der HashMap die Daten
                     if(!content.containsKey(f.getName())) {
-                        try {
-                            FileInputStream fr = new FileInputStream(f);
-                            InputStreamReader isr = new InputStreamReader(fr);
-                            BufferedReader reader = new BufferedReader(isr);
-
-                            String line = null;
-                            while ((line = reader.readLine()) != null) {
-                                buffer.append(line + "\n");
-                            }
-                            reader.close();
-
-                            content.put(f.getName(), buffer);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        buffer = loadFile(f);
                     }
 
                     else
@@ -341,30 +326,12 @@ public class TexteditorController {
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
              if(f.getName().equals("Run.abs"))
-                {try {
-                    FileInputStream fr = new FileInputStream(f);
-                    InputStreamReader isr = new InputStreamReader(fr);
-                    BufferedReader reader = new BufferedReader(isr);
-
-                    StringBuffer buffer = new StringBuffer();
-                    String line = null;
-                    while ((line = reader.readLine()) != null) {
-                        buffer.append(line + "\n");
-                    }
-                    reader.close();
-
-                    content.put(f.getName(), buffer);
-
-                    editorPane.setText(buffer.toString());
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                {StringBuffer buf = loadFile(f);
 
                  lab.setStyle("-fx-background-color: lightblue");
                  actualLab = lab;
 
-                 setDocumentToPane(lex.lex(editorPane.getText()), 0);
+                 setDocumentToPane(lex.lex(buf.toString()), 0);
 
                  his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
                 }
@@ -378,6 +345,32 @@ public class TexteditorController {
          grid.setMinWidth(200);
          leftPane.getChildren().add(grid);
          leftPane.setPadding(new Insets(10,10,0,10));
+        }
+
+    /**
+     * lädt einen File in die Content-Map
+     * @param f
+     */
+    private StringBuffer loadFile(File f)
+        {try {
+            FileInputStream fr = new FileInputStream(f);
+            InputStreamReader isr = new InputStreamReader(fr);
+            BufferedReader reader = new BufferedReader(isr);
+
+            StringBuffer buffer = new StringBuffer();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line + "\n");
+            }
+            reader.close();
+
+            content.put(f.getName(), buffer);
+
+            return buffer;
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+         return null;
         }
 
 
@@ -475,7 +468,7 @@ public class TexteditorController {
                  startRed = content.lastIndexOf("\n", offset) + 1;
                  endRed = content.indexOf("\n", offset) + 1;
                  endRed = endRed == 0 ? content.length() : endRed;
-                    System.out.println("start: " + content.indexOf("grid start", offset) + "  end: " + content.indexOf("grid end", offset) + " offset: " + offset);
+                 System.out.println("start: " + content.indexOf("grid start", offset) + "  end: " + content.indexOf("grid end", offset) + " offset: " + offset);
 
 
                     try
@@ -570,5 +563,15 @@ public class TexteditorController {
     private void createSwingContent(final SwingNode swingNode, final JComponent component) {
         SwingUtilities.invokeLater(() -> swingNode.setContent(component));
     }
+
+    /**
+     * Reloads all files to the content-Map by destroying the old Map and displays
+     * the reloaded files.
+     */
+    public void reloadAll()
+        {content.clear();
+         StringBuffer buf = loadFile(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())));
+         setDocumentToPane(lex.lex(buf.toString()), 0);
+        }
 
 }

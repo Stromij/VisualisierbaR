@@ -148,17 +148,23 @@ public class AbsSource implements DataSource {
      * @param graph iterating graph
      * @return returs the destination Directory
      */
+
     public File refactorSource(@Nullable Graph graph)
-        {File destDir = new File(fileToAbsSource.toString().concat("_new"));
-         for (int i = 1; destDir.exists(); i++) {
-             destDir = new File(fileToAbsSource.toString().concat("_new_" + i));
+        {return refactorSource(graph, null);}
+
+    public File refactorSource(@Nullable Graph graph, @Nullable File destDir)
+        {if(destDir == null) {
+            destDir = new File(fileToAbsSource.toString().concat("_new"));
+            for (int i = 1; destDir.exists(); i++) {
+                destDir = new File(fileToAbsSource.toString().concat("_new_" + i));
+            }
+            if(!copyFiles(destDir)) {return null;}
          }
 
 
          String newCode = "";
 
-         if(copyFiles(destDir))
-            {try {
+         try {
                 FileReader fr = new FileReader(destDir + "/Run.abs");
                 BufferedReader br = new BufferedReader(fr);
                 String deltaContent = "";
@@ -252,6 +258,8 @@ public class AbsSource implements DataSource {
                 fw.close();
                 fr.close();
                 br.close();
+             System.out.println("----- newCode start -----");
+                System.out.println(newCode);
 
                 System.out.println("----- ABS start -----");
                 System.out.println(nodeAbs.concat("\n").replace("\t\t", ""));
@@ -281,7 +289,6 @@ public class AbsSource implements DataSource {
                 contentText = String.format(contentText, e.getMessage());
                 alert.setContentText(contentText);
                 alert.showAndWait();
-            }
             }
 
          return destDir;
