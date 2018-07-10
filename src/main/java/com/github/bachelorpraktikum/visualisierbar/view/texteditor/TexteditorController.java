@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
@@ -24,6 +25,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 public class TexteditorController {
 
@@ -134,8 +136,15 @@ public class TexteditorController {
                  bw.close();
                  fw.close();
                 }
-             catch(IOException e) {// TODO throw error
-                  e.printStackTrace();
+             catch(IOException e) {
+                 ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                 Alert alert = new Alert(Alert.AlertType.ERROR);
+                 String headerText = bundle.getString("file_not_save_header");
+                 alert.setHeaderText(headerText);
+                 String contentText = String.format(bundle.getString("file_not_save_content"), pathname);
+                 contentText = String.format(contentText, e.getMessage());
+                 alert.setContentText(contentText);
+                 alert.showAndWait();
                   }
             }
         }
