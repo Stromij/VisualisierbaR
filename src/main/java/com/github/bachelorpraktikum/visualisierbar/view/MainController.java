@@ -291,6 +291,16 @@ public class MainController {
         });
         reopenTextEditorButton.setManaged(false);
 
+        printToABSButton.setOnAction(event -> {
+            if(graph != null && absSource != null)
+                {absSource.refactorSource(graph, newAbsFile);
+                 textController.reloadAll();
+                }
+            else if (graph != null) {
+                 graph.printToAbs();
+                }
+        });
+
         SVGPath svgPlay = new SVGPath();
         svgPlay.setContent("M0 0 L12 7 L0 14 L0 0 Z");
         playButton.setGraphic(svgPlay);
@@ -1588,8 +1598,9 @@ public class MainController {
         }
 
         textController = loader.getController();
+        textController.setSource(absSource);
         textController.setPath(newAbsFile);
-        textController.setStage(editorStage);
+        textController.setStage(editorStage, stage);
 
         editorStage.show();
 
