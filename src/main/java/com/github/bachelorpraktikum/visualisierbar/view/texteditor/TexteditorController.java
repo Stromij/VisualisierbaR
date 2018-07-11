@@ -1,9 +1,14 @@
 package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 
 import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
+import com.github.bachelorpraktikum.visualisierbar.datasource.AbsSource;
+import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
+import com.github.bachelorpraktikum.visualisierbar.view.MainController;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -53,6 +58,7 @@ public class TexteditorController {
     private JEditorPane editorPane;
     private SwingNode editorPaneNode;
     private Stage stage;
+    private Stage mainStage;
     private File fileOfAbs;
 
     private Label actualLab;
@@ -63,6 +69,8 @@ public class TexteditorController {
     private ChangeListener changeListener;
     private boolean firstUndo;
     private boolean firstRedo;
+
+    private MainController parent;
 
     @FXML
     private void initialize() {
@@ -149,8 +157,17 @@ public class TexteditorController {
         firstRedo = true;
     }
 
+    /**
+     * Recompile the edited ABS-Files and reopen the Mainview without the editor!
+     */
     private void play()
-        {}
+        {save(false);
+         parent.play();
+        }
+
+    public Stage getStage()
+        {return stage;}
+
 
     /**
      * Save the Content of the EditorPane to the given Path (fileOfAbs)
@@ -282,10 +299,12 @@ public class TexteditorController {
     /**
      * The {@link #rootPane} will be displayed on the given stage.
      *
-     * @param stage Stage on which the scene will be displayed
+     * @param editorStage Stage on which the texteditor will be displayed
+     * @param mainStage the Stage of the MainView
      */
-    public void setStage(@Nonnull Stage stage) {
-        this.stage = stage;
+    public void setStage(@Nonnull Stage editorStage, @Nonnull Stage mainStage) {
+        this.mainStage = mainStage;
+        this.stage = editorStage;
         stage.setScene(new Scene(rootPane));
 
         stage.centerOnScreen();
@@ -600,5 +619,9 @@ public class TexteditorController {
          StringBuffer buf = loadFile(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())));
          setDocumentToPane(lex.lex(buf.toString()), 0);
         }
+
+
+    public void setParent(MainController parent)
+        {this.parent = parent;}
 
 }

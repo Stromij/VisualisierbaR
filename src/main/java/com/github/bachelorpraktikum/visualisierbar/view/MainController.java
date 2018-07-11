@@ -304,6 +304,7 @@ public class MainController {
         SVGPath svgPlay = new SVGPath();
         svgPlay.setContent("M0 0 L12 7 L0 14 L0 0 Z");
         playButton.setGraphic(svgPlay);
+        playButton.setOnAction(event -> play());
 
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
@@ -1598,18 +1599,71 @@ public class MainController {
         }
 
         textController = loader.getController();
-        textController.setSource(absSource);
         textController.setPath(newAbsFile);
         textController.setStage(editorStage, stage);
+        textController.setParent(this);
 
         editorStage.show();
 
         stage.requestFocus();
 
         editorStage.setOnCloseRequest(event -> {
-            System.out.println("closed");
-            reopenTextEditorButton.setManaged(true);
             editorStage = null;
+            reopenTextEditorButton.setManaged(true);
+
         });
     }
+
+    /**
+     *  Recompile the edited ABS-Files and reopen the Mainview without the editor!
+     */
+    public void play()
+        {// Nehme den Editor und den MainView vom Bildschirm
+         stage.hide();
+         textController.getStage().hide();
+
+         // TODO mix Texteditor and Mainview togehter in Abs-Data
+
+         // lade einen neuen MainViewLoader
+         FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+         loader.setResources(ResourceBundle.getBundle("bundles.localization"));
+         try {
+            loader.load();
+         } catch (IOException e) {
+            // This should never happen, because the location is set (see load function)
+            return;
+         }
+
+         // erstelle aus dem Loader einen neuen MainController
+         MainController controller = loader.getController();
+         controller.setStage(stage);
+
+
+         String command = String.format("absc -v -product=%s -erlang %s/*.abs -d %sgen/erlang/", absSource.getProduct(), newAbsFile, absSource.getParent().getPath());
+         try {
+             //cleanUp();
+             AbsSource newAbsSource = new AbsSource(command, newAbsFile, absSource.getProduct());
+
+             // Die DataSource konnte nicht verarbeitet werden, da bspw. ein Syntaxerror vorlag
+             if (com.github.bachelorpraktikum.visualisierbar.model.Node.in(newAbsSource.getContext()).getAll().isEmpty()) {
+                 textController.getStage().show();
+                 controller.setDataSource(absSource);
+                 stage.show();
+                 // TODO Errormessage
+
+                 System.out.println("Error");
+                 return;
+             }
+
+             controller.setDataSource(newAbsSource);
+             System.out.println("Source: " + newAbsSource.getFileToAbsSource().toString());
+
+             textController.getStage().close();
+             stage.show();
+         }
+         catch (IOException e)
+            {e.printStackTrace();}
+
+
+        }
 }
