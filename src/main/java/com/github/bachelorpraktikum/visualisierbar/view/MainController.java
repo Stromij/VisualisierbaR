@@ -54,10 +54,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
+import javafx.scene.shape.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -109,6 +106,8 @@ public class MainController {
     private Button closeButton;
     @FXML
     private Button reopenTextEditorButton;
+    @FXML
+    private Button playButton;
     @FXML
     private Button printToABSButton;
     @FXML
@@ -291,17 +290,11 @@ public class MainController {
             reopenTextEditorButton.setManaged(false);
         });
         reopenTextEditorButton.setManaged(false);
-        printToABSButton.setOnAction(event -> {
-            if(graph != null && absSource != null)
-                {System.out.println("file: " + newAbsFile);
-                 System.out.println("to: " + absSource.refactorSource(graph, newAbsFile));
-                 textController.reloadAll();
-                }
-            else if (graph != null) {
-                graph.printToAbs();
-            }
 
-        });
+        SVGPath svgPlay = new SVGPath();
+        svgPlay.setContent("M0 0 L12 7 L0 14 L0 0 Z");
+        playButton.setGraphic(svgPlay);
+
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
@@ -427,12 +420,13 @@ public class MainController {
                 if (event.getCode() == KeyCode.D && event.isControlDown()) {
                     fcButton.fire();
                 }
+                if(event.getCode() == KeyCode.R && event.isControlDown())
+                    {playButton.fire();}
                 if (event.getCode() == KeyCode.N && event.isControlDown()) {
                     newNodeButton.fire();
                 }
-                if (event.getCode() == KeyCode.R && event.isControlDown() ||
-                     event.getCode() == KeyCode.DELETE ||
-                     event.getCode() == KeyCode.BACK_SPACE ) {
+                if (event.getCode() == KeyCode.DELETE ||
+                    event.getCode() == KeyCode.BACK_SPACE ) {
                     deleteButton.fire();
                 }
                 if (event.getCode() == KeyCode.C && event.isAltDown()) {
@@ -603,9 +597,10 @@ public class MainController {
         TooltipUtil.install(fcButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.D.getName()));
         TooltipUtil.install(newNodeButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.N.getName()));
         TooltipUtil.install(disconnectButton, new Tooltip(KeyCode.ALT.getName() + " + " + KeyCode.C.getName()));
-        TooltipUtil.install(deleteButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName()));
+        TooltipUtil.install(deleteButton, new Tooltip(KeyCode.DELETE.getName()));
         TooltipUtil.install(printToABSButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.P.getName()));
         TooltipUtil.install(toolSelector, new Tooltip("use " + KeyCode.DIGIT1.getName() + " and " + KeyCode.DIGIT2.getName()+ " to switch between modes "));
+        TooltipUtil.install(playButton, new Tooltip(KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName()));
         NodeSizeSlider.valueProperty().bindBidirectional(Junction.getCALIBRATION_COEFFICIENT_prop());
 
         legendButton.selectedProperty().addListener((observable, oldValue, newValue) -> {

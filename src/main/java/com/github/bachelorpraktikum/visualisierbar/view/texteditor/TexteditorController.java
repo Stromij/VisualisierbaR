@@ -1,6 +1,7 @@
 package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 
 import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
+import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -9,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -41,6 +43,8 @@ public class TexteditorController {
     private Pane centerPane;
     @FXML
     private Button saveButton;
+    @FXML
+    private Button playButton;
     @FXML
     private Button redoButton;
     @FXML
@@ -93,9 +97,13 @@ public class TexteditorController {
 
 
         // Fülle das TopPane mit den Funktionstasten
-        SVGPath svgCopy = new SVGPath();
-        svgCopy.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
-        saveButton.setGraphic(svgCopy);
+        SVGPath svgSave = new SVGPath();
+        svgSave.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
+        saveButton.setGraphic(svgSave);
+
+        SVGPath svgPlay = new SVGPath();
+        svgPlay.setContent("M0 0 L12 7 L0 14 L0 0 Z");
+        playButton.setGraphic(svgPlay);
 
         saveButton.setOnAction(ActionEvent -> save(true));
 
@@ -109,8 +117,18 @@ public class TexteditorController {
             if (event.getCode() == KeyCode.S && event.isControlDown()) { // Strg + S
                 saveButton.fire();
             }
+            if (event.getCode() == KeyCode.R && event.isControlDown()) { // Strg + R
+                playButton.fire();
+            }
 
         });
+
+        TooltipUtil.install(undoButton, new Tooltip("Redo (" + KeyCode.CONTROL.getName() + " + " + KeyCode.Z.getName() + ")"));
+        TooltipUtil.install(redoButton, new Tooltip("Undo (" + KeyCode.CONTROL.getName() + " + " + KeyCode.Y.getName() + ")"));
+        TooltipUtil.install(saveButton, new Tooltip("Save (" + KeyCode.CONTROL.getName() + " + " + KeyCode.S.getName() + ")"));
+        TooltipUtil.install(playButton, new Tooltip("Recompile (" + KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName() + ")"));
+
+
 
         undoButton.setOnAction(ActionEvent -> undo());
         redoButton.setOnAction(ActionEvent -> redo());
