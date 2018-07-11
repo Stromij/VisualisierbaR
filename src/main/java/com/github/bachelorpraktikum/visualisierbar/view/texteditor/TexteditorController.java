@@ -96,17 +96,25 @@ public class TexteditorController {
         editorPaneNode.setOnMouseClicked((event -> {editorPaneNode.requestFocus();}));
 
 
-        // Fülle das TopPane mit den Funktionstasten
+        // Fülle das TopPane mit den Funktionstasten und initialisiere sie
         SVGPath svgSave = new SVGPath();
         svgSave.setContent("M5 0 L12 0 L12 15 L0 15 L0 5 Z");
         saveButton.setGraphic(svgSave);
+
+        saveButton.setOnAction(ActionEvent -> save(true));
 
         SVGPath svgPlay = new SVGPath();
         svgPlay.setContent("M0 0 L12 7 L0 14 L0 0 Z");
         playButton.setGraphic(svgPlay);
 
-        saveButton.setOnAction(ActionEvent -> save(true));
+        playButton.setOnAction(ActionEvent -> play());
 
+        undoButton.setOnAction(ActionEvent -> undo());
+        redoButton.setOnAction(ActionEvent -> redo());
+        undoButton.setDisable(true);
+        redoButton.setDisable(true);
+
+        // Füge Shortcuts hinzu
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.Z && event.isControlDown()) { // Strg + Z
                undoButton.fire();
@@ -123,6 +131,7 @@ public class TexteditorController {
 
         });
 
+        // Füge Tooltips hinzu
         TooltipUtil.install(undoButton, new Tooltip("Redo (" + KeyCode.CONTROL.getName() + " + " + KeyCode.Z.getName() + ")"));
         TooltipUtil.install(redoButton, new Tooltip("Undo (" + KeyCode.CONTROL.getName() + " + " + KeyCode.Y.getName() + ")"));
         TooltipUtil.install(saveButton, new Tooltip("Save (" + KeyCode.CONTROL.getName() + " + " + KeyCode.S.getName() + ")"));
@@ -130,12 +139,7 @@ public class TexteditorController {
 
 
 
-        undoButton.setOnAction(ActionEvent -> undo());
-        redoButton.setOnAction(ActionEvent -> redo());
-        undoButton.setDisable(true);
-        redoButton.setDisable(true);
-
-
+        // Initialisiere sonstige Variablen
         content = new HashMap<>();
         labels = new ArrayList<>();
         lex = new SyntaxLexer();
@@ -144,6 +148,9 @@ public class TexteditorController {
         firstUndo = true;
         firstRedo = true;
     }
+
+    private void play()
+        {}
 
     /**
      * Save the Content of the EditorPane to the given Path (fileOfAbs)
@@ -170,14 +177,16 @@ public class TexteditorController {
                  fw.close();
                 }
              catch(IOException e) {
-                 ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
-                 Alert alert = new Alert(Alert.AlertType.ERROR);
-                 String headerText = bundle.getString("file_not_save_header");
-                 alert.setHeaderText(headerText);
-                 String contentText = String.format(bundle.getString("file_not_save_content"), pathname);
-                 contentText = String.format(contentText, e.getMessage());
-                 alert.setContentText(contentText);
-                 alert.showAndWait();
+                 if(errorReporting) {
+                     ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                     Alert alert = new Alert(Alert.AlertType.ERROR);
+                     String headerText = bundle.getString("file_not_save_header");
+                     alert.setHeaderText(headerText);
+                     String contentText = String.format(bundle.getString("file_not_save_content"), pathname);
+                     contentText = String.format(contentText, e.getMessage());
+                     alert.setContentText(contentText);
+                     alert.showAndWait();
+                    }
                   }
             }
         }
