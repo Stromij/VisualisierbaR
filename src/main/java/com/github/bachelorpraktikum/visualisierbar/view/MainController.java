@@ -304,7 +304,7 @@ public class MainController {
         SVGPath svgPlay = new SVGPath();
         svgPlay.setContent("M0 0 L12 7 L0 14 L0 0 Z");
         playButton.setGraphic(svgPlay);
-        playButton.setOnAction(event -> play());
+        playButton.setOnAction(event -> play(true));
 
         resetButton.setOnAction(event -> {
             simulationTime.set(Context.INIT_STATE_TIME);
@@ -1616,13 +1616,16 @@ public class MainController {
 
     /**
      *  Recompile the edited ABS-Files and reopen the Mainview without the editor!
+     *  @param printAbs if true, the Abs of the MainView will be printed, otherwise not
      */
-    public void play()
+    public void play(boolean printAbs)
         {// Nehme den Editor und den MainView vom Bildschirm
          stage.hide();
          textController.getStage().hide();
 
          // TODO mix Texteditor and Mainview togehter in Abs-Data
+         if(printAbs)
+            {printToABSButton.fire();}
 
          // lade einen neuen MainViewLoader
          FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));

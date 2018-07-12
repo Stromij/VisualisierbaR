@@ -162,7 +162,7 @@ public class TexteditorController {
      */
     private void play()
         {save(false);
-         parent.play();
+         parent.play(false);
         }
 
     public Stage getStage()
