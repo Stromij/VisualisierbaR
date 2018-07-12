@@ -1623,41 +1623,39 @@ public class MainController {
          stage.hide();
          textController.getStage().hide();
 
-         // TODO mix Texteditor and Mainview togehter in Abs-Data
+         // Sollte der Abs-Grid-Code aus dem MainView erstellt werden sollen
          if(printAbs)
             {printToABSButton.fire();}
 
-         // lade einen neuen MainViewLoader
-         FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
-         loader.setResources(ResourceBundle.getBundle("bundles.localization"));
-         try {
-            loader.load();
-         } catch (IOException e) {
-            // This should never happen, because the location is set (see load function)
-            return;
-         }
-
-         // erstelle aus dem Loader einen neuen MainController
-         MainController controller = loader.getController();
-         controller.setStage(stage);
-
-
+         // Versuche den neuen ABs-Code zu kompilieren
          String command = String.format("absc -v -product=%s -erlang %s/*.abs -d %sgen/erlang/", absSource.getProduct(), newAbsFile, absSource.getParent().getPath());
          try {
-             //cleanUp();
              AbsSource newAbsSource = new AbsSource(command, newAbsFile, absSource.getProduct());
 
              // Die DataSource konnte nicht verarbeitet werden, da bspw. ein Syntaxerror vorlag
              if (com.github.bachelorpraktikum.visualisierbar.model.Node.in(newAbsSource.getContext()).getAll().isEmpty()) {
                  textController.getStage().show();
-                 controller.setDataSource(absSource);
                  stage.show();
-                 // TODO Errormessage
-
+                 generateErrorMessage();
                  System.out.println("Error");
                  return;
              }
 
+             // COMPILATION SUCCESSFUL
+             // lade einen neuen MainViewLoader
+             FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+             loader.setResources(ResourceBundle.getBundle("bundles.localization"));
+             try {
+                 loader.load();
+             } catch (IOException e) {
+                 // This should never happen, because the location is set (see load function)
+                 return;
+             }
+
+             // erstelle aus dem Loader einen neuen MainController
+             MainController controller = loader.getController();
+
+             controller.setStage(stage);
              controller.setDataSource(newAbsSource);
              System.out.println("Source: " + newAbsSource.getFileToAbsSource().toString());
 
@@ -1668,5 +1666,15 @@ public class MainController {
             {e.printStackTrace();}
 
 
+        }
+
+    private void generateErrorMessage()
+        {ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+         Alert alert = new Alert(Alert.AlertType.ERROR);
+         String headerText = bundle.getString("parse_error_header");
+         alert.setHeaderText(headerText);
+         String contentText = bundle.getString("parse_error_content");
+         alert.setContentText(contentText);
+         alert.showAndWait();
         }
 }
