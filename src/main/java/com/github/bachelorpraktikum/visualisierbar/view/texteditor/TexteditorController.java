@@ -213,7 +213,7 @@ public class TexteditorController {
          // Wenn der das I im Changelistener größer als 0 ist muss der aktuelle Zustand
          // gespeicher werden, bevor ein erster Undo gemancht werden kann
          if(changeListener.getI() > 0 && firstUndo)
-            {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
+            {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()), editorPane.getCaretPosition());
              changeListener.setI(0);
             }
          // Wenn es der erste Undo ist, dann muss der Undo doppelt gemacht werden,
@@ -229,11 +229,12 @@ public class TexteditorController {
          HistoryElement hisElem = his.undo();
          File fileToUndo = hisElem.getFile();
          StringBuffer doc = hisElem.getDocument();
+         int cursorPosition = hisElem.getCursorPosition();
 
          //ersetzte das Document in content & lexe es
          content.replace(fileToUndo.getName(), doc);
 
-         setDocumentToPane(lex.lex(doc.toString()), 0);
+         setDocumentToPane(lex.lex(doc.toString()), cursorPosition);
 
          // Datei-Switch
          if(!actualLab.getText().equals(fileToUndo.getName()))
@@ -269,12 +270,13 @@ public class TexteditorController {
          HistoryElement hisElem = his.redo();
          File fileToRedo = hisElem.getFile();
          StringBuffer doc = hisElem.getDocument();
+         int cursorPosition = hisElem.getCursorPosition();
 
          //ersetzte das Document in content
 
          content.replace(fileToRedo.getName(), doc);
 
-         setDocumentToPane(lex.lex(doc.toString()), 0);
+         setDocumentToPane(lex.lex(doc.toString()), cursorPosition);
 
          // Datei-Switch
          if(!actualLab.getText().equals(fileToRedo.getName()))
@@ -349,7 +351,7 @@ public class TexteditorController {
                              {actualLab.setStyle(null);
                               if(content.containsKey(actualLab.getText()))
                                   {if(!content.get(actualLab.getText()).equals(editorPane.getText()))
-                                      {his.insert(new File(fileOfAbs.toString().concat(actualLab.getText())), new StringBuffer(editorPane.getText()));}
+                                      {his.insert(new File(fileOfAbs.toString().concat(actualLab.getText())), new StringBuffer(editorPane.getText()), editorPane.getCaretPosition());}
                                    content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));
                                   }
                              }
@@ -379,7 +381,7 @@ public class TexteditorController {
 
                  setDocumentToPane(lex.lex(buf.toString()), 0);
 
-                 his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
+                 his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()), editorPane.getCaretPosition());
                 }
 
              // Füge das Label dem Grid hinzu
@@ -459,7 +461,7 @@ public class TexteditorController {
         }
 
         private void safe()
-            {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()));
+            {his.insert(new File(fileOfAbs.toString().concat("/").concat(actualLab.getText())), new StringBuffer(editorPane.getText()), editorPane.getCaretPosition());
              undoButton.setDisable(!his.canUndo());
             }
 

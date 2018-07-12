@@ -22,8 +22,8 @@ public class History {
      * @param file path to the changed ABS-File
      * @param doc current document in the editorPane
      */
-    public void insert(@Nonnull File file, @Nullable StringBuffer doc)
-        {HistoryElement newElem = new HistoryElement(file, doc);
+    public void insert(@Nonnull File file, @Nullable StringBuffer doc, int cursorPosition)
+        {HistoryElement newElem = new HistoryElement(file, doc, cursorPosition);
          if(timeline.size() >= size)
             {timeline.pollLast();}
          if(curser != 0)
