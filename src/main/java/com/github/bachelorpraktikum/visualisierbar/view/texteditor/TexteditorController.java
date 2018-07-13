@@ -192,6 +192,18 @@ public class TexteditorController {
 
                  bw.close();
                  fw.close();
+
+                 if(errorReporting) {
+                     ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                     String headerText = bundle.getString("file_saved_header");
+                     alert.setHeaderText(headerText);
+                     String contentText = String.format(bundle.getString("file_saved_content"));
+                     alert.setContentText(contentText);
+                     alert.initOwner(stage);
+                     alert.showAndWait();
+                 }
+
                 }
              catch(IOException e) {
                  if(errorReporting) {
