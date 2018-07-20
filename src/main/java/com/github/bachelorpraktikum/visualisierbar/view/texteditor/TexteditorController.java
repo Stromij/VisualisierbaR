@@ -12,10 +12,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -23,6 +22,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import javax.swing.*;
@@ -31,10 +31,8 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class TexteditorController {
 
@@ -136,6 +134,9 @@ public class TexteditorController {
             if (event.getCode() == KeyCode.R && event.isControlDown()) { // Strg + R
                 playButton.fire();
             }
+            if(event.getCode() == KeyCode.L && event.isControlDown()){   // Strg + L
+                goToLine();
+            }
 
         });
 
@@ -156,6 +157,60 @@ public class TexteditorController {
         firstUndo = true;
         firstRedo = true;
     }
+
+
+    private void goToLine()
+        {int number;
+         try{number = goToLineDialog();
+             if(number == -1) {return;}                 // Dialog wurde abgebrochen
+             int i = 0;
+             for(int n = 0; n < number - 1; n++)
+                {System.out.println(n);
+                 try
+                    {i = Utilities.getRowEnd(editorPane,i) + 1;}
+                 catch (BadLocationException e)
+                    {i = Utilities.getRowStart(editorPane,editorPane.getDocument().getLength());break;}
+                }
+              editorPane.setCaretPosition(i);
+             }
+         catch(NumberFormatException e) {               // Es wurde keine Nummer eingegeben
+             ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+             Alert alert = new Alert(Alert.AlertType.ERROR);
+             String headerText = bundle.getString("number_io_exception_header");
+             alert.setHeaderText(headerText);
+             String contentText = bundle.getString("number_io_exception_content");
+             alert.setContentText(contentText);
+             alert.showAndWait();
+             }
+         catch(BadLocationException e){
+             // Shold not happen
+         }
+
+         editorPaneNode.requestFocus();
+        }
+
+    /**
+     * Asks the Users for a line nubmer to got to
+     * @return returns the Number given by the User, -2 if he press Cancel
+     * @throws NumberFormatException if the user does not enter a positiv Integer
+     */
+    private int goToLineDialog() throws NumberFormatException
+        {ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+         TextInputDialog dialog = new TextInputDialog();
+         dialog.setTitle(bundle.getString("go_to_line_header"));
+         dialog.setGraphic(null);
+         dialog.setHeaderText(bundle.getString("go_to_line_content"));
+         Optional<String> s = dialog.showAndWait();
+         if (s.isPresent())
+            {if(s.get().length() == 0)
+                {return 1;}
+             if(Integer.parseInt(s.get()) >= 0)
+                return Integer.parseInt(s.get());
+            }
+         else
+            {return -1;}
+         throw new NumberFormatException();
+        }
 
     /**
      * Recompile the edited ABS-Files and reopen the Mainview without the editor!
