@@ -4,6 +4,8 @@
 
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+
 <BorderPane fx:id="rootPane" prefHeight="600" prefWidth="800" xmlns="http://javafx.com/javafx/8.0.112" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.bachelorpraktikum.visualisierbar.view.texteditor.TexteditorController">
     <top>
         <ToolBar fx:id="standartTB" prefHeight="60.0" prefWidth="852.0">
@@ -11,6 +13,8 @@
             <Button fx:id="playButton" text="" />
             <Button fx:id="redoButton" text="Redo" />
             <Button fx:id="undoButton" text="Undo" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <TextField fx:id="searchText" prefWidth="200.0" />
         </ToolBar>
     </top>
     <center>

@@ -1,20 +1,17 @@
 package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 
 import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
-import com.github.bachelorpraktikum.visualisierbar.datasource.AbsSource;
-import com.github.bachelorpraktikum.visualisierbar.view.DataSourceHolder;
 import com.github.bachelorpraktikum.visualisierbar.view.MainController;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -22,8 +19,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
-import org.jetbrains.annotations.Nullable;
-
 import javax.annotation.Nonnull;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -52,6 +47,8 @@ public class TexteditorController {
     private Button redoButton;
     @FXML
     private Button undoButton;
+    @FXML
+    private TextField searchText;
 
     private JEditorPane editorPane;
     private SwingNode editorPaneNode;
@@ -99,7 +96,7 @@ public class TexteditorController {
         centerPane.getChildren().add(editorPaneNode);
         centerPane.setFocusTraversable(true);
         centerPane.setPadding(new Insets(5,5,5,5));
-        editorPaneNode.setOnMouseClicked((event -> {editorPaneNode.requestFocus();}));
+        editorPaneNode.setOnMouseClicked((event -> editorPaneNode.requestFocus()));
 
 
         // Fülle das TopPane mit den Funktionstasten und initialisiere sie
@@ -119,6 +116,10 @@ public class TexteditorController {
         redoButton.setOnAction(ActionEvent -> redo());
         undoButton.setDisable(true);
         redoButton.setDisable(true);
+
+
+        ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+        searchText.setPromptText(bundle.getString("search"));
 
         // Füge Shortcuts hinzu
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
