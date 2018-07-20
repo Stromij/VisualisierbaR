@@ -288,8 +288,10 @@ public class MainController {
         reopenTextEditorButton.setOnAction(event -> {
             startTexteditor();
             reopenTextEditorButton.setManaged(false);
+            reopenTextEditorButton.setVisible(false);
         });
         reopenTextEditorButton.setManaged(false);
+        reopenTextEditorButton.setVisible(false);
 
         printToABSButton.setOnAction(event -> {
             if(graph != null && absSource != null)
@@ -1610,7 +1612,7 @@ public class MainController {
         editorStage.setOnCloseRequest(event -> {
             editorStage = null;
             reopenTextEditorButton.setManaged(true);
-
+            reopenTextEditorButton.setVisible(true);
         });
     }
 
