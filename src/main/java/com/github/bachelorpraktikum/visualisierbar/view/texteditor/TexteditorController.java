@@ -135,10 +135,12 @@ public class TexteditorController {
             if (event.getCode() == KeyCode.R && event.isControlDown()) { // Strg + R
                 playButton.fire();
             }
-            if(event.getCode() == KeyCode.L && event.isControlDown()){   // Strg + L
+            if (event.getCode() == KeyCode.L && event.isControlDown()) {  // Strg + L
                 goToLine();
             }
-
+            if (event.getCode() == KeyCode.F && event.isControlDown()) {  // Strg + F
+                searchText.requestFocus();
+            }
         });
 
         // Füge Tooltips hinzu
