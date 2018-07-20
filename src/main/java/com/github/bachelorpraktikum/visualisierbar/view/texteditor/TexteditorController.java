@@ -14,9 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javax.annotation.Nonnull;
@@ -27,7 +25,7 @@ import javax.swing.text.*;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
+import javafx.scene.paint.Paint;
 
 public class TexteditorController {
 
@@ -120,10 +118,13 @@ public class TexteditorController {
         // Konfiguriere das Textfeld für die Suche
         ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
         searchText.setPromptText(bundle.getString("search"));
+        searchText.setBackground(new Background(new BackgroundFill(Paint.valueOf("FFFFFF"), CornerRadii.EMPTY, Insets.EMPTY)));
+
         searchText.addEventHandler(KeyEvent.KEY_PRESSED, event ->{
+            searchText.setBackground(new Background(new BackgroundFill(Paint.valueOf("FFFFFF"), CornerRadii.EMPTY, Insets.EMPTY)));
             if(event.getCode() == KeyCode.ENTER)
                 {if(searchText.getText().length() > 0)
-                    {startSearch(searchText.getText());}
+                    {startSearch(searchText.getText(), editorPane.getCaretPosition());}
                 }
         });
 
@@ -168,21 +169,14 @@ public class TexteditorController {
     }
 
 
-    private void startSearch(String textToSearch)
+    private void startSearch(String textToSearch, int offset)
         {setDocumentToPane(editorPane.getDocument(), editorPane.getCaretPosition());
 
          GridHighlighter yellowHighlighter = new GridHighlighter(new Color(255, 243, 79));
 
          String text = editorPane.getText();
-         if(!text.contains(textToSearch))
-            {ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
-             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-             String headerText = bundle.getString("search_failed_header");
-             alert.setHeaderText(headerText);
-             String contentText = String.format(bundle.getString("search_failed_content"), textToSearch);
-             alert.setContentText(contentText);
-             alert.initOwner(stage);
-             alert.showAndWait();
+         if(!text.contains(textToSearch))                           // der gesuchte Text konnte nicht gefunden werden
+            {searchText.setBackground(new Background(new BackgroundFill(Paint.valueOf("FFDBC8"), CornerRadii.EMPTY, Insets.EMPTY)));
              return;
             }
 
