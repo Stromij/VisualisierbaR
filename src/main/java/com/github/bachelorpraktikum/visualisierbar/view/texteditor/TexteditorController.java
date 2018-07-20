@@ -117,9 +117,15 @@ public class TexteditorController {
         undoButton.setDisable(true);
         redoButton.setDisable(true);
 
-
+        // Konfiguriere das Textfeld für die Suche
         ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
         searchText.setPromptText(bundle.getString("search"));
+        searchText.addEventHandler(KeyEvent.KEY_PRESSED, event ->{
+            if(event.getCode() == KeyCode.ENTER)
+                {if(searchText.getText().length() > 0)
+                    {startSearch(searchText.getText());}
+                }
+        });
 
         // Füge Shortcuts hinzu
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -162,6 +168,41 @@ public class TexteditorController {
     }
 
 
+    private void startSearch(String textToSearch)
+        {setDocumentToPane(editorPane.getDocument(), editorPane.getCaretPosition());
+
+         GridHighlighter yellowHighlighter = new GridHighlighter(new Color(255, 243, 79));
+
+         String text = editorPane.getText();
+         if(!text.contains(textToSearch))
+            {ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+             Alert alert = new Alert(Alert.AlertType.INFORMATION);
+             String headerText = bundle.getString("search_failed_header");
+             alert.setHeaderText(headerText);
+             String contentText = String.format(bundle.getString("search_failed_content"), textToSearch);
+             alert.setContentText(contentText);
+             alert.initOwner(stage);
+             alert.showAndWait();
+             return;
+            }
+
+         int startYellow;
+         int endYellow = 0;
+
+         while(text.indexOf(textToSearch,endYellow + 1) != -1)
+            {startYellow = text.indexOf(textToSearch,endYellow + 1);
+             endYellow = startYellow + textToSearch.length();
+             try
+                {editorPane.getHighlighter().addHighlight(startYellow, endYellow, yellowHighlighter); }
+             catch (BadLocationException e)
+                {e.printStackTrace();}
+            }
+        }
+
+
+    /**
+     * Opens a dialog, asks the User for a line number and jumps to the given line
+     */
     private void goToLine()
         {int number;
          try{number = goToLineDialog();
@@ -589,7 +630,7 @@ public class TexteditorController {
                  System.out.println("start: " + content.indexOf("grid start", offset) + "  end: " + content.indexOf("grid end", offset) + " offset: " + offset);
 
 
-                    try
+                 try
                     {editorPane.getHighlighter().addHighlight(startRed, endRed, redHighlighter); }
                  catch (BadLocationException e)
                     {e.printStackTrace();}
