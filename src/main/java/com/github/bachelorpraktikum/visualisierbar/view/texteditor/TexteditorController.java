@@ -24,6 +24,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 import java.awt.*;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.util.*;
 import javafx.scene.paint.Paint;
 
@@ -174,23 +175,41 @@ public class TexteditorController {
 
          GridHighlighter yellowHighlighter = new GridHighlighter(new Color(255, 243, 79));
 
+
          String text = editorPane.getText();
          if(!text.contains(textToSearch))                           // der gesuchte Text konnte nicht gefunden werden
             {searchText.setBackground(new Background(new BackgroundFill(Paint.valueOf("FFDBC8"), CornerRadii.EMPTY, Insets.EMPTY)));
              return;
             }
 
+
          int startYellow;
          int endYellow = 0;
 
+         int firstYellow = -1;
+         boolean cursorPosition = false;            // Wurde der Cursor schon neu positioniert?
+
+         // Suche und Markiere
          while(text.indexOf(textToSearch,endYellow + 1) != -1)
             {startYellow = text.indexOf(textToSearch,endYellow + 1);
              endYellow = startYellow + textToSearch.length();
+
+             if(firstYellow == -1)
+                {firstYellow = startYellow + 1;}
+             // Positioniere Cursor neu, falls es das erste :
+             if(!cursorPosition && startYellow >= offset)
+                {editorPane.setCaretPosition(startYellow + 1);
+                 cursorPosition = true;
+                }
+
              try
                 {editorPane.getHighlighter().addHighlight(startYellow, endYellow, yellowHighlighter); }
              catch (BadLocationException e)
                 {e.printStackTrace();}
             }
+
+         if(!cursorPosition)
+            {editorPane.setCaretPosition(firstYellow);}
         }
 
 
