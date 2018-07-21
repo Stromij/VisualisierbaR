@@ -402,6 +402,8 @@ public final class Junction extends SingleGraphShapeBase<Node, Circle> implement
                 a.setTranslateY(a.getTranslateY() + offsetY);
             });
 
+            //System.out.println("here");
+
             t.consume();
         });
     }

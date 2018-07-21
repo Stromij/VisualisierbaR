@@ -36,7 +36,6 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
@@ -736,33 +735,6 @@ public class MainController {
                         alert.setContentText("no negative coordinates allowed");
                         alert.showAndWait();
                         return;
-                        /*
-                        if (Math.round(c.getX()) < 0 && Math.round(c.getY()) >= 0) {
-                            double x = 0 - Math.round(c.getX());
-                            Map<Node, GraphShape<Node>> nodes = graph.getNodes();
-                            for (Node n : nodes.keySet()) {
-                                n.setCoordinates(new SimpleCoordinatesAdapter().reverse(new Point2D(( n.getCoordinates().getX() + (int) x), ( n.getCoordinates().getY()))));
-                            }
-
-                            graph.addNode(name, new Coordinates(0, (int) Math.round(c.getY())));
-                        } else if (Math.round(c.getX()) >= 0 && Math.round(c.getY()) < 0) {
-                            int y = 0 - (int) Math.round(c.getY());
-                            Map<Node, GraphShape<Node>> nodes = graph.getNodes();
-                            for (Node n : nodes.keySet()) {
-                                n.setCoordinates(new Coordinates( n.getCoordinates().getX(),  n.getCoordinates().getY() +  y));
-                            }
-
-                            graph.addNode(name, new Coordinates((int) Math.round(c.getX()), 0));
-                        } else {
-                            int x = 0 - (int) Math.round(c.getX());
-                            int y = 0 - (int) Math.round(c.getY());
-                            Map<Node, GraphShape<Node>> nodes = graph.getNodes();
-                            for (Node n : nodes.keySet()) {
-                                n.setCoordinates(new Coordinates( n.getCoordinates().getX() + x,  n.getCoordinates().getY() + y));
-                            }
-                            graph.addNode(name, new Coordinates(0, 0));
-                        }
-                        */
                     } else {
                         graph.addNode(newName, new Coordinates(newX, newY));
                         Node.in(graph.getContext()).get(newName).setAbsName(newName);
@@ -790,47 +762,59 @@ public class MainController {
                              if(isOnNode != null)
                                 {// Errechne die direction, in die verschoben wird
                                  // true = vertical, false = horizontal
-                                 boolean direction = Math.abs(event.getY() - newY) > Math.abs(event.getX() - newX);
+                                 final boolean direction = Math.abs(event.getY() - newY) > Math.abs(event.getX() - newX);
                                  System.out.println("Y " + (newY - isOnNode.getCoordinates().getY() > 0 && direction));
                                  System.out.println("X " + (newX - isOnNode.getCoordinates().getX() >0 && !direction ));
 
                                  newY = newY - isOnNode.getCoordinates().getY() > 0 && direction ? newY +1 : newY;
                                  newX = newX - isOnNode.getCoordinates().getX() > 0 && !direction? newX +1 : newX;
                                  Node.in(graph.getContext()).get(newName).setCoordinates(new Coordinates(newX,newY));
-                                 Node.in(graph.getContext()).get(newName).moved();
 
 
-                                 for(Node n : Node.in(graph.getContext()).getAll())
-                                    {if(direction)                      // Vertikale Verschiebung
-                                        {if (n.getCoordinates().getX() == newX && n.getCoordinates().getY() >= newY && !n.getAbsName().equals(newName)) {
-                                             Coordinates newCood = new Coordinates(n.getCoordinates().getX(), n.getCoordinates().getY() + 1);
-                                             Node.in(graph.getContext()).get(n.getName()).setCoordinates(newCood);
-                                             //n.moved();
-                                            Node.in(graph.getContext()).get(n.getName()).moved();
+
+                                 // Relocate den Graph neu
+                                 final int newYLambda = newY;
+                                 final int newXLambda = newX;
+                                 final String newNameLambda = newName;
+                                 graph.getNodes().forEach((node, shape) -> {
+                                        Circle circ = (Circle) shape.getShape();
+                                        if(direction)                   // Vertiakle Verschiebung
+                                            {if(node.getCoordinates().getX() == newXLambda &&
+                                                node.getCoordinates().getY() >= newYLambda &&
+                                                !node.getAbsName().equals(newNameLambda)
+                                               )
+                                                {circ.setTranslateY(circ.getTranslateY() + 1);}
                                             }
-                                        }
-                                     else {
-                                        if (n.getCoordinates().getY() == newY && n.getCoordinates().getX() >= newX && !n.getAbsName().equals(newName)) {
-                                            Coordinates newCood = new Coordinates(n.getCoordinates().getX() + 1, n.getCoordinates().getY());
-                                            Node.in(graph.getContext()).get(n.getName()).setCoordinates(newCood);
-                                            //n.moved();
-                                            Node.in(graph.getContext()).get(n.getName()).moved();
-                                        }
+                                        else
+                                            {if(node.getCoordinates().getX() >= newXLambda &&
+                                                node.getCoordinates().getY() == newYLambda &&
+                                                !node.getAbsName().equals(newNameLambda)
+                                               )
+                                                {circ.setTranslateX(circ.getTranslateX() + 1);}
+                                            }
 
-                                    }
-                                    }
+                                     double xx = circ.getCenterX() + circ.getTranslateX();
+                                     double yy = circ.getCenterY() + circ.getTranslateY();
+
+                                     circ.setCenterX(xx);
+                                     circ.setCenterY(yy);
+
+                                     node.setCoordinates(graph.getCoordinatesAdapter().reverse(new Point2D(((int) circ.getCenterX()), (int) circ.getCenterY())));
+
+                                     circ.setTranslateX(0);
+                                     circ.setTranslateY(0);
+                                     node.moved();
+                                 });
                                 }
 
                              Node replaceNode1 = Node.in(graph.getContext()).get(replace.getNode1().getName());
                              Node replaceNode2 = Node.in(graph.getContext()).get(replace.getNode2().getName());
-
 
                              graph.addEdge(firstNameTmp, node1, Node.in(graph.getContext()).get(name), length / 2, firstAbsName);
                              graph.addEdge(secondName, Node.in(graph.getContext()).get(name), node2, length / 2, secondName);
 
 
                              // Hänge die direction für alle relevanten Elemente um
-
                              for(Element e : Node.in(graph.getContext()).get(replaceNode1.getName()).getElements())
                                 {if(e.getDirection() == (replaceNode2))
                                     {Element.in(graph.getContext()).get(e.getName()).setDirection(Node.in(graph.getContext()).get(newName));}
@@ -843,9 +827,6 @@ public class MainController {
                              // Räume die Anzeige auf
                              graph.removeEdge(Edge.in(graph.getContext()).get(replace.getName()));
                              Edge.in(graph.getContext()).get(firstNameTmp).setName(firstName);
-
-                             for(Node no : Node.in(graph.getContext()).getAll())
-                                {Node.in(graph.getContext()).get(no.getName()).moved();}
                             }
 
                     }
