@@ -825,8 +825,8 @@ public class MainController {
                              Node replaceNode2 = Node.in(graph.getContext()).get(replace.getNode2().getName());
 
 
-                             graph.addEdge(firstNameTmp, node1, Node.in(graph.getContext()).get(name), length, firstAbsName);
-                             graph.addEdge(secondName, Node.in(graph.getContext()).get(name), node2, length, secondName);
+                             graph.addEdge(firstNameTmp, node1, Node.in(graph.getContext()).get(name), length / 2, firstAbsName);
+                             graph.addEdge(secondName, Node.in(graph.getContext()).get(name), node2, length / 2, secondName);
 
 
                              // Hänge die direction für alle relevanten Elemente um
