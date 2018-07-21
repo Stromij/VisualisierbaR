@@ -174,6 +174,7 @@ public class TexteditorController {
         {setDocumentToPane(editorPane.getDocument(), editorPane.getCaretPosition());
 
          GridHighlighter yellowHighlighter = new GridHighlighter(new Color(255, 243, 79));
+         GridHighlighter orangeHighlighter = new GridHighlighter(new Color(255, 194, 110));
 
 
          String text = editorPane.getText();
@@ -183,10 +184,11 @@ public class TexteditorController {
             }
 
 
-         int startYellow;
+         int startYellow = 0;
          int endYellow = 0;
 
          int firstYellow = -1;
+         int firstEndYellow = -1;
          boolean cursorPosition = false;            // Wurde der Cursor schon neu positioniert?
 
          // Suche und Markiere
@@ -195,21 +197,30 @@ public class TexteditorController {
              endYellow = startYellow + textToSearch.length();
 
              if(firstYellow == -1)
-                {firstYellow = startYellow + 1;}
-             // Positioniere Cursor neu, falls es das erste :
-             if(!cursorPosition && startYellow >= offset)
-                {editorPane.setCaretPosition(startYellow + 1);
-                 cursorPosition = true;
+                {firstYellow = startYellow;
+                 firstEndYellow = endYellow;
                 }
 
-             try
-                {editorPane.getHighlighter().addHighlight(startYellow, endYellow, yellowHighlighter); }
+             try {// Positioniere Cursor neu, falls es das erste :
+                 if (!cursorPosition && startYellow >= offset) {
+                     editorPane.setCaretPosition(startYellow + 1);
+                     cursorPosition = true;
+                     editorPane.getHighlighter().addHighlight(startYellow, endYellow, orangeHighlighter);
+                 } else {
+                    editorPane.getHighlighter().addHighlight(startYellow, endYellow, yellowHighlighter);
+                 }
+             }
              catch (BadLocationException e)
                 {e.printStackTrace();}
             }
 
          if(!cursorPosition)
-            {editorPane.setCaretPosition(firstYellow);}
+            {editorPane.setCaretPosition(firstYellow + 1);
+             try
+                {editorPane.getHighlighter().addHighlight(firstYellow, firstEndYellow, orangeHighlighter);}
+             catch (BadLocationException e)
+                {e.printStackTrace();}
+            }
         }
 
 
@@ -222,8 +233,7 @@ public class TexteditorController {
              if(number == -1) {return;}                 // Dialog wurde abgebrochen
              int i = 0;
              for(int n = 0; n < number - 1; n++)
-                {System.out.println(n);
-                 try
+                {try
                     {i = Utilities.getRowEnd(editorPane,i) + 1;}
                  catch (BadLocationException e)
                     {i = Utilities.getRowStart(editorPane,editorPane.getDocument().getLength());break;}
@@ -293,7 +303,6 @@ public class TexteditorController {
          for(Map.Entry<String, StringBuffer> ent : content.entrySet())
             {String pathname = fileOfAbs.toString().concat("/").concat(ent.getKey());
              String file = ent.getValue().toString();
-             System.out.println(pathname);
 
              // Schreibe in die Dateien
              try {
@@ -640,7 +649,6 @@ public class TexteditorController {
                  startRed = content.lastIndexOf("\n", offset) + 1;
                  endRed = content.indexOf("\n", offset) + 1;
                  endRed = endRed == 0 ? content.length() : endRed;
-                 System.out.println("start: " + content.indexOf("grid start", offset) + "  end: " + content.indexOf("grid end", offset) + " offset: " + offset);
 
 
                  try
@@ -658,7 +666,6 @@ public class TexteditorController {
                      startRed = content.lastIndexOf("\n", startInt) + 1;
                      endRed = content.indexOf("\n", startInt) + 1;
                      endRed = endRed == 0 ? content.length() : endRed;
-                     System.out.println("catched");
                      offset = endRed;
                      try
                         {editorPane.getHighlighter().addHighlight(startRed, endRed, redHighlighter); }
