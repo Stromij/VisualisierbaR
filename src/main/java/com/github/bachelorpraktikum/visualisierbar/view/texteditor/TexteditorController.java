@@ -23,6 +23,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
@@ -68,6 +70,7 @@ public class TexteditorController {
 
     @FXML
     private void initialize() {
+        ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
         // Füllle das CenterPane mit dem JEditorPane
         editorPaneNode = new SwingNode();
         editorPane = new JEditorPane()
@@ -117,7 +120,6 @@ public class TexteditorController {
         redoButton.setDisable(true);
 
         // Konfiguriere das Textfeld für die Suche
-        ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
         searchText.setPromptText(bundle.getString("search"));
         searchText.setBackground(new Background(new BackgroundFill(Paint.valueOf("FFFFFF"), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -128,6 +130,55 @@ public class TexteditorController {
                     {startSearch(searchText.getText(), editorPane.getCaretPosition());}
                 }
         });
+
+        //Konfiguriere das JEditorPane für Spezifikationen
+        editorPane.addMouseListener(new MouseListener() {
+                                        @Override
+                                        public void mouseClicked(MouseEvent e) {
+
+                                        }
+
+                                        @Override
+                                        public void mousePressed(MouseEvent event) {
+                                            if(event.getButton() == MouseEvent.BUTTON3)
+                                                {int offset = editorPane.viewToModel( event.getPoint() );
+                                                 try{
+                                                     int rowStart = Utilities.getRowStart(editorPane, offset);
+                                                     int rowEnd = Utilities.getRowEnd(editorPane, offset);
+                                                     int wordStart = Utilities.getWordStart(editorPane, offset);
+                                                     int wordEnd = Utilities.getWordEnd(editorPane, offset);
+                                                     String row = editorPane.getText(rowStart, rowEnd - rowStart);
+                                                     if(row.matches(".*//\\[[^:\\\"\\]]*:[^:\\\"\\]]*\\]\\s*"))
+                                                        {String model = row.substring(row.indexOf("[")+1, row.indexOf(":"));
+                                                         String attri = row.substring(row.indexOf(":")+1, row.indexOf("]"));
+                                                         System.out.println(model + "  " + attri);
+                                                         // TODO Specification found
+                                                        }
+                                                 }
+                                                 catch(BadLocationException e){
+                                                     e.printStackTrace();
+                                                 }
+
+                                                }
+                                        }
+
+                                        @Override
+                                        public void mouseReleased(MouseEvent e) {
+
+                                        }
+
+                                        @Override
+                                        public void mouseEntered(MouseEvent e) {
+
+                                        }
+
+                                        @Override
+                                        public void mouseExited(MouseEvent e) {
+
+                                        }
+                                    }
+
+        );
 
         // Füge Shortcuts hinzu
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -152,10 +203,11 @@ public class TexteditorController {
         });
 
         // Füge Tooltips hinzu
-        TooltipUtil.install(undoButton, new Tooltip("Redo (" + KeyCode.CONTROL.getName() + " + " + KeyCode.Z.getName() + ")"));
-        TooltipUtil.install(redoButton, new Tooltip("Undo (" + KeyCode.CONTROL.getName() + " + " + KeyCode.Y.getName() + ")"));
-        TooltipUtil.install(saveButton, new Tooltip("Save (" + KeyCode.CONTROL.getName() + " + " + KeyCode.S.getName() + ")"));
-        TooltipUtil.install(playButton, new Tooltip("Recompile (" + KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName() + ")"));
+        TooltipUtil.install(undoButton, new Tooltip(bundle.getString("undo") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.Z.getName() + ")"));
+        TooltipUtil.install(redoButton, new Tooltip(bundle.getString("redo") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.Y.getName() + ")"));
+        TooltipUtil.install(saveButton, new Tooltip(bundle.getString("save") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.S.getName() + ")"));
+        TooltipUtil.install(playButton, new Tooltip(bundle.getString("recompile") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName() + ")"));
+        TooltipUtil.install(searchText, new Tooltip(bundle.getString("search")));
 
 
 
