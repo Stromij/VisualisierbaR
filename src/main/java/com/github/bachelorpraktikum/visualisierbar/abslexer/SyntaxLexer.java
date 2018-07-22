@@ -26,7 +26,7 @@ public class SyntaxLexer {
          AbsLexer lexer = new AbsLexer(stream);
 
          for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken())
-            {try {//Ausgabe zum finden von Token-Nummern
+            {try {//Ausgabe zum Finden von Token-Nummern
                   //System.out.println(token.getText() + "  " + token.getType());
                   response.insertString(response.getLength(), token.getText(), getStyle(token.getType()));
                 } catch (BadLocationException e) {
@@ -45,6 +45,8 @@ public class SyntaxLexer {
      */
     private Style getStyle(int type)
         {switch(type) {
+            case AbsLexer.Specification:
+                return getSpecificationStyle();
             case AbsLexer.EndOfLineComment:
                 return getCommandStyle();
             case AbsLexer.TraditionalComment:
@@ -231,7 +233,7 @@ public class SyntaxLexer {
                 return getDeclarationStyle();
             case AbsLexer.T__86:                // ?
                 return null;
-            case 90:                            // Leerzeichen
+            case AbsLexer.WhiteSpace:           // Leerzeichen
                 return null;
 
             default: return null;
@@ -286,8 +288,21 @@ public class SyntaxLexer {
      * @return the style for form
      */
     private Style getFromStyle()
-        {Style stringStyle = new StyleContext().addStyle("from", null);
-         StyleConstants.setItalic(stringStyle, true);
-         return stringStyle;
+        {Style fromStyle = new StyleContext().addStyle("from", null);
+         StyleConstants.setItalic(fromStyle, true);
+         return fromStyle;
+        }
+
+    /**
+     * Style for Specification
+     * @return the style for form
+     */
+    private Style getSpecificationStyle()
+        {Style specificationStyle = new StyleContext().addStyle("specification", null);
+         StyleConstants.setForeground(specificationStyle, new Color(87, 128, 211));
+         StyleConstants.setItalic(specificationStyle, true);
+         StyleConstants.setBold(specificationStyle, true);
+         StyleConstants.setUnderline(specificationStyle, true);
+         return specificationStyle;
         }
 }
