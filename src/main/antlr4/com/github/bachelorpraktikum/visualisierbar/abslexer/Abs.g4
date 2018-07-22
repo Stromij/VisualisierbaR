@@ -10,7 +10,7 @@
 grammar Abs;
 
 TraditionalComment : '/*' .*? '*/';
-Specification : '//[' ~('"' | ']')* WhiteSpace*? ':' WhiteSpace*? ~('"' | ']')* ']' ('\n' | EOF);
+Specification : '//[' ~('"' | ']' | ':')* WhiteSpace*? ':' WhiteSpace*? ~('"' | ']' | ':')* ']' WhiteSpace*? ('\n' | EOF);
 EndOfLineComment : '//' .*? ('\n' | EOF);
 WhiteSpace : [ \t\f\r\n]+;
 QuotationMark: '"';
