@@ -145,14 +145,18 @@ public class TexteditorController {
                                                  try{
                                                      int rowStart = Utilities.getRowStart(editorPane, offset);
                                                      int rowEnd = Utilities.getRowEnd(editorPane, offset);
-                                                     int wordStart = Utilities.getWordStart(editorPane, offset);
-                                                     int wordEnd = Utilities.getWordEnd(editorPane, offset);
                                                      String row = editorPane.getText(rowStart, rowEnd - rowStart);
                                                      if(row.matches(".*//\\[[^:\\\"\\]]*:[^:\\\"\\]]*\\]\\s*"))
-                                                        {String model = row.substring(row.indexOf("[")+1, row.indexOf(":"));
-                                                         String attri = row.substring(row.indexOf(":")+1, row.indexOf("]"));
-                                                         System.out.println(model + "  " + attri);
+                                                        {int specStart = row.indexOf("[");
+                                                         int specEnd = row.indexOf("]");
+                                                         String model = row.substring(specStart+1, row.indexOf(":"));
+                                                         String attri = row.substring(row.indexOf(":")+1, specEnd);
+                                                         if(rowStart + specStart > offset || rowStart + specEnd < offset)
+                                                            {// Klick war zwar in der Zeile, aber nicht auf dem Spec-Element
+                                                             return;
+                                                            }
                                                          // TODO Specification found
+                                                         System.out.println(model + "  " + attri);
                                                         }
                                                  }
                                                  catch(BadLocationException e){
