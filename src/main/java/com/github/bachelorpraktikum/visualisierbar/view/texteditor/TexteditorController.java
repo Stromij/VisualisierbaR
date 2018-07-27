@@ -156,11 +156,7 @@ public class TexteditorController {
                                                              return;
                                                             }
                                                          // TODO Specification found
-                                                         System.out.println(model + "  " + attri);
-                                                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                                         alert.setHeaderText(model);
-                                                         alert.setContentText(attri);
-                                                         alert.showAndWait();
+
                                                         }
                                                  }
                                                  catch(BadLocationException e){
