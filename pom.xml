@@ -119,7 +119,12 @@
         <dependency>
             <groupId>org.icepdf.os</groupId>
             <artifactId>icepdf-core</artifactId>
-            <version>6.2.2</version>
+            <version>6.2.1_P01</version>
+        </dependency>
+        <dependency>
+            <groupId>org.icepdf.os</groupId>
+            <artifactId>icepdf-viewer</artifactId>
+            <version>6.2.1_P01</version>
         </dependency>
     </dependencies>
 
