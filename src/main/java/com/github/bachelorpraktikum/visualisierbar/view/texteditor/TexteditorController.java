@@ -163,10 +163,7 @@ public class TexteditorController {
                                                          pdfViewer.highlight(pdfData.getStartPage(),pdfData.getEndPage(),pdfData.getStartY(), pdfData.getEndY());
                                                         }
                                                  }
-                                                 catch(BadLocationException e){
-                                                     e.printStackTrace();
-                                                 }
-                                                 catch (IOException e) {
+                                                 catch(BadLocationException | IOException e){
                                                      e.printStackTrace();
                                                  }
 
@@ -247,7 +244,7 @@ public class TexteditorController {
             }
 
 
-         int startYellow = 0;
+         int startYellow;
          int endYellow = 0;
 
          int firstYellow = -1;
@@ -382,7 +379,7 @@ public class TexteditorController {
                      Alert alert = new Alert(Alert.AlertType.INFORMATION);
                      String headerText = bundle.getString("file_saved_header");
                      alert.setHeaderText(headerText);
-                     String contentText = String.format(bundle.getString("file_saved_content"));
+                     String contentText = bundle.getString("file_saved_content");
                      alert.setContentText(contentText);
                      alert.initOwner(stage);
                      alert.showAndWait();

@@ -1,9 +1,6 @@
 package com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
@@ -20,12 +17,9 @@ import javax.swing.*;
 
 public class PDFViewer {
 
-    private File fileToPDF;
     private SwingController controller;
 
     public PDFViewer(File fileToPDF){
-        this.fileToPDF = fileToPDF;
-
         // Erstelle die GUI für die PDF-Darstellung
         controller = new SwingController();
         SwingViewBuilder factory = new SwingViewBuilder(controller);
@@ -110,8 +104,8 @@ public class PDFViewer {
 
     /**
      * Helps to find highlighting Positions
-     * @param pageStart
-     * @param pageEnd
+     * @param pageStart page where the search should start
+     * @param pageEnd page where the search should end
      */
     public void funnyDebug(int pageStart, int pageEnd)
         {Page page = controller.getDocument().getPageTree().getPage(pageStart);
