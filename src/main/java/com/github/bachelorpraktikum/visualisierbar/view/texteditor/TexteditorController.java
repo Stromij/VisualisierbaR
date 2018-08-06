@@ -3,6 +3,8 @@ package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
 import com.github.bachelorpraktikum.visualisierbar.view.MainController;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFData;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFViewer;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -26,7 +28,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 import javafx.scene.paint.Paint;
 
@@ -65,6 +66,7 @@ public class TexteditorController {
     private ChangeListener changeListener;
     private boolean firstUndo;
     private boolean firstRedo;
+    private PDFViewer pdfViewer;
 
     private MainController parent;
 
@@ -155,11 +157,16 @@ public class TexteditorController {
                                                             {// Klick war zwar in der Zeile, aber nicht auf dem Spec-Element
                                                              return;
                                                             }
-                                                         // TODO Specification found
-
+                                                         PDFData pdfData = new PDFData(model, attri);
+                                                         pdfViewer = new PDFViewer(pdfData.getLocation());
+                                                         pdfViewer.setPage(pdfData.getStartPage());
+                                                         pdfViewer.highlight(pdfData.getStartPage(),pdfData.getEndPage(),pdfData.getStartY(), pdfData.getEndY());
                                                         }
                                                  }
                                                  catch(BadLocationException e){
+                                                     e.printStackTrace(); 
+                                                 }
+                                                 catch (IOException e) {
                                                      e.printStackTrace();
                                                  }
 
