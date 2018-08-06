@@ -159,6 +159,7 @@ public class TexteditorController {
                                                             }
                                                          PDFData pdfData = new PDFData(model, attri);
                                                          pdfViewer = new PDFViewer(pdfData.getLocation());
+                                                         //pdfViewer.funnyHighlight(183, 190);
                                                          pdfViewer.setPage(pdfData.getStartPage());
                                                          pdfViewer.highlight(pdfData.getStartPage(),pdfData.getEndPage(),pdfData.getStartY(), pdfData.getEndY());
                                                         }

@@ -61,7 +61,7 @@ public class PDFViewer {
     public void highlight(int startPageNumber,int endPageNumber, int startLineCoords, int endLineCoords)
         {Page page = controller.getDocument().getPageTree().getPage(startPageNumber);
 
-         // Generiere den Markup - (Anfang?)
+         // Generiere das Markup
          int height = endPageNumber == startPageNumber ? endLineCoords - startLineCoords : (int) page.getSize(0).getHeight() - startLineCoords;
          int start = endPageNumber == startPageNumber ? (int) page.getSize(0).getHeight() - (startLineCoords + (endLineCoords - startLineCoords)) : 0;
          TextMarkupAnnotation markupAnnotation = (TextMarkupAnnotation) AnnotationFactory.buildAnnotation(
@@ -107,7 +107,7 @@ public class PDFViewer {
      * @param pageStart page where the search should start
      * @param pageEnd page where the search should end
      */
-    public void funnyDebug(int pageStart, int pageEnd)
+    public void funnyHighlight(int pageStart, int pageEnd)
         {Page page = controller.getDocument().getPageTree().getPage(pageStart);
          try {
             for(LineText pl : page.getViewText().getPageLines())
@@ -117,7 +117,7 @@ public class PDFViewer {
             e.printStackTrace();
          }
          if(pageStart < pageEnd)
-            {funnyDebug(pageStart+1, pageEnd);}
+            {funnyHighlight(pageStart+1, pageEnd);}
         }
 
 
