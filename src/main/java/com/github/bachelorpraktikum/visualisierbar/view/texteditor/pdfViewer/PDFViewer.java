@@ -58,20 +58,14 @@ public class PDFViewer {
 
 
     /**
-     *
-     * @param startPageNumber
+     * Adds a highlight to the shown PDF
+     * @param startPageNumber Number of Page where the highlight starts
+     * @param endPageNumber Number of Page where the highlight ends
+     * @param startLineCoords Y-Coordinate where the highlight starts
+     * @param endLineCoords Y-Coordinate where the highlight ends
      */
     public void highlight(int startPageNumber,int endPageNumber, int startLineCoords, int endLineCoords)
         {Page page = controller.getDocument().getPageTree().getPage(startPageNumber);
-
-         try {
-            for(LineText pl : page.getViewText().getPageLines())
-                {System.out.println(pl.toString() + "  " + (page.getSize(0).getHeight() - pl.getBounds().y) + "  " + ((page.getSize(0).getHeight() - pl.getBounds().y) - pl.getBounds().height)); }
-            }
-         catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
 
          // Generiere den Markup - (Anfang?)
          int height = endPageNumber == startPageNumber ? endLineCoords - startLineCoords : (int) page.getSize(0).getHeight() - startLineCoords;
@@ -111,6 +105,25 @@ public class PDFViewer {
 
          if(startPageNumber < endPageNumber)
             {highlight(startPageNumber + 1, endPageNumber, 0, endLineCoords);}
+        }
+
+
+    /**
+     * Helps to find highlighting Positions
+     * @param pageStart
+     * @param pageEnd
+     */
+    public void funnyDebug(int pageStart, int pageEnd)
+        {Page page = controller.getDocument().getPageTree().getPage(pageStart);
+         try {
+            for(LineText pl : page.getViewText().getPageLines())
+                {System.out.println(pl.toString() + "  Bottom of Line: " + Math.round(page.getSize(0).getHeight() - pl.getBounds().y) + "  Top of Line: " + Math.round((page.getSize(0).getHeight() - pl.getBounds().y) - pl.getBounds().height)); }
+         }
+         catch (InterruptedException e) {
+            e.printStackTrace();
+         }
+         if(pageStart < pageEnd)
+            {funnyDebug(pageStart+1, pageEnd);}
         }
 
 

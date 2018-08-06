@@ -164,7 +164,7 @@ public class TexteditorController {
                                                         }
                                                  }
                                                  catch(BadLocationException e){
-                                                     e.printStackTrace(); 
+                                                     e.printStackTrace();
                                                  }
                                                  catch (IOException e) {
                                                      e.printStackTrace();
