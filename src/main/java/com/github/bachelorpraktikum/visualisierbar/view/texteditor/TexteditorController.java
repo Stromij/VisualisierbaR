@@ -3,19 +3,29 @@ package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
 import com.github.bachelorpraktikum.visualisierbar.view.MainController;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
+import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFData;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFDataLines;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFViewer;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
@@ -66,13 +76,13 @@ public class TexteditorController {
     private ChangeListener changeListener;
     private boolean firstUndo;
     private boolean firstRedo;
-    private PDFViewer pdfViewer;
 
     private MainController parent;
+    private ResourceBundle bundle;
 
     @FXML
     private void initialize() {
-        ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+        bundle = ResourceBundle.getBundle("bundles.localization");
         // Füllle das CenterPane mit dem JEditorPane
         editorPaneNode = new SwingNode();
         editorPane = new JEditorPane()
@@ -158,10 +168,23 @@ public class TexteditorController {
                                                              return;
                                                             }
                                                          PDFData pdfData = new PDFData(model, attri);
-                                                         pdfViewer = new PDFViewer(pdfData.getLocation());
+
+
                                                          //pdfViewer.funnyHighlight(183, 190);
-                                                         pdfViewer.setPage(pdfData.getStartPage());
-                                                         pdfViewer.highlight(pdfData.getStartPage(),pdfData.getEndPage(),pdfData.getStartY(), pdfData.getEndY());
+
+
+                                                         if(pdfData.getAllMatches().size() == 1)    // Es wurde nur ein Treffer gefunden
+                                                            {openPDFWithHighlight(pdfData, 0);}
+                                                         else
+                                                            {// Es wurde mehr als ein Treffer gefunden.
+                                                             // Lasse den User auswählen welchen Treffer er öffnen möchte.
+                                                             Platform.runLater(new Runnable() {
+                                                                @Override
+                                                                public void run() {
+                                                                    generateGuidelineChooser(pdfData);
+                                                                }
+                                                             });
+                                                            }
                                                         }
                                                  }
                                                  catch(BadLocationException | IOException e){
@@ -229,6 +252,80 @@ public class TexteditorController {
         firstUndo = true;
         firstRedo = true;
     }
+
+
+    private void openPDFWithHighlight(PDFData pdfData, int indiz)
+        {PDFViewer pdfViewer = new PDFViewer(pdfData.getLocation(indiz));
+         pdfViewer.setPage(pdfData.getStartPage(indiz));
+         pdfViewer.highlight(pdfData.getStartPage(indiz),pdfData.getEndPage(indiz),pdfData.getStartY(indiz), pdfData.getEndY(indiz));
+        }
+
+
+    private void generateGuidelineChooser(PDFData pdfData) {
+         Label label = new Label(bundle.getString("found_hits"));
+
+         // Generiere die Übersichtstabelle
+         TableView table = new TableView();
+
+         TableColumn guidelineColumn = new TableColumn(bundle.getString("guideline"));
+         guidelineColumn.setCellValueFactory(
+                new PropertyValueFactory<PDFDataLines,String>("guideline")
+         );
+         guidelineColumn.setMinWidth(160);
+
+         TableColumn guidelineNameColumn = new TableColumn(bundle.getString("guideline_name"));
+         guidelineNameColumn.setCellValueFactory(
+                new PropertyValueFactory<PDFDataLines,String>("guidelineName")
+         );
+         guidelineNameColumn.setMinWidth(160);
+
+         TableColumn pageColumn = new TableColumn(bundle.getString("page"));
+         pageColumn.setCellValueFactory(
+                new PropertyValueFactory<PDFDataLines,String>("startPage")
+         );
+         pageColumn.setMinWidth(70);
+
+         TableColumn lengthColumn = new TableColumn(bundle.getString("pagecount"));
+         lengthColumn.setCellValueFactory(
+                new PropertyValueFactory<PDFDataLines,String>("length")
+         );
+         lengthColumn.setMinWidth(70);
+
+         table.setRowFactory(tv -> {
+            TableRow<PDFDataLines> tableRow = new TableRow<>();
+            tableRow.setOnMouseClicked(e -> {
+                if (! tableRow.isEmpty() && e.getButton()== MouseButton.PRIMARY
+                        && e.getClickCount() == 2) {
+                    openPDFWithHighlight(pdfData, tableRow.getItem().getIndiz());
+                }
+            });
+            return tableRow ;
+         });
+
+
+         // Fülle die Zellen mit den Daten
+         table.setItems(pdfData.getDataLines());
+         table.getColumns().addAll(guidelineColumn, guidelineNameColumn, pageColumn, lengthColumn);
+
+         table.setFixedCellSize(25);
+         table.setMaxHeight(350);
+         table.setMinWidth(600);
+         table.setPrefHeight(table.getItems().size()*25 + 28);
+
+
+         // Wrappe alles
+         VBox vbox = new VBox();
+         vbox.setSpacing(5);
+         vbox.setPadding(new Insets(20, 10, 0, 10));
+         vbox.getChildren().addAll(label, table);
+
+
+         // Gerneriere die Warnung an den User
+         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+         alert.setHeaderText(bundle.getString("results_of_guideline_search"));
+         alert.getDialogPane().setContent(vbox);
+         alert.showAndWait();
+        }
 
 
     private void startSearch(String textToSearch, int offset)
@@ -302,7 +399,6 @@ public class TexteditorController {
               editorPane.setCaretPosition(i);
              }
          catch(NumberFormatException e) {               // Es wurde keine Nummer eingegeben
-             ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
              Alert alert = new Alert(Alert.AlertType.ERROR);
              String headerText = bundle.getString("number_io_exception_header");
              alert.setHeaderText(headerText);
@@ -323,8 +419,7 @@ public class TexteditorController {
      * @throws NumberFormatException if the user does not enter a positiv Integer
      */
     private int goToLineDialog() throws NumberFormatException
-        {ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
-         TextInputDialog dialog = new TextInputDialog();
+        {TextInputDialog dialog = new TextInputDialog();
          dialog.setTitle(bundle.getString("go_to_line_header"));
          dialog.setGraphic(null);
          dialog.setHeaderText(bundle.getString("go_to_line_content"));
@@ -376,7 +471,6 @@ public class TexteditorController {
                  fw.close();
 
                  if(errorReporting) {
-                     ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
                      Alert alert = new Alert(Alert.AlertType.INFORMATION);
                      String headerText = bundle.getString("file_saved_header");
                      alert.setHeaderText(headerText);
@@ -389,7 +483,6 @@ public class TexteditorController {
                 }
              catch(IOException e) {
                  if(errorReporting) {
-                     ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
                      Alert alert = new Alert(Alert.AlertType.ERROR);
                      String headerText = bundle.getString("file_not_save_header");
                      alert.setHeaderText(headerText);
