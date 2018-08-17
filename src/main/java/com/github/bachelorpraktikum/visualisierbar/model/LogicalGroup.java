@@ -387,6 +387,7 @@ public class LogicalGroup {
     @Nonnull
     public String toABS(String deltaContent)
         {String rowOfElements = generateRowOfElements();
+         String isLocal = "";
 
          // Alle Elemente innerhalb einer logischen Gruppe werden erst nach dem erstellen der Logischen Gruppe hinzugefügt
          String addElem = "";
@@ -403,8 +404,9 @@ public class LogicalGroup {
                  try {Matcher matcherSignal = patternSignal.matcher(deltaContent);
                       matcherSignal.find();
                       zfst = matcherSignal.group(2).equals("local") ? matcherSignal.group(3) : matcherSignal.group(2);
-                    }
-                    catch(IllegalStateException ignored) {/*Falls Signal in alter Datei nicht gefunden werden konnte*/}
+                      isLocal = matcherSignal.group(2).equals("local") ? " local" : "";
+                 }
+                 catch(IllegalStateException ignored) {/*Falls Signal in alter Datei nicht gefunden werden konnte*/}
                 }
              //Ende der Suche nach einem zfst
 
@@ -413,8 +415,9 @@ public class LogicalGroup {
 
              addElem = addElem.concat(String.format("%s.addElement(%s);\n", elemVorne, elemHinten));
 
-             return String.format("[HTTPName: \"%s\"]Signal %s = new local SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n%s\n",
-                    name, name, rowOfElements, name, zfst, belongOut, name, addElem);
+
+             return String.format("[HTTPName: \"%s\"]Signal %s = new%s SignalImpl(%s\"%s\", %s);\n%s.setSignal(%s);\n%s\n",
+                    name, name, isLocal, rowOfElements, name, zfst, belongOut, name, addElem);
             }
 
 
