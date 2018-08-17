@@ -400,11 +400,11 @@ public class LogicalGroup {
              String zfst = this.additional == null ? " null/*missing zfst*/" : " " + additional;
              if(deltaContent != null && this.additional == null)
                 {//Pattern patternSignal = compile("(.*new SwWechselImpl\\()(.*?)(,\\p{Blank}*\"" + oldName + "\"\\);.*)");
-                 Pattern patternSignal = compile("(.*new (local)? SignalImpl\\(.*,\\p{Blank}*\"" + oldName + "\",\\p{Blank}*)(.*?)(\\);.*)");
+                 Pattern patternSignal = compile("(.*new( local)? SignalImpl\\(.*,\\p{Blank}*\"" + oldName + "\",\\p{Blank}*)(.*?)(\\);.*)");
                  try {Matcher matcherSignal = patternSignal.matcher(deltaContent);
                       matcherSignal.find();
-                      zfst = matcherSignal.group(2).equals("local") ? matcherSignal.group(3) : matcherSignal.group(2);
-                      isLocal = matcherSignal.group(2).equals("local") ? " local" : "";
+                      zfst = matcherSignal.group(2).equals(" local") ? matcherSignal.group(3) : matcherSignal.group(2);
+                      isLocal = matcherSignal.group(2).equals(" local") ? " local" : "";
                  }
                  catch(IllegalStateException ignored) {/*Falls Signal in alter Datei nicht gefunden werden konnte*/}
                 }
