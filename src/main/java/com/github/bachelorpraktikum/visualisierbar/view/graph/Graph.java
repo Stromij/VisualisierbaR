@@ -479,9 +479,9 @@ public final class Graph {
     @Nonnull
     public String printLogicalGroupsToAbs(@Nonnull String prefix, @Nullable String deltaContent)
         {String response = prefix;
-            for (LogicalGroup iteration_element : LogicalGroup.in(context).getAll()) {
-                response = response.concat(iteration_element.toABS(deltaContent));
-            }
+         for (LogicalGroup iteration_element : LogicalGroup.in(context).getAll()) {
+            response = response.concat(iteration_element.toABS(deltaContent));
+         }
          response = response.replace("\n", "\n" + prefix);
          return response;
         }

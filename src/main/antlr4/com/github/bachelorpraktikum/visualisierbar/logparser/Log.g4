@@ -27,7 +27,7 @@ elem: 'ELEM' SEP elem_name SEP node_name SEP STATE (SEP elem_abs_name)?;
 
 view: 'TOWARDS' SEP elem_name SEP edge_name;
 
-logicalGroup: 'GROUP' SEP kind SEP log_name SEP (elem_name SEP)*;
+logicalGroup: 'GROUP' SEP kind SEP log_name SEP sw_name SEP (elem_name SEP)*;
 
 also: 'ALSO' SEP elem_name SEP log_name;
 
@@ -51,6 +51,7 @@ data: 'DATA' SEP train_readable_name SEP time WHITESPACE speed SEP time_with_wra
 
 MV_IND: 'MV';
 
+sw_name: name;
 node_name: name;
 log_name: name;
 node_abs_name: name;

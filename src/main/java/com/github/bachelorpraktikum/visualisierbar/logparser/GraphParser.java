@@ -243,10 +243,20 @@ public final class GraphParser {
                 }
 
                 LogicalGroup logicalGroup = LogicalGroup.in(context).create(groupName, kind);      //new logicalGroup(groupName, kind);
+                logicalGroup.setSw_element(ctx.sw_name().getText());
+
+                alsoGroupTracker.forEach((key, group) -> {
+                    if(group.equals(ctx.sw_name().getText()) && Element.in(context).NameExists(key))
+                        {logicalGroup.setBelongsTo(Element.in(context).get(key));}
+                });
+
 
                 for (int i = 0; ctx.elem_name(i) != null; i++) {
                     if (ctx.elem_name(i).getText().equals("null")) continue;
-                    elemGroupTracker.put(ctx.elem_name(i).getText(), logicalGroup);
+                    if(Element.in(context).NameExists(ctx.elem_name(i).getText()))
+                        {logicalGroup.addElement(Element.in(context).get(ctx.elem_name(i).getText()));}
+                    else
+                        {elemGroupTracker.put(ctx.elem_name(i).getText(), logicalGroup);}
                 }
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
@@ -260,6 +270,11 @@ public final class GraphParser {
             {try
                 {String elemName = ctx.elem_name().getText();
                  String logName = ctx.log_name().getText();
+
+                 LogicalGroup.in(context).getAll().forEach(group ->{
+                     if(group.getSw_element().equals(logName) && Element.in(context).NameExists(elemName))
+                        {group.setBelongsTo(Element.in(context).get(elemName));}
+                 });
 
                  alsoGroupTracker.put(elemName, logName);
                 }

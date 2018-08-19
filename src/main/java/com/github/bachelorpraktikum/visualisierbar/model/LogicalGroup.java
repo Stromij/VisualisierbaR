@@ -27,6 +27,8 @@ public class LogicalGroup {
     private Kind type;
     @Nullable
     private String additional;
+    @Nullable
+    private String sw_element;
 
 
     public enum Kind {
@@ -403,8 +405,8 @@ public class LogicalGroup {
                  Pattern patternSignal = compile("(.*new( local)? SignalImpl\\(.*,\\p{Blank}*\"" + oldName + "\",\\p{Blank}*)(.*?)(\\);.*)");
                  try {Matcher matcherSignal = patternSignal.matcher(deltaContent);
                       matcherSignal.find();
-                      zfst = matcherSignal.group(2).equals(" local") ? matcherSignal.group(3) : matcherSignal.group(2);
-                      isLocal = matcherSignal.group(2).equals(" local") ? " local" : "";
+                      zfst = matcherSignal.group(3);
+                      isLocal = matcherSignal.group(2) != null ? " local" : "";
                  }
                  catch(IllegalStateException ignored) {/*Falls Signal in alter Datei nicht gefunden werden konnte*/}
                 }
@@ -489,5 +491,11 @@ public class LogicalGroup {
         element.setLogicalGroup(null);
     }
 
+
+    public void setSw_element(String name)
+        {sw_element = name;}
+
+    public String getSw_element()
+        {return sw_element;}
 
 }
