@@ -166,9 +166,10 @@ public final class GraphParser {
                 }
 
                 if(alsoGroupTracker.get(elementName) != null){
-                    LogicalGroup group = elemGroupTracker.get(alsoGroupTracker.get(elementName));
-                    group.setBelongsTo(elemNew);
-                    elemGroupTracker.remove(alsoGroupTracker.get(elementName));
+                    LogicalGroup.in(context).getAll().forEach(gr -> {
+                        if(alsoGroupTracker.get(elementName).equals(gr.getSw_element()))
+                            {gr.setBelongsTo(elemNew);}
+                    });
                 }
 
 
@@ -275,7 +276,6 @@ public final class GraphParser {
                      if(group.getSw_element().equals(logName) && Element.in(context).NameExists(elemName))
                         {group.setBelongsTo(Element.in(context).get(elemName));}
                  });
-
                  alsoGroupTracker.put(elemName, logName);
                 }
             catch (IllegalArgumentException e) {

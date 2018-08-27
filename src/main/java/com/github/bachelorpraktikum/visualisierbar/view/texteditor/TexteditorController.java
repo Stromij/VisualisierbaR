@@ -169,10 +169,6 @@ public class TexteditorController {
                                                             }
                                                          PDFData pdfData = new PDFData(model, attri);
 
-
-                                                         //pdfViewer.funnyHighlight(183, 190);
-
-
                                                          if(pdfData.getAllMatches().size() == 1)    // Es wurde nur ein Treffer gefunden
                                                             {openPDFWithHighlight(pdfData, 0);}
                                                          else
@@ -258,6 +254,8 @@ public class TexteditorController {
         {PDFViewer pdfViewer = new PDFViewer(pdfData.getLocation(indiz));
          pdfViewer.setPage(pdfData.getStartPage(indiz));
          pdfViewer.highlight(pdfData.getStartPage(indiz),pdfData.getEndPage(indiz),pdfData.getStartY(indiz), pdfData.getEndY(indiz));
+
+         // pdfViewer.funnyHighlight(170, 190);
         }
 
 

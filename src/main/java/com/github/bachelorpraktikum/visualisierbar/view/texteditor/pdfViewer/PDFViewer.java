@@ -6,9 +6,15 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
 import java.util.ArrayList;
-import org.icepdf.core.pobjects.Page;
+import java.util.HashMap;
+import java.util.Hashtable;
+
+import org.icepdf.core.pobjects.*;
+import org.icepdf.core.pobjects.actions.Action;
+import org.icepdf.core.pobjects.actions.GoToAction;
 import org.icepdf.core.pobjects.annotations.*;
 import org.icepdf.core.pobjects.graphics.text.LineText;
+import org.icepdf.core.util.Library;
 import org.icepdf.ri.common.ComponentKeyBinding;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
@@ -39,6 +45,8 @@ public class PDFViewer {
         // Verberge die Toolbar und setzte den View-Mode auf Seitenfortlaufend
         controller.setToolBarVisible(false);
         controller.setPageViewMode(0,true);
+
+        generateCSV();
     }
 
 
@@ -49,6 +57,10 @@ public class PDFViewer {
      */
     public void setPage(int page)
         {controller.showPage(page);}
+
+
+    public Document getDocument()
+        {return controller.getDocument();}
 
 
     /**
@@ -103,7 +115,8 @@ public class PDFViewer {
 
 
     /**
-     * Helps to find highlighting Positions
+     * Helps to find highlighting Positions (Coordinates). Prints the text of a PDf
+     * to the console and add the Coordinates of each Line
      * @param pageStart page where the search should start
      * @param pageEnd page where the search should end
      */
@@ -136,5 +149,18 @@ public class PDFViewer {
         }
         return at;
     }
+
+
+    /**
+     * Tries to generate the CSV automatically
+     */
+    public void generateCSV()
+        {Catalog cat = controller.getDocument().getCatalog();
+            System.out.println(cat.toString());
+
+            System.out.println(cat.getOutlines().getRootOutlineItem().getTitle());
+            System.out.println(cat.getOutlines().getEntries().size());
+            controller.setUtilityPaneVisible(true);
+        }
 
 }
