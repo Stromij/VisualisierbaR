@@ -52,12 +52,12 @@ public class AbsSource implements DataSource {
         String OS = System.getProperty("os.name").toLowerCase();
         String fileToConsole = "/bin/bash";
         String c = "-c";
-        String printConsole = String.format("source /etc/bash.bashrc; rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run -l 5 > %sactual.zug;", command, this.parent.getPath());
+        String printConsole = String.format("source /etc/bash.bashrc; rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run > %sactual.zug;", command, this.parent.getPath());
 
         if(OS.contains("win"))
             {fileToConsole = "cmd.exe";
              c = "/c";
-             printConsole = String.format("rmdir gen\\erlang /S /Q; %s; cd gen\\erlang; ./run -l 5 > %s/actual.zug;", command, this.parent.getPath());
+             printConsole = String.format("rmdir gen\\erlang /S /Q; %s; cd gen\\erlang; ./run > %s/actual.zug;", command, this.parent.getPath());
             }
 
 
