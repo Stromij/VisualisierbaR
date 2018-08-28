@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,15 +65,29 @@ public class AbsSource implements DataSource {
         builder.directory(new File(this.parent.getPath()));
         builder.command(fileToConsole, c, printConsole);
 
+
         // Debugging Output (Ausgabe der Konsolenrückgabe)
-        // builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
+        //builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
 
         Process process = builder.start();
 
+        String outputLineFromCommand;
+        BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        while ((outputLineFromCommand = inputStream.readLine()) != null) {
+            // This will be displayed in the console...
+            System.out.println(outputLineFromCommand);
+
+            try {
+                process.waitFor(700, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        inputStream.close();
 
 
         try {
-            int exitCode = process.waitFor();
+            boolean exitCode = process.waitFor(700, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
