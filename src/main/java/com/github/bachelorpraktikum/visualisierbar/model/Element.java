@@ -116,6 +116,8 @@ public final class Element implements GraphObject<Shape> {
         ),
         SwWechsel("SwWechselImpl",
             "SwWechselImpl", "SwWechselImpl2", "SwWechselImpl3", "SwWechselImpl4"),
+        Zs10("Zs10", "Zs10"),
+        Ne5("Ne5", "Ne5"),
         UnknownElement("", Rectangle::new);
 
         private final String logName;
@@ -763,6 +765,18 @@ public final class Element implements GraphObject<Shape> {
                      highName, highName, edge, highName, addElem);
                       //name, name, Kantenname, addElem
             }
+         if(getType() == Type.Zs10)
+            {// [HTTPName: "zs1"]Zs10 zs1 = new local Zs10(e15, "ss2");
+             return String.format("[HTTPName: \"%s\"]Zs10 %s = new local Zs10(%s, \"%s\");\n%s",
+                    highName, highName, edge, highName, addElem);
+            }
+
+         if(getType() == Type.Ne5)
+            {// [HTTPName: "ne"]Ne5 zs1 = new local Ne5(60, "nesig2, False, el067, "ne");
+             return "";
+             // Unkown Paramter
+            }
+
          return "";
         }
 
