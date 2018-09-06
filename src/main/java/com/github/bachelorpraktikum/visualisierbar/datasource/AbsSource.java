@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ResourceBundle;
@@ -60,6 +61,7 @@ public class AbsSource implements DataSource {
              printConsole = String.format("rmdir gen\\erlang /S /Q; %s; cd gen\\erlang; ./run > %s/actual.zug;", command, this.parent.getPath());
             }
 
+        System.out.println(printConsole);
 
         ProcessBuilder builder = new ProcessBuilder();
         builder.directory(new File(this.parent.getPath()));
@@ -67,27 +69,36 @@ public class AbsSource implements DataSource {
 
 
         // Debugging Output (Ausgabe der Konsolenrückgabe)
-        //builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
+        builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
 
         Process process = builder.start();
 
-        String outputLineFromCommand;
-        BufferedReader inputStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        while ((outputLineFromCommand = inputStream.readLine()) != null) {
-            // This will be displayed in the console...
-            System.out.println(outputLineFromCommand);
+        // System zum Abbrechen, wenn die Simulation durchgelaufen ist.
 
-            try {
-                process.waitFor(700, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        PrintStream stdout = System.out;
+
+        System.setOut(new PrintStream(System.out) {
+            Timestamp newTimestamp;
+
+            public void println(String s) {
+                if(newTimestamp == null) {startObservation();}
+                newTimestamp = new Timestamp(System.currentTimeMillis());
+                super.println(s); super.println("here");
             }
-        }
-        inputStream.close();
 
+            public void startObservation()
+                {Runnable runnable = () -> {
+                    while(newTimestamp.getTime() + 1000 > new Timestamp(System.currentTimeMillis()).getTime()) {}
+                    if(process.isAlive()) {process.destroy();}
+                    System.setOut(stdout);
+                };
+                 Thread thread = new Thread(runnable);
+                 thread.start();
+                }
+        });
 
         try {
-            boolean exitCode = process.waitFor(700, TimeUnit.MILLISECONDS);
+            int exitCode = process.waitFor();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
