@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,7 +70,7 @@ public class AbsSource implements DataSource {
 
 
         // Debugging Output (Ausgabe der Konsolenrückgabe)
-        builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
+        // builder.redirectErrorStream(true).redirectOutput(ProcessBuilder.Redirect.INHERIT); //Process out auf stdout zum testen
 
         Process process = builder.start();
 
@@ -83,19 +84,32 @@ public class AbsSource implements DataSource {
             public void println(String s) {
                 if(newTimestamp == null) {startObservation();}
                 newTimestamp = new Timestamp(System.currentTimeMillis());
-                super.println(s); super.println("here");
+                super.print(s); super.println(" here");
             }
 
             public void startObservation()
-                {Runnable runnable = () -> {
-                    while(newTimestamp.getTime() + 1000 > new Timestamp(System.currentTimeMillis()).getTime()) {}
-                    if(process.isAlive()) {process.destroy();}
-                    System.setOut(stdout);
+                {Runnable runnable = () -> {super.println("started Observation");
+                 long aktTime = System.currentTimeMillis();
+                 while(newTimestamp == null || newTimestamp.getTime() + 2000 > aktTime) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println(newTimestamp.getTime() - aktTime);
+                    aktTime = System.currentTimeMillis();
+                 }
+                 if(process.isAlive()) {process.destroy();}
+                 super.println("destroyed");
+                 System.setOut(stdout);
                 };
                  Thread thread = new Thread(runnable);
                  thread.start();
                 }
         });
+
+        StreamGobbler outputGobbler = new StreamGobbler(process.getInputStream(), System.out::println);
+        new Thread(outputGobbler).start();
 
         try {
             int exitCode = process.waitFor();
@@ -107,6 +121,22 @@ public class AbsSource implements DataSource {
 
 
         return file;
+    }
+
+
+
+    class StreamGobbler implements Runnable {
+        private InputStream inputStream;
+        private Consumer<String> consumeInputLine;
+
+        public StreamGobbler(InputStream inputStream, Consumer<String> consumeInputLine) {
+            this.inputStream = inputStream;
+            this.consumeInputLine = consumeInputLine;
+        }
+
+        public void run() {
+            new BufferedReader(new InputStreamReader(inputStream)).lines().forEach(consumeInputLine);
+        }
     }
 
     private Context parseFile() throws IOException {

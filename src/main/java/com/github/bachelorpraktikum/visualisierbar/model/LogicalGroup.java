@@ -479,7 +479,7 @@ public class LogicalGroup {
              return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n%s.setLogical(%s);\n%s\n",
                     name, name, rowOfElements, limit, name, belongOut, name, addElem);}
 
-         return "// Type of logical group not supported";
+         return "// Type of logical group not supported\n";
         }
 
     /**
