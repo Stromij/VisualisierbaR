@@ -676,9 +676,10 @@ public final class Element implements GraphObject<Shape> {
                      highName, highName, node.higherName(), highName, addElem);
             }
          if(getType() == Type.HauptSignal)
-            {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33, "hs3");
-             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s, \"%s\");\n%s",
-                     highName, highName, node.higherName(), edge, highName, addElem);
+            {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33, "s11", "hs3");
+             String group = logicalGroup.getName();
+             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s, \"%s\", \"%s\");\n%s",
+                     highName, highName, node.higherName(), edge, group, highName, addElem);
                       //name, name, Nodename, Kantenname, addElem, name
             }
          if(getType() == Type.GefahrenPunkt)
@@ -706,7 +707,7 @@ public final class Element implements GraphObject<Shape> {
                 //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.SwWechsel)
-            {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1, "ch5");
+            {// [HTTPName: "ch5"]SwWechsel ch5 = new SwWechselImpl(zfst1, e16, "ch5");
              // Suche in deltaContent nach dem Element um die zfst zu übernehmen.
              String zfst = "null /*missing zfst!*/";
              if(deltaContent != null)
@@ -717,14 +718,15 @@ public final class Element implements GraphObject<Shape> {
                      }
                  catch(IllegalStateException ignored) {/*Falls SwWechsel in alter Datei nicht gefunden werden konnte*/}
                 }
-             return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s, \"%s\");\n%s",
-                     highName, highName, zfst, highName, addElem);
+             return String.format("[HTTPName: \"%s\"]SwWechsel %s = new SwWechselImpl(%s, %s, \"%s\");\n%s",
+                     highName, highName, zfst, edge, highName, addElem);
                       //name, name, zfst, name, addElem
             }
          if(getType() == Type.VorSignal)
             {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21, "vs2");
-             return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s, \"%s\");\n%s",
-                     highName, highName, edge, highName, addElem);
+             String group = logicalGroup.getName();
+             return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s, \"%s\", \"%s\");\n%s",
+                     highName, highName, edge, group, highName, addElem);
                       //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.Magnet)
