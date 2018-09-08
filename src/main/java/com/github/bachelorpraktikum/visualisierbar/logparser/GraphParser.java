@@ -91,6 +91,7 @@ public final class GraphParser {
         private HashMap<String, Edge> elemViewTracker;
         private HashMap<String, LogicalGroup> elemGroupTracker;
         private HashMap<String, String> alsoGroupTracker;
+        private HashMap<String, Extra> extraTracker;
 
         Listener(Context context) {
             this.context = context;
@@ -98,6 +99,7 @@ public final class GraphParser {
             elemViewTracker = new HashMap<>();
             elemGroupTracker = new HashMap<>();
             alsoGroupTracker = new HashMap<>();
+            extraTracker = new HashMap<>();
         }
 
         private int createTime(LogParser.TimeContext ctx) {
@@ -172,6 +174,11 @@ public final class GraphParser {
                     });
                 }
 
+                if(extraTracker.get(elementName) != null) {
+                    elemNew.setExtra(extraTracker.get(elementName));
+                    extraTracker.remove(elementName);
+                }
+
 
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
@@ -238,6 +245,9 @@ public final class GraphParser {
                     case "LIMITER":
                         kind = LogicalGroup.Kind.LIMITER;
                         break;
+                    case "GENERIC":
+                        kind = LogicalGroup.Kind.GENERIC;
+                        break;
                     default:
                         kind = LogicalGroup.Kind.DEFAULT;
                         break;
@@ -296,6 +306,22 @@ public final class GraphParser {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
                 );
+            }
+        }
+
+        @Override
+        public void enterExtra(LogParser.ExtraContext ctx) {
+            String name = ctx.elem_name().getText();
+
+            //Falls das Element schon angelegt wurde:
+            if(Element.in(context).NameExists(name)) {
+                Element elem = Element.in(context).get(name);
+                elem.setExtra(new Extra(Integer.parseInt(ctx.value().getText()), ctx.name().getText(), ctx.bool().getText()));
+            }
+
+            //Falls das Element noch nicht angelegt wurde:
+            else {
+                extraTracker.put(name, new Extra(Integer.parseInt(ctx.value().getText()), ctx.name().getText(), ctx.bool().getText()));
             }
         }
 
