@@ -764,9 +764,50 @@ public final class Element implements GraphObject<Shape> {
                         highName, highName, highName, addElem);
             }
          if(getType() == Type.SichtbarkeitsPunkt)
-            {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15, "ss2");
-             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new local SichtbarkeitsPunktImpl(%s, \"%s\");\n%s",
-                     highName, highName, edge, highName, addElem);
+            {// [HTTPName: "ss2"]SichtbarkeitsPunkt ss2 = new local SichtbarkeitsPunktImpl(e15, 300, "ss2");
+             String distance = null;
+
+             if(logicalGroup != null){                              // Wenn die Logische Gruppe gesetzt ist, kann daraus die Distanz vom Sichtbarkeitspunkt zum Vorsignal errechnet werden
+                 // Suche Vorsignal, Annahme: Es ist nur eine Edge (!) zwischen Vorsignal und Sichtbarkeitspunkt und keine weiteren Nodes oder Edges!
+                 // VS o--------------o SP okay, VS o---------o---------o SP nicht okay!
+                 // Annahme: Es gibt nur zwei Edges vom SP aus! Eine zum VS und eine in die andere Richtung, in die der SP gerichtet ist!
+                 if(direction != null){
+                    for(Edge e : node.getEdges()){
+                        if(e.getNode1().equals(node) && e.getNode2().equals(direction) ||
+                           e.getNode2().equals(node) && e.getNode1().equals(direction)
+                        ) {continue;}
+                        distance = String.valueOf(e.getLength());
+                        break;
+                    }
+
+                 }
+
+
+                 /*for(Edge e : node.getEdges()) {                                        // Durchsuche alle Edges des Nodes, auf dem der SP sitzt:
+                    if(e.getNode1().equals(node) && distance == null) {                 // Der Node 1 ist der gleiche, auf dem der SP sitzt
+                        for(Element element : e.getNode2().getElements()){
+                            if(element.getLogicalGroup() != null && element.getLogicalGroup().equals(logicalGroup) && element.getType().equals(Type.VorSignal))
+                                {distance = String.valueOf(e.getLength()); break;}
+                        }
+                    }
+                    else if(e.getNode2().equals(node) && distance == null)  {           // Der Node 2 ist der gleiche, auf dem der SP sitzt
+                        for(Element element : e.getNode1().getElements()){
+                            if(element.getLogicalGroup() != null && element.getLogicalGroup().equals(logicalGroup) && element.getType().equals(Type.VorSignal))
+                                {distance = String.valueOf(e.getLength()); break;}
+                        }
+                    }
+                    else if(distance != null)
+                        {break;}
+
+                 }*/
+             }
+
+             if(distance == null){
+                 distance = "0 /*missing distance*/";
+             }
+
+             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new local SichtbarkeitsPunktImpl(%s, %s, \"%s\");\n%s",
+                     highName, highName, edge, distance, highName, addElem);
                       //name, name, Kantenname, addElem
             }
          if(getType() == Type.Zs10)
