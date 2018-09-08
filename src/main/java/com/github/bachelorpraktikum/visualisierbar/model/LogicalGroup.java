@@ -32,7 +32,7 @@ public class LogicalGroup {
 
 
     public enum Kind {
-        SIGNAL, SWITCH, LIMITER, DEFAULT
+        SIGNAL, SWITCH, LIMITER, GENERIC, DEFAULT
     }
 
     /**
@@ -304,6 +304,19 @@ public class LogicalGroup {
                 {return "Warning: This element already exists in LogicalGroup!";}
              return null;
             }
+         if(type == Kind.GENERIC)
+            {if(!(elem.getType() == Type.Ne5 || elem.getType() == Type.SichtbarkeitsPunkt))
+                {return "Error: A SpeedLimiter does not contain a " + elem.getReadableName();}
+             for(Element e : elements) {
+                 if(e.getType() == elem.getType()){
+                     return  "Error: LogicalGroup contains already a " + elem.getType().getName() +"!";
+                 }
+             }
+             if(!addElement(elem))
+                {return "Warning: This element already exists in LogicalGroup!";}
+             return null;
+            }
+
          return "Error: Unknown group-type!";
         }
 
@@ -477,7 +490,43 @@ public class LogicalGroup {
                 }
 
              return String.format("[HTTPName: \"%s\"]SpeedLimiter %s = new SpeedLimiterImpl(%s%s, \"%s\");\n%s.setLogical(%s);\n%s\n",
-                    name, name, rowOfElements, limit, name, belongOut, name, addElem);}
+                    name, name, rowOfElements, limit, name, belongOut, name, addElem);
+            }
+
+
+         if(type == Kind.GENERIC)
+            {// Observable obs1 = new GenericObservable(spn1, ne1, "nesig1");
+
+             // Suche den Sichtbarkeitspunkt
+             String sichtbarkeitspunkt = "null /*missing Sichtbarkeitspunkt*/";
+             for(Element e : elements)
+                {if(e.getType() == Type.SichtbarkeitsPunkt)
+                    {sichtbarkeitspunkt = e.higherName();
+                     break;
+                    }
+                }
+
+             // Suche den Ne5
+             String ne5 = "null /*missing Ne5*/";
+             for(Element e : elements) {
+                 if(e.getType() == Type.Ne5) {
+                     ne5 = e.higherName();
+                     break;
+                }
+             }
+
+             // Suche nach dem ABS-Namen des SW-Elements
+             String sw_e = sw_element;
+             for(Element e : elements.get(0).getGraph().getElements().keySet()) {
+                 if(e.getName().equals(sw_e)){
+                     sw_e = e.higherName(); break;
+                }
+             }
+
+
+             return String.format("[HTTPName: \"%s\"]Observable %s = new GenericObservable(%s, %s, \"%s\");\n",
+                        sw_e, sw_e, sichtbarkeitspunkt, ne5, name);
+            }
 
          return "// Type of logical group not supported\n";
         }

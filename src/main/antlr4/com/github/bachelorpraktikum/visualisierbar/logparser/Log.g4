@@ -9,6 +9,7 @@ elements:         node
                 | view
                 | logicalGroup
                 | also
+                | extra
                 | train
                 | mv_init
                 | mv_leaves
@@ -30,6 +31,8 @@ view: 'TOWARDS' SEP elem_name SEP edge_name;
 logicalGroup: 'GROUP' SEP kind SEP log_name SEP sw_name SEP (elem_name SEP)*;
 
 also: 'ALSO' SEP elem_name SEP log_name;
+
+extra: 'EXTRA' SEP elem_name SEP value SEP name SEP bool;
 
 train: 'ZUG' SEP train_name SEP train_readable_name SEP INT;
 
@@ -73,6 +76,8 @@ time_with_wrapper: 'Time' '(' time ')';
 message: any+;
 any: ~(NEWLINE | SEP);
 error_char: .;
+value: INT;
+bool: 'False' | 'True';
 
 
 STATE:   NOSIG

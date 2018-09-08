@@ -84,11 +84,11 @@ public class AbsSource implements DataSource {
             public void println(String s) {
                 if(newTimestamp == null) {startObservation();}
                 newTimestamp = new Timestamp(System.currentTimeMillis());
-                super.print(s); super.println(" here");
+                // super.print(s);  // Consume Console-Output. Only for debugging
             }
 
             public void startObservation()
-                {Runnable runnable = () -> {super.println("started Observation");
+                {Runnable runnable = () -> {super.println("Started process observation.");
                  long aktTime = System.currentTimeMillis();
                  while(newTimestamp == null || newTimestamp.getTime() + 2000 > aktTime) {
                     try {
@@ -100,8 +100,7 @@ public class AbsSource implements DataSource {
                     aktTime = System.currentTimeMillis();
                  }
                  if(process.isAlive()) {process.destroy();}
-                 super.println("destroyed");
-                 System.setOut(stdout);
+                 super.println("Destroyed process due to running out of time.");
                 };
                  Thread thread = new Thread(runnable);
                  thread.start();
@@ -113,6 +112,7 @@ public class AbsSource implements DataSource {
 
         try {
             int exitCode = process.waitFor();
+            System.setOut(stdout);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

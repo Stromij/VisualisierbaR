@@ -58,6 +58,8 @@ public final class Element implements GraphObject<Shape> {
     private LogicalGroup logicalGroup;
     @Nullable
     private String absName;
+    @Nullable
+    private Extra extra;
 
     /**
      * Represents the state of an {@link Element}.
@@ -774,9 +776,21 @@ public final class Element implements GraphObject<Shape> {
             }
 
          if(getType() == Type.Ne5)
-            {// [HTTPName: "ne"]Ne5 zs1 = new local Ne5(60, "nesig2, False, el067, "ne");
-             return "";
-             // Unkown Paramter
+            {// [HTTPName: "ne1"]Ne5 ne1 = new Ne5(60, "nesig1", False, e067a, "ne1");
+             //Defaultwerte setzten
+             int value = 0;
+             String addName = "/*missing Additional Name*/";
+             String bool = "False/*missing boolean*/";
+
+             //Defaultwerte überschreiben, falls vorhanden
+             if(extra != null)
+                {value = extra.getNumber();
+                 addName = extra.getAdditionalName();
+                 bool = extra.getBool();
+                }
+
+             return String.format("[HTTPName: \"%s\"]Ne5 %s = new local Ne5(%s, \"%s\", %s, %s, \"%s\");\n%s",
+                        highName, highName, String.valueOf(value), addName, bool, edge, highName, addElem);
             }
 
          return "";
@@ -863,4 +877,7 @@ public final class Element implements GraphObject<Shape> {
                 + '}';
         }
     }
+
+    public void setExtra(Extra ex)
+        {extra = ex;}
 }
