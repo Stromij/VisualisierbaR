@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
@@ -78,6 +79,12 @@ public class Visualisierbar extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setResources(localizationBundle);
 
+        primaryStage.setOnCloseRequest(event -> {
+            log.info("Stage is closing");
+            Platform.exit();
+
+        });
+
         if (getParameters().getUnnamed().contains("--live")
             || getParameters().getUnnamed().contains("--pipe")) {
             log.info("Loading...");
@@ -98,6 +105,7 @@ public class Visualisierbar extends Application {
             loader.load();
             MainController controller = loader.getController();
             controller.setDataSource(dataSource);
+
             controller.setStage(primaryStage);
 
         } else {
@@ -109,7 +117,6 @@ public class Visualisierbar extends Application {
             SourceController controller = loader.getController();
             controller.setStage(primaryStage);
         }
-
         primaryStage.show();
     }
 
