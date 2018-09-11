@@ -1088,6 +1088,7 @@ public class MainController {
     }
 
     private Event selectClosestLogEntry(int time) {
+        if (logList.getItems().size() == 0) {return null;}
         Event event = logList.getItems().get(getLastEventIndex(time));
         selectEvent(event);
         return event;
