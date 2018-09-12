@@ -174,6 +174,9 @@ public final class Element implements GraphObject<Shape> {
             if (this == Magnet) {
                 shape.setRotate(180);
             }
+            if (this == Ne5) {
+                shape.setScaleX(0.5);
+            }
             return shape;
         }
 

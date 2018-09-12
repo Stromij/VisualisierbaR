@@ -29,6 +29,7 @@ public final class Elements {
                     break;
                 case SichtbarkeitsPunkt:
                 case GefahrenPunkt:
+                case Ne5:
                     if (element.getGraph()!=null) {count++; break;}
                     shapes.add(new RotatedDefaultOffsetElement(element, node, adapter, count++));
                     break;
@@ -50,6 +51,7 @@ public final class Elements {
                 case VorSignal:
                 case HauptSignal:
                 case GeschwindigkeitsAnzeiger:
+                case Zs10:
                     if (element.getGraph()!=null) break;
                     compositeElements.add(element);
                     break;
