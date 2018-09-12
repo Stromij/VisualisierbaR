@@ -24,6 +24,7 @@ final class CompositeElement extends ElementBase<Group> {
     private static final double ELEMENT_SPACING = 0.7;
     private static final double GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR = 0.5;
     private static final double FOOT_HEIGHT = 0.5;
+    private static final double ZS10_WIDTH_FACTOR = 0.4;
 
     private final Map<Element, Shape> shapes;
     private final List<ChangeListener<Element.State>> stateListeners;
@@ -151,6 +152,9 @@ final class CompositeElement extends ElementBase<Group> {
                 break;
             case GeschwindigkeitsVoranzeiger:
                 maxWidth *= GESCHWINDIGKEITS_ANZEIGER_WIDTH_FACTOR;
+                break;
+            case Zs10:
+                maxWidth *= ZS10_WIDTH_FACTOR;
                 break;
             default:
                 break;
