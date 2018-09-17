@@ -42,7 +42,7 @@ public class Visualisierbar extends Application {
         licenceInfo.setContentText("MIT License\n"
             + "\n"
             + "Copyright (c) 2016 Torben Carstens, Björn Petersen, Yannick Roder, Christian Schaarschmidt, Johannes Semsch\n"
-            + "Copyright (c) 2018 Chrisoph Speh, Jonas Stromberg, Safae Lamharzi\n"
+            + "Copyright (c) 2018 Christoph Speh, Jonas Stromberg, Safae Lamharzi\n"
             + "\n"
             + "Permission is hereby granted, free of charge, to any person obtaining a copy\n"
             + "of this software and associated documentation files (the \"Software\"), to deal\n"

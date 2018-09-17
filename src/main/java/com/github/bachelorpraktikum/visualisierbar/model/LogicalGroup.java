@@ -515,15 +515,6 @@ public class LogicalGroup {
                 }
              }
 
-             // Suche nach dem ABS-Namen des SW-Elements
-             String sw_e = sw_element;
-             for(Element e : elements.get(0).getGraph().getElements().keySet()) {
-                 if(e.getName().equals(sw_e)){
-                     sw_e = e.higherName(); break;
-                }
-             }
-
-
              return String.format("[HTTPName: \"%s\"]Observable %s = new GenericObservable(%s, %s, \"%s\");\n",
                         name, name, sichtbarkeitspunkt, ne5, name);
             }
