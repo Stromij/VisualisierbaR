@@ -784,25 +784,6 @@ public final class Element implements GraphObject<Shape> {
                     }
 
                  }
-
-
-                 /*for(Edge e : node.getEdges()) {                                        // Durchsuche alle Edges des Nodes, auf dem der SP sitzt:
-                    if(e.getNode1().equals(node) && distance == null) {                 // Der Node 1 ist der gleiche, auf dem der SP sitzt
-                        for(Element element : e.getNode2().getElements()){
-                            if(element.getLogicalGroup() != null && element.getLogicalGroup().equals(logicalGroup) && element.getType().equals(Type.VorSignal))
-                                {distance = String.valueOf(e.getLength()); break;}
-                        }
-                    }
-                    else if(e.getNode2().equals(node) && distance == null)  {           // Der Node 2 ist der gleiche, auf dem der SP sitzt
-                        for(Element element : e.getNode1().getElements()){
-                            if(element.getLogicalGroup() != null && element.getLogicalGroup().equals(logicalGroup) && element.getType().equals(Type.VorSignal))
-                                {distance = String.valueOf(e.getLength()); break;}
-                        }
-                    }
-                    else if(distance != null)
-                        {break;}
-
-                 }*/
              }
 
              if(distance == null){
