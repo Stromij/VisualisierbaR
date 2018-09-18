@@ -1641,8 +1641,6 @@ public class MainController {
              MainController controller = loader.getController();
 
              controller.setStage(stage);
-             controller.setDataSource(newAbsSource);
-             System.out.println("Source: " + newAbsSource.getFileToAbsSource().toString());
 
              textController.getStage().close();
              stage.show();
