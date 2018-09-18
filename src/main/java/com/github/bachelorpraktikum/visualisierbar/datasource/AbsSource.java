@@ -252,7 +252,6 @@ public class AbsSource implements DataSource {
 
     public File refactorSource(@Nullable Graph graph, @Nullable File destDir)
         {if(destDir == null) {
-            //TODO Main ersetzten
             destDir = new File( parent.getPath().concat(String.valueOf(System.currentTimeMillis())).concat("-").concat(name));
             if(!copyFiles(destDir)) {return null;}
          }
@@ -430,7 +429,9 @@ public class AbsSource implements DataSource {
         }
 
     @Override
-    public void close(){ }
+    public void close(){
+        // TODO copy to result-File
+        }
 
     public String getProduct()
         {return product;}

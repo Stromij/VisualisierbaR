@@ -1487,7 +1487,9 @@ public class MainController {
 
 
     private void cleanUp() {
-        stage.setMaximized(false);
+        if(stage != null)
+            {stage.setMaximized(false);}
+
         if (graph != null) {
             simulation.stop();
             graphPane.getChildren().clear();
@@ -1569,6 +1571,7 @@ public class MainController {
      * Installs the Texteditor
      */
     private void startTexteditor(){
+        System.out.println(absSource);
         if(absSource == null) return;
         FXMLLoader loader = new FXMLLoader(TexteditorController.class.getResource("TexteditorView.fxml"));
         ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
@@ -1589,6 +1592,14 @@ public class MainController {
         textController.setParent(this);
 
         editorStage.show();
+        if(!editorStage.isShowing()) {
+            System.out.println("showing not");
+            editorStage.show();
+            if(!editorStage.isShowing())
+                {reopenTextEditorButton.setManaged(true);
+                 reopenTextEditorButton.setVisible(true);
+                }
+        }
 
         stage.requestFocus();
 
@@ -1614,8 +1625,7 @@ public class MainController {
 
          // Versuche den neuen ABs-Code zu kompilieren
          String command = String.format("absc -v -product=%s -erlang %s/*.abs -d %sgen/erlang/", absSource.getProduct(), newAbsFile, absSource.getParent().getPath());
-         try {
-             AbsSource newAbsSource = new AbsSource(command, newAbsFile, absSource.getProduct());
+         try {AbsSource newAbsSource = new AbsSource(command, newAbsFile, absSource.getProduct());
 
              // Die DataSource konnte nicht verarbeitet werden, da bspw. ein Syntaxerror vorlag
              if (com.github.bachelorpraktikum.visualisierbar.model.Node.in(newAbsSource.getContext()).getAll().isEmpty()) {
@@ -1640,6 +1650,7 @@ public class MainController {
              // erstelle aus dem Loader einen neuen MainController
              MainController controller = loader.getController();
 
+             controller.setDataSource(newAbsSource);
              controller.setStage(stage);
 
              textController.getStage().close();

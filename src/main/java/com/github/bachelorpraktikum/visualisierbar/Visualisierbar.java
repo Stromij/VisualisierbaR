@@ -81,7 +81,6 @@ public class Visualisierbar extends Application {
 
         primaryStage.setOnCloseRequest(event -> {
             log.info("Stage is closing");
-            // TODO copy to result-File
             System.out.println("closing");
             Platform.exit();
         });
