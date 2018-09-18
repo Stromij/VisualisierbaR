@@ -352,8 +352,8 @@ public class AbsSource implements DataSource {
                 fw.close();
                 fr.close();
                 br.close();
-                System.out.println("----- newCode start -----");
-                System.out.println(newCode);
+                // System.out.println("----- newCode start -----");
+                // System.out.println(newCode);
 
                 System.out.println("----- ABS start -----");
                 System.out.println(nodeAbs.concat("\n").replace("\t\t", ""));
