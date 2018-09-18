@@ -700,15 +700,17 @@ public final class Element implements GraphObject<Shape> {
                       //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.GeschwindigkeitsAnzeiger)
-            {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21, "vs2");
-             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new GeschwindigkeitsAnzeigerImpl(%s, \"%s\");\n%s",
-                     highName, highName, edge, highName, addElem);
+            {// [HTTPName: "vs2"]GeschwindigkeitsAnzeiger vs2 = new local GeschwindigkeitsAnzeigerImpl(e21, 11, "vs2");
+             int speed = extra != null ? extra.getNumber() : 0;
+             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsAnzeiger %s = new GeschwindigkeitsAnzeigerImpl(%s, %d, \"%s\");\n%s",
+                     highName, highName, edge, speed, highName, addElem);
                 //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.GeschwindigkeitsVoranzeiger)
-            {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21, "vs2");
-                return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVorAnzeiger %s = new GeschwindigkeitsVorAnzeigerImpl(%s, \"%s\");\n%s",
-                        highName, highName, edge, highName, addElem);
+            {// [HTTPName: "vs2"]GeschwindigkeitsVoranzeiger vs2 = new local GeschwindigkeitsVoranzeiger(e21, 11, "vs2");
+             int speed = extra != null ? extra.getNumber() : 0;
+             return String.format("[HTTPName: \"%s\"]GeschwindigkeitsVorAnzeiger %s = new GeschwindigkeitsVorAnzeigerImpl(%s, %d, \"%s\");\n%s",
+                    highName, highName, edge, speed, highName, addElem);
                 //name, name, Kantenname, name, addElem
             }
          if(getType() == Type.SwWechsel)
