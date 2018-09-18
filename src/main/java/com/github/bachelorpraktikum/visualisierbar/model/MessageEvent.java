@@ -91,6 +91,8 @@ final class MessageEvent implements Event {
             return;
         }
 
+        System.out.println(getNode().getAbsName());
+
         javafx.scene.Node node = nodeResolve.apply(getNode());
         Dialog<Void> dialog = new Dialog<>();
         dialog.initModality(Modality.NONE);
