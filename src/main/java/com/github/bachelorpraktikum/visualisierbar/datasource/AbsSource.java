@@ -90,11 +90,13 @@ public class AbsSource implements DataSource {
      * @throws IOException throws an Error, when the Input is not valid e.g. it's not an ABS-File
      */
     private File compileABS(String command) throws IOException {
-        File file = new File(String.format("%sactual.zug", this.parent.getPath()));
+        File file = new File(String.format("%s/actual.zug", fileToAbsSource.toString()));
         String OS = System.getProperty("os.name").toLowerCase();
         String fileToConsole = "/bin/bash";
         String c = "-c";
-        String printConsole = String.format("source /etc/bash.bashrc; rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run > %sactual.zug;", command, this.parent.getPath());
+        String printConsole = String.format("source /etc/bash.bashrc; rm -r gen/erlang/*; %s; cd ./gen/erlang; ./run > %s;", command, file.toString());
+        System.out.println(printConsole);
+
 
         if(OS.contains("win"))
             {fileToConsole = "cmd.exe";
