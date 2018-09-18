@@ -133,7 +133,7 @@ public class AbsSource implements DataSource {
             public void startObservation()
                 {Runnable runnable = () -> {super.println("Started process observation.");
                  long aktTime = System.currentTimeMillis();
-                 while(newTimestamp == null || newTimestamp.getTime() + 5000 > aktTime) {
+                 while(newTimestamp == null || newTimestamp.getTime() + 10000 > aktTime) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -325,7 +325,7 @@ public class AbsSource implements DataSource {
                 // Füge alles, dessen Löschung ungewiss ist ein
                 while((zeile = br.readLine()) != null)
                     {if (zeile.toLowerCase().contains("grid end")) {break;}
-                     if (!(zeile.contains("new local") || zeile.contains(".add") || zeile.contains(".set") || zeile.contains("SpeedLimiter") || zeile.replaceAll("(\t| )*", "").length() <= 2 || zeile.contains("//"))) {
+                     if (!(zeile.contains("new") || zeile.contains(".add") || zeile.contains(".set") || zeile.contains("SpeedLimiter") || zeile.replaceAll("(\t| )*", "").length() <= 2 || zeile.contains("//"))) {
                         boolean found = false;
                         for (Element.Type t : Element.Type.values()) {
                             if (zeile.toLowerCase().contains(t.getName().toLowerCase())) found = true;

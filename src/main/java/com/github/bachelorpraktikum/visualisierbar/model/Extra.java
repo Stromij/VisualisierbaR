@@ -3,6 +3,7 @@ package com.github.bachelorpraktikum.visualisierbar.model;
 public class Extra {
 
     //Ne5 ne1 = new Ne5(60, "nesig1", False, el056, "ne1");
+    // Geschwindigkeitsanzeiger -> Maximageschwindigkeit, nur number
 
     private int number;
     private String additionalName;

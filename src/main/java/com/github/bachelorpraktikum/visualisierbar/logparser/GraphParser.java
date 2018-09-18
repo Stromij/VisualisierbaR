@@ -212,14 +212,19 @@ public final class GraphParser {
         public void enterView(LogParser.ViewContext ctx)
             {try {String edgeName = ctx.edge_name().getText();
                   String elemName = ctx.elem_name().getText();
+                  int speed = ctx.speed() != null ? Integer.valueOf(ctx.speed().getText()) : -1;
                   Edge edge1 = Edge.in(context).get(edgeName);
                   // Versuche die Edge zu finden - falls nicht vorhanden, schiebe sie in die HashMap
                   try{Element elem1 = Element.in(context).get(elemName);
                       Node viewNode = elem1.getNode().equals(edge1.getNode1()) ? edge1.getNode2() : edge1.getNode1();
                       elem1.setDirection(viewNode);
+                      if(speed != -1)
+                        {elem1.setExtra(new Extra(speed, null, null));}
                      }
                   catch (IllegalArgumentException e)
-                     {elemViewTracker.put(elemName, edge1);}
+                     {elemViewTracker.put(elemName, edge1);
+                      extraTracker.put(elemName, new Extra(speed, null, null));
+                     }
                  }
              catch (IllegalArgumentException e){
                 log.warning("Could not parse line: " + ctx.getText()

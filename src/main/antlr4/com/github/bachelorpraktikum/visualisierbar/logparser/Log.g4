@@ -26,7 +26,7 @@ edge: 'EDGE' SEP edge_name SEP node_name SEP node_name SEP INT (SEP edge_abs_nam
 
 elem: 'ELEM' SEP elem_name SEP node_name SEP STATE (SEP elem_abs_name)?;
 
-view: 'TOWARDS' SEP elem_name SEP edge_name;
+view: 'TOWARDS' SEP elem_name SEP edge_name (SEP speed)?;
 
 logicalGroup: 'GROUP' SEP kind SEP log_name SEP sw_name SEP (elem_name SEP)*;
 
