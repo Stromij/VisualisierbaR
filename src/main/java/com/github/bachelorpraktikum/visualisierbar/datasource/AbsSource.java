@@ -46,7 +46,6 @@ public class AbsSource implements DataSource {
             long milis = System.currentTimeMillis();
             String copyCommand = String.format("source /etc/bash.bashrc; rm -r %s/origin/*; mkdir -p %s/origin/%s-%s/; cp -rf %s/*  %s/origin/%s-%s/",
                     originalFile.getParent(), originalFile.getParent(), milis, originalFile.getName(), originalFile.toString(), originalFile.getParent(), milis, originalFile.getName());
-            System.out.println(copyCommand);
             String fileToConsole = "/bin/bash";
             String c = "-c";
 
@@ -103,10 +102,7 @@ public class AbsSource implements DataSource {
              printConsole = String.format("rmdir gen\\erlang /S /Q; %s; cd gen\\erlang; ./run > %s/actual.zug;", command, this.parent.getPath());
             }
 
-        System.out.println(printConsole);
-
         ProcessBuilder builder = new ProcessBuilder();
-        System.out.println(parent);
         builder.directory(new File(this.parent.getPath()));
         builder.command(fileToConsole, c, printConsole);
 
@@ -356,7 +352,7 @@ public class AbsSource implements DataSource {
                 fw.close();
                 fr.close();
                 br.close();
-             System.out.println("----- newCode start -----");
+                System.out.println("----- newCode start -----");
                 System.out.println(newCode);
 
                 System.out.println("----- ABS start -----");
