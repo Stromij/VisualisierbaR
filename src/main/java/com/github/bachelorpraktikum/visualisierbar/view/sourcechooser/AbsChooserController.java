@@ -178,8 +178,8 @@ public class AbsChooserController implements SourceChooser<AbsSource>{
 
         if(fileUriProperty.get() != null && productProperty.get() != null)
             {String parent = new File(fileUriProperty.getValue().getPath()).getParentFile().toString();
-             command = String.format("absc -v -product=%s -erlang %s*.abs -d %s/gen/erlang/",
-                    productProperty.get(), fileUriProperty.getValue().getPath(), parent);}
+             command = String.format("absc -v -product=%s -erlang %%s/*.abs -d %%s/gen/erlang/",
+                    productProperty.get(), parent);}
 
         completeProperty.set(command);
     }

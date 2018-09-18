@@ -24,23 +24,65 @@ import static java.util.regex.Pattern.compile;
 public class AbsSource implements DataSource {
 
 
+    private final File originalFile;
     private final File fileToAbs;
     private final File fileToAbsSource;
     private final Context context;
     private final URI parent;
     private final String product;
 
+    private final String name;
+
     private ArrayList<String> delta;
 
 
     public AbsSource(String command, File path, String product) throws IOException {
-        this.parent = new File(path.getParent()).toURI();
-        this.fileToAbs = compileABS(command);
-        this.fileToAbsSource = path;
+        // Problem: beim recompile ist er schon in Origin und legt wieder ein Origin an!
+
+        this.originalFile = path;
+
+        if(!path.toString().contains("origin")) {           // Falls er nicht im Origin-Ordner arbeitet
+            // Kopiere den Originaldatensatz in den orign-Ordner
+            long milis = System.currentTimeMillis();
+            String copyCommand = String.format("source /etc/bash.bashrc; rm -r %s/origin/*; mkdir -p %s/origin/%s-%s/; cp -rf %s/*  %s/origin/%s-%s/",
+                    originalFile.getParent(), originalFile.getParent(), milis, originalFile.getName(), originalFile.toString(), originalFile.getParent(), milis, originalFile.getName());
+            System.out.println(copyCommand);
+            String fileToConsole = "/bin/bash";
+            String c = "-c";
+
+            ProcessBuilder builder = new ProcessBuilder();
+            builder.directory(this.originalFile);
+            builder.command(fileToConsole, c, copyCommand);
+
+            Process p = builder.start();
+
+            try {
+                p.waitFor();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            fileToAbsSource = new File(String.format("%s/origin/%s-%s/", originalFile.getParent(), milis, originalFile.getName()));
+        }
+
+        else
+            {fileToAbsSource = path;}
+
+        // Setzte restliche Paramter
+
+        this.parent = new File(fileToAbsSource.getParent()).toURI();
         this.product = product;
+
+        //Kompiliere
+        if(command.contains("%s"))
+            {command = String.format(command, fileToAbsSource.toString(), fileToAbsSource.getParent());}
+        this.fileToAbs = compileABS(command);
 
         this.context = parseFile();
         this.delta = new ArrayList<>();
+
+        int posOfName = path.getName().indexOf("-") == -1 ? 0 : path.getName().indexOf("-") + 1;
+        name = path.getName().substring(posOfName);
+        System.out.println(name);
     }
 
     /**
@@ -65,6 +107,7 @@ public class AbsSource implements DataSource {
         System.out.println(printConsole);
 
         ProcessBuilder builder = new ProcessBuilder();
+        System.out.println(parent);
         builder.directory(new File(this.parent.getPath()));
         builder.command(fileToConsole, c, printConsole);
 
@@ -90,7 +133,7 @@ public class AbsSource implements DataSource {
             public void startObservation()
                 {Runnable runnable = () -> {super.println("Started process observation.");
                  long aktTime = System.currentTimeMillis();
-                 while(newTimestamp == null || newTimestamp.getTime() + 2000 > aktTime) {
+                 while(newTimestamp == null || newTimestamp.getTime() + 5000 > aktTime) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -99,8 +142,11 @@ public class AbsSource implements DataSource {
                     System.out.println(newTimestamp.getTime() - aktTime);
                     aktTime = System.currentTimeMillis();
                  }
-                 if(process.isAlive()) {process.destroy();}
-                 super.println("Destroyed process due to running out of time.");
+                 if(process.isAlive()) {
+                     process.destroy();
+                     super.println("Destroyed process due to running out of time.");
+                 }
+
                 };
                  Thread thread = new Thread(runnable);
                  thread.start();
@@ -142,6 +188,9 @@ public class AbsSource implements DataSource {
     private Context parseFile() throws IOException {
         return new GraphParser().parse(fileToAbs.getPath());
     }
+
+    public String getNameOfOriginal()
+        {return name;}
 
     @Nonnull
     @Override
@@ -209,10 +258,8 @@ public class AbsSource implements DataSource {
 
     public File refactorSource(@Nullable Graph graph, @Nullable File destDir)
         {if(destDir == null) {
-            destDir = new File(fileToAbsSource.toString().concat("_new"));
-            for (int i = 1; destDir.exists(); i++) {
-                destDir = new File(fileToAbsSource.toString().concat("_new_" + i));
-            }
+            //TODO Main ersetzten
+            destDir = new File( parent.getPath().concat(String.valueOf(System.currentTimeMillis())).concat("-").concat(name));
             if(!copyFiles(destDir)) {return null;}
          }
 
