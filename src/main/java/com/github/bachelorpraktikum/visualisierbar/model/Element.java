@@ -677,13 +677,13 @@ public final class Element implements GraphObject<Shape> {
 
          if(getType() == Type.WeichenPunkt)
             {// [HTTPName: "w1_wa"]WeichenPunkt w1_wa = new local WeichenPunktImpl(n10, "w1_wa");
-             return String.format("[HTTPName: \"%s\"]WeichenPunkt %s = new local WeichenPunktImpl(%s, \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]WeichenPunkt %s = new WeichenPunktImpl(%s, \"%s\");\n%s",
                      highName, highName, node.higherName(), highName, addElem);
             }
          if(getType() == Type.HauptSignal)
             {// [HTTPName: "hs3"]HauptSignal hs3 = new local HauptSignalImpl(n34, e33, "s11", "hs3");
              String group = logicalGroup.getName();
-             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new local HauptSignalImpl(%s, %s, \"%s\", \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]HauptSignal %s = new HauptSignalImpl(%s, %s, \"%s\", \"%s\");\n%s",
                      highName, highName, node.higherName(), edge, group, highName, addElem);
                       //name, name, Nodename, Kantenname, addElem, name
             }
@@ -695,7 +695,7 @@ public final class Element implements GraphObject<Shape> {
                     {addElem = ""; break;}
                 }
 
-             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new local GefahrenPunktImpl(%s, \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]GefahrenPunkt %s = new GefahrenPunktImpl(%s, \"%s\");\n%s",
                      highName, highName, edge, highName, addElem);
                       //name, name, Kantenname, name, addElem
             }
@@ -732,7 +732,7 @@ public final class Element implements GraphObject<Shape> {
          if(getType() == Type.VorSignal)
             {// [HTTPName: "vs2"]VorSignal vs2 = new local VorSignalImpl(e21, "vs2");
              String group = logicalGroup.getName();
-             return String.format("[HTTPName: \"%s\"]VorSignal %s = new local VorSignalImpl(%s, \"%s\", \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]VorSignal %s = new VorSignalImpl(%s, \"%s\", \"%s\");\n%s",
                      highName, highName, edge, group, highName, addElem);
                       //name, name, Kantenname, name, addElem
             }
@@ -792,13 +792,13 @@ public final class Element implements GraphObject<Shape> {
                  distance = "0 /*missing distance*/";
              }
 
-             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new local SichtbarkeitsPunktImpl(%s, %s, \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]SichtbarkeitsPunkt %s = new SichtbarkeitsPunktImpl(%s, %s, \"%s\");\n%s",
                      highName, highName, edge, distance, highName, addElem);
                       //name, name, Kantenname, addElem
             }
          if(getType() == Type.Zs10)
             {// [HTTPName: "zs1"]Zs10 zs1 = new local Zs10(e15, "ss2");
-             return String.format("[HTTPName: \"%s\"]Zs10 %s = new local Zs10(%s, \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]Zs10 %s = new Zs10(%s, \"%s\");\n%s",
                     highName, highName, edge, highName, addElem);
             }
 
@@ -816,7 +816,7 @@ public final class Element implements GraphObject<Shape> {
                  bool = extra.getBool();
                 }
 
-             return String.format("[HTTPName: \"%s\"]Ne5 %s = new local Ne5(%s, \"%s\", %s, %s, \"%s\");\n%s",
+             return String.format("[HTTPName: \"%s\"]Ne5 %s = new Ne5(%s, \"%s\", %s, %s, \"%s\");\n%s",
                         highName, highName, String.valueOf(value), addName, bool, edge, highName, addElem);
             }
 

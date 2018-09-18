@@ -37,7 +37,7 @@ public class AbsSource implements DataSource {
 
 
     public AbsSource(String command, File path, String product) throws IOException {
-        // Problem: beim recompile ist er schon in Origin und legt wieder ein Origin an!
+
 
         this.originalFile = path;
 
@@ -82,7 +82,6 @@ public class AbsSource implements DataSource {
 
         int posOfName = path.getName().indexOf("-") == -1 ? 0 : path.getName().indexOf("-") + 1;
         name = path.getName().substring(posOfName);
-        System.out.println(name);
     }
 
     /**
@@ -133,7 +132,7 @@ public class AbsSource implements DataSource {
             public void startObservation()
                 {Runnable runnable = () -> {super.println("Started process observation.");
                  long aktTime = System.currentTimeMillis();
-                 while(newTimestamp == null || newTimestamp.getTime() + 10000 > aktTime) {
+                 while((newTimestamp == null || newTimestamp.getTime() + 10000 > aktTime) && process.isAlive()) {
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -162,9 +161,6 @@ public class AbsSource implements DataSource {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-
-
 
         return file;
     }

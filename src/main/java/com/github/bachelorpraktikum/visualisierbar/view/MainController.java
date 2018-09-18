@@ -1255,6 +1255,7 @@ public class MainController {
                 alert.showAndWait();
             }
 
+            cleanUp();
             initializeDataSource(source);
 
             String secondComp = graph.printToAbs();

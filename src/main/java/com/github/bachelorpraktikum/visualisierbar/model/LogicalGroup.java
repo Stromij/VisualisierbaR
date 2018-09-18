@@ -515,8 +515,8 @@ public class LogicalGroup {
                 }
              }
 
-             return String.format("[HTTPName: \"%s\"]Observable %s = new GenericObservable(%s, %s, \"%s\");\n",
-                        name, name, sichtbarkeitspunkt, ne5, name);
+             return String.format("[HTTPName: \"%s\"]Observable %s = new GenericObservable(%s, %s, \"%s\");\n%s\n",
+                        name, name, sichtbarkeitspunkt, ne5, name, addElem);
             }
 
          return "// Type of logical group not supported\n";
