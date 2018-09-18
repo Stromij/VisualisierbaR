@@ -430,8 +430,27 @@ public class AbsSource implements DataSource {
 
     @Override
     public void close(){
-        // TODO copy to result-File
+        String copyCommand = String.format("source /etc/bash.bashrc; rm -r %s/res/*; mkdir -p %s/res/%s/; cp -rf %s/*.abs  %s/res/%s/",
+                fileToAbsSource.getParentFile().getParent(), fileToAbsSource.getParentFile().getParent(), name, fileToAbsSource.toString(), fileToAbsSource.getParentFile().getParent(), name);
+        String fileToConsole = "/bin/bash";
+        String c = "-c";
+
+        ProcessBuilder builder = new ProcessBuilder();
+        builder.directory(this.originalFile);
+        builder.command(fileToConsole, c, copyCommand);
+
+
+
+        try {
+            Process p = builder.start();
+            p.waitFor();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public String getProduct()
         {return product;}
