@@ -21,6 +21,9 @@ import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCel
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.TexteditorController;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFData;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFDataLines;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFSelectionWindow;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
@@ -50,6 +53,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -105,6 +109,8 @@ public class MainController {
     private Button closeButton;
     @FXML
     private Button reopenTextEditorButton;
+    @FXML
+    private Button openPDFButton;
     @FXML
     private Button playButton;
     @FXML
@@ -284,6 +290,8 @@ public class MainController {
         fireOnEnterPress(logToggle);
         fireOnEnterPress(editorToggle);
         closeButton.setOnAction(event -> showSourceChooser());
+
+        // Doing some Texteditor related things
         reopenTextEditorButton.setOnAction(event -> {
             startTexteditor();
             reopenTextEditorButton.setManaged(false);
@@ -292,6 +300,16 @@ public class MainController {
         reopenTextEditorButton.setManaged(false);
         reopenTextEditorButton.setVisible(false);
 
+
+        // Doing some openPdf related things
+        openPDFButton.setOnAction(event -> {
+            ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
+
+            PDFSelectionWindow psw = new PDFSelectionWindow();
+            psw.display();
+        });
+
+        // Doing some PrintToAbs related things
         printToABSButton.setOnAction(event -> {
             if(graph != null && absSource != null)
                 {absSource.refactorSource(graph, newAbsFile);
@@ -311,6 +329,7 @@ public class MainController {
             simulationTime.set(Context.INIT_STATE_TIME);
             selectClosestLogEntry(Context.INIT_STATE_TIME);
         });
+
         infoButton.setOnAction(event -> showLicenceInfo());
 
         resetViewButton.setOnAction(event -> resetGraphView());
