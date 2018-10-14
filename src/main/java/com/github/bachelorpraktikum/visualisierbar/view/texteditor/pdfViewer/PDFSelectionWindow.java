@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.ColumnConstraints;
@@ -83,6 +84,10 @@ public class PDFSelectionWindow {
         // Generiere die leere Übersichtstabelle
         TableView table = new TableView();
 
+        // Passe das Layout ein wenig an
+        table.setStyle("-fx-selection-bar: lightblue; -fx-selection-bar-non-focused: lightblue;");
+        System.out.println(table.getStyle());
+
         TableColumn nameColumn = new TableColumn(bundle.getString("guideline"));
         nameColumn.setCellValueFactory(
                 new PropertyValueFactory<PDFSelectionLines,String>("name")
@@ -97,7 +102,7 @@ public class PDFSelectionWindow {
             tableRow.setOnMouseClicked(e -> {
                 if (! tableRow.isEmpty() && e.getButton()== MouseButton.PRIMARY
                         && e.getClickCount() == 2) {
-                    PDFViewer pdfViewer = new PDFViewer(new File(PDF_DIRECTORY.concat(tableRow.getItem().getName())));
+                    openPDFViewer(new File(PDF_DIRECTORY.concat(tableRow.getItem().getName())));
                 }
             });
             return tableRow ;
@@ -122,18 +127,55 @@ public class PDFSelectionWindow {
         vbox.getChildren().addAll(pane, table);
 
 
+        // Nur für Dinge, die bei einem gedrückten Key sich wieder holen sollen!
+        textField.addEventHandler(KeyEvent.ANY, event -> {
+            // Fange die Up- and Down-Keys um die Selection hoch oder runter zu bewegen. Ziehe dabei, falls nötg, den
+            // Scroll nach.
+            int actualSelectedRow = table.getSelectionModel().getSelectedIndex();
+            if(event.getCode() == KeyCode.DOWN && actualSelectedRow + 1 < table.getItems().size()){
+                table.requestFocus();
+                table.getSelectionModel().clearAndSelect(actualSelectedRow + 1);
+            }
+            else if(event.getCode() == KeyCode.UP  && actualSelectedRow - 1 >= 0) {
+                table.requestFocus();
+                table.getSelectionModel().clearAndSelect(actualSelectedRow - 1);
+            }
+
+            // Sollte das Suchtextfeld textField nicht leer sein und das obige nicht zutreffen, selectiere standardmäßig
+            // den obersten Eintrag
+            else if(textField.getText().length() > 0 && actualSelectedRow == -1) {
+                table.getSelectionModel().clearAndSelect(0);
+                table.scrollTo(0);
+            }
+        });
+
+
+        // Nur für Dinge, die beim Loslassen eines Keys getan werden sollen!
         // Füge dem Fenster einen Listener für beliebigen Key hinzu, um Schnellsuche zu aktivieren
         textField.addEventHandler(KeyEvent.KEY_RELEASED, event -> {
 
-            //TODO catch up and down Keys for navigation to table -> Usability
-
+            // Suche alle PDFs die den gesuchten String aus textField im Dateinamen enthalten und speichere sie in seachedDataLines
             ObservableList<PDFSelectionLines> searchedDataLines = FXCollections.observableArrayList();
             for (PDFSelectionLines l: dataLines) {
                 if(l.name.getValue().toLowerCase().contains(textField.getText().toLowerCase()))
                     {searchedDataLines.add(l);}
             }
 
+            // Lade die gefundenen Daten in die Tabelle
             table.setItems(searchedDataLines);
+
+            // Sollte der UP-Key gedrückt worden sein, dann setze den Cursor ans Ende des Suchbegriffes im Textfeld,
+            // da der Cursor sonst an den Anfang des Suchbegriffes springt
+            if(event.getCode() == KeyCode.UP){
+                textField.positionCaret(textField.getText().length());
+            }
+
+            // Sollte ein Enter gedrückt worden sein, öffne die PDF-Datei, die ganz oben ist und dank des vorherigen
+            // Befehls nun makiert ist.
+            if(event.getCode() == KeyCode.ENTER){
+               PDFSelectionLines selectedLine =  (PDFSelectionLines) table.getSelectionModel().getSelectedItem();
+               openPDFViewer(new File(PDF_DIRECTORY.concat(selectedLine.getName())));
+            }
         });
 
 
@@ -143,12 +185,28 @@ public class PDFSelectionWindow {
         alert.setHeaderText(bundle.getString("found_pdf"));
         alert.getDialogPane().setContent(vbox);
         alert.getDialogPane().addEventHandler(KeyEvent.KEY_PRESSED, event-> {
+
+            // Falls ESC gedrückt wurde schließe das Fenster, da es sonst keine Shortcut Close-Operation gibt.
+            if(event.getCode() == KeyCode.ESCAPE)
+                {alert.close();}
+
+            // Hole den Focus des Cursors auf das Suchfeld textField
             textField.requestFocus();
+            textField.positionCaret(textField.getText().length());
         });
+
+        // Lösche die Default Close-Operation vom Yes-Button um ein Enter-Hit für die Suche fangen zu können.
+        Button yesButton = (Button) alert.getDialogPane().lookupButton(ButtonType.OK);
+        yesButton.setDefaultButton(false);
+
+        // Zeige den Dialog
         alert.showAndWait();
     }
 
 
+    private void openPDFViewer (File file){
+        new PDFViewer(file);
+    }
 
 
 
@@ -157,7 +215,7 @@ public class PDFSelectionWindow {
 
         private SimpleStringProperty name;
 
-        public PDFSelectionLines(String name) {
+        PDFSelectionLines(String name) {
             this.name = new SimpleStringProperty(name);
         }
 
