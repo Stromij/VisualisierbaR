@@ -303,11 +303,10 @@ public class MainController {
 
         // Doing some openPdf related things
         openPDFButton.setOnAction(event -> {
-            ResourceBundle bundle = ResourceBundle.getBundle("bundles.localization");
-
             PDFSelectionWindow psw = new PDFSelectionWindow();
             psw.display();
         });
+        TooltipUtil.install(openPDFButton, new Tooltip(ResourceBundle.getBundle("bundles.localization").getString("openpdf") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.O.getName() + ")"));
 
         // Doing some PrintToAbs related things
         printToABSButton.setOnAction(event -> {
@@ -453,6 +452,8 @@ public class MainController {
                 }
                 if(event.getCode() == KeyCode.R && event.isControlDown())
                     {playButton.fire();}
+                if(event.getCode() == KeyCode.O && event.isControlDown())
+                    {openPDFButton.fire();}
                 if (event.getCode() == KeyCode.N && event.isControlDown()) {
                     newNodeButton.fire();
                 }

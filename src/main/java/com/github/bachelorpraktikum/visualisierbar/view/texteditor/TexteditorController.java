@@ -6,6 +6,7 @@ import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFData;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFDataLines;
+import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFSelectionWindow;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFViewer;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -61,6 +62,8 @@ public class TexteditorController {
     private Button undoButton;
     @FXML
     private TextField searchText;
+    @FXML
+    private Button openPDFButton;
 
     private JEditorPane editorPane;
     private SwingNode editorPaneNode;
@@ -143,6 +146,12 @@ public class TexteditorController {
                 }
         });
 
+        // Doing some openPdf related things
+        openPDFButton.setOnAction(event -> {
+            PDFSelectionWindow psw = new PDFSelectionWindow();
+            psw.display();
+        });
+
         //Konfiguriere das JEditorPane für Spezifikationen
         editorPane.addMouseListener(new MouseListener() {
                                         @Override
@@ -210,23 +219,26 @@ public class TexteditorController {
 
         // Füge Shortcuts hinzu
         rootPane.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (event.getCode() == KeyCode.Z && event.isControlDown()) { // Strg + Z
+            if (event.getCode() == KeyCode.Z && event.isControlDown()) { // Strg + Z        Zurück
                undoButton.fire();
             }
-            if (event.getCode() == KeyCode.Y && event.isControlDown()) { // Strg + Y
+            if (event.getCode() == KeyCode.Y && event.isControlDown()) { // Strg + Y        Vorwärts
                 redoButton.fire();
             }
-            if (event.getCode() == KeyCode.S && event.isControlDown()) { // Strg + S
+            if (event.getCode() == KeyCode.S && event.isControlDown()) { // Strg + S        Speichern
                 saveButton.fire();
             }
-            if (event.getCode() == KeyCode.R && event.isControlDown()) { // Strg + R
+            if (event.getCode() == KeyCode.R && event.isControlDown()) { // Strg + R        Recompile
                 playButton.fire();
             }
-            if (event.getCode() == KeyCode.L && event.isControlDown()) {  // Strg + L
+            if (event.getCode() == KeyCode.L && event.isControlDown()) {  // Strg + L       Go to Line
                 goToLine();
             }
-            if (event.getCode() == KeyCode.F && event.isControlDown()) {  // Strg + F
+            if (event.getCode() == KeyCode.F && event.isControlDown()) {  // Strg + F       Suche
                 searchText.requestFocus();
+            }
+            if (event.getCode() == KeyCode.O && event.isControlDown()) {  // Strg + O       Öffne PDF
+                openPDFButton.fire();
             }
         });
 
@@ -235,6 +247,7 @@ public class TexteditorController {
         TooltipUtil.install(redoButton, new Tooltip(bundle.getString("redo") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.Y.getName() + ")"));
         TooltipUtil.install(saveButton, new Tooltip(bundle.getString("save") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.S.getName() + ")"));
         TooltipUtil.install(playButton, new Tooltip(bundle.getString("recompile") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.R.getName() + ")"));
+        TooltipUtil.install(openPDFButton, new Tooltip(bundle.getString("openpdf") +  "(" + KeyCode.CONTROL.getName() + " + " + KeyCode.O.getName() + ")"));
         TooltipUtil.install(searchText, new Tooltip(bundle.getString("search")));
 
 

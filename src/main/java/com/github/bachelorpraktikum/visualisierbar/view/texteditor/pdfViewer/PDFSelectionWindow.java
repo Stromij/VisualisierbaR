@@ -84,10 +84,11 @@ public class PDFSelectionWindow {
         // Generiere die leere Übersichtstabelle
         TableView table = new TableView();
 
-        // Passe das Layout ein wenig an
+        // Passe das Layout ein wenig an, damit auch im Unfokussierten TableView die Zeile Blau selektiert werden kann
         table.setStyle("-fx-selection-bar: lightblue; -fx-selection-bar-non-focused: lightblue;");
-        System.out.println(table.getStyle());
 
+
+        // Füge die Tabellenspalten ein
         TableColumn nameColumn = new TableColumn(bundle.getString("guideline"));
         nameColumn.setCellValueFactory(
                 new PropertyValueFactory<PDFSelectionLines,String>("name")

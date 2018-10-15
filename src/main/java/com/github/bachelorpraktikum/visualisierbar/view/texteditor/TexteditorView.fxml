@@ -13,6 +13,7 @@
             <Button fx:id="playButton" text="" />
             <Button fx:id="redoButton" text="Redo" />
             <Button fx:id="undoButton" text="Undo" />
+            <Button fx:id="openPDFButton" text="%openpdf" />
             <Pane HBox.hgrow="ALWAYS" />
             <TextField fx:id="searchText" prefWidth="200.0" />
         </ToolBar>
