@@ -126,7 +126,8 @@ public final class GraphParser {
                 try {nodeAbsName = ctx.node_abs_name().getText();}
                 catch (NullPointerException e){nodeAbsName = null;}
                 Coordinates coordinates = createCoordinates(ctx.coord());
-                Node.in(context).create(nodeName, coordinates, nodeAbsName);
+                Node newNode = Node.in(context).create(nodeName, coordinates, nodeAbsName);
+                newNode.setOldName(newNode.higherName());
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()
@@ -200,7 +201,8 @@ public final class GraphParser {
                 String absName;
                 try {absName = ctx.edge_abs_name().getText();}
                 catch (NullPointerException e){absName = null;}
-                Edge.in(context).create(edgeName, length, node1, node2, absName);
+                Edge newEdge = Edge.in(context).create(edgeName, length, node1, node2, absName);
+                newEdge.setOldName(newEdge.higherName());
             } catch (IllegalArgumentException e) {
                 log.warning("Could not parse line: " + ctx.getText()
                     + "\nReason: " + e.getMessage()

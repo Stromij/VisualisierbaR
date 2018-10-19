@@ -40,7 +40,7 @@ public final class Element implements GraphObject<Shape> {
     private final ElementFactory factory;
     @Nonnull
     private String name;
-    @Nonnull
+    @Nullable
     private  String oldName;
     @Nonnull
     private final Node node;

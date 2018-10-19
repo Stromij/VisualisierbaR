@@ -49,6 +49,8 @@ public final class Node implements GraphObject<Circle> {
     private final BooleanProperty movedProperty;
     @Nullable
     private Graph graph;
+    @Nullable
+    private  String oldName;
 
 
     private Node(String name, Coordinates coordinates) {
@@ -59,7 +61,7 @@ public final class Node implements GraphObject<Circle> {
         this.elements = new HashSet<>();
         this.stateProperty = new SimpleObjectProperty<>();
         this.movedProperty = new SimpleBooleanProperty(false);
-        this.graph =null;
+        this.graph=null;
     }
 
     private Node(String name, Coordinates coordinates, @Nullable String absName) {
@@ -395,4 +397,8 @@ public final class Node implements GraphObject<Circle> {
     @Nonnull
     public String higherName()
         {return absName == null ? name : absName;}
+
+    public void setOldName(@Nullable String oldName) {this.oldName = oldName;}
+
+    public String getOldName() {return oldName;}
 }

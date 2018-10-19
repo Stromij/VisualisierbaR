@@ -6,15 +6,10 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.NoninvertibleTransformException;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 
 import org.icepdf.core.pobjects.*;
-import org.icepdf.core.pobjects.actions.Action;
-import org.icepdf.core.pobjects.actions.GoToAction;
 import org.icepdf.core.pobjects.annotations.*;
 import org.icepdf.core.pobjects.graphics.text.LineText;
-import org.icepdf.core.util.Library;
 import org.icepdf.ri.common.ComponentKeyBinding;
 import org.icepdf.ri.common.SwingController;
 import org.icepdf.ri.common.SwingViewBuilder;
@@ -45,8 +40,6 @@ public class PDFViewer {
         // Verberge die Toolbar und setzte den View-Mode auf Seitenfortlaufend
         controller.setToolBarVisible(false);
         controller.setPageViewMode(0,true);
-
-        generateCSV();
     }
 
 

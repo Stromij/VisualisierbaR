@@ -15,14 +15,13 @@ import com.github.bachelorpraktikum.visualisierbar.view.detail.DetailsController
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Graph;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.GraphShape;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.Junction;
+import com.github.bachelorpraktikum.visualisierbar.view.graph.Rail;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.ProportionalCoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.graph.adapter.SimpleCoordinatesAdapter;
 import com.github.bachelorpraktikum.visualisierbar.view.legend.LegendListViewCell;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.SourceController;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.TexteditorController;
-import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFData;
-import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFDataLines;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFSelectionWindow;
 import com.github.bachelorpraktikum.visualisierbar.view.train.TrainView;
 import javafx.animation.Animation;
@@ -53,7 +52,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -61,7 +59,6 @@ import javafx.scene.shape.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
@@ -210,7 +207,6 @@ public class MainController {
         HBox.setHgrow(rightSpacer, Priority.ALWAYS);
         listeners = new LinkedList<>();
 
-
         // START OF TIME RELATED INIT
 
 
@@ -351,6 +347,19 @@ public class MainController {
         editorToggle.selectedProperty().addListener((observable, oldValue, newValue) -> {
             if (graph == null) return;
             if (newValue) {
+
+                graph.getNodes().forEach((node, shape) -> {
+                    shape.getShape().setOnMousePressed(event -> {
+                        ((Junction) shape).mouseListener(event, this);
+                    });
+                });
+
+                graph.getEdges().forEach((edge, shape)-> {
+                    shape.getShape().setOnMousePressed(event -> {
+                        ((Rail) shape).mouseListener(event, this);
+                    });
+                });
+
 
                 if (!simulationStopWarning()) {
                     editorToggle.setSelected(false);
@@ -594,9 +603,9 @@ public class MainController {
                                             for(Element e: grp.getElements()){
                                                 groupCollector.put(e, newGrp);
                                             }
+
                                             // Gefahrenpunkte müssen seperat gehandelt werden, da sie nicht direkter Bestandteil
                                             // einer Gruppe sind und nur über das belongTo-Attribut der Gruppe erreichbar sind
-
                                             if(grp.getBelongsTo().getType() == Element.Type.GefahrenPunkt)
                                                 {// Wenn der Gefahrenpunkt schon kopiert wurde
                                                  if(alreadyCopiedElements.containsKey(grp.getBelongsTo()))
@@ -695,8 +704,6 @@ public class MainController {
             modelTime.setText(String.format(text, source.getTime()));
             continueSimulation.setDisable(false);
         });
-
-
     }
 
 
@@ -1591,7 +1598,6 @@ public class MainController {
      * Installs the Texteditor
      */
     private void startTexteditor(){
-        System.out.println(absSource);
         if(absSource == null) return;
         FXMLLoader loader = new FXMLLoader(TexteditorController.class.getResource("TexteditorView.fxml"));
         ResourceBundle localizationBundle = ResourceBundle.getBundle("bundles.localization");
@@ -1629,6 +1635,27 @@ public class MainController {
             reopenTextEditorButton.setVisible(true);
         });
     }
+
+
+    /**
+     * Opens a new Texteditor if one is not open. otherwise it will request the Focus on it
+     * @return the (newly) opened TexteditorController or null if the Texteditor could not be opened
+     */
+    @Nullable
+    public TexteditorController reOpenTexteditor(){
+        if(editorStage == null) {
+            this.startTexteditor();
+        }
+
+        if(editorStage != null) {
+            editorStage.requestFocus();
+        }
+
+        return editorStage == null? null : this.textController;
+    }
+
+    @Nullable
+    public AbsSource getAbsSource() {return this.absSource;}
 
     /**
      *  Recompile the edited ABS-Files and reopen the Mainview without the editor!

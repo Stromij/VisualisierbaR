@@ -41,6 +41,8 @@ public final class Edge implements GraphObject<Line> {
     private final Property<VisibleState> stateProperty;
     @Nullable
     private Graph graph;
+    @Nullable
+    private  String oldName;
 
    private Edge(String name, int length, Node node1, Node node2) {
         this.name = Objects.requireNonNull(name);
@@ -440,4 +442,8 @@ public final class Edge implements GraphObject<Line> {
     @Nonnull
     public String higherName()
         {return absName == null ? name : absName;}
+
+    public void setOldName(@Nullable String oldName) {this.oldName = oldName;}
+
+    public String getOldName() {return oldName;}
 }

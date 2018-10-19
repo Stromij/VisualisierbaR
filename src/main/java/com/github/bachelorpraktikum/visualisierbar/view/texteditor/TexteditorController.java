@@ -3,24 +3,19 @@ package com.github.bachelorpraktikum.visualisierbar.view.texteditor;
 import com.github.bachelorpraktikum.visualisierbar.abslexer.SyntaxLexer;
 import com.github.bachelorpraktikum.visualisierbar.view.MainController;
 import com.github.bachelorpraktikum.visualisierbar.view.TooltipUtil;
-import com.github.bachelorpraktikum.visualisierbar.view.sourcechooser.AbsLines;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFData;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFDataLines;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFSelectionWindow;
 import com.github.bachelorpraktikum.visualisierbar.view.texteditor.pdfViewer.PDFViewer;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -40,7 +35,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javafx.scene.paint.Paint;
+
+import static java.util.regex.Pattern.compile;
 
 public class TexteditorController {
 
@@ -272,6 +272,9 @@ public class TexteditorController {
         }
 
 
+
+
+    // TODO auslagern und mit PDFSelectionWindow zusammenfassen
     private void generateGuidelineChooser(PDFData pdfData) {
          Label label = new Label(bundle.getString("found_hits"));
 
@@ -616,6 +619,122 @@ public class TexteditorController {
 
 
     /**
+     * Highlights a whole line with the given keyword in a given delta
+     * @param deltas the deltas which schould be search through
+     * @param keyword the keyword wich schould appear in a line
+     */
+    public void highlightLinesWithKeyWord(ArrayList<String> deltas, String keyword) {
+        GridHighlighter greenHighlighter = new GridHighlighter(new Color(255, 246, 168));
+        String content = editorPane.getText();
+
+        int startGreen = 0;
+        int endGreen = 0;
+        int startDelta = 0;
+        int endDelta = 0;
+
+        Label runLabel = null;
+
+        for(Label l : labels) {
+            if(l.getText().equals("Run.abs"))
+                {runLabel = l; break;}
+        }
+
+        // Zeige die Datei ./Run.abs an
+        openOnLab(runLabel, new File(fileOfAbs.getName().concat("/Run.abs")));
+
+
+        // für jeden Eintrag in deltas durchsuche den Code
+        for(String d : deltas) {
+            if(!content.contains("delta "  +d)) {continue;}
+
+            startDelta = content.indexOf("delta "  +d);
+            endDelta = content.indexOf("delta ", startDelta + 1);
+
+            String deltaContent = content.substring(startDelta, endDelta);
+
+            // Parameter für Suche
+            Matcher matcher;
+
+            // Das in dieser Funktion gesuchte Keyword darf nicht teil eines anderen Wortes sein!
+            Pattern patternDeltaLines = compile("[^a-zA-Z0-9]" + keyword + "[^a-zA-Z0-9]");
+
+            // Suche
+            matcher = patternDeltaLines.matcher(deltaContent);
+            matcher.find();
+
+            // Berechnung der Koordinaten für das Highlight
+            startGreen = content.lastIndexOf("\n", startDelta + matcher.start()) + 1;
+            endGreen = content.indexOf("\n", startDelta + matcher.start()) + 1;
+
+            // Fall, dass das Highlight ganz am Ende der Datei ist, dann gibt es kein letzten Zeilenumbruch!
+            endGreen = endGreen == 0 ? content.length() : endGreen;
+
+            // Positionsberechnung für das Suchergebnis im Window. Vorzugsweise in der oberen Hälfte des Bildschirmes,
+            // sagen wir mal 20 Zeilen vom Bildschirmrand.
+            String lines = content.substring(startGreen);
+            int startCursor = 0;
+            for(int  i = 0; i <= 20; i++){
+                startCursor += lines.indexOf("\n") + 1;
+                if(startCursor == -1){
+                    break;
+                }
+                lines = lines.substring(lines.indexOf("\n") + 1);
+            }
+
+            if(startCursor == -1){
+                startCursor = content.length();
+            }
+            else{
+                startCursor = startGreen + startCursor;
+            }
+
+            // Füge das highlight hinzu und setzte den Cursor darauf, damit der Scroll automatisch dahin springt
+
+            editorPane.setCaretPosition(startCursor);
+
+            //TODO Cursor in die Zeile zurücksetzten ohne Scroll. Mit setCaretPosition oder moveCaretPosition nicht möglich!
+
+
+            try {
+                editorPane.getHighlighter().addHighlight(startGreen, endGreen, greenHighlighter);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+
+    private void openOnLab(Label lab, File f) {
+        // Wechsel den Background und lade den editierten Inhalt in die HashMap
+        if(actualLab != lab)
+        {lab.setStyle("-fx-background-color: lightblue");
+            if(actualLab != null)
+            {actualLab.setStyle(null);
+                if(content.containsKey(actualLab.getText()))
+                {if(!content.get(actualLab.getText()).equals(editorPane.getText()))
+                {his.insert(new File(fileOfAbs.toString().concat(actualLab.getText())), new StringBuffer(editorPane.getText()), editorPane.getCaretPosition());}
+                    content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));
+                }
+            }
+            actualLab = lab;
+        }
+
+        StringBuffer buffer = new StringBuffer();
+
+
+        // Lade aus der Datei, oder falls vorhanden aus der HashMap die Daten
+        if(!content.containsKey(f.getName())) {
+            buffer = loadFile(f);
+        }
+
+        else
+        {buffer = content.get(f.getName());}
+
+        setDocumentToPane(lex.lex(buffer.toString()), 0);
+    }
+
+    /**
      * Sets the path to the ABS-Directory, displays its content as labels at the left hand side of the editor
      * and adds Listeners to the labels to switch the content of the EditorPane and the style of the choosen
      * input-File
@@ -642,32 +761,7 @@ public class TexteditorController {
 
              // Listener für Maus-Klicks: Der user möchte eine andere Datei sehen
              lab.setOnMouseClicked((event -> {
-                    // Wechsel den Background und lade den editierten Inhalt in die HashMap
-                    if(actualLab != lab)
-                        {lab.setStyle("-fx-background-color: lightblue");
-                         if(actualLab != null)
-                             {actualLab.setStyle(null);
-                              if(content.containsKey(actualLab.getText()))
-                                  {if(!content.get(actualLab.getText()).equals(editorPane.getText()))
-                                      {his.insert(new File(fileOfAbs.toString().concat(actualLab.getText())), new StringBuffer(editorPane.getText()), editorPane.getCaretPosition());}
-                                   content.replace(actualLab.getText(), new StringBuffer(editorPane.getText()));
-                                  }
-                             }
-                         actualLab = lab;
-                        }
-
-                    StringBuffer buffer = new StringBuffer();
-
-
-                    // Lade aus der Datei, oder falls vorhanden aus der HashMap die Daten
-                    if(!content.containsKey(f.getName())) {
-                        buffer = loadFile(f);
-                    }
-
-                    else
-                        {buffer = content.get(f.getName());}
-
-                 setDocumentToPane(lex.lex(buffer.toString()), 0);
+                    openOnLab(lab, f);
              }));
 
              // Lade die Startdatei Run.abs beim Öffnen des Editors in das JEditorPane
